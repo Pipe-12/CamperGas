@@ -28,7 +28,7 @@ jobs:
       - name: Set up Android Emulator API 35
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 35
+          api-level: 34
           script: ./gradlew connectedCheck  # Ejecutar pruebas de instrumentación
 
       # Paso 4: Subir los informes de las pruebas (v3.1.0)
