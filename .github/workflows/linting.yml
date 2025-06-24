@@ -1,0 +1,39 @@
+name: Linting
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Paso 1: Checkout del código
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Paso 2: Configurar JDK 17 (Temurin)
+      - name: Set up JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Paso 3: Ejecutar Ktlint
+      - name: Run Ktlint
+        run: ./gradlew ktlintCheck
+
+      # Paso 4: Ejecutar Detekt
+      - name: Run Detekt
+        run: ./gradlew detekt
+
+      # Paso 5: Subir informes de lint (v3.1.0)
+      - name: Upload Lint Reports
+        uses: actions/upload-artifact@v3.1.0  # Actualizado a v3.1.0
+        with:
+          name: lint-reports
+          path: app/build/reports
