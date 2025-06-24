@@ -1,0 +1,39 @@
+name: Instrumentation Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    steps:
+      # Paso 1: Checkout del código
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Paso 2: Configurar JDK 17 (Temurin)
+      - name: Set up JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Paso 3: Configurar emulador de Android API Level 35
+      - name: Set up Android Emulator API 35
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          script: ./gradlew connectedCheck  # Ejecutar pruebas de instrumentación
+
+      # Paso 4: Subir los informes de las pruebas (v3.1.0)
+      - name: Upload Test Reports
+        uses: actions/upload-artifact@v3.1.0  # Actualizado a v3.1.0
+        with:
+          name: test-reports
+          path: app/build/reports/androidTests/connected
