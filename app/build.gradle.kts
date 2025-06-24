@@ -61,7 +61,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Hilt
-    val hiltVersion = "2.50"
+    val hiltVersion = "2.56.2"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     ksp("com.google.dagger:hilt-compiler:$hiltVersion")
     ksp("androidx.hilt:hilt-compiler:1.0.0")
