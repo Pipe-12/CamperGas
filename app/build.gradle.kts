@@ -72,7 +72,7 @@ dependencies {
     ksp("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     // BLE Nordic
-    implementation("no.nordicsemi.android:ble:2.6.1")
+    implementation("no.nordicsemi.android:ble:2.10.1")
     implementation("no.nordicsemi.android.support.v18:scanner:1.6.0")
 
     // Jetpack Compose
