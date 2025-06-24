@@ -56,6 +56,10 @@ jobs:
       - name: Set up Gradle
         uses: gradle/wrapper-validation-action@v1
 
+      # Paso par hacer ejecutble gradlew
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
       # Paso para construir el proyecto
       - name: Build with Gradle
         run: ./gradlew build
