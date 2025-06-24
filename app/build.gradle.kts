@@ -67,7 +67,7 @@ dependencies {
     ksp("androidx.hilt:hilt-compiler:1.0.0")
 
     // Room
-    val roomVersion = "2.6.1"
+    val roomVersion = "2.7.2"
     implementation("androidx.room:room-runtime:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
