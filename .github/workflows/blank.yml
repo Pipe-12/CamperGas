@@ -1,69 +1,90 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
-      # Paso para hacer checkout del código
+      # Clona el repositorio
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Paso para configurar el JDK 17
+      # Configura Java JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          java-package: jdk 
+          java-package: jdk
           distribution: 'temurin'
 
-      # Paso para instalar el SDK de Android 35
+      # Instala el Android SDK 35 y las herramientas necesarias
       - name: Install Android SDK 35
         run: |
           mkdir -p $HOME/android-sdk
-            cd $HOME/android-sdk
-            wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-            unzip commandlinetools-linux-11076708_latest.zip -d cmdline-tools
-            mkdir -p $HOME/android-sdk/cmdline-tools/latest
-            mv cmdline-tools/*/* $HOME/android-sdk/cmdline-tools/latest/
-            export ANDROID_SDK_ROOT=$HOME/android-sdk
-            export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
-            yes | sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-35" "build-tools;30.0.3" "platform-tools"
-            export ANDROID_HOME=$HOME/android-sdk
-            export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+          cd $HOME/android-sdk
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip commandlinetools-linux-11076708_latest.zip -d cmdline-tools
+          mkdir -p $HOME/android-sdk/cmdline-tools/latest
+          mv cmdline-tools/*/* $HOME/android-sdk/cmdline-tools/latest/
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
+          yes | sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-35" "build-tools;30.0.3" "platform-tools"
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
 
-      # Paso para configurar el Android SDK
+      # Configura variables de entorno para el Android SDK (ajusta según tu proyecto si es necesario)
       - name: Configure Android SDK
         run: |
           export ANDROID_HOME=$HOME/Android/Sdk
           export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
 
-      # Paso para configurar Gradle
+      # Valida el wrapper de Gradle
       - name: Set up Gradle
         uses: gradle/wrapper-validation-action@v1
 
-      # Paso par hacer ejecutble gradlew
+      # Da permisos de ejecución al script gradlew
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # Paso para construir el proyecto
+      # Compila el proyecto
       - name: Build with Gradle
         run: ./gradlew build
 
-      # Paso para correr el análisis de seguridad con CodeQL (si lo tienes configurado)
+      # Ejecuta todos los tests del proyecto
+      - name: Run Tests
+        run: ./gradlew test
+
+      # Sube los resultados de las pruebas como artefactos
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: '**/build/test-results/'
+
+      # Ejecuta análisis de estilo/linter
+      - name: Run Lint
+        run: ./gradlew lint
+
+      # Sube los resultados de lint como artefactos (opcional, útil para revisión)
+      - name: Upload Lint Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-results
+          path: '**/build/reports/lint-results*'
+
+      # Inicializa CodeQL para análisis de seguridad
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+
+      # Ejecuta el análisis de seguridad con CodeQL
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
