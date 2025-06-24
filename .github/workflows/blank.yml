@@ -24,7 +24,7 @@ jobs:
           java-package: jdk
           distribution: 'temurin'
 
-      # Instala el Android SDK 35 y las herramientas necesarias
+      # Instala el Android SDK 35 y herramientas necesarias
       - name: Install Android SDK 35
         run: |
           mkdir -p $HOME/android-sdk
@@ -33,17 +33,10 @@ jobs:
           unzip commandlinetools-linux-11076708_latest.zip -d cmdline-tools
           mkdir -p $HOME/android-sdk/cmdline-tools/latest
           mv cmdline-tools/*/* $HOME/android-sdk/cmdline-tools/latest/
-          export ANDROID_SDK_ROOT=$HOME/android-sdk
-          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
-          yes | sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-35" "build-tools;30.0.3" "platform-tools"
-          export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
-
-      # Configura variables de entorno para el Android SDK (ajusta según tu proyecto si es necesario)
-      - name: Configure Android SDK
-        run: |
-          export ANDROID_HOME=$HOME/Android/Sdk
-          export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
+          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH" >> $GITHUB_PATH
+          yes | sdkmanager --sdk_root=$HOME/android-sdk "platforms;android-35" "build-tools;30.0.3" "platform-tools"
 
       # Valida el wrapper de Gradle
       - name: Set up Gradle
@@ -53,11 +46,11 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # Compila el proyecto
-      - name: Build with Gradle
-        run: ./gradlew build
+      # Compila el proyecto Android (genera los .class necesarios para CodeQL)
+      - name: Build Android app
+        run: ./gradlew assembleDebug
 
-      # Ejecuta todos los tests del proyecto
+      # Ejecuta los tests (opcional, puedes dejarlo)
       - name: Run Tests
         run: ./gradlew test
 
@@ -72,7 +65,7 @@ jobs:
       - name: Run Lint
         run: ./gradlew lint
 
-      # Sube los resultados de lint como artefactos (opcional, útil para revisión)
+      # Sube los resultados de lint como artefactos (opcional)
       - name: Upload Lint Results
         uses: actions/upload-artifact@v4
         with:
