@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'adoptopenjdk'  # Usando Temurin (anteriormente AdoptOpenJDK)
+          distribution: 'temurin'  # Usando Temurin (anteriormente AdoptOpenJDK)
 
       # Paso 3: Conceder permisos de ejecución a gradlew
       - name: Grant execute permission for gradlew
