@@ -34,9 +34,17 @@ jobs:
       # Paso para instalar el SDK de Android 35
       - name: Install Android SDK 35
         run: |
-          sudo apt update
-          sudo apt install -y android-sdk
-          sdkmanager "platforms;android-35" "build-tools;30.0.3" "tools" "platform-tools"
+          mkdir -p $HOME/android-sdk
+            cd $HOME/android-sdk
+            wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+            unzip commandlinetools-linux-11076708_latest.zip -d cmdline-tools
+            mkdir -p $HOME/android-sdk/cmdline-tools/latest
+            mv cmdline-tools/*/* $HOME/android-sdk/cmdline-tools/latest/
+            export ANDROID_SDK_ROOT=$HOME/android-sdk
+            export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
+            yes | sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-35" "build-tools;30.0.3" "platform-tools"
+            export ANDROID_HOME=$HOME/android-sdk
+            export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
 
       # Paso para configurar el Android SDK
       - name: Configure Android SDK
