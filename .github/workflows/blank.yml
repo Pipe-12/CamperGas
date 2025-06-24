@@ -3,10 +3,10 @@ name: Android CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Paso 2: Configurar JDK 17 de Temurin
+      # Paso 2: Configurar JDK 17 (Temurin)
       - name: Set up JDK 17 (Temurin)
         uses: actions/setup-java@v4
         with:
@@ -40,9 +40,9 @@ jobs:
       - name: Run Lint
         run: ./gradlew lintDebug
 
-      # Paso 7: Subir informes generados
+      # Paso 7: Subir informes generados (v3)
       - name: Upload Reports
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: reports
           path: app/build/reports
