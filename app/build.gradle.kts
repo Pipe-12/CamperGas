@@ -83,5 +83,5 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.9.0")
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 }
