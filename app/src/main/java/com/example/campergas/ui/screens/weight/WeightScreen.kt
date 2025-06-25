@@ -38,7 +38,7 @@ fun WeightScreen(
     viewModel: WeightViewModel = hiltViewModel()
 ) {
     val weightState by viewModel.weightState.collectAsState()
-    val caravanState by viewModel.caravanState.collectAsState()
+    val vehicleState by viewModel.vehicleState.collectAsState()
     
     Scaffold(
         topBar = {
@@ -100,7 +100,7 @@ fun WeightScreen(
                     }
                     
                     // Tarjeta de capacidad del tanque
-                    caravanState?.let { caravan ->
+                    vehicleState?.let { vehicle ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -117,11 +117,11 @@ fun WeightScreen(
                                 Spacer(modifier = Modifier.height(8.dp))
                                 
                                 Text(
-                                    text = "Capacidad: ${caravan.gasTankCapacity} kg",
+                                    text = "Capacidad: ${vehicle.gasTankCapacity} kg",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                                 
-                                val remainingPercentage = (weight.value / caravan.gasTankCapacity * 100).toInt()
+                                val remainingPercentage = (weight.value / vehicle.gasTankCapacity * 100).toInt()
                                 Text(
                                     text = "Nivel actual: $remainingPercentage%",
                                     style = MaterialTheme.typography.headlineSmall,
