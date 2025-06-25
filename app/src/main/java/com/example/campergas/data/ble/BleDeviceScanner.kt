@@ -1,10 +1,11 @@
 package com.example.campergas.data.ble
 
+import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
-import android.content.Context
+import androidx.annotation.RequiresPermission
 import com.example.campergas.domain.model.BleDevice
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +24,7 @@ class BleDeviceScanner @Inject constructor(
     private var scanner: BluetoothLeScanner? = null
     
     private val scanCallback = object : ScanCallback() {
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val device = result.device
             val deviceName = device.name ?: "Dispositivo desconocido"
@@ -56,6 +58,7 @@ class BleDeviceScanner @Inject constructor(
         _scanResults.value = currentList
     }
     
+    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun startScan() {
         if (_isScanning.value) return
         
@@ -68,6 +71,7 @@ class BleDeviceScanner @Inject constructor(
         }
     }
     
+    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun stopScan() {
         if (!_isScanning.value) return
         
