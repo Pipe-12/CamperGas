@@ -2,9 +2,9 @@ package com.example.campergas.ui.screens.weight
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.campergas.domain.model.Caravan
+import com.example.campergas.domain.model.VehicleConfig
 import com.example.campergas.domain.model.Weight
-import com.example.campergas.domain.usecase.GetCaravanConfigUseCase
+import com.example.campergas.domain.usecase.GetVehicleConfigUseCase
 import com.example.campergas.domain.usecase.GetWeightUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,14 +16,14 @@ import javax.inject.Inject
 @HiltViewModel
 class WeightViewModel @Inject constructor(
     private val getWeightUseCase: GetWeightUseCase,
-    private val getCaravanConfigUseCase: GetCaravanConfigUseCase
+    private val getVehicleConfigUseCase: GetVehicleConfigUseCase
 ) : ViewModel() {
     
     private val _weightState = MutableStateFlow<Weight?>(null)
     val weightState: StateFlow<Weight?> = _weightState
     
-    private val _caravanState = MutableStateFlow<Caravan?>(null)
-    val caravanState: StateFlow<Caravan?> = _caravanState
+    private val _vehicleState = MutableStateFlow<VehicleConfig?>(null)
+    val vehicleState: StateFlow<VehicleConfig?> = _vehicleState
     
     init {
         // Obtener datos de peso en tiempo real
@@ -33,10 +33,10 @@ class WeightViewModel @Inject constructor(
             }
         }
         
-        // Obtener configuración de la caravana
+        // Obtener configuración del vehículo
         viewModelScope.launch {
-            getCaravanConfigUseCase().collectLatest { caravan ->
-                _caravanState.value = caravan
+            getVehicleConfigUseCase().collectLatest { vehicle ->
+                _vehicleState.value = vehicle
             }
         }
     }
