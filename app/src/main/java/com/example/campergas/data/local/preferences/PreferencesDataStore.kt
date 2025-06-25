@@ -13,7 +13,7 @@ import java.util.prefs.Preferences
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private val Context.dataStore: PreferencesDataStore<Preferences> by preferencesDataStore(name = "settings")
+private val Context.dataStore by preferencesDataStore(name = "settings")
 
 @Singleton
 class PreferencesDataStore @Inject constructor(
