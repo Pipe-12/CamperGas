@@ -5,6 +5,7 @@ import com.example.campergas.domain.model.Inclination
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 class GetInclinationUseCase @Inject constructor(
     private val bleRepository: BleRepository
