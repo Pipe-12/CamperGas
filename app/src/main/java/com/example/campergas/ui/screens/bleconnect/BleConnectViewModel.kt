@@ -104,6 +104,14 @@ class BleConnectViewModel @Inject constructor(
     fun checkBluetoothPermissions(): Boolean {
         return scanBleDevicesUseCase.isBluetoothEnabled()
     }
+    
+    fun isBluetoothEnabled(): Boolean {
+        return scanBleDevicesUseCase.isBluetoothEnabled()
+    }
+    
+    fun requiresPermissions(): Boolean {
+        return !scanBleDevicesUseCase.isBluetoothEnabled()
+    }
 }
 
 data class BleConnectUiState(

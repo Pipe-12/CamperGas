@@ -21,6 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.campergas.domain.model.BleDevice
+import com.example.campergas.ui.components.BluetoothPermissionDialog
+import com.example.campergas.ui.components.BluetoothDisabledDialog
+import com.example.campergas.utils.BluetoothPermissionManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,10 +33,41 @@ fun BleConnectScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     
+    // Estados para controlar diálogos de permisos
+    var showPermissionDialog by remember { mutableStateOf(false) }
+    var showBluetoothDialog by remember { mutableStateOf(false) }
+    
+    // Verificar permisos al entrar a la pantalla
     LaunchedEffect(Unit) {
-        if (!viewModel.checkBluetoothPermissions()) {
-            // Bluetooth no está habilitado
+        if (!viewModel.isBluetoothEnabled()) {
+            showBluetoothDialog = true
         }
+    }
+    
+    // Diálogo para activar Bluetooth
+    if (showBluetoothDialog) {
+        BluetoothDisabledDialog(
+            onAccept = {
+                showBluetoothDialog = false
+                // El usuario activará Bluetooth manualmente
+            },
+            onDismiss = {
+                showBluetoothDialog = false
+            }
+        )
+    }
+    
+    // Diálogo para permisos
+    if (showPermissionDialog) {
+        BluetoothPermissionDialog(
+            onAccept = {
+                showPermissionDialog = false
+                // Los permisos se manejan desde MainActivity
+            },
+            onDismiss = {
+                showPermissionDialog = false
+            }
+        )
     }
 
     Column(

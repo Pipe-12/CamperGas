@@ -7,17 +7,35 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.campergas.ui.navigation.NavGraph
 import com.example.campergas.ui.theme.CamperGasTheme
+import com.example.campergas.utils.BluetoothPermissionManager
+import com.example.campergas.ui.components.PermissionDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    
+    private lateinit var bluetoothPermissionManager: BluetoothPermissionManager
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // Configurar el gestor de permisos
+        bluetoothPermissionManager = BluetoothPermissionManager(
+            activity = this,
+            onPermissionsGranted = {
+                // Permisos concedidos, la app puede usar BLE
+            },
+            onPermissionsDenied = { deniedPermissions ->
+                // Manejar permisos denegados
+            }
+        )
+        
         setContent {
             CamperGasTheme {
                 Surface(
@@ -25,6 +43,34 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
+                    
+                    // Estado para controlar si mostrar el diálogo de permisos
+                    var showPermissionDialog by remember { mutableStateOf(false) }
+                    var permissionMessage by remember { mutableStateOf("") }
+                    
+                    // Verificar permisos al iniciar
+                    LaunchedEffect(Unit) {
+                        if (!bluetoothPermissionManager.hasAllPermissions()) {
+                            showPermissionDialog = true
+                            permissionMessage = "CamperGas necesita permisos de Bluetooth y ubicación para funcionar correctamente."
+                        }
+                    }
+                    
+                    // Mostrar diálogo de permisos si es necesario
+                    if (showPermissionDialog) {
+                        PermissionDialog(
+                            title = "Permisos necesarios",
+                            message = permissionMessage,
+                            onAccept = {
+                                showPermissionDialog = false
+                                bluetoothPermissionManager.checkAndRequestAllPermissions()
+                            },
+                            onDismiss = {
+                                showPermissionDialog = false
+                            }
+                        )
+                    }
+                    
                     NavGraph(navController = navController)
                 }
             }
