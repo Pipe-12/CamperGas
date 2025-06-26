@@ -25,7 +25,10 @@ class BleConnectViewModel @Inject constructor(
     @SuppressLint("MissingPermission")
     fun startScan() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isScanning = true)
+            _uiState.value = _uiState.value.copy(
+                isScanning = true,
+                error = null
+            )
             try {
                 scanBleDevicesUseCase().collect { devices ->
                     _uiState.value = _uiState.value.copy(
@@ -36,38 +39,77 @@ class BleConnectViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isScanning = false,
-                    error = e.message
+                    error = e.message ?: "Error al escanear dispositivos"
                 )
             }
         }
     }
 
+    @SuppressLint("MissingPermission")
     fun stopScan() {
-        _uiState.value = _uiState.value.copy(isScanning = false)
-        // TODO: Implementar lógica para detener el scan
+        try {
+            scanBleDevicesUseCase.stopScan()
+            _uiState.value = _uiState.value.copy(isScanning = false)
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(
+                isScanning = false,
+                error = e.message ?: "Error al detener el escaneo"
+            )
+        }
     }
 
     @SuppressLint("MissingPermission")
     fun connectToDevice(device: BleDevice) {
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isConnecting = device.address,
+                error = null
+            )
             try {
                 connectBleDeviceUseCase(device.address)
+                val updatedDevice = device.copy(isConnected = true)
                 _uiState.value = _uiState.value.copy(
-                    connectedDevices = _uiState.value.connectedDevices + device,
+                    connectedDevices = _uiState.value.connectedDevices + updatedDevice,
+                    isConnecting = null,
                     error = null
                 )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = e.message)
+                _uiState.value = _uiState.value.copy(
+                    isConnecting = null,
+                    error = e.message ?: "Error al conectar con el dispositivo"
+                )
             }
         }
     }
-
-    // TODO: Implementar métodos adicionales para gestión BLE
+    
+    fun disconnectDevice(device: BleDevice) {
+        viewModelScope.launch {
+            try {
+                // TODO: Implementar desconexión específica
+                _uiState.value = _uiState.value.copy(
+                    connectedDevices = _uiState.value.connectedDevices.filter { it.address != device.address }
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    error = e.message ?: "Error al desconectar dispositivo"
+                )
+            }
+        }
+    }
+    
+    fun clearError() {
+        _uiState.value = _uiState.value.copy(error = null)
+    }
+    
+    fun checkBluetoothPermissions(): Boolean {
+        return scanBleDevicesUseCase.isBluetoothEnabled()
+    }
 }
 
 data class BleConnectUiState(
     val availableDevices: List<BleDevice> = emptyList(),
     val connectedDevices: List<BleDevice> = emptyList(),
     val isScanning: Boolean = false,
+    val isConnecting: String? = null, // MAC address del dispositivo que se está conectando
     val error: String? = null
 )

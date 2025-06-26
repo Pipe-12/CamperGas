@@ -31,13 +31,23 @@ class BleDeviceScanner @Inject constructor(
             val deviceAddress = device.address
             val rssi = result.rssi
             
+            // Obtener servicios de los datos del scan
+            val services = result.scanRecord?.serviceUuids?.map { it.toString() } ?: emptyList()
+            
             val bleDevice = BleDevice(
                 name = deviceName,
                 address = deviceAddress,
-                rssi = rssi
+                rssi = rssi,
+                services = services,
+                isConnectable = result.isConnectable
             )
             
             addDeviceToList(bleDevice)
+        }
+        
+        override fun onScanFailed(errorCode: Int) {
+            _isScanning.value = false
+            // Podrías emitir un error aquí si necesitas manejar fallos de scan
         }
     }
     
