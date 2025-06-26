@@ -1,5 +1,7 @@
 package com.example.campergas.data.repository
 
+import android.Manifest
+import androidx.annotation.RequiresPermission
 import com.example.campergas.data.ble.BleDeviceScanner
 import com.example.campergas.data.ble.BleManager
 import com.example.campergas.data.ble.HistoryBleService
@@ -30,17 +32,16 @@ class BleRepository @Inject constructor(
     
     // Inclination
     val inclinationData = inclinationBleService.inclinationData
-    
-    // History
-    val historyData = historyBleService.historyData
+
     
     // Preferences
     val lastConnectedDeviceAddress: Flow<String> = preferencesDataStore.lastConnectedDeviceAddress
     
     fun isBluetoothEnabled(): Boolean = bleManager.isBluetoothEnabled()
     
+    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun startScan() = bleDeviceScanner.startScan()
-    
+    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun stopScan() = bleDeviceScanner.stopScan()
     
     fun connectToWeightDevice(deviceAddress: String) = weightBleService.connect(deviceAddress)
@@ -54,8 +55,6 @@ class BleRepository @Inject constructor(
     fun connectToHistoryDevice(deviceAddress: String) = historyBleService.connect(deviceAddress)
     
     fun disconnectHistoryDevice() = historyBleService.disconnect()
-    
-    fun requestHistoryData() = historyBleService.requestHistoryData()
     
     suspend fun saveLastConnectedDevice(address: String) = preferencesDataStore.saveLastConnectedDevice(address)
 }

@@ -1,11 +1,10 @@
 package com.example.campergas.data.ble
 
-import android.bluetooth.BluetoothGatt
+
 import android.content.Context
 import com.example.campergas.domain.model.Consumption
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.util.Date
 import javax.inject.Inject
 
 class HistoryBleService @Inject constructor(
