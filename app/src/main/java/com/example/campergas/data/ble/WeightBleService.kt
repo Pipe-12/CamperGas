@@ -3,13 +3,14 @@ package com.example.campergas.data.ble
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 class WeightBleService @Inject constructor(
     private val bleManager: BleManager,
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) {
     private val _weightData = MutableStateFlow<Float?>(null)
     val weightData: StateFlow<Float?> = _weightData

@@ -3,13 +3,14 @@ package com.example.campergas.data.ble
 
 import android.content.Context
 import com.example.campergas.domain.model.Consumption
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 class HistoryBleService @Inject constructor(
     private val bleManager: BleManager,
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) {
     private val _historyData = MutableStateFlow<List<Consumption>>(emptyList())
     val historyData: StateFlow<List<Consumption>> = _historyData

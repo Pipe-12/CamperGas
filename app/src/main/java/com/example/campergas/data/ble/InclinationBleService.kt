@@ -2,13 +2,14 @@ package com.example.campergas.data.ble
 
 import android.bluetooth.BluetoothGatt
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 class InclinationBleService @Inject constructor(
     private val bleManager: BleManager,
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) {
     private val _inclinationData = MutableStateFlow<Pair<Float, Float>?>(null) // x, y inclinación
     val inclinationData: StateFlow<Pair<Float, Float>?> = _inclinationData
