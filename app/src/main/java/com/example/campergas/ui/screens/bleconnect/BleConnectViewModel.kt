@@ -1,5 +1,6 @@
 package com.example.campergas.ui.screens.bleconnect
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.domain.model.BleDevice
@@ -21,6 +22,7 @@ class BleConnectViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(BleConnectUiState())
     val uiState: StateFlow<BleConnectUiState> = _uiState.asStateFlow()
 
+    @SuppressLint("MissingPermission")
     fun startScan() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isScanning = true)
@@ -45,6 +47,7 @@ class BleConnectViewModel @Inject constructor(
         // TODO: Implementar lógica para detener el scan
     }
 
+    @SuppressLint("MissingPermission")
     fun connectToDevice(device: BleDevice) {
         viewModelScope.launch {
             try {
