@@ -3,24 +3,43 @@ package com.example.campergas.ui.screens.bleconnect
 import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.campergas.data.repository.BleRepository
 import com.example.campergas.domain.model.BleDevice
 import com.example.campergas.domain.usecase.ScanBleDevicesUseCase
-import com.example.campergas.domain.usecase.ConnectBleDeviceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class BleConnectViewModel @Inject constructor(
     private val scanBleDevicesUseCase: ScanBleDevicesUseCase,
-    private val connectBleDeviceUseCase: ConnectBleDeviceUseCase
+    private val bleRepository: BleRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BleConnectUiState())
     val uiState: StateFlow<BleConnectUiState> = _uiState.asStateFlow()
+
+    // Observar estado de conexión
+    val connectionState = bleRepository.connectionState
+    
+    // Observar datos del sensor
+    val weightData = bleRepository.weightData
+    val inclinationData = bleRepository.inclinationData
+    val historyData = bleRepository.historyData
+    val isLoadingHistory = bleRepository.isLoadingHistory
+
+    init {
+        // Observar cambios en el estado de conexión
+        viewModelScope.launch {
+            connectionState.collect { isConnected ->
+                _uiState.value = _uiState.value.copy(
+                    isConnected = isConnected,
+                    isConnecting = if (isConnected) null else _uiState.value.isConnecting
+                )
+            }
+        }
+    }
 
     @SuppressLint("MissingPermission")
     fun startScan() {
@@ -66,11 +85,14 @@ class BleConnectViewModel @Inject constructor(
                 error = null
             )
             try {
-                connectBleDeviceUseCase(device.address)
-                val updatedDevice = device.copy(isConnected = true)
+                // Usar el repositorio unificado para conectar
+                bleRepository.connectToSensor(device.address)
+                
+                // Guardar dispositivo como último conectado
+                bleRepository.saveLastConnectedDevice(device.address)
+                
                 _uiState.value = _uiState.value.copy(
-                    connectedDevices = _uiState.value.connectedDevices + updatedDevice,
-                    isConnecting = null,
+                    connectedDevice = device,
                     error = null
                 )
             } catch (e: Exception) {
@@ -82,12 +104,13 @@ class BleConnectViewModel @Inject constructor(
         }
     }
     
-    fun disconnectDevice(device: BleDevice) {
+    fun disconnectDevice() {
         viewModelScope.launch {
             try {
-                // TODO: Implementar desconexión específica
+                bleRepository.disconnectSensor()
                 _uiState.value = _uiState.value.copy(
-                    connectedDevices = _uiState.value.connectedDevices.filter { it.address != device.address }
+                    connectedDevice = null,
+                    isConnecting = null
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -95,6 +118,22 @@ class BleConnectViewModel @Inject constructor(
                 )
             }
         }
+    }
+    
+    fun requestHistoryData() {
+        viewModelScope.launch {
+            try {
+                bleRepository.requestHistoryData()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    error = e.message ?: "Error al solicitar datos históricos"
+                )
+            }
+        }
+    }
+    
+    fun clearHistoryData() {
+        bleRepository.clearHistoryData()
     }
     
     fun clearError() {
@@ -134,9 +173,10 @@ class BleConnectViewModel @Inject constructor(
 
 data class BleConnectUiState(
     val availableDevices: List<BleDevice> = emptyList(),
-    val connectedDevices: List<BleDevice> = emptyList(),
+    val connectedDevice: BleDevice? = null,
+    val isConnected: Boolean = false,
     val isScanning: Boolean = false,
     val isConnecting: String? = null, // MAC address del dispositivo que se está conectando
     val error: String? = null,
-    val showOnlyCompatibleDevices: Boolean = false // Nuevo estado para filtrar dispositivos compatibles
+    val showOnlyCompatibleDevices: Boolean = false
 )

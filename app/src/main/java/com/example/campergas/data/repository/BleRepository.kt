@@ -4,9 +4,7 @@ import android.Manifest
 import androidx.annotation.RequiresPermission
 import com.example.campergas.data.ble.BleDeviceScanner
 import com.example.campergas.data.ble.BleManager
-import com.example.campergas.data.ble.HistoryBleService
-import com.example.campergas.data.ble.InclinationBleService
-import com.example.campergas.data.ble.WeightBleService
+import com.example.campergas.data.ble.CamperGasBleService
 import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.domain.model.BleDevice
 import kotlinx.coroutines.flow.Flow
@@ -18,21 +16,21 @@ import javax.inject.Singleton
 class BleRepository @Inject constructor(
     private val bleManager: BleManager,
     private val bleDeviceScanner: BleDeviceScanner,
-    private val weightBleService: WeightBleService,
-    private val inclinationBleService: InclinationBleService,
-    private val historyBleService: HistoryBleService,
+    private val camperGasBleService: CamperGasBleService,
     private val preferencesDataStore: PreferencesDataStore
 ) {
     // Scan
     val scanResults: StateFlow<List<BleDevice>> = bleDeviceScanner.scanResults
     val isScanning: StateFlow<Boolean> = bleDeviceScanner.isScanning
     
-    // Weight
-    val weightData = weightBleService.weightData
+    // Connection state
+    val connectionState: StateFlow<Boolean> = camperGasBleService.connectionState
     
-    // Inclination
-    val inclinationData = inclinationBleService.inclinationData
-
+    // Sensor data
+    val weightData = camperGasBleService.weightData
+    val inclinationData = camperGasBleService.inclinationData
+    val historyData = camperGasBleService.historyData
+    val isLoadingHistory = camperGasBleService.isLoadingHistory
     
     // Preferences
     val lastConnectedDeviceAddress: Flow<String> = preferencesDataStore.lastConnectedDeviceAddress
@@ -41,20 +39,21 @@ class BleRepository @Inject constructor(
     
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun startScan() = bleDeviceScanner.startScan()
+    
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun stopScan() = bleDeviceScanner.stopScan()
     
-    fun connectToWeightDevice(deviceAddress: String) = weightBleService.connect(deviceAddress)
+    // Conexión unificada al sensor CamperGas
+    fun connectToSensor(deviceAddress: String) = camperGasBleService.connect(deviceAddress)
     
-    fun disconnectWeightDevice() = weightBleService.disconnect()
+    fun disconnectSensor() = camperGasBleService.disconnect()
     
-    fun connectToInclinationDevice(deviceAddress: String) = inclinationBleService.connect(deviceAddress)
+    fun isConnected(): Boolean = camperGasBleService.isConnected()
     
-    fun disconnectInclinationDevice() = inclinationBleService.disconnect()
+    // Solicitar datos históricos
+    fun requestHistoryData() = camperGasBleService.requestHistoryData()
     
-    fun connectToHistoryDevice(deviceAddress: String) = historyBleService.connect(deviceAddress)
-    
-    fun disconnectHistoryDevice() = historyBleService.disconnect()
+    fun clearHistoryData() = camperGasBleService.clearHistoryData()
     
     suspend fun saveLastConnectedDevice(address: String) = preferencesDataStore.saveLastConnectedDevice(address)
 

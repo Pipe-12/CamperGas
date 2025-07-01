@@ -51,14 +51,13 @@ class BleForegroundService : Service() {
     private fun connectToDevice(deviceAddress: String) {
         serviceScope.launch {
             try {
-                bleRepository.connectToWeightDevice(deviceAddress)
-                bleRepository.connectToInclinationDevice(deviceAddress)
+                bleRepository.connectToSensor(deviceAddress)
                 
                 // Monitorear el peso y actualizar la notificación
                 launch {
                     bleRepository.weightData.collect { weight ->
                         if (weight != null) {
-                            updateNotification("Peso actual: $weight kg")
+                            updateNotification("Peso actual: ${weight.getFormattedValue()}")
                         }
                     }
                 }
@@ -103,8 +102,7 @@ class BleForegroundService : Service() {
     
     override fun onDestroy() {
         serviceScope.launch {
-            bleRepository.disconnectWeightDevice()
-            bleRepository.disconnectInclinationDevice()
+            bleRepository.disconnectSensor()
         }
         serviceScope.cancel()
         super.onDestroy()

@@ -8,19 +8,15 @@ class ConnectBleDeviceUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
     suspend operator fun invoke(deviceAddress: String) {
-        // Conectamos a los servicios disponibles
-        bleRepository.connectToWeightDevice(deviceAddress)
-        bleRepository.connectToInclinationDevice(deviceAddress)
-        bleRepository.connectToHistoryDevice(deviceAddress)
+        // Conectamos al sensor unificado
+        bleRepository.connectToSensor(deviceAddress)
         
         // Guardamos la dirección del último dispositivo conectado
         bleRepository.saveLastConnectedDevice(deviceAddress)
     }
     
     fun disconnect() {
-        bleRepository.disconnectWeightDevice()
-        bleRepository.disconnectInclinationDevice()
-        bleRepository.disconnectHistoryDevice()
+        bleRepository.disconnectSensor()
     }
     
     fun getLastConnectedDevice(): Flow<String> {

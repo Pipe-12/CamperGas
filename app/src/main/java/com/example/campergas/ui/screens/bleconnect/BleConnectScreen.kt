@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,9 +22,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.campergas.domain.model.BleDevice
+import com.example.campergas.domain.model.Weight
+import com.example.campergas.domain.model.Inclination
 import com.example.campergas.ui.components.BluetoothPermissionDialog
 import com.example.campergas.ui.components.BluetoothDisabledDialog
 import com.example.campergas.utils.BluetoothPermissionManager
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,6 +37,11 @@ fun BleConnectScreen(
     viewModel: BleConnectViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val connectionState by viewModel.connectionState.collectAsState()
+    val weightData by viewModel.weightData.collectAsState()
+    val inclinationData by viewModel.inclinationData.collectAsState()
+    val historyData by viewModel.historyData.collectAsState()
+    val isLoadingHistory by viewModel.isLoadingHistory.collectAsState()
     
     // Estados para controlar diálogos de permisos
     var showPermissionDialog by remember { mutableStateOf(false) }
@@ -49,7 +59,6 @@ fun BleConnectScreen(
         BluetoothDisabledDialog(
             onAccept = {
                 showBluetoothDialog = false
-                // El usuario activará Bluetooth manualmente
             },
             onDismiss = {
                 showBluetoothDialog = false
@@ -62,7 +71,6 @@ fun BleConnectScreen(
         BluetoothPermissionDialog(
             onAccept = {
                 showPermissionDialog = false
-                // Los permisos se manejan desde MainActivity
             },
             onDismiss = {
                 showPermissionDialog = false
@@ -75,41 +83,29 @@ fun BleConnectScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Header
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = if (uiState.isScanning) Icons.Default.CheckCircle else Icons.Default.Settings,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(32.dp)
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column {
-                        Text(
-                            text = "Conexión Bluetooth",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = if (uiState.isScanning) "Escaneando dispositivos..." else "Buscar dispositivos BLE",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-        }
+        // Header con estado de conexión
+        ConnectionStatusCard(
+            isConnected = connectionState,
+            isScanning = uiState.isScanning,
+            connectedDevice = uiState.connectedDevice,
+            onDisconnect = { viewModel.disconnectDevice() }
+        )
         
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Datos del sensor en tiempo real (solo si está conectado)
+        if (connectionState) {
+            SensorDataSection(
+                weightData = weightData,
+                inclinationData = inclinationData,
+                historyData = historyData,
+                isLoadingHistory = isLoadingHistory,
+                onRequestHistory = { viewModel.requestHistoryData() },
+                onClearHistory = { viewModel.clearHistoryData() }
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         // Control buttons
         Row(
@@ -119,7 +115,7 @@ fun BleConnectScreen(
             Button(
                 onClick = { viewModel.startScan() },
                 modifier = Modifier.weight(1f),
-                enabled = !uiState.isScanning
+                enabled = !uiState.isScanning && !connectionState
             ) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
@@ -217,82 +213,60 @@ fun BleConnectScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
-        
-        // Connected devices section
-        if (uiState.connectedDevices.isNotEmpty()) {
+
+        // Available devices section (solo si no está conectado)
+        if (!connectionState) {
             Text(
-                text = "Dispositivos Conectados (${uiState.connectedDevices.size})",
+                text = "Dispositivos Disponibles (${uiState.availableDevices.size})",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.weight(0.3f)
-            ) {
-                items(uiState.connectedDevices) { device ->
-                    ConnectedDeviceCard(
-                        device = device,
-                        onDisconnect = { viewModel.disconnectDevice(device) }
+            if (uiState.availableDevices.isEmpty() && !uiState.isScanning) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        // Available devices section
-        Text(
-            text = "Dispositivos Disponibles (${uiState.availableDevices.size})",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        
-        if (uiState.availableDevices.isEmpty() && !uiState.isScanning) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Warning,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "No se encontraron dispositivos",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = "Presiona 'Buscar' para escanear",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "No se encontraron dispositivos",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "Presiona 'Buscar' para escanear",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
-            }
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.weight(1f)
-            ) {
-                items(uiState.availableDevices) { device ->
-                    AvailableDeviceCard(
-                        device = device,
-                        isConnecting = uiState.isConnecting == device.address,
-                        onConnect = { viewModel.connectToDevice(device) }
-                    )
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    items(uiState.availableDevices) { device ->
+                        AvailableDeviceCard(
+                            device = device,
+                            isConnecting = uiState.isConnecting == device.address,
+                            onConnect = { viewModel.connectToDevice(device) }
+                        )
+                    }
                 }
             }
         }
@@ -521,4 +495,265 @@ private fun getSignalColor(rssi: Int): Color {
         rssi >= -85 -> Color(0xFFFF9800) // Naranja
         else -> Color(0xFFF44336) // Rojo
     }
+}
+
+@Composable
+fun ConnectionStatusCard(
+    isConnected: Boolean,
+    isScanning: Boolean,
+    connectedDevice: BleDevice?,
+    onDisconnect: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isConnected) 
+                MaterialTheme.colorScheme.primaryContainer 
+            else 
+                MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = if (isConnected) Icons.Default.CheckCircle else Icons.Default.Settings,
+                    contentDescription = null,
+                    tint = if (isConnected) 
+                        MaterialTheme.colorScheme.primary 
+                    else 
+                        MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(32.dp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = if (isConnected) "Sensor Conectado" else "Conexión Bluetooth",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = when {
+                            isConnected && connectedDevice != null -> connectedDevice.name
+                            isScanning -> "Escaneando dispositivos..."
+                            else -> "Buscar dispositivos BLE"
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                
+                if (isConnected) {
+                    OutlinedButton(
+                        onClick = onDisconnect,
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text("Desconectar")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SensorDataSection(
+    weightData: Weight?,
+    inclinationData: Inclination?, 
+    historyData: List<Weight>,
+    isLoadingHistory: Boolean,
+    onRequestHistory: () -> Unit,
+    onClearHistory: () -> Unit
+) {
+    Column {
+        // Datos en tiempo real
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Tarjeta de peso
+            Card(
+                modifier = Modifier.weight(1f),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "⚖️",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Peso",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    Text(
+                        text = weightData?.getFormattedValue() ?: "--.- kg",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    if (weightData != null) {
+                        Text(
+                            text = weightData.getFormattedTimestamp(),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+            }
+            
+            // Tarjeta de inclinación
+            Card(
+                modifier = Modifier.weight(1f),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "📐",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Inclinación",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                    if (inclinationData != null) {
+                        Text(
+                            text = "P: %.1f°".format(inclinationData.pitch),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                        Text(
+                            text = "R: %.1f°".format(inclinationData.roll),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    } else {
+                        Text(
+                            text = "-- °",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    }
+                }
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        // Datos históricos
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Datos Históricos (${historyData.size})",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    Row {
+                        if (historyData.isNotEmpty()) {
+                            TextButton(onClick = onClearHistory) {
+                                Text("Limpiar")
+                            }
+                        }
+                        
+                        Button(
+                            onClick = onRequestHistory,
+                            enabled = !isLoadingHistory
+                        ) {
+                            if (isLoadingHistory) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Text("📊")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Solicitar")
+                        }
+                    }
+                }
+                
+                if (historyData.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LazyColumn(
+                        modifier = Modifier.heightIn(max = 200.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        items(historyData.take(10)) { weight ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = weight.getFormattedValue(),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = weight.getFullFormattedTimestamp(),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        if (historyData.size > 10) {
+                            item {
+                                Text(
+                                    text = "... y ${historyData.size - 10} más",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(top = 8.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+fun Weight.getFormattedValue(): String {
+    return String.format("%.1f kg", this.value)
+}
+
+fun Weight.getFormattedTimestamp(): String {
+    val dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+    return dateFormat.format(Date(this.timestamp))
+}
+
+fun Weight.getFullFormattedTimestamp(): String {
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+    return dateFormat.format(Date(this.timestamp))
 }

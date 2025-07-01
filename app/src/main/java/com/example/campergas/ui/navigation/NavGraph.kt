@@ -13,6 +13,7 @@ import com.example.campergas.ui.screens.consumption.ConsumptionScreen
 import com.example.campergas.ui.screens.bleconnect.BleConnectScreen
 import com.example.campergas.ui.screens.settings.SettingsScreen
 import com.example.campergas.ui.screens.caravanconfig.CaravanConfigScreen
+import com.example.campergas.ui.screens.cylinders.CylindersScreen
 
 @Composable
 fun NavGraph(
@@ -52,6 +53,9 @@ fun NavGraph(
             CaravanConfigScreen(navController = navController)
         }
         
+        composable(Screen.Cylinders.route) {
+            CylindersScreen()
+        }
 
     }
 }
@@ -64,4 +68,5 @@ sealed class Screen(val route: String) {
     data object BleConnect : Screen("ble_connect")
     data object Settings : Screen("settings")
     data object CaravanConfig : Screen("caravan_config")
+    data object Cylinders : Screen("cylinders")
 }
