@@ -7,6 +7,7 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import androidx.annotation.RequiresPermission
 import com.example.campergas.domain.model.BleDevice
+import com.example.campergas.domain.model.CamperGasUuids
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -19,6 +20,9 @@ class BleDeviceScanner @Inject constructor(
     
     private val _isScanning = MutableStateFlow(false)
     val isScanning: StateFlow<Boolean> = _isScanning
+    
+    // Filtro para mostrar solo dispositivos compatibles
+    private var showOnlyCompatibleDevices = false
     
     private val bluetoothAdapter: BluetoothAdapter? get() = bleManager.bluetoothAdapter
     private var scanner: BluetoothLeScanner? = null
@@ -61,11 +65,46 @@ class BleDeviceScanner @Inject constructor(
             // Actualizar dispositivo existente
             currentList[existingIndex] = device
         } else {
-            // Añadir nuevo dispositivo
-            currentList.add(device)
+            // Añadir nuevo dispositivo solo si pasa el filtro o si el filtro está desactivado
+            if (!showOnlyCompatibleDevices || device.isCompatibleWithCamperGas) {
+                currentList.add(device)
+            }
         }
         
-        _scanResults.value = currentList
+        // Aplicar filtro a toda la lista si está activado
+        val filteredList = if (showOnlyCompatibleDevices) {
+            currentList.filter { it.isCompatibleWithCamperGas }
+        } else {
+            currentList
+        }
+        
+        _scanResults.value = filteredList
+    }
+    
+    /**
+     * Establece el filtro para mostrar solo dispositivos compatibles con CamperGas
+     */
+    fun setCompatibleDevicesFilter(enabled: Boolean) {
+        showOnlyCompatibleDevices = enabled
+        updateFilteredResults()
+    }
+    
+    /**
+     * Obtiene el estado current del filtro
+     */
+    fun isCompatibleFilterEnabled(): Boolean = showOnlyCompatibleDevices
+    
+    /**
+     * Actualiza los resultados aplicando el filtro si está activado
+     */
+    private fun updateFilteredResults() {
+        val allDevices = _scanResults.value
+        val filteredDevices = if (showOnlyCompatibleDevices) {
+            allDevices.filter { it.isCompatibleWithCamperGas }
+        } else {
+            allDevices
+        }
+        _scanResults.value = filteredDevices
     }
     
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)

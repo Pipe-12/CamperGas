@@ -57,4 +57,8 @@ class BleRepository @Inject constructor(
     fun disconnectHistoryDevice() = historyBleService.disconnect()
     
     suspend fun saveLastConnectedDevice(address: String) = preferencesDataStore.saveLastConnectedDevice(address)
+
+    // Filtrado de dispositivos
+    fun setCompatibleDevicesFilter(enabled: Boolean) = bleDeviceScanner.setCompatibleDevicesFilter(enabled)
+    fun isCompatibleFilterEnabled(): Boolean = bleDeviceScanner.isCompatibleFilterEnabled()
 }

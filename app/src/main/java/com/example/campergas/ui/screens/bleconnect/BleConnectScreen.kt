@@ -139,6 +139,24 @@ fun BleConnectScreen(
             }
         }
         
+        // Filter toggle
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Solo dispositivos CamperGas",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Switch(
+                checked = uiState.showOnlyCompatibleDevices,
+                onCheckedChange = { viewModel.toggleCompatibleDevicesFilter() }
+            )
+        }
+        
         Spacer(modifier = Modifier.height(16.dp))
 
         // Loading indicator
@@ -288,14 +306,49 @@ private fun AvailableDeviceCard(
     isConnecting: Boolean,
     onConnect: () -> Unit
 ) {
+    val isCompatible = device.isCompatibleWithCamperGas
+    val cardColors = if (isCompatible) {
+        CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+        )
+    } else {
+        CardDefaults.elevatedCardColors()
+    }
+    
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
-        onClick = if (!isConnecting) onConnect else { {} }
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = if (isCompatible) 6.dp else 2.dp
+        ),
+        colors = cardColors,
+        onClick = if (!isConnecting && (isCompatible || device.isConnectable)) onConnect else { {} }
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            // Badge de compatibilidad
+            if (isCompatible) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = MaterialTheme.shapes.small,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    ) {
+                        Text(
+                            text = "✓ Compatible",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+            }
+            
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -361,6 +414,35 @@ private fun AvailableDeviceCard(
                     text = "Servicios: ${device.services.size} disponibles",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
+                )
+            }
+            
+            // Información de compatibilidad
+            if (device.isCompatibleWithCamperGas) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = device.deviceType,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            } else {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "No compatible con CamperGas",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

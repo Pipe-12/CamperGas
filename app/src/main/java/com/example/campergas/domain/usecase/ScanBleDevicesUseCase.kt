@@ -26,4 +26,33 @@ class ScanBleDevicesUseCase @Inject constructor(
     fun isBluetoothEnabled(): Boolean {
         return bleRepository.isBluetoothEnabled()
     }
+    
+    /**
+     * Activa el filtro para mostrar solo dispositivos compatibles con CamperGas
+     */
+    fun enableCompatibleDevicesFilter() {
+        bleRepository.setCompatibleDevicesFilter(true)
+    }
+    
+    /**
+     * Desactiva el filtro y muestra todos los dispositivos BLE
+     */
+    fun disableCompatibleDevicesFilter() {
+        bleRepository.setCompatibleDevicesFilter(false)
+    }
+    
+    /**
+     * Verifica si el filtro está activado
+     */
+    fun isCompatibleFilterEnabled(): Boolean {
+        return bleRepository.isCompatibleFilterEnabled()
+    }
+    
+    /**
+     * Alterna el estado del filtro
+     */
+    fun toggleCompatibleDevicesFilter() {
+        val currentState = bleRepository.isCompatibleFilterEnabled()
+        bleRepository.setCompatibleDevicesFilter(!currentState)
+    }
 }

@@ -112,6 +112,24 @@ class BleConnectViewModel @Inject constructor(
     fun requiresPermissions(): Boolean {
         return !scanBleDevicesUseCase.isBluetoothEnabled()
     }
+    
+    // Gestión de filtros
+    fun toggleCompatibleDevicesFilter() {
+        scanBleDevicesUseCase.toggleCompatibleDevicesFilter()
+        _uiState.value = _uiState.value.copy(
+            showOnlyCompatibleDevices = scanBleDevicesUseCase.isCompatibleFilterEnabled()
+        )
+    }
+    
+    fun enableCompatibleDevicesFilter() {
+        scanBleDevicesUseCase.enableCompatibleDevicesFilter()
+        _uiState.value = _uiState.value.copy(showOnlyCompatibleDevices = true)
+    }
+    
+    fun disableCompatibleDevicesFilter() {
+        scanBleDevicesUseCase.disableCompatibleDevicesFilter()
+        _uiState.value = _uiState.value.copy(showOnlyCompatibleDevices = false)
+    }
 }
 
 data class BleConnectUiState(
@@ -119,5 +137,6 @@ data class BleConnectUiState(
     val connectedDevices: List<BleDevice> = emptyList(),
     val isScanning: Boolean = false,
     val isConnecting: String? = null, // MAC address del dispositivo que se está conectando
-    val error: String? = null
+    val error: String? = null,
+    val showOnlyCompatibleDevices: Boolean = false // Nuevo estado para filtrar dispositivos compatibles
 )
