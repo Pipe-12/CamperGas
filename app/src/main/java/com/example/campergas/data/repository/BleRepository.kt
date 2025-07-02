@@ -37,6 +37,21 @@ class BleRepository @Inject constructor(
     
     fun isBluetoothEnabled(): Boolean = bleManager.isBluetoothEnabled()
     
+    /**
+     * Verifica si se tienen todos los permisos necesarios para operaciones BLE
+     */
+    fun hasAllBluetoothPermissions(): Boolean = bleManager.hasAllBluetoothPermissions()
+    
+    /**
+     * Verifica si se tienen permisos para escanear dispositivos BLE
+     */
+    fun hasBluetoothScanPermission(): Boolean = bleManager.hasBluetoothScanPermission()
+    
+    /**
+     * Verifica si se tienen permisos para conectar dispositivos BLE
+     */
+    fun hasBluetoothConnectPermission(): Boolean = bleManager.hasBluetoothConnectPermission()
+    
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun startScan() = bleDeviceScanner.startScan()
     

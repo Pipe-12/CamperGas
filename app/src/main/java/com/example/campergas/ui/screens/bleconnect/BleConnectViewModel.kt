@@ -1,6 +1,5 @@
 package com.example.campergas.ui.screens.bleconnect
 
-import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.data.repository.BleRepository
@@ -41,8 +40,15 @@ class BleConnectViewModel @Inject constructor(
         }
     }
 
-    @SuppressLint("MissingPermission")
     fun startScan() {
+        // Verificar que tenemos permisos antes de escanear
+        if (!bleRepository.isBluetoothEnabled()) {
+            _uiState.value = _uiState.value.copy(
+                error = "Bluetooth no está habilitado"
+            )
+            return
+        }
+        
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isScanning = true,
@@ -55,6 +61,11 @@ class BleConnectViewModel @Inject constructor(
                         error = null
                     )
                 }
+            } catch (e: SecurityException) {
+                _uiState.value = _uiState.value.copy(
+                    isScanning = false,
+                    error = "Permisos de Bluetooth requeridos para escanear dispositivos"
+                )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isScanning = false,
@@ -64,11 +75,15 @@ class BleConnectViewModel @Inject constructor(
         }
     }
 
-    @SuppressLint("MissingPermission")
     fun stopScan() {
         try {
             scanBleDevicesUseCase.stopScan()
             _uiState.value = _uiState.value.copy(isScanning = false)
+        } catch (e: SecurityException) {
+            _uiState.value = _uiState.value.copy(
+                isScanning = false,
+                error = "Permisos de Bluetooth requeridos para detener el escaneo"
+            )
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(
                 isScanning = false,
@@ -77,8 +92,14 @@ class BleConnectViewModel @Inject constructor(
         }
     }
 
-    @SuppressLint("MissingPermission")
     fun connectToDevice(device: BleDevice) {
+        if (!bleRepository.isBluetoothEnabled()) {
+            _uiState.value = _uiState.value.copy(
+                error = "Bluetooth no está habilitado"
+            )
+            return
+        }
+        
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isConnecting = device.address,
@@ -94,6 +115,11 @@ class BleConnectViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     connectedDevice = device,
                     error = null
+                )
+            } catch (e: SecurityException) {
+                _uiState.value = _uiState.value.copy(
+                    isConnecting = null,
+                    error = "Permisos de Bluetooth requeridos para conectar"
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(

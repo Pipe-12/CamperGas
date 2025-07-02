@@ -28,6 +28,20 @@ class ScanBleDevicesUseCase @Inject constructor(
     }
     
     /**
+     * Verifica si se tienen todos los permisos necesarios para operaciones BLE
+     */
+    fun hasAllBluetoothPermissions(): Boolean {
+        return bleRepository.hasAllBluetoothPermissions()
+    }
+    
+    /**
+     * Verifica si se tienen permisos para escanear dispositivos BLE
+     */
+    fun hasBluetoothScanPermission(): Boolean {
+        return bleRepository.hasBluetoothScanPermission()
+    }
+    
+    /**
      * Activa el filtro para mostrar solo dispositivos compatibles con CamperGas
      */
     fun enableCompatibleDevicesFilter() {

@@ -14,6 +14,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -75,26 +76,31 @@ fun WeightScreen(
                             modifier = Modifier.padding(16.dp)
                         ) {
                             Text(
-                                text = "Peso actual",
+                                text = "Peso Actual",
                                 style = MaterialTheme.typography.titleMedium
                             )
                             
                             Text(
-                                text = "${weight.value} kg",
+                                text = weight.getFormattedValue(),
                                 style = MaterialTheme.typography.headlineLarge,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
                             )
                             
                             Spacer(modifier = Modifier.height(8.dp))
                             
                             Text(
-                                text = "Estado: ${if (weight.isCalibrated) "Calibrado" else "No calibrado"}",
-                                style = MaterialTheme.typography.bodyMedium
+                                text = "Estado: ${if (weight.isCalibrated) "✅ Calibrado" else "⚠️ No calibrado"}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (weight.isCalibrated) 
+                                    MaterialTheme.colorScheme.primary 
+                                else 
+                                    MaterialTheme.colorScheme.error
                             )
                             
                             Text(
                                 text = "Última medición: ${formatTimestamp(weight.timestamp)}",
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
                     }
@@ -110,32 +116,64 @@ fun WeightScreen(
                                 modifier = Modifier.padding(16.dp)
                             ) {
                                 Text(
-                                    text = "Información del tanque",
+                                    text = "Información del Tanque",
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 
                                 Spacer(modifier = Modifier.height(8.dp))
                                 
                                 Text(
-                                    text = "Capacidad: ${vehicle.gasTankCapacity} kg",
+                                    text = "Capacidad máxima: ${vehicle.gasTankCapacity} kg",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                                 
-                                val remainingPercentage = (weight.value / vehicle.gasTankCapacity * 100).toInt()
+                                val remainingPercentage = if (vehicle.gasTankCapacity > 0) {
+                                    ((weight.value / vehicle.gasTankCapacity) * 100).coerceIn(0f, 100f).toInt()
+                                } else 0
+                                
                                 Text(
                                     text = "Nivel actual: $remainingPercentage%",
                                     style = MaterialTheme.typography.headlineSmall,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    color = when {
+                                        remainingPercentage > 50 -> MaterialTheme.colorScheme.primary
+                                        remainingPercentage > 20 -> MaterialTheme.colorScheme.tertiary
+                                        else -> MaterialTheme.colorScheme.error
+                                    }
+                                )
+                                
+                                // Barra de progreso visual
+                                Spacer(modifier = Modifier.height(8.dp))
+                                LinearProgressIndicator(
+                                    progress = remainingPercentage / 100f,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = when {
+                                        remainingPercentage > 50 -> MaterialTheme.colorScheme.primary
+                                        remainingPercentage > 20 -> MaterialTheme.colorScheme.tertiary
+                                        else -> MaterialTheme.colorScheme.error
+                                    }
                                 )
                             }
                         }
                     }
                 } ?: run {
-                    CircularProgressIndicator()
-                    Text(
-                        text = "Esperando datos...",
-                        modifier = Modifier.padding(top = 16.dp)
-                    )
+                    // Estado cuando no hay datos
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Esperando datos del sensor...",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Asegúrate de que el sensor esté conectado",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }

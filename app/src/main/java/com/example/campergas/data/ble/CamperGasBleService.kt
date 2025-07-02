@@ -67,14 +67,18 @@ class CamperGasBleService @Inject constructor(
     private var offlineCharacteristic: BluetoothGattCharacteristic? = null
     
     private val gattCallback = object : BluetoothGattCallback() {
-        @SuppressLint("MissingPermission")
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             when (newState) {
                 BluetoothProfile.STATE_CONNECTED -> {
                     Log.d(TAG, "Conectado al sensor CamperGas")
                     _connectionState.value = true
-                    // Descubrir servicios
-                    gatt?.discoverServices()
+                    // Descubrir servicios solo si tenemos permisos
+                    if (bleManager.hasBluetoothConnectPermission()) {
+                        gatt?.discoverServices()
+                    } else {
+                        Log.e(TAG, "No hay permisos para descubrir servicios")
+                        disconnect()
+                    }
                 }
                 BluetoothProfile.STATE_DISCONNECTED -> {
                     Log.d(TAG, "Desconectado del sensor CamperGas")
@@ -85,7 +89,6 @@ class CamperGasBleService @Inject constructor(
             }
         }
         
-        @SuppressLint("MissingPermission")
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d(TAG, "Servicios descubiertos")
@@ -156,8 +159,13 @@ class CamperGasBleService @Inject constructor(
         }
     }
     
-    @SuppressLint("MissingPermission")
     private fun setupCharacteristics(service: BluetoothGattService, gatt: BluetoothGatt) {
+        // Verificar permisos antes de configurar características
+        if (!bleManager.hasBluetoothConnectPermission()) {
+            Log.e(TAG, "No hay permisos para configurar características")
+            return
+        }
+        
         // Configurar característica de peso
         weightCharacteristic = service.getCharacteristic(
             UUID.fromString(CamperGasUuids.WEIGHT_CHARACTERISTIC_UUID)
@@ -192,8 +200,13 @@ class CamperGasBleService @Inject constructor(
         }
     }
     
-    @SuppressLint("MissingPermission")
     private fun enableNotifications(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+        // Verificar permisos antes de habilitar notificaciones
+        if (!bleManager.hasBluetoothConnectPermission()) {
+            Log.e(TAG, "No hay permisos para habilitar notificaciones")
+            return
+        }
+        
         val success = gatt.setCharacteristicNotification(characteristic, true)
         
         if (success) {
@@ -218,8 +231,13 @@ class CamperGasBleService @Inject constructor(
         }
     }
     
-    @SuppressLint("MissingPermission")
     private fun listAvailableServices(gatt: BluetoothGatt?) {
+        // Verificar permisos antes de listar servicios
+        if (!bleManager.hasBluetoothConnectPermission()) {
+            Log.e(TAG, "No hay permisos para listar servicios")
+            return
+        }
+        
         gatt?.services?.forEach { service ->
             Log.d(TAG, "Servicio disponible: ${service.uuid}")
             service.characteristics.forEach { characteristic ->
@@ -338,9 +356,14 @@ class CamperGasBleService @Inject constructor(
         }
     }
     
-    @SuppressLint("MissingPermission")
     fun connect(deviceAddress: String) {
         try {
+            // Verificar permisos antes de conectar
+            if (!bleManager.hasBluetoothConnectPermission()) {
+                Log.e(TAG, "No hay permisos para conectar dispositivos BLE")
+                return
+            }
+            
             val device = bleManager.bluetoothAdapter?.getRemoteDevice(deviceAddress)
             device?.let {
                 Log.d(TAG, "Conectando al sensor CamperGas: $deviceAddress")
@@ -353,20 +376,31 @@ class CamperGasBleService @Inject constructor(
         }
     }
     
-    @SuppressLint("MissingPermission")
     fun disconnect() {
         Log.d(TAG, "Desconectando del sensor CamperGas")
         bluetoothGatt?.let { gatt ->
-            gatt.disconnect()
-            gatt.close()
+            // Verificar permisos antes de desconectar
+            if (bleManager.hasBluetoothConnectPermission()) {
+                gatt.disconnect()
+                gatt.close()
+            } else {
+                Log.w(TAG, "No hay permisos para desconectar, forzando limpieza")
+                // Forzar limpieza local aunque no tengamos permisos
+                cleanup()
+            }
         }
         cleanup()
     }
     
-    @SuppressLint("MissingPermission")
     fun requestHistoryData() {
         offlineCharacteristic?.let { characteristic ->
             bluetoothGatt?.let { gatt ->
+                // Verificar permisos antes de solicitar datos históricos
+                if (!bleManager.hasBluetoothConnectPermission()) {
+                    Log.e(TAG, "No hay permisos para solicitar datos históricos")
+                    return
+                }
+                
                 _isLoadingHistory.value = true
                 Log.d(TAG, "Solicitando datos históricos...")
                 
