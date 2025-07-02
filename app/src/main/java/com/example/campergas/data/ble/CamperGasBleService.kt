@@ -74,6 +74,7 @@ class CamperGasBleService @Inject constructor(
                     _connectionState.value = true
                     // Descubrir servicios solo si tenemos permisos
                     if (bleManager.hasBluetoothConnectPermission()) {
+                        @SuppressLint("MissingPermission")
                         gatt?.discoverServices()
                     } else {
                         Log.e(TAG, "No hay permisos para descubrir servicios")
@@ -207,6 +208,7 @@ class CamperGasBleService @Inject constructor(
             return
         }
         
+        @SuppressLint("MissingPermission")
         val success = gatt.setCharacteristicNotification(characteristic, true)
         
         if (success) {
@@ -216,6 +218,7 @@ class CamperGasBleService @Inject constructor(
             
             descriptor?.let {
                 // Usar el nuevo método writeDescriptor con ByteArray (API 33+)
+                @SuppressLint("MissingPermission")
                 val result = gatt.writeDescriptor(
                     it, 
                     BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
@@ -367,6 +370,7 @@ class CamperGasBleService @Inject constructor(
             val device = bleManager.bluetoothAdapter?.getRemoteDevice(deviceAddress)
             device?.let {
                 Log.d(TAG, "Conectando al sensor CamperGas: $deviceAddress")
+                @SuppressLint("MissingPermission")
                 bluetoothGatt = it.connectGatt(context, false, gattCallback)
             } ?: run {
                 Log.e(TAG, "No se pudo obtener el dispositivo remoto")
@@ -381,7 +385,9 @@ class CamperGasBleService @Inject constructor(
         bluetoothGatt?.let { gatt ->
             // Verificar permisos antes de desconectar
             if (bleManager.hasBluetoothConnectPermission()) {
+                @SuppressLint("MissingPermission")
                 gatt.disconnect()
+                @SuppressLint("MissingPermission")
                 gatt.close()
             } else {
                 Log.w(TAG, "No hay permisos para desconectar, forzando limpieza")
@@ -408,6 +414,7 @@ class CamperGasBleService @Inject constructor(
                 enableNotifications(gatt, characteristic)
                 
                 // Luego leer la característica para obtener los datos offline
+                @SuppressLint("MissingPermission")
                 val success = gatt.readCharacteristic(characteristic)
                 if (!success) {
                     Log.e(TAG, "Error al solicitar lectura de datos históricos")

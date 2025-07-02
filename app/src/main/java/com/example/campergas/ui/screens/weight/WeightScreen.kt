@@ -145,7 +145,7 @@ fun WeightScreen(
                                 // Barra de progreso visual
                                 Spacer(modifier = Modifier.height(8.dp))
                                 LinearProgressIndicator(
-                                    progress = remainingPercentage / 100f,
+                                    progress = { remainingPercentage / 100f },
                                     modifier = Modifier.fillMaxWidth(),
                                     color = when {
                                         remainingPercentage > 50 -> MaterialTheme.colorScheme.primary
