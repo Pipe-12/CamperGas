@@ -124,7 +124,7 @@ fun SettingsScreen(
                     )
                     Switch(
                         checked = uiState.notificationsEnabled,
-                        onCheckedChange = viewModel::toggleNotifications
+                        onCheckedChange = { viewModel.toggleNotifications() }
                     )
                 }
             }
