@@ -40,6 +40,7 @@ fun WeightScreen(
 ) {
     val weightState by viewModel.weightState.collectAsState()
     val vehicleState by viewModel.vehicleState.collectAsState()
+    val activeCylinder by viewModel.activeCylinder.collectAsState()
     
     Scaffold(
         topBar = {
@@ -102,6 +103,137 @@ fun WeightScreen(
                                 text = "Última medición: ${formatTimestamp(weight.timestamp)}",
                                 style = MaterialTheme.typography.bodySmall
                             )
+                        }
+                    }
+                    
+                    // Tarjeta de información de bombona activa
+                    activeCylinder?.let { cylinder ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text(
+                                    text = "Bombona Activa",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                
+                                Spacer(modifier = Modifier.height(8.dp))
+                                
+                                Text(
+                                    text = "Nombre: ${cylinder.name}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                
+                                Text(
+                                    text = "Peso vacía: ${String.format("%.1f", cylinder.tare)} kg",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                
+                                Text(
+                                    text = "Capacidad: ${String.format("%.1f", cylinder.capacity)} kg",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                
+                                Spacer(modifier = Modifier.height(8.dp))
+                                
+                                val gasContent = cylinder.calculateGasContent(weight.value)
+                                val gasPercentage = cylinder.calculateGasPercentage(weight.value)
+                                
+                                Text(
+                                    text = "Gas actual: ${String.format("%.1f", gasContent)} kg",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                
+                                Text(
+                                    text = "Nivel de gas: ${String.format("%.1f", gasPercentage)}%",
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = when {
+                                        gasPercentage > 50 -> MaterialTheme.colorScheme.primary
+                                        gasPercentage > 20 -> MaterialTheme.colorScheme.tertiary
+                                        else -> MaterialTheme.colorScheme.error
+                                    }
+                                )
+                                
+                                // Barra de progreso para nivel de gas
+                                Spacer(modifier = Modifier.height(8.dp))
+                                LinearProgressIndicator(
+                                    progress = { gasPercentage / 100f },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = when {
+                                        gasPercentage > 50 -> MaterialTheme.colorScheme.primary
+                                        gasPercentage > 20 -> MaterialTheme.colorScheme.tertiary
+                                        else -> MaterialTheme.colorScheme.error
+                                    }
+                                )
+                                
+                                // Indicadores de estado
+                                Spacer(modifier = Modifier.height(8.dp))
+                                when {
+                                    cylinder.isEmpty(weight.value) -> {
+                                        Text(
+                                            text = "⚠️ Bombona vacía",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.error,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                    cylinder.isLowGas(weight.value) -> {
+                                        Text(
+                                            text = "⚠️ Nivel bajo de gas",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.tertiary,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                    else -> {
+                                        Text(
+                                            text = "✅ Nivel de gas adecuado",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    } ?: run {
+                        // Mensaje cuando no hay bombona activa
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text(
+                                    text = "Bombona Activa",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                
+                                Spacer(modifier = Modifier.height(8.dp))
+                                
+                                Text(
+                                    text = "⚠️ No hay bombona activa configurada",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                
+                                Text(
+                                    text = "Añade una bombona desde la pantalla principal para obtener información detallada del gas.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                     

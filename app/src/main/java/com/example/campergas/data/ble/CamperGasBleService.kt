@@ -7,6 +7,7 @@ import android.util.Log
 import com.example.campergas.domain.model.CamperGasUuids
 import com.example.campergas.domain.model.Weight
 import com.example.campergas.domain.model.Inclination
+import com.example.campergas.domain.usecase.GetActiveCylinderUseCase
 import com.example.campergas.domain.usecase.SaveWeightMeasurementUseCase
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -32,6 +33,7 @@ import javax.inject.Singleton
 class CamperGasBleService @Inject constructor(
     private val bleManager: BleManager,
     private val saveWeightMeasurementUseCase: SaveWeightMeasurementUseCase,
+    private val getActiveCylinderUseCase: GetActiveCylinderUseCase,
     @ApplicationContext private val context: Context
 ) {
     companion object {
@@ -267,14 +269,19 @@ class CamperGasBleService @Inject constructor(
             _weightData.value = weight
             Log.d(TAG, "Peso actualizado: ${weight.value} kg")
             
-            // Guardar en la base de datos de forma asíncrona
+            // Guardar en la base de datos solo si hay una bombona activa
             serviceScope.launch {
                 try {
-                    saveWeightMeasurementUseCase.saveRealTimeMeasurement(
-                        value = weightValue,
-                        timestamp = weight.timestamp
-                    )
-                    Log.d(TAG, "Medición de peso guardada en base de datos")
+                    val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
+                    if (activeCylinder != null) {
+                        saveWeightMeasurementUseCase.saveRealTimeMeasurement(
+                            value = weightValue,
+                            timestamp = weight.timestamp
+                        )
+                        Log.d(TAG, "Medición de peso guardada en base de datos")
+                    } else {
+                        Log.w(TAG, "No hay bombona activa - Medición de peso NO guardada")
+                    }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error al guardar medición de peso: ${e.message}")
                 }
@@ -346,8 +353,13 @@ class CamperGasBleService @Inject constructor(
             // Guardar datos históricos en la base de datos de forma asíncrona
             serviceScope.launch {
                 try {
-                    saveWeightMeasurementUseCase.saveHistoricalMeasurements(historicalMeasurements)
-                    Log.d(TAG, "Datos históricos guardados en base de datos: ${historicalMeasurements.size} registros")
+                    val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
+                    if (activeCylinder != null) {
+                        saveWeightMeasurementUseCase.saveHistoricalMeasurements(historicalMeasurements)
+                        Log.d(TAG, "Datos históricos guardados en base de datos: ${historicalMeasurements.size} registros")
+                    } else {
+                        Log.w(TAG, "No hay bombona activa - Datos históricos NO guardados")
+                    }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error al guardar datos históricos: ${e.message}")
                 }

@@ -14,14 +14,12 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -29,24 +27,46 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-
 import androidx.navigation.NavController
+import com.example.campergas.ui.components.gas.AddGasCylinderDialog
+import com.example.campergas.ui.components.gas.GasCylinderFloatingActionButton
+import com.example.campergas.ui.components.gas.GasCylinderInfoCard
+import com.example.campergas.ui.components.gas.GasCylinderViewModel
 import com.example.campergas.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    gasCylinderViewModel: GasCylinderViewModel = hiltViewModel()
 ) {
     val connectionState by viewModel.connectionState.collectAsState()
     val weightValue by viewModel.weight.collectAsState()
+    val activeCylinder by gasCylinderViewModel.activeCylinder.collectAsState()
+    val gasCylinderUiState by gasCylinderViewModel.uiState.collectAsState()
+    
+    var showAddCylinderDialog by remember { mutableStateOf(false) }
+    
+    // Diálogo para agregar bombona
+    if (showAddCylinderDialog) {
+        AddGasCylinderDialog(
+            onDismiss = { showAddCylinderDialog = false },
+            onConfirm = { name, tare, capacity, setAsActive ->
+                gasCylinderViewModel.addCylinder(name, tare, capacity, setAsActive)
+                showAddCylinderDialog = false
+            }
+        )
+    }
     
     Scaffold(
         topBar = {
@@ -71,6 +91,11 @@ fun HomeScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
+        },
+        floatingActionButton = {
+            GasCylinderFloatingActionButton(
+                onClick = { showAddCylinderDialog = true }
+            )
         }
     ) { paddingValues ->
         LazyColumn(
@@ -91,13 +116,13 @@ fun HomeScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "Estado del Sistema",
+                            text = "Conexión BLE",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         
                         Text(
-                            text = "Conexión: ${if (connectionState) "✅ Conectado" else "❌ Desconectado"}",
+                            text = "Estado: ${if (connectionState) "✅ Conectado" else "❌ Desconectado"}",
                             style = MaterialTheme.typography.bodyLarge
                         )
                         
@@ -110,6 +135,15 @@ fun HomeScreen(
                         }
                     }
                 }
+            }
+            
+            // Información de bombona activa
+            item {
+                GasCylinderInfoCard(
+                    activeCylinder = activeCylinder,
+                    currentWeight = weightValue,
+                    errorMessage = gasCylinderUiState.errorMessage
+                )
             }
             
             // Título de navegación
