@@ -58,17 +58,20 @@ fun CaravanConfigScreen(
                             .fillMaxWidth()
                             .selectable(
                                 selected = (uiState.selectedVehicleType == vehicleType),
-                                onClick = { /* TODO: Implementar selección */ }
+                                onClick = { viewModel.updateVehicleType(vehicleType) }
                             )
                             .padding(vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
                             selected = (uiState.selectedVehicleType == vehicleType),
-                            onClick = null
+                            onClick = { viewModel.updateVehicleType(vehicleType) }
                         )
                         Text(
-                            text = vehicleType.name,
+                            text = when (vehicleType) {
+                                VehicleType.CARAVAN -> "Caravana"
+                                VehicleType.AUTOCARAVANA -> "Autocaravana"
+                            },
                             modifier = Modifier.padding(start = 8.dp)
                         )
                     }
@@ -91,9 +94,12 @@ fun CaravanConfigScreen(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
+                // Distancia entre ruedas traseras (común para ambos tipos)
                 OutlinedTextField(
-                    value = uiState.distanceBetweenWheels.toString(),
-                    onValueChange = { /* TODO: Implementar cambio */ },
+                    value = if (uiState.distanceBetweenWheels == 0f) "" else uiState.distanceBetweenWheels.toString(),
+                    onValueChange = { value ->
+                        value.toFloatOrNull()?.let { viewModel.updateDistanceBetweenWheels(it) }
+                    },
                     label = { Text("Distancia entre ruedas traseras") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
@@ -101,12 +107,58 @@ fun CaravanConfigScreen(
                         .padding(bottom = 8.dp)
                 )
 
-                OutlinedTextField(
-                    value = uiState.distanceToFrontSupport.toString(),
-                    onValueChange = { /* TODO: Implementar cambio */ },
-                    label = { Text("Distancia al apoyo delantero") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
+                // Campo específico según el tipo de vehículo
+                when (uiState.selectedVehicleType) {
+                    VehicleType.CARAVAN -> {
+                        OutlinedTextField(
+                            value = if (uiState.distanceToFrontSupport == 0f) "" else uiState.distanceToFrontSupport.toString(),
+                            onValueChange = { value ->
+                                value.toFloatOrNull()?.let { viewModel.updateDistanceToFrontSupport(it) }
+                            },
+                            label = { Text("Distancia al apoyo delantero") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    VehicleType.AUTOCARAVANA -> {
+                        OutlinedTextField(
+                            value = if (uiState.distanceBetweenFrontWheels == 0f) "" else uiState.distanceBetweenFrontWheels.toString(),
+                            onValueChange = { value ->
+                                value.toFloatOrNull()?.let { viewModel.updateDistanceBetweenFrontWheels(it) }
+                            },
+                            label = { Text("Distancia entre ruedas delanteras") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+        }
+
+        // Indicador de carga
+        if (uiState.isLoading || uiState.isSaving) {
+            Box(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        // Mensaje de error
+        uiState.error?.let { error ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer
+                )
+            ) {
+                Text(
+                    text = error,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    modifier = Modifier.padding(16.dp)
                 )
             }
         }
@@ -118,16 +170,25 @@ fun CaravanConfigScreen(
         ) {
             OutlinedButton(
                 onClick = { navController.popBackStack() },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                enabled = !uiState.isSaving
             ) {
                 Text("Cancelar")
             }
 
             Button(
-                onClick = { /* TODO: Implementar guardado */ },
-                modifier = Modifier.weight(1f)
+                onClick = { viewModel.saveConfiguration() },
+                modifier = Modifier.weight(1f),
+                enabled = !uiState.isSaving && !uiState.isLoading
             ) {
-                Text("Guardar")
+                if (uiState.isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Guardar")
+                }
             }
         }
     }

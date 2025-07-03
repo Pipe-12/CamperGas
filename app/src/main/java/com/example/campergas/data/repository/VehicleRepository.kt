@@ -37,7 +37,8 @@ class VehicleRepository @Inject constructor(
         return VehicleConfig(
             type = this.type,
             distanceBetweenRearWheels = this.distanceBetweenRearWheels,
-            distanceToFrontSupport = this.distanceToFrontSupport
+            distanceToFrontSupport = this.distanceToFrontSupport,
+            distanceBetweenFrontWheels = this.distanceBetweenFrontWheels
         )
     }
     
@@ -45,7 +46,8 @@ class VehicleRepository @Inject constructor(
         return VehicleConfigEntity(
             type = this.type,
             distanceBetweenRearWheels = this.distanceBetweenRearWheels,
-            distanceToFrontSupport = this.distanceToFrontSupport
+            distanceToFrontSupport = this.distanceToFrontSupport,
+            distanceBetweenFrontWheels = this.distanceBetweenFrontWheels
         )
     }
 }

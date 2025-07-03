@@ -53,7 +53,9 @@ object DatabaseModule {
             context,
             VehicleDatabase::class.java,
             "vehicle_database"
-        ).build()
+        )
+        .addMigrations(VehicleDatabase.MIGRATION_1_2)
+        .build()
     }
 
     @Provides

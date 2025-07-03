@@ -15,12 +15,14 @@ class SaveVehicleConfigUseCase @Inject constructor(
     suspend operator fun invoke(
         type: VehicleType,
         distanceBetweenRearWheels: Float,
-        distanceToFrontSupport: Float
+        distanceToFrontSupport: Float,
+        distanceBetweenFrontWheels: Float? = null
     ) {
         val config = VehicleConfig(
             type = type,
             distanceBetweenRearWheels = distanceBetweenRearWheels,
-            distanceToFrontSupport = distanceToFrontSupport
+            distanceToFrontSupport = distanceToFrontSupport,
+            distanceBetweenFrontWheels = distanceBetweenFrontWheels
         )
         
         vehicleRepository.saveVehicleConfig(config)

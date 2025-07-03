@@ -36,6 +36,7 @@ class CaravanConfigViewModel @Inject constructor(
                             selectedVehicleType = config.type,
                             distanceBetweenWheels = config.distanceBetweenRearWheels,
                             distanceToFrontSupport = config.distanceToFrontSupport,
+                            distanceBetweenFrontWheels = config.distanceBetweenFrontWheels ?: 0f,
                             isLoading = false,
                             error = null
                         )
@@ -64,6 +65,10 @@ class CaravanConfigViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(distanceToFrontSupport = distance)
     }
 
+    fun updateDistanceBetweenFrontWheels(distance: Float) {
+        _uiState.value = _uiState.value.copy(distanceBetweenFrontWheels = distance)
+    }
+
     fun saveConfiguration() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true)
@@ -71,7 +76,9 @@ class CaravanConfigViewModel @Inject constructor(
                 saveVehicleConfigUseCase(
                     type = _uiState.value.selectedVehicleType,
                     distanceBetweenRearWheels = _uiState.value.distanceBetweenWheels,
-                    distanceToFrontSupport = _uiState.value.distanceToFrontSupport
+                    distanceToFrontSupport = _uiState.value.distanceToFrontSupport,
+                    distanceBetweenFrontWheels = if (_uiState.value.selectedVehicleType == VehicleType.AUTOCARAVANA) 
+                        _uiState.value.distanceBetweenFrontWheels else null
                 )
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
@@ -91,6 +98,7 @@ data class CaravanConfigUiState(
     val selectedVehicleType: VehicleType = VehicleType.CARAVAN,
     val distanceBetweenWheels: Float = 0f,
     val distanceToFrontSupport: Float = 0f,
+    val distanceBetweenFrontWheels: Float = 0f,
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val error: String? = null
