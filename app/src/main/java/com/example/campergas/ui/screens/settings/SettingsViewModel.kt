@@ -3,6 +3,7 @@ package com.example.campergas.ui.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.data.local.preferences.PreferencesDataStore
+import com.example.campergas.domain.model.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,11 +27,11 @@ class SettingsViewModel @Inject constructor(
     private fun loadSettings() {
         viewModelScope.launch {
             combine(
-                preferencesDataStore.isDarkModeEnabled,
+                preferencesDataStore.themeMode,
                 preferencesDataStore.areNotificationsEnabled
-            ) { isDarkMode, notificationsEnabled ->
+            ) { themeMode, notificationsEnabled ->
                 SettingsUiState(
-                    isDarkMode = isDarkMode,
+                    themeMode = themeMode,
                     notificationsEnabled = notificationsEnabled
                 )
             }.collect { settings ->
@@ -39,9 +40,9 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun toggleDarkMode() {
+    fun setThemeMode(themeMode: ThemeMode) {
         viewModelScope.launch {
-            preferencesDataStore.setDarkMode(!_uiState.value.isDarkMode)
+            preferencesDataStore.setThemeMode(themeMode)
         }
     }
 
@@ -55,7 +56,7 @@ class SettingsViewModel @Inject constructor(
 }
 
 data class SettingsUiState(
-    val isDarkMode: Boolean = false,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val notificationsEnabled: Boolean = true,
     val isLoading: Boolean = false,
     val error: String? = null

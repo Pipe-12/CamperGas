@@ -1,7 +1,7 @@
 package com.example.campergas.ui.screens.settings
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.campergas.R
+import com.example.campergas.domain.model.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,6 +20,14 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val isSystemInDarkTheme = isSystemInDarkTheme()
+    
+    // Determinar si el switch debe estar activado
+    val isDarkModeEnabled = when (uiState.themeMode) {
+        ThemeMode.SYSTEM -> isSystemInDarkTheme
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+    }
 
     Column(
         modifier = Modifier
@@ -55,10 +64,38 @@ fun SettingsScreen(
                         modifier = Modifier.weight(1f)
                     )
                     Switch(
-                        checked = uiState.isDarkMode,
-                        onCheckedChange = { /* TODO: Implementar cambio de tema */ }
+                        checked = isDarkModeEnabled,
+                        onCheckedChange = { isEnabled ->
+                            // Si se activa, poner modo oscuro; si se desactiva, poner modo claro
+                            viewModel.setThemeMode(if (isEnabled) ThemeMode.DARK else ThemeMode.LIGHT)
+                        }
                     )
                 }
+                
+                // Botón para volver al modo sistema
+                if (uiState.themeMode != ThemeMode.SYSTEM) {
+                    TextButton(
+                        onClick = { viewModel.setThemeMode(ThemeMode.SYSTEM) },
+                        modifier = Modifier.padding(top = 8.dp)
+                    ) {
+                        Text(
+                            text = "Usar configuración del sistema",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+                
+                // Texto explicativo del estado actual
+                Text(
+                    text = when (uiState.themeMode) {
+                        ThemeMode.SYSTEM -> "Siguiendo configuración del sistema"
+                        ThemeMode.LIGHT -> "Modo claro activado"
+                        ThemeMode.DARK -> "Modo oscuro activado"
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
             }
         }
 
@@ -87,7 +124,7 @@ fun SettingsScreen(
                     )
                     Switch(
                         checked = uiState.notificationsEnabled,
-                        onCheckedChange = { /* TODO: Implementar cambio de notificaciones */ }
+                        onCheckedChange = viewModel::toggleNotifications
                     )
                 }
             }
