@@ -24,7 +24,10 @@ object DatabaseModule {
             CamperGasDatabase::class.java,
             CamperGasDatabase.DATABASE_NAME
         )
-        .addMigrations(CamperGasDatabase.MIGRATION_1_2)
+        .addMigrations(
+            CamperGasDatabase.MIGRATION_1_2,
+            CamperGasDatabase.MIGRATION_2_3
+        )
         .build()
     }
 

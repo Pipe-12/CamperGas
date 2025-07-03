@@ -19,8 +19,24 @@ class ConsumptionRepository @Inject constructor(
         }
     }
     
+    fun getConsumptionsByCylinder(cylinderId: Long): Flow<List<Consumption>> {
+        return consumptionDao.getConsumptionsByCylinder(cylinderId).map { entities ->
+            entities.map { it.toDomainModel() }
+        }
+    }
+    
     fun getConsumptionsByDateRange(startDate: Long, endDate: Long): Flow<List<Consumption>> {
         return consumptionDao.getConsumptionsByDateRange(startDate, endDate).map { entities ->
+            entities.map { it.toDomainModel() }
+        }
+    }
+    
+    fun getConsumptionsByCylinderAndDateRange(
+        cylinderId: Long, 
+        startDate: Long, 
+        endDate: Long
+    ): Flow<List<Consumption>> {
+        return consumptionDao.getConsumptionsByCylinderAndDateRange(cylinderId, startDate, endDate).map { entities ->
             entities.map { it.toDomainModel() }
         }
     }
@@ -33,13 +49,18 @@ class ConsumptionRepository @Inject constructor(
         consumptionDao.deleteAllConsumptions()
     }
     
+    suspend fun clearConsumptionsByCylinder(cylinderId: Long) {
+        consumptionDao.deleteConsumptionsByCylinder(cylinderId)
+    }
+    
     private fun ConsumptionEntity.toDomainModel(): Consumption {
         return Consumption(
             id = this.id,
+            cylinderId = this.cylinderId,
+            cylinderName = this.cylinderName,
             date = this.date,
-            initialWeight = this.initialWeight,
-            finalWeight = this.finalWeight,
-            consumptionValue = this.consumptionValue,
+            fuelPercentage = this.fuelPercentage,
+            fuelKilograms = this.fuelKilograms,
             duration = this.duration
         )
     }
@@ -47,10 +68,11 @@ class ConsumptionRepository @Inject constructor(
     private fun Consumption.toEntity(): ConsumptionEntity {
         return ConsumptionEntity(
             id = this.id,
+            cylinderId = this.cylinderId,
+            cylinderName = this.cylinderName,
             date = this.date,
-            initialWeight = this.initialWeight,
-            finalWeight = this.finalWeight,
-            consumptionValue = this.consumptionValue,
+            fuelPercentage = this.fuelPercentage,
+            fuelKilograms = this.fuelKilograms,
             duration = this.duration
         )
     }

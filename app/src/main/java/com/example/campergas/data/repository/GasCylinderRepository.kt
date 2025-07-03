@@ -23,6 +23,8 @@ class GasCylinderRepository @Inject constructor(
     
     suspend fun getCylinderById(id: Long): GasCylinder? = gasCylinderDao.getCylinderById(id)
     
+    suspend fun getGasCylinderById(id: Long): GasCylinder? = gasCylinderDao.getCylinderById(id)
+    
     suspend fun insertCylinder(cylinder: GasCylinder): Long {
         return gasCylinderDao.insertCylinder(cylinder)
     }

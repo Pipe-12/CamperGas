@@ -274,11 +274,24 @@ class CamperGasBleService @Inject constructor(
                 try {
                     val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
                     if (activeCylinder != null) {
-                        saveWeightMeasurementUseCase.saveRealTimeMeasurement(
+                        val result = saveWeightMeasurementUseCase.saveRealTimeMeasurement(
                             value = weightValue,
                             timestamp = weight.timestamp
                         )
-                        Log.d(TAG, "Medición de peso guardada en base de datos")
+                        
+                        result.fold(
+                            onSuccess = { saveResult ->
+                                Log.d(TAG, "Medición de peso guardada (ID: ${saveResult.measurementId})")
+                                if (saveResult.consumptionSaved) {
+                                    Log.d(TAG, "✅ Registro de consumo guardado (cambio significativo detectado)")
+                                } else {
+                                    Log.d(TAG, "⏸️ Registro de consumo omitido (sin cambios significativos)")
+                                }
+                            },
+                            onFailure = { error ->
+                                Log.e(TAG, "Error al guardar medición de peso: ${error.message}")
+                            }
+                        )
                     } else {
                         Log.w(TAG, "No hay bombona activa - Medición de peso NO guardada")
                     }
@@ -355,8 +368,17 @@ class CamperGasBleService @Inject constructor(
                 try {
                     val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
                     if (activeCylinder != null) {
-                        saveWeightMeasurementUseCase.saveHistoricalMeasurements(historicalMeasurements)
-                        Log.d(TAG, "Datos históricos guardados en base de datos: ${historicalMeasurements.size} registros")
+                        val result = saveWeightMeasurementUseCase.saveHistoricalMeasurements(historicalMeasurements)
+                        
+                        result.fold(
+                            onSuccess = { saveResult ->
+                                Log.d(TAG, "Datos históricos guardados: ${saveResult.measurementsSaved} mediciones")
+                                Log.d(TAG, "Registros de consumo inteligentes guardados: ${saveResult.consumptionsSaved}")
+                            },
+                            onFailure = { error ->
+                                Log.e(TAG, "Error al guardar datos históricos: ${error.message}")
+                            }
+                        )
                     } else {
                         Log.w(TAG, "No hay bombona activa - Datos históricos NO guardados")
                     }

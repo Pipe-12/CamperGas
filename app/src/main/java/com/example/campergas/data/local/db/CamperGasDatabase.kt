@@ -15,7 +15,7 @@ import com.example.campergas.domain.model.Weight
         Weight::class,
         ConsumptionEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class CamperGasDatabase : RoomDatabase() {
@@ -59,6 +59,35 @@ abstract class CamperGasDatabase : RoomDatabase() {
                 // Crear índices
                 database.execSQL("CREATE INDEX IF NOT EXISTS index_weight_measurements_cylinderId ON weight_measurements(cylinderId)")
                 database.execSQL("CREATE INDEX IF NOT EXISTS index_weight_measurements_timestamp ON weight_measurements(timestamp)")
+            }
+        }
+        
+        // Migración de la versión 2 a la 3 (actualizar tabla de consumo)
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Crear nueva tabla de consumo con la estructura actualizada
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS consumption_table_new (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        cylinderId INTEGER NOT NULL,
+                        cylinderName TEXT NOT NULL,
+                        date INTEGER NOT NULL,
+                        fuelPercentage REAL NOT NULL,
+                        fuelKilograms REAL NOT NULL,
+                        duration INTEGER NOT NULL,
+                        FOREIGN KEY(cylinderId) REFERENCES gas_cylinders(id) ON DELETE CASCADE
+                    )
+                """.trimIndent())
+                
+                // Crear índices para la nueva tabla
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_consumption_table_cylinderId ON consumption_table_new(cylinderId)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_consumption_table_date ON consumption_table_new(date)")
+                
+                // Eliminar tabla antigua si existe
+                database.execSQL("DROP TABLE IF EXISTS consumption_table")
+                
+                // Renombrar nueva tabla
+                database.execSQL("ALTER TABLE consumption_table_new RENAME TO consumption_table")
             }
         }
     }

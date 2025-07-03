@@ -15,9 +15,30 @@ interface ConsumptionDao {
     @Query("SELECT * FROM consumption_table ORDER BY date DESC")
     fun getAllConsumptions(): Flow<List<ConsumptionEntity>>
     
-    @Query("SELECT * FROM consumption_table WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC")
+    @Query("SELECT * FROM consumption_table WHERE cylinderId = :cylinderId ORDER BY date DESC")
+    fun getConsumptionsByCylinder(cylinderId: Long): Flow<List<ConsumptionEntity>>
+    
+    @Query("""
+        SELECT * FROM consumption_table 
+        WHERE date BETWEEN :startDate AND :endDate 
+        ORDER BY date DESC
+    """)
     fun getConsumptionsByDateRange(startDate: Long, endDate: Long): Flow<List<ConsumptionEntity>>
+    
+    @Query("""
+        SELECT * FROM consumption_table 
+        WHERE cylinderId = :cylinderId AND date BETWEEN :startDate AND :endDate 
+        ORDER BY date DESC
+    """)
+    fun getConsumptionsByCylinderAndDateRange(
+        cylinderId: Long, 
+        startDate: Long, 
+        endDate: Long
+    ): Flow<List<ConsumptionEntity>>
     
     @Query("DELETE FROM consumption_table")
     suspend fun deleteAllConsumptions()
+    
+    @Query("DELETE FROM consumption_table WHERE cylinderId = :cylinderId")
+    suspend fun deleteConsumptionsByCylinder(cylinderId: Long)
 }
