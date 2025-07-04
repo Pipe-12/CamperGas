@@ -95,6 +95,12 @@ class CamperGasBleService @Inject constructor(
                     _isLoadingHistory.value = false
                     cleanup()
                 }
+                BluetoothProfile.STATE_CONNECTING -> {
+                    Log.d(TAG, "Conectando al sensor CamperGas...")
+                }
+                BluetoothProfile.STATE_DISCONNECTING -> {
+                    Log.d(TAG, "Desconectando del sensor CamperGas...")
+                }
             }
         }
         
@@ -162,6 +168,16 @@ class CamperGasBleService @Inject constructor(
         ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d(TAG, "Descriptor escrito correctamente para ${descriptor.characteristic?.uuid}")
+                
+                // Si se escribió correctamente el descriptor de la característica offline, iniciar lectura
+                if (descriptor.characteristic?.uuid?.toString()?.lowercase() == 
+                    CamperGasUuids.OFFLINE_CHARACTERISTIC_UUID.lowercase()) {
+                    Log.d(TAG, "Descriptor offline configurado, iniciando lectura de datos...")
+                    serviceScope.launch {
+                        delay(200) // Pequeña pausa para estabilizar
+                        continueOfflineDataReading()
+                    }
+                }
             } else {
                 Log.e(TAG, "Error al escribir descriptor: $status")
             }
@@ -393,24 +409,20 @@ class CamperGasBleService @Inject constructor(
             // Guardar datos históricos del lote actual en la base de datos de forma asíncrona
             serviceScope.launch {
                 try {
-                    val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
-                    if (activeCylinder != null) {
-                        val result = saveWeightMeasurementUseCase.saveHistoricalMeasurements(batchHistoricalMeasurements)
-                        
-                        result.fold(
-                            onSuccess = { saveResult ->
-                                Log.d(TAG, "Lote ${offlineDataCount} guardado: ${saveResult.measurementsSaved} mediciones")
-                                Log.d(TAG, "Registros de consumo inteligentes guardados en lote: ${saveResult.consumptionsSaved}")
-                            },
-                            onFailure = { error ->
-                                Log.e(TAG, "Error al guardar lote ${offlineDataCount}: ${error.message}")
-                            }
-                        )
-                    } else {
-                        Log.w(TAG, "No hay bombona activa - Lote ${offlineDataCount} NO guardado")
-                    }
+                    // Guardar directamente sin verificaciones adicionales
+                    val result = saveWeightMeasurementUseCase.saveOfflineMeasurementsDirectly(batchHistoricalMeasurements)
+                    
+                    result.fold(
+                        onSuccess = { saveResult ->
+                            Log.d(TAG, "✅ Lote ${offlineDataCount} guardado automáticamente: ${saveResult.measurementsSaved} mediciones")
+                            Log.d(TAG, "📥 Datos offline guardados directamente en Room")
+                        },
+                        onFailure = { error ->
+                            Log.e(TAG, "❌ Error al guardar lote ${offlineDataCount} automáticamente: ${error.message}")
+                        }
+                    )
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error al guardar lote ${offlineDataCount}: ${e.message}")
+                    Log.e(TAG, "❌ Error al procesar guardado automático del lote ${offlineDataCount}: ${e.message}")
                 }
             }
             
@@ -440,6 +452,10 @@ class CamperGasBleService @Inject constructor(
             val device = bleManager.bluetoothAdapter?.getRemoteDevice(deviceAddress)
             device?.let {
                 Log.d(TAG, "Conectando al sensor CamperGas: $deviceAddress")
+                
+                // Limpiar estado anterior si existe
+                cleanup()
+                
                 @SuppressLint("MissingPermission")
                 bluetoothGatt = it.connectGatt(context, false, gattCallback)
             } ?: run {
@@ -510,18 +526,21 @@ class CamperGasBleService @Inject constructor(
                     return
                 }
                 
+                Log.d(TAG, "🔄 Iniciando lectura automática de datos offline al conectar...")
+                
                 // Inicializar la lectura continua de datos offline
                 startOfflineDataReading()
                 
-                Log.d(TAG, "🔄 Iniciando lectura automática de datos offline al conectar...")
-                
-                // Primero habilitar notificaciones para datos offline
+                // Habilitar notificaciones para datos offline
                 enableNotifications(gatt, characteristic)
                 
-                // Hacer una pequeña pausa antes de iniciar la lectura para asegurar que las notificaciones estén habilitadas
+                // Iniciar la primera lectura inmediatamente después de habilitar notificaciones
                 serviceScope.launch {
-                    delay(500) // 500ms de pausa para estabilizar la conexión
-                    continueOfflineDataReading()
+                    delay(300) // Pausa para estabilizar la conexión
+                    if (isReadingOfflineData) {
+                        Log.d(TAG, "Ejecutando primera lectura de datos offline...")
+                        continueOfflineDataReading()
+                    }
                 }
                 
             } ?: run {
@@ -613,4 +632,18 @@ class CamperGasBleService @Inject constructor(
     }
     
     fun isConnected(): Boolean = _connectionState.value
+    
+    /**
+     * Fuerza la verificación y lectura de datos offline si hay conexión activa
+     */
+    fun ensureOfflineDataReading() {
+        if (isConnected() && !isReadingOfflineData) {
+            Log.d(TAG, "🔍 Verificando y forzando lectura de datos offline...")
+            startAutomaticOfflineDataReading()
+        } else if (isReadingOfflineData) {
+            Log.d(TAG, "ℹ️ Lectura de datos offline ya en progreso")
+        } else {
+            Log.w(TAG, "⚠️ No hay conexión activa para leer datos offline")
+        }
+    }
 }

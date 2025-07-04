@@ -79,6 +79,27 @@ class SaveWeightMeasurementUseCase @Inject constructor(
     }
     
     /**
+     * Guarda mediciones offline directamente sin verificaciones ni lógica inteligente
+     */
+    suspend fun saveOfflineMeasurementsDirectly(
+        measurements: List<Pair<Float, Long>>
+    ): Result<HistoricalSaveResult> {
+        return try {
+            // Guardar directamente en Room sin verificaciones
+            repository.saveHistoricalMeasurements(measurements)
+            
+            Result.success(
+                HistoricalSaveResult(
+                    measurementsSaved = measurements.size,
+                    consumptionsSaved = 0 // No se procesan consumos automáticamente
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    /**
      * Obtiene las mediciones más recientes
      */
     fun getRecentMeasurements(limit: Int = 50): Flow<List<Weight>> {
