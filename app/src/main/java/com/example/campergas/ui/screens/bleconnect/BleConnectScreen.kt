@@ -99,8 +99,7 @@ fun BleConnectScreen(
                 weightData = weightData,
                 inclinationData = inclinationData,
                 historyData = historyData,
-                isLoadingHistory = isLoadingHistory,
-                onClearHistory = { viewModel.clearHistoryData() }
+                isLoadingHistory = isLoadingHistory
             )
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -566,8 +565,7 @@ fun SensorDataSection(
     weightData: Weight?,
     inclinationData: Inclination?, 
     historyData: List<Weight>,
-    isLoadingHistory: Boolean,
-    onClearHistory: () -> Unit
+    isLoadingHistory: Boolean
 ) {
     Column {
         // Datos en tiempo real
@@ -671,42 +669,35 @@ fun SensorDataSection(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = "Datos Históricos (${historyData.size})",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        if (isLoadingHistory) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    strokeWidth = 2.dp
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "Sincronizando automáticamente...",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        } else {
+                ) {                Column {
+                    Text(
+                        text = "Datos Históricos (${historyData.size})",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    if (isLoadingHistory) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "🔄 Sincronización automática al conectar",
+                                text = "Sincronizando automáticamente...",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
+                    } else {
+                        Text(
+                            text = "🔄 Sincronización automática al conectar",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
-                    
-                    if (historyData.isNotEmpty()) {
-                        TextButton(onClick = onClearHistory) {
-                            Text("Limpiar")
-                        }
-                    }
+                }
                 }
                 
                 if (isLoadingHistory) {

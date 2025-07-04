@@ -145,9 +145,6 @@ class BleConnectViewModel @Inject constructor(
             }
         }
     }
-     fun clearHistoryData() {
-        bleRepository.clearHistoryData()
-    }
     
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)

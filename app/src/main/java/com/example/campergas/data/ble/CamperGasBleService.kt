@@ -613,8 +613,4 @@ class CamperGasBleService @Inject constructor(
     }
     
     fun isConnected(): Boolean = _connectionState.value
-    
-    fun clearHistoryData() {
-        _historyData.value = emptyList()
-    }
 }

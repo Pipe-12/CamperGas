@@ -65,8 +65,6 @@ class BleRepository @Inject constructor(
     
     fun isConnected(): Boolean = camperGasBleService.isConnected()
     
-    fun clearHistoryData() = camperGasBleService.clearHistoryData()
-    
     suspend fun saveLastConnectedDevice(address: String) = preferencesDataStore.saveLastConnectedDevice(address)
 
     // Filtrado de dispositivos
