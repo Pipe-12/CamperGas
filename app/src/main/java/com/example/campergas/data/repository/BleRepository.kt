@@ -64,11 +64,7 @@ class BleRepository @Inject constructor(
     fun disconnectSensor() = camperGasBleService.disconnect()
     
     fun isConnected(): Boolean = camperGasBleService.isConnected()
-     // Solicitar datos históricos
-    fun requestHistoryData() = camperGasBleService.requestHistoryData()
     
-    fun stopOfflineDataReading() = camperGasBleService.stopOfflineDataReading()
-
     fun clearHistoryData() = camperGasBleService.clearHistoryData()
     
     suspend fun saveLastConnectedDevice(address: String) = preferencesDataStore.saveLastConnectedDevice(address)

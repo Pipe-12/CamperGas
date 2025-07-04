@@ -203,7 +203,9 @@ class CamperGasBleService @Inject constructor(
         )
         if (offlineCharacteristic != null) {
             Log.d(TAG, "Característica offline encontrada")
-            // Las notificaciones offline se habilitan solo cuando se solicitan datos históricos
+            // Iniciar lectura automática de datos offline al conectar
+            Log.d(TAG, "Iniciando lectura automática de datos offline...")
+            startAutomaticOfflineDataReading()
         } else {
             Log.w(TAG, "Característica offline no encontrada")
         }
@@ -340,9 +342,13 @@ class CamperGasBleService @Inject constructor(
             val jsonString = String(data, Charsets.UTF_8)
             Log.d(TAG, "Datos offline recibidos (lote ${offlineDataCount + 1}): $jsonString")
             
-            // Verificar si los datos están vacíos o indican fin de datos
-            if (jsonString.isBlank() || jsonString == "[]" || jsonString == "{}" || jsonString.equals("END", ignoreCase = true)) {
-                Log.d(TAG, "Fin de datos offline detectado o datos vacíos")
+            // Verificar si los datos están vacíos, son "0", o indican fin de datos
+            if (jsonString.isBlank() || 
+                jsonString == "[]" || 
+                jsonString == "{}" || 
+                jsonString.equals("END", ignoreCase = true) ||
+                jsonString.trim() == "0") {
+                Log.d(TAG, "Fin de datos offline detectado (datos vacíos o 0)")
                 finishOfflineDataReading()
                 return
             }
@@ -492,6 +498,40 @@ class CamperGasBleService @Inject constructor(
         }
     }
     
+    /**
+     * Inicia la lectura automática de datos offline al conectar
+     */
+    private fun startAutomaticOfflineDataReading() {
+        offlineCharacteristic?.let { characteristic ->
+            bluetoothGatt?.let { gatt ->
+                // Verificar permisos antes de solicitar datos históricos
+                if (!bleManager.hasBluetoothConnectPermission()) {
+                    Log.e(TAG, "No hay permisos para lectura automática de datos offline")
+                    return
+                }
+                
+                // Inicializar la lectura continua de datos offline
+                startOfflineDataReading()
+                
+                Log.d(TAG, "🔄 Iniciando lectura automática de datos offline al conectar...")
+                
+                // Primero habilitar notificaciones para datos offline
+                enableNotifications(gatt, characteristic)
+                
+                // Hacer una pequeña pausa antes de iniciar la lectura para asegurar que las notificaciones estén habilitadas
+                serviceScope.launch {
+                    delay(500) // 500ms de pausa para estabilizar la conexión
+                    continueOfflineDataReading()
+                }
+                
+            } ?: run {
+                Log.e(TAG, "No hay conexión GATT disponible para lectura automática")
+            }
+        } ?: run {
+            Log.w(TAG, "Característica offline no disponible para lectura automática")
+        }
+    }
+    
     private fun startOfflineDataReading() {
         isReadingOfflineData = true
         offlineDataCount = 0
@@ -545,6 +585,7 @@ class CamperGasBleService @Inject constructor(
         if (allHistoryData.isNotEmpty()) {
             Log.d(TAG, "✅ Sincronización offline completada con éxito")
             Log.d(TAG, "📊 Rango de datos: ${allHistoryData.minOfOrNull { it.timestamp }} - ${allHistoryData.maxOfOrNull { it.timestamp }}")
+            Log.d(TAG, "🎯 Datos offline sincronizados automáticamente al conectar")
         } else {
             Log.d(TAG, "ℹ️ No se encontraron datos offline en el sensor")
         }

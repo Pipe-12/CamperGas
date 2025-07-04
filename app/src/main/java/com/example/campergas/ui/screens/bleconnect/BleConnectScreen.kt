@@ -100,8 +100,6 @@ fun BleConnectScreen(
                 inclinationData = inclinationData,
                 historyData = historyData,
                 isLoadingHistory = isLoadingHistory,
-                onRequestHistory = { viewModel.requestHistoryData() },
-                onStopHistory = { viewModel.stopOfflineDataReading() },
                 onClearHistory = { viewModel.clearHistoryData() }
             )
             
@@ -569,8 +567,6 @@ fun SensorDataSection(
     inclinationData: Inclination?, 
     historyData: List<Weight>,
     isLoadingHistory: Boolean,
-    onRequestHistory: () -> Unit,
-    onStopHistory: () -> Unit,
     onClearHistory: () -> Unit
 ) {
     Column {
@@ -676,36 +672,39 @@ fun SensorDataSection(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Datos Históricos (${historyData.size})",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    
-                    Row {
-                        if (historyData.isNotEmpty()) {
-                            TextButton(onClick = onClearHistory) {
-                                Text("Limpiar")
-                            }
-                        }
-                        
+                    Column {
+                        Text(
+                            text = "Datos Históricos (${historyData.size})",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
                         if (isLoadingHistory) {
-                            Button(
-                                onClick = onStopHistory,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.error
-                                )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("⏹️")
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    strokeWidth = 2.dp
+                                )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Detener")
+                                Text(
+                                    text = "Sincronizando automáticamente...",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
                             }
                         } else {
-                            Button(onClick = onRequestHistory) {
-                                Text("📊")
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Sincronizar")
-                            }
+                            Text(
+                                text = "🔄 Sincronización automática al conectar",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    
+                    if (historyData.isNotEmpty()) {
+                        TextButton(onClick = onClearHistory) {
+                            Text("Limpiar")
                         }
                     }
                 }
