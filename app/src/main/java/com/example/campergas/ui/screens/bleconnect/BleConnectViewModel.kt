@@ -158,6 +158,18 @@ class BleConnectViewModel @Inject constructor(
         }
     }
     
+    fun stopOfflineDataReading() {
+        viewModelScope.launch {
+            try {
+                bleRepository.stopOfflineDataReading()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    error = e.message ?: "Error al detener lectura offline"
+                )
+            }
+        }
+    }
+    
     fun clearHistoryData() {
         bleRepository.clearHistoryData()
     }

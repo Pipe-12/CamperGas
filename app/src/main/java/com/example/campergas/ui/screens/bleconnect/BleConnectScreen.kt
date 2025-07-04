@@ -101,6 +101,7 @@ fun BleConnectScreen(
                 historyData = historyData,
                 isLoadingHistory = isLoadingHistory,
                 onRequestHistory = { viewModel.requestHistoryData() },
+                onStopHistory = { viewModel.stopOfflineDataReading() },
                 onClearHistory = { viewModel.clearHistoryData() }
             )
             
@@ -569,6 +570,7 @@ fun SensorDataSection(
     historyData: List<Weight>,
     isLoadingHistory: Boolean,
     onRequestHistory: () -> Unit,
+    onStopHistory: () -> Unit,
     onClearHistory: () -> Unit
 ) {
     Column {
@@ -687,21 +689,43 @@ fun SensorDataSection(
                             }
                         }
                         
-                        Button(
-                            onClick = onRequestHistory,
-                            enabled = !isLoadingHistory
-                        ) {
-                            if (isLoadingHistory) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    strokeWidth = 2.dp
+                        if (isLoadingHistory) {
+                            Button(
+                                onClick = onStopHistory,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.error
                                 )
-                            } else {
-                                Text("📊")
+                            ) {
+                                Text("⏹️")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Detener")
                             }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Solicitar")
+                        } else {
+                            Button(onClick = onRequestHistory) {
+                                Text("📊")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Sincronizar")
+                            }
                         }
+                    }
+                }
+                
+                if (isLoadingHistory) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Text(
+                            text = "Sincronizando datos del sensor...",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
                 

@@ -13,6 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -62,6 +63,11 @@ class CamperGasBleService @Inject constructor(
     // Estado de carga de datos históricos
     private val _isLoadingHistory = MutableStateFlow(false)
     val isLoadingHistory: StateFlow<Boolean> = _isLoadingHistory
+    
+    // Control para lectura continua de datos offline
+    private var isReadingOfflineData = false
+    private var offlineDataCount = 0
+    private val allHistoryData = mutableListOf<Weight>()
     
     private var bluetoothGatt: BluetoothGatt? = null
     private var weightCharacteristic: BluetoothGattCharacteristic? = null
@@ -332,12 +338,27 @@ class CamperGasBleService @Inject constructor(
     private fun processOfflineData(data: ByteArray) {
         try {
             val jsonString = String(data, Charsets.UTF_8)
-            Log.d(TAG, "Datos offline recibidos: $jsonString")
+            Log.d(TAG, "Datos offline recibidos (lote ${offlineDataCount + 1}): $jsonString")
+            
+            // Verificar si los datos están vacíos o indican fin de datos
+            if (jsonString.isBlank() || jsonString == "[]" || jsonString == "{}" || jsonString.equals("END", ignoreCase = true)) {
+                Log.d(TAG, "Fin de datos offline detectado o datos vacíos")
+                finishOfflineDataReading()
+                return
+            }
             
             // Parsear JSON array: [{"w":25.1,"t":1234567890},{"w":25.3,"t":1234567900}]
             val jsonArray = JSONArray(jsonString)
-            val historyWeights = mutableListOf<Weight>()
-            val historicalMeasurements = mutableListOf<Pair<Float, Long>>()
+            
+            // Si el array está vacío, hemos terminado
+            if (jsonArray.length() == 0) {
+                Log.d(TAG, "Array vacío recibido - fin de datos offline")
+                finishOfflineDataReading()
+                return
+            }
+            
+            val batchHistoryWeights = mutableListOf<Weight>()
+            val batchHistoricalMeasurements = mutableListOf<Pair<Float, Long>>()
             
             for (i in 0 until jsonArray.length()) {
                 val jsonObject = jsonArray.getJSONObject(i)
@@ -351,45 +372,54 @@ class CamperGasBleService @Inject constructor(
                     isHistorical = true
                 )
                 
-                historyWeights.add(weight)
-                historicalMeasurements.add(Pair(weightValue, timestamp))
+                batchHistoryWeights.add(weight)
+                allHistoryData.add(weight)
+                batchHistoricalMeasurements.add(Pair(weightValue, timestamp))
             }
             
-            // Ordenar por timestamp (más antiguos primero)
-            historyWeights.sortBy { it.timestamp }
+            offlineDataCount++
+            Log.d(TAG, "Lote ${offlineDataCount} procesado: ${batchHistoryWeights.size} registros (Total acumulado: ${allHistoryData.size})")
             
-            _historyData.value = historyWeights
-            _isLoadingHistory.value = false
+            // Actualizar UI con todos los datos acumulados hasta ahora
+            val sortedHistoryData = allHistoryData.sortedBy { it.timestamp }
+            _historyData.value = sortedHistoryData
             
-            Log.d(TAG, "Datos históricos procesados: ${historyWeights.size} registros")
-            
-            // Guardar datos históricos en la base de datos de forma asíncrona
+            // Guardar datos históricos del lote actual en la base de datos de forma asíncrona
             serviceScope.launch {
                 try {
                     val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
                     if (activeCylinder != null) {
-                        val result = saveWeightMeasurementUseCase.saveHistoricalMeasurements(historicalMeasurements)
+                        val result = saveWeightMeasurementUseCase.saveHistoricalMeasurements(batchHistoricalMeasurements)
                         
                         result.fold(
                             onSuccess = { saveResult ->
-                                Log.d(TAG, "Datos históricos guardados: ${saveResult.measurementsSaved} mediciones")
-                                Log.d(TAG, "Registros de consumo inteligentes guardados: ${saveResult.consumptionsSaved}")
+                                Log.d(TAG, "Lote ${offlineDataCount} guardado: ${saveResult.measurementsSaved} mediciones")
+                                Log.d(TAG, "Registros de consumo inteligentes guardados en lote: ${saveResult.consumptionsSaved}")
                             },
                             onFailure = { error ->
-                                Log.e(TAG, "Error al guardar datos históricos: ${error.message}")
+                                Log.e(TAG, "Error al guardar lote ${offlineDataCount}: ${error.message}")
                             }
                         )
                     } else {
-                        Log.w(TAG, "No hay bombona activa - Datos históricos NO guardados")
+                        Log.w(TAG, "No hay bombona activa - Lote ${offlineDataCount} NO guardado")
                     }
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error al guardar datos históricos: ${e.message}")
+                    Log.e(TAG, "Error al guardar lote ${offlineDataCount}: ${e.message}")
+                }
+            }
+            
+            // Continuar leyendo más datos si estamos en modo de lectura continua
+            if (isReadingOfflineData) {
+                // Hacer una pausa pequeña antes de solicitar más datos
+                serviceScope.launch {
+                    delay(100) // 100ms de pausa entre lecturas
+                    continueOfflineDataReading()
                 }
             }
             
         } catch (e: Exception) {
             Log.e(TAG, "Error al procesar datos offline: ${e.message}")
-            _isLoadingHistory.value = false
+            finishOfflineDataReading()
         }
     }
     
@@ -441,28 +471,96 @@ class CamperGasBleService @Inject constructor(
                     return
                 }
                 
-                _isLoadingHistory.value = true
-                Log.d(TAG, "Solicitando datos históricos...")
+                // Inicializar la lectura continua de datos offline
+                startOfflineDataReading()
+                
+                Log.d(TAG, "Iniciando lectura continua de datos históricos...")
                 
                 // Primero habilitar notificaciones para datos offline si no están habilitadas
                 enableNotifications(gatt, characteristic)
                 
-                // Luego leer la característica para obtener los datos offline
-                @SuppressLint("MissingPermission")
-                val success = gatt.readCharacteristic(characteristic)
-                if (!success) {
-                    Log.e(TAG, "Error al solicitar lectura de datos históricos")
-                    _isLoadingHistory.value = false
-                }
+                // Iniciar la primera lectura
+                continueOfflineDataReading()
+                
             } ?: run {
                 Log.e(TAG, "No hay conexión GATT disponible")
+                _isLoadingHistory.value = false
             }
         } ?: run {
             Log.e(TAG, "Característica offline no disponible")
+            _isLoadingHistory.value = false
+        }
+    }
+    
+    private fun startOfflineDataReading() {
+        isReadingOfflineData = true
+        offlineDataCount = 0
+        allHistoryData.clear()
+        _isLoadingHistory.value = true
+        _historyData.value = emptyList()
+        Log.d(TAG, "Iniciando lectura continua de datos offline")
+    }
+    
+    private fun continueOfflineDataReading() {
+        if (!isReadingOfflineData) {
+            Log.d(TAG, "Lectura offline cancelada")
+            return
+        }
+        
+        offlineCharacteristic?.let { characteristic ->
+            bluetoothGatt?.let { gatt ->
+                if (bleManager.hasBluetoothConnectPermission()) {
+                    @SuppressLint("MissingPermission")
+                    val success = gatt.readCharacteristic(characteristic)
+                    if (!success) {
+                        Log.e(TAG, "Error al continuar lectura de datos históricos")
+                        finishOfflineDataReading()
+                    }
+                } else {
+                    Log.e(TAG, "No hay permisos para continuar lectura")
+                    finishOfflineDataReading()
+                }
+            } ?: run {
+                Log.e(TAG, "No hay conexión GATT para continuar lectura")
+                finishOfflineDataReading()
+            }
+        } ?: run {
+            Log.e(TAG, "Característica offline no disponible para continuar")
+            finishOfflineDataReading()
+        }
+    }
+    
+    private fun finishOfflineDataReading() {
+        isReadingOfflineData = false
+        _isLoadingHistory.value = false
+        
+        Log.d(TAG, "Lectura de datos offline completada")
+        Log.d(TAG, "Total de lotes procesados: $offlineDataCount")
+        Log.d(TAG, "Total de registros históricos obtenidos: ${allHistoryData.size}")
+        
+        // Ordenar todos los datos por timestamp final
+        val sortedHistoryData = allHistoryData.sortedBy { it.timestamp }
+        _historyData.value = sortedHistoryData
+        
+        if (allHistoryData.isNotEmpty()) {
+            Log.d(TAG, "✅ Sincronización offline completada con éxito")
+            Log.d(TAG, "📊 Rango de datos: ${allHistoryData.minOfOrNull { it.timestamp }} - ${allHistoryData.maxOfOrNull { it.timestamp }}")
+        } else {
+            Log.d(TAG, "ℹ️ No se encontraron datos offline en el sensor")
+        }
+    }
+    
+    fun stopOfflineDataReading() {
+        if (isReadingOfflineData) {
+            Log.d(TAG, "Deteniendo lectura continua de datos offline...")
+            finishOfflineDataReading()
         }
     }
     
     private fun cleanup() {
+        // Detener lectura offline si está en progreso
+        stopOfflineDataReading()
+        
         bluetoothGatt = null
         weightCharacteristic = null
         inclinationCharacteristic = null
