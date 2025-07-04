@@ -46,4 +46,7 @@ interface WeightDao {
     
     @Query("SELECT * FROM weight_measurements ORDER BY timestamp DESC LIMIT :limit")
     fun getRecentMeasurements(limit: Int): Flow<List<Weight>>
+    
+    @Query("SELECT COUNT(*) FROM weight_measurements WHERE timestamp = :timestamp")
+    suspend fun doesTimestampExist(timestamp: Long): Int
 }

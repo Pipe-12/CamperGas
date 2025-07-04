@@ -381,57 +381,74 @@ class CamperGasBleService @Inject constructor(
             
             val batchHistoryWeights = mutableListOf<Weight>()
             val batchHistoricalMeasurements = mutableListOf<Pair<Float, Long>>()
+            var duplicateFound = false
             
-            for (i in 0 until jsonArray.length()) {
-                val jsonObject = jsonArray.getJSONObject(i)
-                val weightValue = jsonObject.getDouble("w").toFloat()
-                val timestamp = jsonObject.getLong("t") * 1000L // Convertir de segundos a milisegundos
-                
-                val weight = Weight(
-                    value = weightValue,
-                    timestamp = timestamp,
-                    unit = "kg",
-                    isHistorical = true
-                )
-                
-                batchHistoryWeights.add(weight)
-                allHistoryData.add(weight)
-                batchHistoricalMeasurements.add(Pair(weightValue, timestamp))
-            }
-            
-            offlineDataCount++
-            Log.d(TAG, "Lote ${offlineDataCount} procesado: ${batchHistoryWeights.size} registros (Total acumulado: ${allHistoryData.size})")
-            
-            // Actualizar UI con todos los datos acumulados hasta ahora
-            val sortedHistoryData = allHistoryData.sortedBy { it.timestamp }
-            _historyData.value = sortedHistoryData
-            
-            // Guardar datos históricos del lote actual en la base de datos de forma asíncrona
+            // Verificar timestamp duplicados antes de procesar el lote completo
             serviceScope.launch {
                 try {
-                    // Guardar directamente sin verificaciones adicionales
-                    val result = saveWeightMeasurementUseCase.saveOfflineMeasurementsDirectly(batchHistoricalMeasurements)
-                    
-                    result.fold(
-                        onSuccess = { saveResult ->
-                            Log.d(TAG, "✅ Lote ${offlineDataCount} guardado automáticamente: ${saveResult.measurementsSaved} mediciones")
-                            Log.d(TAG, "📥 Datos offline guardados directamente en Room")
-                        },
-                        onFailure = { error ->
-                            Log.e(TAG, "❌ Error al guardar lote ${offlineDataCount} automáticamente: ${error.message}")
+                    for (i in 0 until jsonArray.length()) {
+                        val jsonObject = jsonArray.getJSONObject(i)
+                        val timestamp = jsonObject.getLong("t") * 1000L // Convertir de segundos a milisegundos
+                        
+                        // Verificar si este timestamp ya existe en la base de datos
+                        if (saveWeightMeasurementUseCase.doesTimestampExist(timestamp)) {
+                            Log.d(TAG, "🛑 Timestamp duplicado detectado: $timestamp - deteniendo lectura offline")
+                            duplicateFound = true
+                            finishOfflineDataReading()
+                            return@launch
                         }
-                    )
+                        
+                        val weightValue = jsonObject.getDouble("w").toFloat()
+                        
+                        val weight = Weight(
+                            value = weightValue,
+                            timestamp = timestamp,
+                            unit = "kg",
+                            isHistorical = true
+                        )
+                        
+                        batchHistoryWeights.add(weight)
+                        allHistoryData.add(weight)
+                        batchHistoricalMeasurements.add(Pair(weightValue, timestamp))
+                    }
+                    
+                    // Solo procesar si no encontramos duplicados
+                    if (!duplicateFound && batchHistoricalMeasurements.isNotEmpty()) {
+                        offlineDataCount++
+                        Log.d(TAG, "Lote ${offlineDataCount} procesado: ${batchHistoryWeights.size} registros (Total acumulado: ${allHistoryData.size})")
+                        
+                        // Actualizar UI con todos los datos acumulados hasta ahora
+                        val sortedHistoryData = allHistoryData.sortedBy { it.timestamp }
+                        _historyData.value = sortedHistoryData
+                        
+                        // Guardar datos históricos del lote actual en la base de datos
+                        try {
+                            // Guardar directamente sin verificaciones adicionales
+                            val result = saveWeightMeasurementUseCase.saveOfflineMeasurementsDirectly(batchHistoricalMeasurements)
+                            
+                            result.fold(
+                                onSuccess = { saveResult ->
+                                    Log.d(TAG, "✅ Lote ${offlineDataCount} guardado automáticamente: ${saveResult.measurementsSaved} mediciones")
+                                    Log.d(TAG, "📥 Datos offline guardados directamente en Room")
+                                },
+                                onFailure = { error ->
+                                    Log.e(TAG, "❌ Error al guardar lote ${offlineDataCount} automáticamente: ${error.message}")
+                                }
+                            )
+                        } catch (e: Exception) {
+                            Log.e(TAG, "❌ Error al procesar guardado automático del lote ${offlineDataCount}: ${e.message}")
+                        }
+                        
+                        // Continuar leyendo más datos si estamos en modo de lectura continua y no hay duplicados
+                        if (isReadingOfflineData) {
+                            // Hacer una pausa pequeña antes de solicitar más datos
+                            delay(100) // 100ms de pausa entre lecturas
+                            continueOfflineDataReading()
+                        }
+                    }
                 } catch (e: Exception) {
-                    Log.e(TAG, "❌ Error al procesar guardado automático del lote ${offlineDataCount}: ${e.message}")
-                }
-            }
-            
-            // Continuar leyendo más datos si estamos en modo de lectura continua
-            if (isReadingOfflineData) {
-                // Hacer una pausa pequeña antes de solicitar más datos
-                serviceScope.launch {
-                    delay(100) // 100ms de pausa entre lecturas
-                    continueOfflineDataReading()
+                    Log.e(TAG, "Error al verificar timestamps duplicados: ${e.message}")
+                    finishOfflineDataReading()
                 }
             }
             

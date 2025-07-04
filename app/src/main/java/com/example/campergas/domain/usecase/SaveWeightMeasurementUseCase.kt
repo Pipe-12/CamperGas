@@ -112,6 +112,13 @@ class SaveWeightMeasurementUseCase @Inject constructor(
     fun getMeasurementsByCylinder(cylinderId: Long): Flow<List<Weight>> {
         return repository.getMeasurementsByCylinder(cylinderId)
     }
+    
+    /**
+     * Verifica si un timestamp ya existe en la base de datos
+     */
+    suspend fun doesTimestampExist(timestamp: Long): Boolean {
+        return repository.doesTimestampExist(timestamp)
+    }
 }
 
 /**

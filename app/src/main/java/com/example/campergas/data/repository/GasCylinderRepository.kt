@@ -78,6 +78,10 @@ class GasCylinderRepository @Inject constructor(
         weightDao.deleteOldMeasurements(beforeTimestamp)
     }
     
+    suspend fun doesTimestampExist(timestamp: Long): Boolean {
+        return weightDao.doesTimestampExist(timestamp) > 0
+    }
+    
     /**
      * Guarda una medición de peso asociándola automáticamente con la bombona activa
      */
