@@ -383,9 +383,9 @@ class CamperGasBleService @Inject constructor(
             
             /*
              * IMPORTANTE: Los datos offline vienen con timestamps relativos
-             * El campo "t" contiene los SEGUNDOS transcurridos desde que se tomó la medición
-             * Debemos calcular el timestamp absoluto restando estos segundos del momento actual
-             * Ejemplo: Si "t":300, significa que la medición se tomó hace 5 minutos (300 segundos)
+             * El campo "t" contiene los MILISEGUNDOS transcurridos desde que se tomó la medición
+             * Debemos calcular el timestamp absoluto restando estos milisegundos del momento actual
+             * Ejemplo: Si "t":300000, significa que la medición se tomó hace 5 minutos (300000 ms)
              */
             
             // Verificar si los datos están vacíos, son "0", o indican fin de datos
@@ -422,10 +422,10 @@ class CamperGasBleService @Inject constructor(
                     for (i in 0 until jsonArray.length()) {
                         val jsonObject = jsonArray.getJSONObject(i)
                         val weightValue = jsonObject.getDouble("w").toFloat()
-                        val secondsAgo = jsonObject.getLong("t")
+                        val millisecondsAgo = jsonObject.getLong("t")
                         
-                        // Crear una clave única para este dato (peso + tiempo relativo)
-                        val dataKey = "${weightValue}_${secondsAgo}"
+                        // Crear una clave única para este dato (peso + tiempo relativo en milisegundos)
+                        val dataKey = "${weightValue}_${millisecondsAgo}"
                         
                         if (!processedOfflineData.contains(dataKey)) {
                             allDataAlreadyProcessed = false
@@ -445,14 +445,14 @@ class CamperGasBleService @Inject constructor(
                     for (i in 0 until jsonArray.length()) {
                         val jsonObject = jsonArray.getJSONObject(i)
                         val weightValue = jsonObject.getDouble("w").toFloat()
-                        val secondsAgo = jsonObject.getLong("t") // Segundos transcurridos desde que se tomó la medición
+                        val millisecondsAgo = jsonObject.getLong("t") // MILISEGUNDOS transcurridos desde que se tomó la medición
                         
                         // Crear una clave única para este dato
-                        val dataKey = "${weightValue}_${secondsAgo}"
+                        val dataKey = "${weightValue}_${millisecondsAgo}"
                         
                         // Si ya procesamos este dato exacto, saltarlo
                         if (processedOfflineData.contains(dataKey)) {
-                            Log.d(TAG, "⏭️ Dato duplicado ignorado: ${weightValue}kg hace ${secondsAgo}s")
+                            Log.d(TAG, "⏭️ Dato duplicado ignorado: ${weightValue}kg hace ${millisecondsAgo}ms")
                             continue
                         }
                         
@@ -460,9 +460,9 @@ class CamperGasBleService @Inject constructor(
                         processedOfflineData.add(dataKey)
                         
                         // Calcular el timestamp real de cuando se tomó la medición
-                        val actualTimestamp = calculateHistoricalTimestamp(secondsAgo)
+                        val actualTimestamp = calculateHistoricalTimestamp(millisecondsAgo)
                         
-                        Log.d(TAG, "📊 Procesando medición histórica: ${weightValue}kg tomada hace ${secondsAgo}s")
+                        Log.d(TAG, "📊 Procesando medición histórica: ${weightValue}kg tomada hace ${millisecondsAgo}ms")
                         Log.d(TAG, "🕒 Timestamp calculado: $actualTimestamp (${java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(actualTimestamp))})")
                         
                         // Mantener para compatibilidad
@@ -762,12 +762,11 @@ class CamperGasBleService @Inject constructor(
             Log.w(TAG, "⚠️ No hay conexión activa para leer datos offline")
         }
     }
-    
-    /**
-     * Calcula el timestamp real de una medición basándose en cuántos segundos han pasado
+     /**
+     * Calcula el timestamp real de una medición basándose en cuántos milisegundos han pasado
      * desde que se tomó la medición hasta ahora
      */
-    private fun calculateHistoricalTimestamp(secondsAgo: Long): Long {
-        return System.currentTimeMillis() - (secondsAgo * 1000L)
+    private fun calculateHistoricalTimestamp(millisecondsAgo: Long): Long {
+        return System.currentTimeMillis() - millisecondsAgo
     }
 }
