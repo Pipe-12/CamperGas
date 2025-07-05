@@ -73,6 +73,7 @@ class CamperGasBleService @Inject constructor(
     private var isReadingOfflineData = false
     private var offlineDataCount = 0
     private val allHistoryData = mutableListOf<FuelMeasurement>()
+    private val processedOfflineData = mutableSetOf<String>() // Para evitar duplicados por peso+tiempo
     
     private var bluetoothGatt: BluetoothGatt? = null
     private var weightCharacteristic: BluetoothGattCharacteristic? = null
@@ -411,7 +412,28 @@ class CamperGasBleService @Inject constructor(
             val batchHistoryWeights = mutableListOf<Weight>()
             val batchHistoricalMeasurements = mutableListOf<Pair<Float, Long>>()
             val batchFuelMeasurements = mutableListOf<FuelMeasurement>()
-            var duplicateFound = false
+            var allDataAlreadyProcessed = true
+            
+            // Verificar si todos los datos del lote ya han sido procesados
+            for (i in 0 until jsonArray.length()) {
+                val jsonObject = jsonArray.getJSONObject(i)
+                val weightValue = jsonObject.getDouble("w").toFloat()
+                val secondsAgo = jsonObject.getLong("t")
+                
+                // Crear una clave única para este dato (peso + tiempo relativo)
+                val dataKey = "${weightValue}_${secondsAgo}"
+                
+                if (!processedOfflineData.contains(dataKey)) {
+                    allDataAlreadyProcessed = false
+                    break
+                }
+            }
+            
+            // Si todos los datos ya fueron procesados, ignorar este lote
+            if (allDataAlreadyProcessed) {
+                Log.d(TAG, "🛑 Lote completo ya procesado - ignorando datos duplicados")
+                return@launch
+            }
             
             // Verificar timestamp duplicados antes de procesar el lote completo
             serviceScope.launch {
@@ -421,20 +443,23 @@ class CamperGasBleService @Inject constructor(
                     
                     for (i in 0 until jsonArray.length()) {
                         val jsonObject = jsonArray.getJSONObject(i)
+                        val weightValue = jsonObject.getDouble("w").toFloat()
                         val secondsAgo = jsonObject.getLong("t") // Segundos transcurridos desde que se tomó la medición
+                        
+                        // Crear una clave única para este dato
+                        val dataKey = "${weightValue}_${secondsAgo}"
+                        
+                        // Si ya procesamos este dato exacto, saltarlo
+                        if (processedOfflineData.contains(dataKey)) {
+                            Log.d(TAG, "⏭️ Dato duplicado ignorado: ${weightValue}kg hace ${secondsAgo}s")
+                            continue
+                        }
+                        
+                        // Marcar este dato como procesado
+                        processedOfflineData.add(dataKey)
                         
                         // Calcular el timestamp real de cuando se tomó la medición
                         val actualTimestamp = calculateHistoricalTimestamp(secondsAgo)
-                        
-                        // Verificar si este timestamp ya existe en la base de datos
-                        if (saveFuelMeasurementUseCase.doesTimestampExist(actualTimestamp)) {
-                            Log.d(TAG, "🛑 Timestamp duplicado detectado: $actualTimestamp - deteniendo lectura offline")
-                            duplicateFound = true
-                            finishOfflineDataReading()
-                            return@launch
-                        }
-                        
-                        val weightValue = jsonObject.getDouble("w").toFloat()
                         
                         Log.d(TAG, "📊 Procesando medición histórica: ${weightValue}kg tomada hace ${secondsAgo}s")
                         Log.d(TAG, "🕒 Timestamp calculado: $actualTimestamp (${java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(actualTimestamp))})")
@@ -451,8 +476,8 @@ class CamperGasBleService @Inject constructor(
                         batchHistoricalMeasurements.add(Pair(weightValue, actualTimestamp))
                     }
                     
-                    // Solo procesar si no encontramos duplicados
-                    if (!duplicateFound && batchHistoricalMeasurements.isNotEmpty()) {
+                    // Solo procesar si tenemos datos nuevos para guardar
+                    if (batchHistoricalMeasurements.isNotEmpty()) {
                         offlineDataCount++
                         Log.d(TAG, "📦 Lote ${offlineDataCount} procesado: ${batchHistoryWeights.size} registros históricos")
                         Log.d(TAG, "📈 Total acumulado: ${allHistoryData.size} mediciones de combustible")
@@ -642,6 +667,7 @@ class CamperGasBleService @Inject constructor(
         isReadingOfflineData = true
         offlineDataCount = 0
         allHistoryData.clear()
+        processedOfflineData.clear() // Limpiar datos procesados anteriores
         _isLoadingHistory.value = true
         _historyData.value = emptyList()
         Log.d(TAG, "Iniciando lectura continua de datos offline")
@@ -717,6 +743,7 @@ class CamperGasBleService @Inject constructor(
         _weightData.value = null
         _fuelData.value = null
         _inclinationData.value = null
+        processedOfflineData.clear() // Limpiar datos procesados al desconectar
     }
     
     fun isConnected(): Boolean = _connectionState.value
