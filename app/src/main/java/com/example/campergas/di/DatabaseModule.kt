@@ -23,13 +23,7 @@ object DatabaseModule {
             context,
             CamperGasDatabase::class.java,
             CamperGasDatabase.DATABASE_NAME
-        )
-        .addMigrations(
-            CamperGasDatabase.MIGRATION_1_2,
-            CamperGasDatabase.MIGRATION_2_3,
-            CamperGasDatabase.MIGRATION_3_4
-        )
-        .build()
+        ).build()
     }
 
     @Provides
