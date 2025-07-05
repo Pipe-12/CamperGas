@@ -412,32 +412,33 @@ class CamperGasBleService @Inject constructor(
             val batchHistoryWeights = mutableListOf<Weight>()
             val batchHistoricalMeasurements = mutableListOf<Pair<Float, Long>>()
             val batchFuelMeasurements = mutableListOf<FuelMeasurement>()
-            var allDataAlreadyProcessed = true
             
-            // Verificar si todos los datos del lote ya han sido procesados
-            for (i in 0 until jsonArray.length()) {
-                val jsonObject = jsonArray.getJSONObject(i)
-                val weightValue = jsonObject.getDouble("w").toFloat()
-                val secondsAgo = jsonObject.getLong("t")
-                
-                // Crear una clave única para este dato (peso + tiempo relativo)
-                val dataKey = "${weightValue}_${secondsAgo}"
-                
-                if (!processedOfflineData.contains(dataKey)) {
-                    allDataAlreadyProcessed = false
-                    break
-                }
-            }
-            
-            // Si todos los datos ya fueron procesados, ignorar este lote
-            if (allDataAlreadyProcessed) {
-                Log.d(TAG, "🛑 Lote completo ya procesado - ignorando datos duplicados")
-                return@launch
-            }
-            
-            // Verificar timestamp duplicados antes de procesar el lote completo
+            // Procesar en corrutina para manejar operaciones de base de datos
             serviceScope.launch {
                 try {
+                    // Verificar si todos los datos del lote ya han sido procesados
+                    var allDataAlreadyProcessed = true
+                    
+                    for (i in 0 until jsonArray.length()) {
+                        val jsonObject = jsonArray.getJSONObject(i)
+                        val weightValue = jsonObject.getDouble("w").toFloat()
+                        val secondsAgo = jsonObject.getLong("t")
+                        
+                        // Crear una clave única para este dato (peso + tiempo relativo)
+                        val dataKey = "${weightValue}_${secondsAgo}"
+                        
+                        if (!processedOfflineData.contains(dataKey)) {
+                            allDataAlreadyProcessed = false
+                            break
+                        }
+                    }
+                    
+                    // Si todos los datos ya fueron procesados, ignorar este lote
+                    if (allDataAlreadyProcessed) {
+                        Log.d(TAG, "🛑 Lote completo ya procesado - ignorando datos duplicados")
+                        return@launch
+                    }
+                    
                     // Obtener el timestamp actual como referencia
                     val currentTimestamp = System.currentTimeMillis()
                     
