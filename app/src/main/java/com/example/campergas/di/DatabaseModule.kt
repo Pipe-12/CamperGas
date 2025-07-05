@@ -26,7 +26,8 @@ object DatabaseModule {
         )
         .addMigrations(
             CamperGasDatabase.MIGRATION_1_2,
-            CamperGasDatabase.MIGRATION_2_3
+            CamperGasDatabase.MIGRATION_2_3,
+            CamperGasDatabase.MIGRATION_3_4
         )
         .build()
     }
@@ -37,13 +38,8 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideWeightDao(database: CamperGasDatabase): WeightDao {
-        return database.weightDao()
-    }
-
-    @Provides
-    fun provideConsumptionDao(database: CamperGasDatabase): ConsumptionDao {
-        return database.consumptionDao()
+    fun provideFuelMeasurementDao(database: CamperGasDatabase): FuelMeasurementDao {
+        return database.fuelMeasurementDao()
     }
 
     @Provides

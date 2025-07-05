@@ -7,8 +7,9 @@ import android.util.Log
 import com.example.campergas.domain.model.CamperGasUuids
 import com.example.campergas.domain.model.Weight
 import com.example.campergas.domain.model.Inclination
+import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.usecase.GetActiveCylinderUseCase
-import com.example.campergas.domain.usecase.SaveWeightMeasurementUseCase
+import com.example.campergas.domain.usecase.SaveFuelMeasurementUseCase
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +34,7 @@ import javax.inject.Singleton
 @Singleton
 class CamperGasBleService @Inject constructor(
     private val bleManager: BleManager,
-    private val saveWeightMeasurementUseCase: SaveWeightMeasurementUseCase,
+    private val saveFuelMeasurementUseCase: SaveFuelMeasurementUseCase,
     private val getActiveCylinderUseCase: GetActiveCylinderUseCase,
     @ApplicationContext private val context: Context
 ) {
@@ -48,17 +49,21 @@ class CamperGasBleService @Inject constructor(
     private val _connectionState = MutableStateFlow(false)
     val connectionState: StateFlow<Boolean> = _connectionState
     
-    // Datos de peso en tiempo real
+    // Datos de peso en tiempo real (mantener para compatibilidad con sensores)
     private val _weightData = MutableStateFlow<Weight?>(null)
     val weightData: StateFlow<Weight?> = _weightData
+    
+    // Datos de combustible calculados
+    private val _fuelData = MutableStateFlow<FuelMeasurement?>(null)
+    val fuelData: StateFlow<FuelMeasurement?> = _fuelData
     
     // Datos de inclinación en tiempo real
     private val _inclinationData = MutableStateFlow<Inclination?>(null)
     val inclinationData: StateFlow<Inclination?> = _inclinationData
     
     // Datos históricos
-    private val _historyData = MutableStateFlow<List<Weight>>(emptyList())
-    val historyData: StateFlow<List<Weight>> = _historyData
+    private val _historyData = MutableStateFlow<List<FuelMeasurement>>(emptyList())
+    val historyData: StateFlow<List<FuelMeasurement>> = _historyData
     
     // Estado de carga de datos históricos
     private val _isLoadingHistory = MutableStateFlow(false)
@@ -67,7 +72,7 @@ class CamperGasBleService @Inject constructor(
     // Control para lectura continua de datos offline
     private var isReadingOfflineData = false
     private var offlineDataCount = 0
-    private val allHistoryData = mutableListOf<Weight>()
+    private val allHistoryData = mutableListOf<FuelMeasurement>()
     
     private var bluetoothGatt: BluetoothGatt? = null
     private var weightCharacteristic: BluetoothGattCharacteristic? = null
@@ -290,37 +295,54 @@ class CamperGasBleService @Inject constructor(
                 unit = "kg"
             )
             
+            // Mantener compatibilidad con el StateFlow de peso
             _weightData.value = weight
             Log.d(TAG, "Peso actualizado: ${weight.value} kg")
             
-            // Guardar en la base de datos solo si hay una bombona activa
+            // Guardar medición de combustible en la base de datos
             serviceScope.launch {
                 try {
-                    val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
-                    if (activeCylinder != null) {
-                        val result = saveWeightMeasurementUseCase.saveRealTimeMeasurement(
-                            value = weightValue,
-                            timestamp = weight.timestamp
-                        )
-                        
-                        result.fold(
-                            onSuccess = { saveResult ->
-                                Log.d(TAG, "Medición de peso guardada (ID: ${saveResult.measurementId})")
-                                if (saveResult.consumptionSaved) {
-                                    Log.d(TAG, "✅ Registro de consumo guardado (cambio significativo detectado)")
+                    val result = saveFuelMeasurementUseCase.saveRealTimeMeasurement(
+                        totalWeight = weightValue,
+                        timestamp = weight.timestamp
+                    )
+                    
+                    result.fold(
+                        onSuccess = { saveResult ->
+                            Log.d(TAG, "Medición de combustible guardada (ID: ${saveResult.measurementId})")
+                            
+                            // Actualizar el StateFlow con los datos de combustible
+                            val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
+                            if (activeCylinder != null) {
+                                val fuelKilograms = maxOf(0f, weightValue - activeCylinder.tare)
+                                val fuelPercentage = if (activeCylinder.capacity > 0) {
+                                    (fuelKilograms / activeCylinder.capacity * 100).coerceIn(0f, 100f)
                                 } else {
-                                    Log.d(TAG, "⏸️ Registro de consumo omitido (sin cambios significativos)")
+                                    0f
                                 }
-                            },
-                            onFailure = { error ->
-                                Log.e(TAG, "Error al guardar medición de peso: ${error.message}")
+                                
+                                val fuelMeasurement = FuelMeasurement(
+                                    id = saveResult.measurementId,
+                                    cylinderId = activeCylinder.id,
+                                    cylinderName = activeCylinder.name,
+                                    timestamp = weight.timestamp,
+                                    fuelKilograms = fuelKilograms,
+                                    fuelPercentage = fuelPercentage,
+                                    totalWeight = weightValue,
+                                    isCalibrated = true,
+                                    isHistorical = false
+                                )
+                                
+                                _fuelData.value = fuelMeasurement
+                                Log.d(TAG, "Combustible calculado: ${fuelKilograms}kg (${fuelPercentage}%)")
                             }
-                        )
-                    } else {
-                        Log.w(TAG, "No hay bombona activa - Medición de peso NO guardada")
-                    }
+                        },
+                        onFailure = { error ->
+                            Log.e(TAG, "Error al guardar medición de combustible: ${error.message}")
+                        }
+                    )
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error al guardar medición de peso: ${e.message}")
+                    Log.e(TAG, "Error al procesar medición de combustible: ${e.message}")
                 }
             }
             
@@ -358,6 +380,13 @@ class CamperGasBleService @Inject constructor(
             val jsonString = String(data, Charsets.UTF_8)
             Log.d(TAG, "Datos offline recibidos (lote ${offlineDataCount + 1}): $jsonString")
             
+            /*
+             * IMPORTANTE: Los datos offline vienen con timestamps relativos
+             * El campo "t" contiene los SEGUNDOS transcurridos desde que se tomó la medición
+             * Debemos calcular el timestamp absoluto restando estos segundos del momento actual
+             * Ejemplo: Si "t":300, significa que la medición se tomó hace 5 minutos (300 segundos)
+             */
+            
             // Verificar si los datos están vacíos, son "0", o indican fin de datos
             if (jsonString.isBlank() || 
                 jsonString == "[]" || 
@@ -381,18 +410,25 @@ class CamperGasBleService @Inject constructor(
             
             val batchHistoryWeights = mutableListOf<Weight>()
             val batchHistoricalMeasurements = mutableListOf<Pair<Float, Long>>()
+            val batchFuelMeasurements = mutableListOf<FuelMeasurement>()
             var duplicateFound = false
             
             // Verificar timestamp duplicados antes de procesar el lote completo
             serviceScope.launch {
                 try {
+                    // Obtener el timestamp actual como referencia
+                    val currentTimestamp = System.currentTimeMillis()
+                    
                     for (i in 0 until jsonArray.length()) {
                         val jsonObject = jsonArray.getJSONObject(i)
-                        val timestamp = jsonObject.getLong("t") * 1000L // Convertir de segundos a milisegundos
+                        val secondsAgo = jsonObject.getLong("t") // Segundos transcurridos desde que se tomó la medición
+                        
+                        // Calcular el timestamp real de cuando se tomó la medición
+                        val actualTimestamp = calculateHistoricalTimestamp(secondsAgo)
                         
                         // Verificar si este timestamp ya existe en la base de datos
-                        if (saveWeightMeasurementUseCase.doesTimestampExist(timestamp)) {
-                            Log.d(TAG, "🛑 Timestamp duplicado detectado: $timestamp - deteniendo lectura offline")
+                        if (saveFuelMeasurementUseCase.doesTimestampExist(actualTimestamp)) {
+                            Log.d(TAG, "🛑 Timestamp duplicado detectado: $actualTimestamp - deteniendo lectura offline")
                             duplicateFound = true
                             finishOfflineDataReading()
                             return@launch
@@ -400,43 +436,77 @@ class CamperGasBleService @Inject constructor(
                         
                         val weightValue = jsonObject.getDouble("w").toFloat()
                         
+                        Log.d(TAG, "📊 Procesando medición histórica: ${weightValue}kg tomada hace ${secondsAgo}s")
+                        Log.d(TAG, "🕒 Timestamp calculado: $actualTimestamp (${java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(actualTimestamp))})")
+                        
+                        // Mantener para compatibilidad
                         val weight = Weight(
                             value = weightValue,
-                            timestamp = timestamp,
+                            timestamp = actualTimestamp,
                             unit = "kg",
                             isHistorical = true
                         )
                         
                         batchHistoryWeights.add(weight)
-                        allHistoryData.add(weight)
-                        batchHistoricalMeasurements.add(Pair(weightValue, timestamp))
+                        batchHistoricalMeasurements.add(Pair(weightValue, actualTimestamp))
                     }
                     
                     // Solo procesar si no encontramos duplicados
                     if (!duplicateFound && batchHistoricalMeasurements.isNotEmpty()) {
                         offlineDataCount++
-                        Log.d(TAG, "Lote ${offlineDataCount} procesado: ${batchHistoryWeights.size} registros (Total acumulado: ${allHistoryData.size})")
-                        
-                        // Actualizar UI con todos los datos acumulados hasta ahora
-                        val sortedHistoryData = allHistoryData.sortedBy { it.timestamp }
-                        _historyData.value = sortedHistoryData
+                        Log.d(TAG, "📦 Lote ${offlineDataCount} procesado: ${batchHistoryWeights.size} registros históricos")
+                        Log.d(TAG, "📈 Total acumulado: ${allHistoryData.size} mediciones de combustible")
                         
                         // Guardar datos históricos del lote actual en la base de datos
                         try {
-                            // Guardar directamente sin verificaciones adicionales
-                            val result = saveWeightMeasurementUseCase.saveOfflineMeasurementsDirectly(batchHistoricalMeasurements)
-                            
-                            result.fold(
-                                onSuccess = { saveResult ->
-                                    Log.d(TAG, "✅ Lote ${offlineDataCount} guardado automáticamente: ${saveResult.measurementsSaved} mediciones")
-                                    Log.d(TAG, "📥 Datos offline guardados directamente en Room")
-                                },
-                                onFailure = { error ->
-                                    Log.e(TAG, "❌ Error al guardar lote ${offlineDataCount} automáticamente: ${error.message}")
-                                }
-                            )
+                            val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
+                            if (activeCylinder != null) {
+                                val result = saveFuelMeasurementUseCase.saveHistoricalMeasurements(
+                                    cylinderId = activeCylinder.id,
+                                    weightMeasurements = batchHistoricalMeasurements,
+                                    isCalibrated = true
+                                )
+                                
+                                result.fold(
+                                    onSuccess = { savedCount ->
+                                        Log.d(TAG, "✅ Lote ${offlineDataCount} guardado: $savedCount mediciones de combustible")
+                                        
+                                        // Crear FuelMeasurements para la UI
+                                        val fuelMeasurements = batchHistoricalMeasurements.map { (weightValue, timestamp) ->
+                                            val fuelKilograms = maxOf(0f, weightValue - activeCylinder.tare)
+                                            val fuelPercentage = if (activeCylinder.capacity > 0) {
+                                                (fuelKilograms / activeCylinder.capacity * 100).coerceIn(0f, 100f)
+                                            } else {
+                                                0f
+                                            }
+                                            
+                                            FuelMeasurement(
+                                                cylinderId = activeCylinder.id,
+                                                cylinderName = activeCylinder.name,
+                                                timestamp = timestamp,
+                                                fuelKilograms = fuelKilograms,
+                                                fuelPercentage = fuelPercentage,
+                                                totalWeight = weightValue,
+                                                isCalibrated = true,
+                                                isHistorical = true
+                                            )
+                                        }
+                                        
+                                        allHistoryData.addAll(fuelMeasurements)
+                                        
+                                        // Actualizar UI con todos los datos acumulados hasta ahora
+                                        val sortedHistoryData = allHistoryData.sortedBy { it.timestamp }
+                                        _historyData.value = sortedHistoryData
+                                    },
+                                    onFailure = { error ->
+                                        Log.e(TAG, "❌ Error al guardar lote ${offlineDataCount}: ${error.message}")
+                                    }
+                                )
+                            } else {
+                                Log.w(TAG, "No hay bombona activa - datos históricos NO guardados")
+                            }
                         } catch (e: Exception) {
-                            Log.e(TAG, "❌ Error al procesar guardado automático del lote ${offlineDataCount}: ${e.message}")
+                            Log.e(TAG, "❌ Error al procesar guardado del lote ${offlineDataCount}: ${e.message}")
                         }
                         
                         // Continuar leyendo más datos si estamos en modo de lectura continua y no hay duplicados
@@ -645,6 +715,7 @@ class CamperGasBleService @Inject constructor(
         
         // Limpiar datos cuando se desconecta
         _weightData.value = null
+        _fuelData.value = null
         _inclinationData.value = null
     }
     
@@ -662,5 +733,13 @@ class CamperGasBleService @Inject constructor(
         } else {
             Log.w(TAG, "⚠️ No hay conexión activa para leer datos offline")
         }
+    }
+    
+    /**
+     * Calcula el timestamp real de una medición basándose en cuántos segundos han pasado
+     * desde que se tomó la medición hasta ahora
+     */
+    private fun calculateHistoricalTimestamp(secondsAgo: Long): Long {
+        return System.currentTimeMillis() - (secondsAgo * 1000L)
     }
 }

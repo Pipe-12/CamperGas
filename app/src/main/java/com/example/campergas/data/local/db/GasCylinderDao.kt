@@ -10,6 +10,9 @@ interface GasCylinderDao {
     @Query("SELECT * FROM gas_cylinders ORDER BY createdAt DESC")
     fun getAllCylinders(): Flow<List<GasCylinder>>
     
+    @Query("SELECT * FROM gas_cylinders ORDER BY createdAt DESC")
+    suspend fun getAllCylindersSync(): List<GasCylinder>
+    
     @Query("SELECT * FROM gas_cylinders WHERE isActive = 1 LIMIT 1")
     fun getActiveCylinder(): Flow<GasCylinder?>
     

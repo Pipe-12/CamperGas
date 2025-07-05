@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.campergas.domain.model.BleDevice
 import com.example.campergas.domain.model.Weight
+import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.model.Inclination
 import com.example.campergas.ui.components.BluetoothPermissionDialog
 import com.example.campergas.ui.components.BluetoothDisabledDialog
@@ -39,6 +40,7 @@ fun BleConnectScreen(
     val uiState by viewModel.uiState.collectAsState()
     val connectionState by viewModel.connectionState.collectAsState()
     val weightData by viewModel.weightData.collectAsState()
+    val fuelData by viewModel.fuelData.collectAsState()
     val inclinationData by viewModel.inclinationData.collectAsState()
     val historyData by viewModel.historyData.collectAsState()
     val isLoadingHistory by viewModel.isLoadingHistory.collectAsState()
@@ -97,6 +99,7 @@ fun BleConnectScreen(
         if (connectionState) {
             SensorDataSection(
                 weightData = weightData,
+                fuelData = fuelData,
                 inclinationData = inclinationData,
                 historyData = historyData,
                 isLoadingHistory = isLoadingHistory
@@ -563,8 +566,9 @@ fun ConnectionStatusCard(
 @Composable
 fun SensorDataSection(
     weightData: Weight?,
+    fuelData: FuelMeasurement?,
     inclinationData: Inclination?, 
-    historyData: List<Weight>,
+    historyData: List<FuelMeasurement>,
     isLoadingHistory: Boolean
 ) {
     Column {
@@ -610,7 +614,7 @@ fun SensorDataSection(
                 }
             }
             
-            // Tarjeta de inclinación
+            // Tarjeta de combustible
             Card(
                 modifier = Modifier.weight(1f),
                 colors = CardDefaults.cardColors(
@@ -622,33 +626,30 @@ fun SensorDataSection(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "📐",
+                        text = "⛽",
                         style = MaterialTheme.typography.headlineMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Inclinación",
+                        text = "Combustible",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onTertiaryContainer
                     )
-                    if (inclinationData != null) {
+                    Text(
+                        text = fuelData?.getFormattedFuelKilograms() ?: "--.- kg",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                    Text(
+                        text = fuelData?.getFormattedPercentage() ?: "--%",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                    if (fuelData != null) {
                         Text(
-                            text = "P: %.1f°".format(inclinationData.pitch),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onTertiaryContainer
-                        )
-                        Text(
-                            text = "R: %.1f°".format(inclinationData.roll),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onTertiaryContainer
-                        )
-                    } else {
-                        Text(
-                            text = "-- °",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
+                            text = fuelData.getFormattedTimestamp(),
+                            style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onTertiaryContainer
                         )
                     }
@@ -725,17 +726,24 @@ fun SensorDataSection(
                         modifier = Modifier.heightIn(max = 200.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        items(historyData.take(10)) { weight ->
+                        items(historyData.take(10)) { fuelMeasurement ->
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
+                                Column {
+                                    Text(
+                                        text = fuelMeasurement.getFormattedFuelKilograms(),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        text = fuelMeasurement.getFormattedPercentage(),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                                 Text(
-                                    text = weight.getFormattedValue(),
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                                Text(
-                                    text = weight.getFullFormattedTimestamp(),
+                                    text = fuelMeasurement.getFullFormattedTimestamp(),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

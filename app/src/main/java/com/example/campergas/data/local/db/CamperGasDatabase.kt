@@ -7,22 +7,19 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import android.content.Context
 import com.example.campergas.domain.model.GasCylinder
-import com.example.campergas.domain.model.Weight
 
 @Database(
     entities = [
         GasCylinder::class,
-        Weight::class,
-        ConsumptionEntity::class
+        FuelMeasurementEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class CamperGasDatabase : RoomDatabase() {
     
     abstract fun gasCylinderDao(): GasCylinderDao
-    abstract fun weightDao(): WeightDao
-    abstract fun consumptionDao(): ConsumptionDao
+    abstract fun fuelMeasurementDao(): FuelMeasurementDao
     
     companion object {
         const val DATABASE_NAME = "campergas_database"
@@ -62,32 +59,41 @@ abstract class CamperGasDatabase : RoomDatabase() {
             }
         }
         
-        // Migración de la versión 2 a la 3 (actualizar tabla de consumo)
-        val MIGRATION_2_3 = object : Migration(2, 3) {
+        // Migración de la versión 3 a la 4 (unificar tablas en fuel_measurements)
+        val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                // Crear nueva tabla de consumo con la estructura actualizada
+                // Crear nueva tabla unificada de mediciones de combustible
                 database.execSQL("""
-                    CREATE TABLE IF NOT EXISTS consumption_table_new (
+                    CREATE TABLE IF NOT EXISTS fuel_measurements (
                         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                         cylinderId INTEGER NOT NULL,
                         cylinderName TEXT NOT NULL,
-                        date INTEGER NOT NULL,
-                        fuelPercentage REAL NOT NULL,
+                        timestamp INTEGER NOT NULL,
                         fuelKilograms REAL NOT NULL,
-                        duration INTEGER NOT NULL,
+                        fuelPercentage REAL NOT NULL,
+                        totalWeight REAL NOT NULL,
+                        isCalibrated INTEGER NOT NULL DEFAULT 1,
+                        isHistorical INTEGER NOT NULL DEFAULT 0,
                         FOREIGN KEY(cylinderId) REFERENCES gas_cylinders(id) ON DELETE CASCADE
                     )
                 """.trimIndent())
                 
                 // Crear índices para la nueva tabla
-                database.execSQL("CREATE INDEX IF NOT EXISTS index_consumption_table_cylinderId ON consumption_table_new(cylinderId)")
-                database.execSQL("CREATE INDEX IF NOT EXISTS index_consumption_table_date ON consumption_table_new(date)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_fuel_measurements_cylinderId ON fuel_measurements(cylinderId)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_fuel_measurements_timestamp ON fuel_measurements(timestamp)")
                 
-                // Eliminar tabla antigua si existe
+                // Migrar datos de consumption_table si existe
+                database.execSQL("""
+                    INSERT INTO fuel_measurements (cylinderId, cylinderName, timestamp, fuelKilograms, fuelPercentage, totalWeight, isCalibrated, isHistorical)
+                    SELECT cylinderId, cylinderName, date, fuelKilograms, fuelPercentage, 
+                           fuelKilograms + (SELECT tare FROM gas_cylinders WHERE id = cylinderId), 1, 0
+                    FROM consumption_table 
+                    WHERE EXISTS (SELECT 1 FROM sqlite_master WHERE type='table' AND name='consumption_table')
+                """.trimIndent())
+                
+                // Eliminar tablas antiguas
                 database.execSQL("DROP TABLE IF EXISTS consumption_table")
-                
-                // Renombrar nueva tabla
-                database.execSQL("ALTER TABLE consumption_table_new RENAME TO consumption_table")
+                database.execSQL("DROP TABLE IF EXISTS weight_measurements")
             }
         }
     }

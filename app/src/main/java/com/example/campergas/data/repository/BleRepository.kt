@@ -28,6 +28,7 @@ class BleRepository @Inject constructor(
     
     // Sensor data
     val weightData = camperGasBleService.weightData
+    val fuelData = camperGasBleService.fuelData
     val inclinationData = camperGasBleService.inclinationData
     val historyData = camperGasBleService.historyData
     val isLoadingHistory = camperGasBleService.isLoadingHistory
