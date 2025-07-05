@@ -1,5 +1,6 @@
 package com.example.campergas.data.repository
 
+import com.example.campergas.data.repository.FuelMeasurementRepository
 import com.example.campergas.domain.model.Consumption
 import com.example.campergas.domain.model.FuelMeasurement
 import kotlinx.coroutines.flow.Flow
