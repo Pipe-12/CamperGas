@@ -176,8 +176,8 @@ fun WeightScreen(
                                     progress = { fuelMeasurement.fuelPercentage / 100f },
                                     modifier = Modifier.fillMaxWidth(),
                                     color = when {
-                                        gasPercentage > 50 -> MaterialTheme.colorScheme.primary
-                                        gasPercentage > 20 -> MaterialTheme.colorScheme.tertiary
+                                        fuelMeasurement.fuelPercentage > 50 -> MaterialTheme.colorScheme.primary
+                                        fuelMeasurement.fuelPercentage > 20 -> MaterialTheme.colorScheme.tertiary
                                         else -> MaterialTheme.colorScheme.error
                                     }
                                 )

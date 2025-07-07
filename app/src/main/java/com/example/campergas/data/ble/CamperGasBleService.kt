@@ -7,7 +7,6 @@ import android.util.Log
 import com.example.campergas.domain.model.CamperGasUuids
 import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.model.Inclination
-import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.usecase.GetActiveCylinderUseCase
 import com.example.campergas.domain.usecase.SaveFuelMeasurementUseCase
 import dagger.hilt.android.qualifiers.ApplicationContext

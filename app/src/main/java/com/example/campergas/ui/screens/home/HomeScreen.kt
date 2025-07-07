@@ -51,7 +51,7 @@ fun HomeScreen(
     gasCylinderViewModel: GasCylinderViewModel = hiltViewModel()
 ) {
     val connectionState by viewModel.connectionState.collectAsState()
-    val weightValue by viewModel.weight.collectAsState()
+    val fuelData by viewModel.fuelData.collectAsState()
     val activeCylinder by gasCylinderViewModel.activeCylinder.collectAsState()
     val gasCylinderUiState by gasCylinderViewModel.uiState.collectAsState()
     
@@ -126,9 +126,9 @@ fun HomeScreen(
                             style = MaterialTheme.typography.bodyLarge
                         )
                         
-                        weightValue?.let {
+                        fuelData?.let {
                             Text(
-                                text = "Peso actual: ${it.value} kg",
+                                text = "Combustible: ${it.getFormattedFuelKilograms()} (${it.getFormattedPercentage()})",
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Medium
                             )
@@ -141,7 +141,7 @@ fun HomeScreen(
             item {
                 GasCylinderInfoCard(
                     activeCylinder = activeCylinder,
-                    currentWeight = weightValue,
+                    currentFuelMeasurement = fuelData,
                     errorMessage = gasCylinderUiState.errorMessage
                 )
             }

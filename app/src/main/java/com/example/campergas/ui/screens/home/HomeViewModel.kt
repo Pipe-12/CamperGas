@@ -23,7 +23,6 @@ class HomeViewModel @Inject constructor(
     
     private val _fuelData = MutableStateFlow<FuelMeasurement?>(null)
     val fuelData: StateFlow<FuelMeasurement?> = _fuelData
-    val fuelData: StateFlow<FuelMeasurement?> = _fuelData
     
     init {
         // Intentar conectar con el último dispositivo utilizado
