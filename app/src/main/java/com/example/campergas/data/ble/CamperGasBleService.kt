@@ -249,7 +249,7 @@ class CamperGasBleService @Inject constructor(
             )
             
             descriptor?.let {
-                // Usar el nuevo método writeDescriptor con ByteArray (API 33+)
+                // Usar el nuevo metodo writeDescriptor con ByteArray (API 33+)
                 @SuppressLint("MissingPermission")
                 val result = gatt.writeDescriptor(
                     it, 
@@ -439,9 +439,6 @@ class CamperGasBleService @Inject constructor(
                         return@launch
                     }
                     
-                    // Obtener el timestamp actual como referencia
-                    val currentTimestamp = System.currentTimeMillis()
-                    
                     for (i in 0 until jsonArray.length()) {
                         val jsonObject = jsonArray.getJSONObject(i)
                         val weightValue = jsonObject.getDouble("w").toFloat()
@@ -463,7 +460,9 @@ class CamperGasBleService @Inject constructor(
                         val actualTimestamp = calculateHistoricalTimestamp(millisecondsAgo)
                         
                         Log.d(TAG, "📊 Procesando medición histórica: ${weightValue}kg tomada hace ${millisecondsAgo}ms")
-                        Log.d(TAG, "🕒 Timestamp calculado: $actualTimestamp (${java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(actualTimestamp))})")
+                        Log.d(TAG, "🕒 Timestamp calculado: $actualTimestamp (${java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(
+                            Date(actualTimestamp)
+                        )})")
                         
                         // Mantener para compatibilidad
                         val weight = Weight(
@@ -596,37 +595,7 @@ class CamperGasBleService @Inject constructor(
         }
         cleanup()
     }
-    
-    fun requestHistoryData() {
-        offlineCharacteristic?.let { characteristic ->
-            bluetoothGatt?.let { gatt ->
-                // Verificar permisos antes de solicitar datos históricos
-                if (!bleManager.hasBluetoothConnectPermission()) {
-                    Log.e(TAG, "No hay permisos para solicitar datos históricos")
-                    return
-                }
-                
-                // Inicializar la lectura continua de datos offline
-                startOfflineDataReading()
-                
-                Log.d(TAG, "Iniciando lectura continua de datos históricos...")
-                
-                // Primero habilitar notificaciones para datos offline si no están habilitadas
-                enableNotifications(gatt, characteristic)
-                
-                // Iniciar la primera lectura
-                continueOfflineDataReading()
-                
-            } ?: run {
-                Log.e(TAG, "No hay conexión GATT disponible")
-                _isLoadingHistory.value = false
-            }
-        } ?: run {
-            Log.e(TAG, "Característica offline no disponible")
-            _isLoadingHistory.value = false
-        }
-    }
-    
+
     /**
      * Inicia la lectura automática de datos offline al conectar
      */
