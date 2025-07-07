@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -56,7 +55,7 @@ fun ConsumptionScreen(
     viewModel: ConsumptionViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    
+
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
 
@@ -202,7 +201,7 @@ fun ConsumptionScreen(
         ) {
             val datePickerState = rememberDatePickerState()
             DatePicker(state = datePickerState)
-            
+
             // Aplicar la fecha seleccionada cuando se confirma
             LaunchedEffect(datePickerState.selectedDateMillis) {
                 datePickerState.selectedDateMillis?.let { selectedDate ->
@@ -233,7 +232,7 @@ fun ConsumptionScreen(
         ) {
             val datePickerState = rememberDatePickerState()
             DatePicker(state = datePickerState)
-            
+
             // Aplicar la fecha seleccionada cuando se confirma
             LaunchedEffect(datePickerState.selectedDateMillis) {
                 datePickerState.selectedDateMillis?.let { selectedDate ->
@@ -274,7 +273,7 @@ fun DateFiltersSection(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                
+
                 if (startDate != null || endDate != null) {
                     FilterChip(
                         selected = true,
@@ -310,7 +309,7 @@ fun DateFiltersSection(
                         )
                     }
                 )
-                
+
                 FilterChip(
                     selected = false,
                     onClick = onLastMonthClick,
@@ -350,7 +349,7 @@ fun DateFiltersSection(
                         }
                     )
                 }
-                
+
                 OutlinedButton(
                     onClick = onEndDateClick,
                     modifier = Modifier.weight(1f)
@@ -416,9 +415,9 @@ fun ConsumptionItem(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
-                    
+
                     Spacer(modifier = Modifier.width(8.dp))
-                    
+
                     // Indicador de offline/histórico
                     if (consumption.isHistorical) {
                         Card(

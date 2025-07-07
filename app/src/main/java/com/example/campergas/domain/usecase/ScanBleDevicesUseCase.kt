@@ -17,7 +17,6 @@ class ScanBleDevicesUseCase @Inject constructor(
     }
 
 
-
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun stopScan() {
         bleRepository.stopScan()
@@ -26,7 +25,6 @@ class ScanBleDevicesUseCase @Inject constructor(
     fun isBluetoothEnabled(): Boolean {
         return bleRepository.isBluetoothEnabled()
     }
-
 
 
     /**
