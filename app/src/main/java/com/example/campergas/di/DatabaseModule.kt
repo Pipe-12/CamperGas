@@ -25,7 +25,9 @@ object DatabaseModule {
             context,
             CamperGasDatabase::class.java,
             CamperGasDatabase.DATABASE_NAME
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
@@ -47,6 +49,7 @@ object DatabaseModule {
             "vehicle_database"
         )
             .addMigrations(VehicleDatabase.MIGRATION_1_2)
+            .fallbackToDestructiveMigration()
             .build()
     }
 
