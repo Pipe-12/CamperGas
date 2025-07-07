@@ -23,7 +23,7 @@ class BleConnectViewModel @Inject constructor(
     val connectionState = bleRepository.connectionState
     
     // Observar datos del sensor
-    val weightData = bleRepository.weightData
+    val fuelMeasurementData = bleRepository.fuelMeasurementData
     val fuelData = bleRepository.fuelData
     val inclinationData = bleRepository.inclinationData
     val historyData = bleRepository.historyData

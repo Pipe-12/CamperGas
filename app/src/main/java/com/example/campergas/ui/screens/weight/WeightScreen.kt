@@ -38,14 +38,14 @@ fun WeightScreen(
     navController: NavController,
     viewModel: WeightViewModel = hiltViewModel()
 ) {
-    val weightState by viewModel.weightState.collectAsState()
+    val fuelState by viewModel.fuelState.collectAsState()
     val vehicleState by viewModel.vehicleState.collectAsState()
     val activeCylinder by viewModel.activeCylinder.collectAsState()
     
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Monitoreo de Peso") },
+                title = { Text("Monitoreo de Combustible") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -66,8 +66,8 @@ fun WeightScreen(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                weightState?.let { weight ->
-                    // Tarjeta de información de peso
+                fuelState?.let { fuelMeasurement ->
+                    // Tarjeta de información de combustible
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -77,30 +77,41 @@ fun WeightScreen(
                             modifier = Modifier.padding(16.dp)
                         ) {
                             Text(
-                                text = "Peso Actual",
+                                text = "Medición de Combustible",
                                 style = MaterialTheme.typography.titleMedium
                             )
                             
                             Text(
-                                text = weight.getFormattedValue(),
+                                text = fuelMeasurement.getFormattedFuelKilograms(),
                                 style = MaterialTheme.typography.headlineLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
                             )
                             
+                            Text(
+                                text = fuelMeasurement.getFormattedPercentage(),
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                            
                             Spacer(modifier = Modifier.height(8.dp))
                             
                             Text(
-                                text = "Estado: ${if (weight.isCalibrated) "✅ Calibrado" else "⚠️ No calibrado"}",
+                                text = "Peso total: ${"%.1f kg".format(fuelMeasurement.totalWeight)}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            
+                            Text(
+                                text = "Estado: ${if (fuelMeasurement.isCalibrated) "✅ Calibrado" else "⚠️ No calibrado"}",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = if (weight.isCalibrated) 
+                                color = if (fuelMeasurement.isCalibrated) 
                                     MaterialTheme.colorScheme.primary 
                                 else 
                                     MaterialTheme.colorScheme.error
                             )
                             
                             Text(
-                                text = "Última medición: ${formatTimestamp(weight.timestamp)}",
+                                text = "Última medición: ${formatTimestamp(fuelMeasurement.timestamp)}",
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -142,22 +153,19 @@ fun WeightScreen(
                                 
                                 Spacer(modifier = Modifier.height(8.dp))
                                 
-                                val gasContent = cylinder.calculateGasContent(weight.value)
-                                val gasPercentage = cylinder.calculateGasPercentage(weight.value)
-                                
                                 Text(
-                                    text = "Gas actual: ${String.format("%.1f", gasContent)} kg",
+                                    text = "Gas actual: ${fuelMeasurement.getFormattedFuelKilograms()}",
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Medium
                                 )
                                 
                                 Text(
-                                    text = "Nivel de gas: ${String.format("%.1f", gasPercentage)}%",
+                                    text = "Nivel de gas: ${fuelMeasurement.getFormattedPercentage()}",
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = when {
-                                        gasPercentage > 50 -> MaterialTheme.colorScheme.primary
-                                        gasPercentage > 20 -> MaterialTheme.colorScheme.tertiary
+                                        fuelMeasurement.fuelPercentage > 50 -> MaterialTheme.colorScheme.primary
+                                        fuelMeasurement.fuelPercentage > 20 -> MaterialTheme.colorScheme.tertiary
                                         else -> MaterialTheme.colorScheme.error
                                     }
                                 )
@@ -165,7 +173,7 @@ fun WeightScreen(
                                 // Barra de progreso para nivel de gas
                                 Spacer(modifier = Modifier.height(8.dp))
                                 LinearProgressIndicator(
-                                    progress = { gasPercentage / 100f },
+                                    progress = { fuelMeasurement.fuelPercentage / 100f },
                                     modifier = Modifier.fillMaxWidth(),
                                     color = when {
                                         gasPercentage > 50 -> MaterialTheme.colorScheme.primary
@@ -177,7 +185,7 @@ fun WeightScreen(
                                 // Indicadores de estado
                                 Spacer(modifier = Modifier.height(8.dp))
                                 when {
-                                    cylinder.isEmpty(weight.value) -> {
+                                    fuelMeasurement.fuelPercentage <= 0 -> {
                                         Text(
                                             text = "⚠️ Bombona vacía",
                                             style = MaterialTheme.typography.bodySmall,
@@ -185,7 +193,7 @@ fun WeightScreen(
                                             fontWeight = FontWeight.Bold
                                         )
                                     }
-                                    cylinder.isLowGas(weight.value) -> {
+                                    fuelMeasurement.fuelPercentage <= 20 -> {
                                         Text(
                                             text = "⚠️ Nivel bajo de gas",
                                             style = MaterialTheme.typography.bodySmall,
@@ -259,9 +267,7 @@ fun WeightScreen(
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                                 
-                                val remainingPercentage = if (vehicle.gasTankCapacity > 0) {
-                                    ((weight.value / vehicle.gasTankCapacity) * 100).coerceIn(0f, 100f).toInt()
-                                } else 0
+                                val remainingPercentage = fuelMeasurement.fuelPercentage.toInt()
                                 
                                 Text(
                                     text = "Nivel actual: $remainingPercentage%",

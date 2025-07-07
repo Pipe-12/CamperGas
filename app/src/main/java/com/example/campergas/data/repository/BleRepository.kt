@@ -27,7 +27,7 @@ class BleRepository @Inject constructor(
     val connectionState: StateFlow<Boolean> = camperGasBleService.connectionState
     
     // Sensor data
-    val weightData = camperGasBleService.weightData
+    val fuelMeasurementData = camperGasBleService.fuelMeasurementData
     val fuelData = camperGasBleService.fuelData
     val inclinationData = camperGasBleService.inclinationData
     val historyData = camperGasBleService.historyData

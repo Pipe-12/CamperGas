@@ -4,11 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.domain.model.GasCylinder
 import com.example.campergas.domain.model.VehicleConfig
-import com.example.campergas.domain.model.Weight
 import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.usecase.GetActiveCylinderUseCase
 import com.example.campergas.domain.usecase.GetVehicleConfigUseCase
-import com.example.campergas.domain.usecase.GetWeightUseCase
 import com.example.campergas.domain.usecase.GetFuelDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,14 +17,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WeightViewModel @Inject constructor(
-    private val getWeightUseCase: GetWeightUseCase,
     private val getFuelDataUseCase: GetFuelDataUseCase,
     private val getVehicleConfigUseCase: GetVehicleConfigUseCase,
     private val getActiveCylinderUseCase: GetActiveCylinderUseCase
 ) : ViewModel() {
-    
-    private val _weightState = MutableStateFlow<Weight?>(null)
-    val weightState: StateFlow<Weight?> = _weightState
     
     private val _fuelState = MutableStateFlow<FuelMeasurement?>(null)
     val fuelState: StateFlow<FuelMeasurement?> = _fuelState
@@ -38,13 +32,6 @@ class WeightViewModel @Inject constructor(
     val activeCylinder: StateFlow<GasCylinder?> = _activeCylinder
     
     init {
-        // Obtener datos de peso en tiempo real
-        viewModelScope.launch {
-            getWeightUseCase().collectLatest { weight ->
-                _weightState.value = weight
-            }
-        }
-        
         // Obtener configuración del vehículo
         viewModelScope.launch {
             getVehicleConfigUseCase().collectLatest { vehicle ->

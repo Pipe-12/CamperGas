@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.campergas.domain.model.BleDevice
-import com.example.campergas.domain.model.Weight
+
 import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.model.Inclination
 import com.example.campergas.ui.components.BluetoothPermissionDialog
@@ -39,7 +39,7 @@ fun BleConnectScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val connectionState by viewModel.connectionState.collectAsState()
-    val weightData by viewModel.weightData.collectAsState()
+    val fuelMeasurementData by viewModel.fuelMeasurementData.collectAsState()
     val fuelData by viewModel.fuelData.collectAsState()
     val inclinationData by viewModel.inclinationData.collectAsState()
     val historyData by viewModel.historyData.collectAsState()
@@ -98,7 +98,7 @@ fun BleConnectScreen(
         // Datos del sensor en tiempo real (solo si está conectado)
         if (connectionState) {
             SensorDataSection(
-                weightData = weightData,
+                fuelMeasurementData = fuelMeasurementData,
                 fuelData = fuelData,
                 inclinationData = inclinationData,
                 historyData = historyData,
@@ -565,7 +565,7 @@ fun ConnectionStatusCard(
 
 @Composable
 fun SensorDataSection(
-    weightData: Weight?,
+    fuelMeasurementData: FuelMeasurement?,
     fuelData: FuelMeasurement?,
     inclinationData: Inclination?, 
     historyData: List<FuelMeasurement>,
@@ -577,7 +577,7 @@ fun SensorDataSection(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Tarjeta de peso
+            // Tarjeta de medición de combustible principal
             Card(
                 modifier = Modifier.weight(1f),
                 colors = CardDefaults.cardColors(
@@ -589,24 +589,29 @@ fun SensorDataSection(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "⚖️",
+                        text = "⛽",
                         style = MaterialTheme.typography.headlineMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Peso",
+                        text = "Combustible",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                     Text(
-                        text = weightData?.getFormattedValue() ?: "--.- kg",
+                        text = fuelMeasurementData?.getFormattedFuelKilograms() ?: "--.- kg",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
-                    if (weightData != null) {
+                    Text(
+                        text = fuelMeasurementData?.getFormattedPercentage() ?: "--%",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    if (fuelMeasurementData != null) {
                         Text(
-                            text = weightData.getFormattedTimestamp(),
+                            text = fuelMeasurementData.getFormattedTimestamp(),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
@@ -764,18 +769,4 @@ fun SensorDataSection(
             }
         }
     }
-}
-
-fun Weight.getFormattedValue(): String {
-    return String.format("%.1f kg", this.value)
-}
-
-fun Weight.getFormattedTimestamp(): String {
-    val dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-    return dateFormat.format(Date(this.timestamp))
-}
-
-fun Weight.getFullFormattedTimestamp(): String {
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-    return dateFormat.format(Date(this.timestamp))
 }

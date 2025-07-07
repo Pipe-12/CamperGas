@@ -5,7 +5,7 @@ import android.bluetooth.*
 import android.content.Context
 import android.util.Log
 import com.example.campergas.domain.model.CamperGasUuids
-import com.example.campergas.domain.model.Weight
+import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.model.Inclination
 import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.usecase.GetActiveCylinderUseCase
@@ -27,7 +27,7 @@ import javax.inject.Singleton
 /**
  * Servicio BLE unificado para manejar todas las características del sensor CamperGas
  * El sensor tiene un solo servicio con tres características:
- * - Weight: datos de peso en tiempo real
+ * - FuelMeasurement: datos de medición de combustible en tiempo real
  * - Inclination: datos de inclinación en tiempo real
  * - Offline: datos históricos en lotes
  */
@@ -50,8 +50,8 @@ class CamperGasBleService @Inject constructor(
     val connectionState: StateFlow<Boolean> = _connectionState
     
     // Datos de peso en tiempo real (mantener para compatibilidad con sensores)
-    private val _weightData = MutableStateFlow<Weight?>(null)
-    val weightData: StateFlow<Weight?> = _weightData
+    private val _fuelMeasurementData = MutableStateFlow<FuelMeasurement?>(null)
+    val fuelMeasurementData: StateFlow<FuelMeasurement?> = _fuelMeasurementData
     
     // Datos de combustible calculados
     private val _fuelData = MutableStateFlow<FuelMeasurement?>(null)
@@ -76,7 +76,7 @@ class CamperGasBleService @Inject constructor(
     private val processedOfflineData = mutableSetOf<String>() // Para evitar duplicados por peso+tiempo
     
     private var bluetoothGatt: BluetoothGatt? = null
-    private var weightCharacteristic: BluetoothGattCharacteristic? = null
+    private var fuelMeasurementCharacteristic: BluetoothGattCharacteristic? = null
     private var inclinationCharacteristic: BluetoothGattCharacteristic? = null
     private var offlineCharacteristic: BluetoothGattCharacteristic? = null
     
@@ -138,7 +138,7 @@ class CamperGasBleService @Inject constructor(
         ) {
             when (characteristic.uuid.toString().lowercase()) {
                 CamperGasUuids.WEIGHT_CHARACTERISTIC_UUID.lowercase() -> {
-                    processWeightData(value)
+                    processFuelMeasurementData(value)
                 }
                 CamperGasUuids.INCLINATION_CHARACTERISTIC_UUID.lowercase() -> {
                     processInclinationData(value)
@@ -197,15 +197,15 @@ class CamperGasBleService @Inject constructor(
             return
         }
         
-        // Configurar característica de peso
-        weightCharacteristic = service.getCharacteristic(
+        // Configurar característica de medición de combustible
+        fuelMeasurementCharacteristic = service.getCharacteristic(
             UUID.fromString(CamperGasUuids.WEIGHT_CHARACTERISTIC_UUID)
         )
-        if (weightCharacteristic != null) {
-            Log.d(TAG, "Característica de peso encontrada")
-            enableNotifications(gatt, weightCharacteristic!!)
+        if (fuelMeasurementCharacteristic != null) {
+            Log.d(TAG, "Característica de medición de combustible encontrada")
+            enableNotifications(gatt, fuelMeasurementCharacteristic!!)
         } else {
-            Log.w(TAG, "Característica de peso no encontrada")
+            Log.w(TAG, "Característica de medición de combustible no encontrada")
         }
         
         // Configurar característica de inclinación
@@ -281,31 +281,21 @@ class CamperGasBleService @Inject constructor(
         }
     }
     
-    private fun processWeightData(data: ByteArray) {
+    private fun processFuelMeasurementData(data: ByteArray) {
         try {
             val jsonString = String(data, Charsets.UTF_8)
-            Log.d(TAG, "Datos de peso recibidos: $jsonString")
+            Log.d(TAG, "Datos de medición de combustible recibidos: $jsonString")
             
             // Parsear JSON: {"w":12.5}
             val jsonObject = JSONObject(jsonString)
-            val weightValue = jsonObject.getDouble("w").toFloat()
-            
-            val weight = Weight(
-                value = weightValue,
-                timestamp = System.currentTimeMillis(),
-                unit = "kg"
-            )
-            
-            // Mantener compatibilidad con el StateFlow de peso
-            _weightData.value = weight
-            Log.d(TAG, "Peso actualizado: ${weight.value} kg")
+            val totalWeight = jsonObject.getDouble("w").toFloat()
             
             // Guardar medición de combustible en la base de datos
             serviceScope.launch {
                 try {
                     val result = saveFuelMeasurementUseCase.saveRealTimeMeasurement(
-                        totalWeight = weightValue,
-                        timestamp = weight.timestamp
+                        totalWeight = totalWeight,
+                        timestamp = System.currentTimeMillis()
                     )
                     
                     result.fold(
@@ -315,7 +305,7 @@ class CamperGasBleService @Inject constructor(
                             // Actualizar el StateFlow con los datos de combustible
                             val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
                             if (activeCylinder != null) {
-                                val fuelKilograms = maxOf(0f, weightValue - activeCylinder.tare)
+                                val fuelKilograms = maxOf(0f, totalWeight - activeCylinder.tare)
                                 val fuelPercentage = if (activeCylinder.capacity > 0) {
                                     (fuelKilograms / activeCylinder.capacity * 100).coerceIn(0f, 100f)
                                 } else {
@@ -326,14 +316,15 @@ class CamperGasBleService @Inject constructor(
                                     id = saveResult.measurementId,
                                     cylinderId = activeCylinder.id,
                                     cylinderName = activeCylinder.name,
-                                    timestamp = weight.timestamp,
+                                    timestamp = System.currentTimeMillis(),
                                     fuelKilograms = fuelKilograms,
                                     fuelPercentage = fuelPercentage,
-                                    totalWeight = weightValue,
+                                    totalWeight = totalWeight,
                                     isCalibrated = true,
                                     isHistorical = false
                                 )
                                 
+                                _fuelMeasurementData.value = fuelMeasurement
                                 _fuelData.value = fuelMeasurement
                                 Log.d(TAG, "Combustible calculado: ${fuelKilograms}kg (${fuelPercentage}%)")
                             }
@@ -348,7 +339,7 @@ class CamperGasBleService @Inject constructor(
             }
             
         } catch (e: Exception) {
-            Log.e(TAG, "Error al procesar datos de peso: ${e.message}")
+            Log.e(TAG, "Error al procesar datos de medición de combustible: ${e.message}")
         }
     }
     
@@ -710,7 +701,7 @@ class CamperGasBleService @Inject constructor(
         offlineCharacteristic = null
         
         // Limpiar datos cuando se desconecta
-        _weightData.value = null
+        _fuelMeasurementData.value = null
         _fuelData.value = null
         _inclinationData.value = null
         processedOfflineData.clear() // Limpiar datos procesados al desconectar

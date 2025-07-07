@@ -53,11 +53,11 @@ class BleForegroundService : Service() {
             try {
                 bleRepository.connectToSensor(deviceAddress)
                 
-                // Monitorear el peso y actualizar la notificación
+                // Monitorear las mediciones de combustible y actualizar la notificación
                 launch {
-                    bleRepository.weightData.collect { weight ->
-                        if (weight != null) {
-                            updateNotification("Peso actual: ${weight.getFormattedValue()}")
+                    bleRepository.fuelMeasurementData.collect { fuelMeasurement ->
+                        if (fuelMeasurement != null) {
+                            updateNotification("Combustible: ${fuelMeasurement.getFormattedFuelKilograms()} (${fuelMeasurement.getFormattedPercentage()})")
                         }
                     }
                 }

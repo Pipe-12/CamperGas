@@ -2,10 +2,8 @@ package com.example.campergas.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.campergas.domain.model.Weight
 import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.usecase.ConnectBleDeviceUseCase
-import com.example.campergas.domain.usecase.GetWeightUseCase
 import com.example.campergas.domain.usecase.GetFuelDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +14,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getWeightUseCase: GetWeightUseCase,
     private val getFuelDataUseCase: GetFuelDataUseCase,
     private val connectBleDeviceUseCase: ConnectBleDeviceUseCase
 ) : ViewModel() {
@@ -24,10 +21,8 @@ class HomeViewModel @Inject constructor(
     private val _connectionState = MutableStateFlow(false)
     val connectionState: StateFlow<Boolean> = _connectionState
     
-    private val _weight = MutableStateFlow<Weight?>(null)
-    val weight: StateFlow<Weight?> = _weight
-    
     private val _fuelData = MutableStateFlow<FuelMeasurement?>(null)
+    val fuelData: StateFlow<FuelMeasurement?> = _fuelData
     val fuelData: StateFlow<FuelMeasurement?> = _fuelData
     
     init {
@@ -42,13 +37,6 @@ class HomeViewModel @Inject constructor(
                         _connectionState.value = false
                     }
                 }
-            }
-        }
-        
-        // Observar los datos de peso
-        viewModelScope.launch {
-            getWeightUseCase().collectLatest {
-                _weight.value = it
             }
         }
         

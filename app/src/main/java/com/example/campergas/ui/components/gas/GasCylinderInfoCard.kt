@@ -14,12 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.campergas.domain.model.GasCylinder
-import com.example.campergas.domain.model.Weight
+import com.example.campergas.domain.model.FuelMeasurement
 
 @Composable
 fun GasCylinderInfoCard(
     activeCylinder: GasCylinder?,
-    currentWeight: Weight?,
+    currentFuelMeasurement: FuelMeasurement?,
     errorMessage: String?,
     modifier: Modifier = Modifier
 ) {
@@ -46,27 +46,25 @@ fun GasCylinderInfoCard(
                     fontWeight = FontWeight.Medium
                 )
                 
-                currentWeight?.let { weight ->
-                    val gasPercentage = cylinder.calculateGasPercentage(weight.value)
+                currentFuelMeasurement?.let { fuelMeasurement ->
                     Text(
-                        text = "Gas restante: ${String.format("%.1f", gasPercentage)}%",
+                        text = "Gas restante: ${fuelMeasurement.getFormattedPercentage()}",
                         style = MaterialTheme.typography.bodySmall,
                         color = when {
-                            gasPercentage > 50 -> MaterialTheme.colorScheme.primary
-                            gasPercentage > 20 -> MaterialTheme.colorScheme.tertiary
+                            fuelMeasurement.fuelPercentage > 50 -> MaterialTheme.colorScheme.primary
+                            fuelMeasurement.fuelPercentage > 20 -> MaterialTheme.colorScheme.tertiary
                             else -> MaterialTheme.colorScheme.error
                         }
                     )
                     
                     Text(
-                        text = "Peso total: ${weight.getFormattedValue()}",
+                        text = "Peso total: ${"%.1f kg".format(fuelMeasurement.totalWeight)}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     
-                    val gasContent = cylinder.calculateGasContent(weight.value)
                     Text(
-                        text = "Contenido de gas: ${String.format("%.1f", gasContent)} kg",
+                        text = "Contenido de gas: ${fuelMeasurement.getFormattedFuelKilograms()}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
