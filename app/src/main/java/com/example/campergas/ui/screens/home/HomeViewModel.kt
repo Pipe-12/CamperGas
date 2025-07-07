@@ -17,13 +17,13 @@ class HomeViewModel @Inject constructor(
     private val getFuelDataUseCase: GetFuelDataUseCase,
     private val connectBleDeviceUseCase: ConnectBleDeviceUseCase
 ) : ViewModel() {
-    
+
     private val _connectionState = MutableStateFlow(false)
     val connectionState: StateFlow<Boolean> = _connectionState
-    
+
     private val _fuelData = MutableStateFlow<FuelMeasurement?>(null)
     val fuelData: StateFlow<FuelMeasurement?> = _fuelData
-    
+
     init {
         // Intentar conectar con el último dispositivo utilizado
         viewModelScope.launch {
@@ -38,7 +38,7 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
-        
+
         // Observar los datos de combustible
         viewModelScope.launch {
             getFuelDataUseCase().collectLatest {
@@ -46,7 +46,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-    
+
     fun disconnectDevice() {
         viewModelScope.launch {
             try {
@@ -57,7 +57,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-    
+
     override fun onCleared() {
         super.onCleared()
         disconnectDevice()

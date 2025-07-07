@@ -1,19 +1,35 @@
 package com.example.campergas.ui.screens.caravanconfig
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.campergas.R
 import com.example.campergas.domain.model.VehicleType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -113,18 +129,21 @@ fun CaravanConfigScreen(
                         OutlinedTextField(
                             value = if (uiState.distanceToFrontSupport == 0f) "" else uiState.distanceToFrontSupport.toString(),
                             onValueChange = { value ->
-                                value.toFloatOrNull()?.let { viewModel.updateDistanceToFrontSupport(it) }
+                                value.toFloatOrNull()
+                                    ?.let { viewModel.updateDistanceToFrontSupport(it) }
                             },
                             label = { Text("Distancia al apoyo delantero") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
+
                     VehicleType.AUTOCARAVANA -> {
                         OutlinedTextField(
                             value = if (uiState.distanceBetweenFrontWheels == 0f) "" else uiState.distanceBetweenFrontWheels.toString(),
                             onValueChange = { value ->
-                                value.toFloatOrNull()?.let { viewModel.updateDistanceBetweenFrontWheels(it) }
+                                value.toFloatOrNull()
+                                    ?.let { viewModel.updateDistanceBetweenFrontWheels(it) }
                             },
                             label = { Text("Distancia entre ruedas delanteras") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -138,7 +157,9 @@ fun CaravanConfigScreen(
         // Indicador de carga
         if (uiState.isLoading || uiState.isSaving) {
             Box(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()

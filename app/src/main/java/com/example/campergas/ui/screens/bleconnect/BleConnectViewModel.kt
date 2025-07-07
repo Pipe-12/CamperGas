@@ -6,7 +6,9 @@ import com.example.campergas.data.repository.BleRepository
 import com.example.campergas.domain.model.BleDevice
 import com.example.campergas.domain.usecase.ScanBleDevicesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,7 +23,7 @@ class BleConnectViewModel @Inject constructor(
 
     // Observar estado de conexión
     val connectionState = bleRepository.connectionState
-    
+
     // Observar datos del sensor
     val fuelMeasurementData = bleRepository.fuelMeasurementData
     val fuelData = bleRepository.fuelData
@@ -49,7 +51,7 @@ class BleConnectViewModel @Inject constructor(
             )
             return
         }
-        
+
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isScanning = true,
@@ -100,7 +102,7 @@ class BleConnectViewModel @Inject constructor(
             )
             return
         }
-        
+
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isConnecting = device.address,
@@ -109,10 +111,10 @@ class BleConnectViewModel @Inject constructor(
             try {
                 // Usar el repositorio unificado para conectar
                 bleRepository.connectToSensor(device.address)
-                
+
                 // Guardar dispositivo como último conectado
                 bleRepository.saveLastConnectedDevice(device.address)
-                
+
                 _uiState.value = _uiState.value.copy(
                     connectedDevice = device,
                     error = null
@@ -130,7 +132,7 @@ class BleConnectViewModel @Inject constructor(
             }
         }
     }
-    
+
     fun disconnectDevice() {
         viewModelScope.launch {
             try {
@@ -146,23 +148,23 @@ class BleConnectViewModel @Inject constructor(
             }
         }
     }
-    
+
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }
-    
+
     fun checkBluetoothPermissions(): Boolean {
         return scanBleDevicesUseCase.isBluetoothEnabled()
     }
-    
+
     fun isBluetoothEnabled(): Boolean {
         return scanBleDevicesUseCase.isBluetoothEnabled()
     }
-    
+
     fun requiresPermissions(): Boolean {
         return !scanBleDevicesUseCase.isBluetoothEnabled()
     }
-    
+
     // Gestión de filtros
     fun toggleCompatibleDevicesFilter() {
         scanBleDevicesUseCase.toggleCompatibleDevicesFilter()
@@ -170,12 +172,12 @@ class BleConnectViewModel @Inject constructor(
             showOnlyCompatibleDevices = scanBleDevicesUseCase.isCompatibleFilterEnabled()
         )
     }
-    
+
     fun enableCompatibleDevicesFilter() {
         scanBleDevicesUseCase.enableCompatibleDevicesFilter()
         _uiState.value = _uiState.value.copy(showOnlyCompatibleDevices = true)
     }
-    
+
     fun disableCompatibleDevicesFilter() {
         scanBleDevicesUseCase.disableCompatibleDevicesFilter()
         _uiState.value = _uiState.value.copy(showOnlyCompatibleDevices = false)

@@ -3,7 +3,6 @@ package com.example.campergas.ui.screens.inclination
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.domain.usecase.GetInclinationUseCase
-import com.example.campergas.domain.model.Inclination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

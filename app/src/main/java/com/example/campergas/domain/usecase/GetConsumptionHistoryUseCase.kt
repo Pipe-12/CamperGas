@@ -16,36 +16,40 @@ class GetConsumptionHistoryUseCase @Inject constructor(
             consumptionRepository.getAllConsumptions()
         }
     }
-    
+
     fun getConsumptionsByCylinder(cylinderId: Long): Flow<List<Consumption>> {
         return consumptionRepository.getConsumptionsByCylinder(cylinderId)
     }
-    
+
     fun getConsumptionsByCylinderAndDateRange(
         cylinderId: Long,
         startDate: Long,
         endDate: Long
     ): Flow<List<Consumption>> {
-        return consumptionRepository.getConsumptionsByCylinderAndDateRange(cylinderId, startDate, endDate)
+        return consumptionRepository.getConsumptionsByCylinderAndDateRange(
+            cylinderId,
+            startDate,
+            endDate
+        )
     }
-    
+
     fun getLastWeekConsumption(): Flow<List<Consumption>> {
         val calendar = Calendar.getInstance()
         val endDate = calendar.timeInMillis
-        
+
         calendar.add(Calendar.DAY_OF_YEAR, -7)
         val startDate = calendar.timeInMillis
-        
+
         return consumptionRepository.getConsumptionsByDateRange(startDate, endDate)
     }
-    
+
     fun getLastMonthConsumption(): Flow<List<Consumption>> {
         val calendar = Calendar.getInstance()
         val endDate = calendar.timeInMillis
-        
+
         calendar.add(Calendar.MONTH, -1)
         val startDate = calendar.timeInMillis
-        
+
         return consumptionRepository.getConsumptionsByDateRange(startDate, endDate)
     }
 }

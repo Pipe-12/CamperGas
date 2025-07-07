@@ -24,10 +24,10 @@ class SaveVehicleConfigUseCase @Inject constructor(
             distanceToFrontSupport = distanceToFrontSupport,
             distanceBetweenFrontWheels = distanceBetweenFrontWheels
         )
-        
+
         vehicleRepository.saveVehicleConfig(config)
     }
-    
+
     /**
      * Guarda o actualiza un objeto de configuración completo.
      * Si ya existe una configuración, se actualizará en lugar de crear una nueva.
@@ -35,7 +35,7 @@ class SaveVehicleConfigUseCase @Inject constructor(
     suspend fun saveVehicleConfig(config: VehicleConfig) {
         vehicleRepository.saveVehicleConfig(config)
     }
-    
+
     /**
      * Elimina la configuración del vehículo si existe.
      */

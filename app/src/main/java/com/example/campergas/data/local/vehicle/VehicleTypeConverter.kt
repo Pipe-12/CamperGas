@@ -8,12 +8,12 @@ class VehicleTypeConverter {
     fun fromVehicleType(vehicleType: VehicleType): String {
         return vehicleType.name
     }
-    
+
     @TypeConverter
     fun toVehicleType(value: String): VehicleType {
         return try {
             VehicleType.valueOf(value)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             VehicleType.CARAVAN // Valor por defecto
         }
     }

@@ -14,7 +14,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,9 +53,9 @@ fun HomeScreen(
     val fuelData by viewModel.fuelData.collectAsState()
     val activeCylinder by gasCylinderViewModel.activeCylinder.collectAsState()
     val gasCylinderUiState by gasCylinderViewModel.uiState.collectAsState()
-    
+
     var showAddCylinderDialog by remember { mutableStateOf(false) }
-    
+
     // Diálogo para agregar bombona
     if (showAddCylinderDialog) {
         AddGasCylinderDialog(
@@ -67,11 +66,11 @@ fun HomeScreen(
             }
         )
     }
-    
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { 
+                title = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -120,12 +119,12 @@ fun HomeScreen(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
-                        
+
                         Text(
                             text = "Estado: ${if (connectionState) "✅ Conectado" else "❌ Desconectado"}",
                             style = MaterialTheme.typography.bodyLarge
                         )
-                        
+
                         fuelData?.let {
                             Text(
                                 text = "Combustible: ${it.getFormattedFuelKilograms()} (${it.getFormattedPercentage()})",
@@ -136,7 +135,7 @@ fun HomeScreen(
                     }
                 }
             }
-            
+
             // Información de bombona activa
             item {
                 GasCylinderInfoCard(
@@ -145,7 +144,7 @@ fun HomeScreen(
                     errorMessage = gasCylinderUiState.errorMessage
                 )
             }
-            
+
             // Título de navegación
             item {
                 Text(
@@ -155,7 +154,7 @@ fun HomeScreen(
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
-            
+
             // Botones de navegación
             item {
                 NavigationButton(
@@ -165,7 +164,7 @@ fun HomeScreen(
                     onClick = { navController.navigate(Screen.Weight.route) }
                 )
             }
-            
+
             item {
                 NavigationButton(
                     title = "Inclinación",
@@ -174,7 +173,7 @@ fun HomeScreen(
                     onClick = { navController.navigate(Screen.Inclination.route) }
                 )
             }
-            
+
             item {
                 NavigationButton(
                     title = "Historial de Consumo",
@@ -183,7 +182,7 @@ fun HomeScreen(
                     onClick = { navController.navigate(Screen.Consumption.route) }
                 )
             }
-            
+
             item {
                 NavigationButton(
                     title = "Conectar Dispositivo",
@@ -192,7 +191,7 @@ fun HomeScreen(
                     onClick = { navController.navigate(Screen.BleConnect.route) }
                 )
             }
-            
+
             item {
                 NavigationButton(
                     title = "Configurar Caravana",
@@ -201,7 +200,7 @@ fun HomeScreen(
                     onClick = { navController.navigate(Screen.CaravanConfig.route) }
                 )
             }
-            
+
             item {
                 NavigationButton(
                     title = "Ajustes",
@@ -239,7 +238,7 @@ private fun NavigationButton(
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(8.dp)
             )
-            
+
             Column(
                 modifier = Modifier.weight(1f)
             ) {

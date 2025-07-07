@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
@@ -13,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.campergas.domain.model.GasCylinder
 import com.example.campergas.domain.model.FuelMeasurement
+import com.example.campergas.domain.model.GasCylinder
 
 @Composable
 fun GasCylinderInfoCard(
@@ -36,7 +35,7 @@ fun GasCylinderInfoCard(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            
+
             // Información de bombona activa
             activeCylinder?.let { cylinder ->
                 Text(
@@ -45,7 +44,7 @@ fun GasCylinderInfoCard(
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
                 )
-                
+
                 currentFuelMeasurement?.let { fuelMeasurement ->
                     Text(
                         text = "Gas restante: ${fuelMeasurement.getFormattedPercentage()}",
@@ -56,13 +55,13 @@ fun GasCylinderInfoCard(
                             else -> MaterialTheme.colorScheme.error
                         }
                     )
-                    
+
                     Text(
                         text = "Peso total: ${"%.1f kg".format(fuelMeasurement.totalWeight)}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    
+
                     Text(
                         text = "Contenido de gas: ${fuelMeasurement.getFormattedFuelKilograms()}",
                         style = MaterialTheme.typography.bodySmall,
@@ -77,7 +76,7 @@ fun GasCylinderInfoCard(
                     fontWeight = FontWeight.Medium
                 )
             }
-            
+
             // Mostrar mensaje de error si existe
             errorMessage?.let { error ->
                 Text(

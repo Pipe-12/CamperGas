@@ -22,7 +22,7 @@ data class GasCylinder(
         val gasWeight = totalWeight - tare
         return if (gasWeight < 0) 0f else gasWeight
     }
-    
+
     /**
      * Calcula el porcentaje de gas restante
      * @param totalWeight Peso total de la bombona
@@ -32,21 +32,21 @@ data class GasCylinder(
         val gasContent = calculateGasContent(totalWeight)
         return if (capacity > 0) (gasContent / capacity * 100).coerceIn(0f, 100f) else 0f
     }
-    
+
     /**
      * Determina si la bombona está vacía (menos del 5% de gas)
      */
     fun isEmpty(totalWeight: Float): Boolean {
         return calculateGasPercentage(totalWeight) < 5f
     }
-    
+
     /**
      * Determina si la bombona está casi vacía (menos del 20% de gas)
      */
     fun isLowGas(totalWeight: Float): Boolean {
         return calculateGasPercentage(totalWeight) < 20f
     }
-    
+
     /**
      * Devuelve una descripción formateada de la bombona
      */

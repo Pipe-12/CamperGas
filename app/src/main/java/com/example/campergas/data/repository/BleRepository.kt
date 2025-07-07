@@ -22,55 +22,58 @@ class BleRepository @Inject constructor(
     // Scan
     val scanResults: StateFlow<List<BleDevice>> = bleDeviceScanner.scanResults
     val isScanning: StateFlow<Boolean> = bleDeviceScanner.isScanning
-    
+
     // Connection state
     val connectionState: StateFlow<Boolean> = camperGasBleService.connectionState
-    
+
     // Sensor data
     val fuelMeasurementData = camperGasBleService.fuelMeasurementData
     val fuelData = camperGasBleService.fuelData
     val inclinationData = camperGasBleService.inclinationData
     val historyData = camperGasBleService.historyData
     val isLoadingHistory = camperGasBleService.isLoadingHistory
-    
+
     // Preferences
     val lastConnectedDeviceAddress: Flow<String> = preferencesDataStore.lastConnectedDeviceAddress
-    
+
     fun isBluetoothEnabled(): Boolean = bleManager.isBluetoothEnabled()
-    
+
     /**
      * Verifica si se tienen todos los permisos necesarios para operaciones BLE
      */
     fun hasAllBluetoothPermissions(): Boolean = bleManager.hasAllBluetoothPermissions()
-    
+
     /**
      * Verifica si se tienen permisos para escanear dispositivos BLE
      */
     fun hasBluetoothScanPermission(): Boolean = bleManager.hasBluetoothScanPermission()
-    
+
     /**
      * Verifica si se tienen permisos para conectar dispositivos BLE
      */
     fun hasBluetoothConnectPermission(): Boolean = bleManager.hasBluetoothConnectPermission()
-    
+
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun startScan() = bleDeviceScanner.startScan()
-    
+
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun stopScan() = bleDeviceScanner.stopScan()
-    
+
     // Conexión unificada al sensor CamperGas
     fun connectToSensor(deviceAddress: String) = camperGasBleService.connect(deviceAddress)
-    
+
     fun disconnectSensor() = camperGasBleService.disconnect()
-    
+
     fun isConnected(): Boolean = camperGasBleService.isConnected()
-    
+
     fun ensureOfflineDataReading() = camperGasBleService.ensureOfflineDataReading()
-    
-    suspend fun saveLastConnectedDevice(address: String) = preferencesDataStore.saveLastConnectedDevice(address)
+
+    suspend fun saveLastConnectedDevice(address: String) =
+        preferencesDataStore.saveLastConnectedDevice(address)
 
     // Filtrado de dispositivos
-    fun setCompatibleDevicesFilter(enabled: Boolean) = bleDeviceScanner.setCompatibleDevicesFilter(enabled)
+    fun setCompatibleDevicesFilter(enabled: Boolean) =
+        bleDeviceScanner.setCompatibleDevicesFilter(enabled)
+
     fun isCompatibleFilterEnabled(): Boolean = bleDeviceScanner.isCompatibleFilterEnabled()
 }

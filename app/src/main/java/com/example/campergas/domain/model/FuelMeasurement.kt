@@ -15,12 +15,12 @@ data class FuelMeasurement(
      * Formatea los kilogramos de combustible para mostrar en la UI
      */
     fun getFormattedFuelKilograms(): String = "%.2f kg".format(fuelKilograms)
-    
+
     /**
      * Formatea el porcentaje para mostrar en la UI
      */
     fun getFormattedPercentage(): String = "%.1f%%".format(fuelPercentage)
-    
+
     /**
      * Obtiene la fecha formateada de la medición
      */
@@ -29,20 +29,21 @@ data class FuelMeasurement(
         val formatter = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
         return formatter.format(date)
     }
-    
+
     /**
      * Obtiene la fecha y hora completa formateada
      */
     fun getFullFormattedTimestamp(): String {
         val date = java.util.Date(timestamp)
-        val formatter = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss", java.util.Locale.getDefault())
+        val formatter =
+            java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss", java.util.Locale.getDefault())
         return formatter.format(date)
     }
-    
+
     /**
      * Verifica si la medición es válida
      */
-    fun isValid(): Boolean = 
+    fun isValid(): Boolean =
         !fuelKilograms.isNaN() && !fuelKilograms.isInfinite() && fuelKilograms >= 0 &&
-        !fuelPercentage.isNaN() && !fuelPercentage.isInfinite() && fuelPercentage >= 0 && fuelPercentage <= 100
+                !fuelPercentage.isNaN() && !fuelPercentage.isInfinite() && fuelPercentage >= 0 && fuelPercentage <= 100
 }

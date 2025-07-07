@@ -10,24 +10,24 @@ data class Inclination(
      */
     val isLevelPitch: Boolean
         get() = kotlin.math.abs(pitch) <= 2.0f
-        
+
     /**
      * Calcula si el dispositivo está nivelado en roll (tolerancia ±2°)
      */
     val isLevelRoll: Boolean
         get() = kotlin.math.abs(roll) <= 2.0f
-        
+
     /**
      * Calcula si el dispositivo está completamente nivelado
      */
     val isLevel: Boolean
         get() = isLevelPitch && isLevelRoll
-        
+
     /**
      * Obtiene una descripción formateada de la inclinación
      */
     fun getFormattedValue(): String = "P: %.1f° R: %.1f°".format(pitch, roll)
-    
+
     /**
      * Obtiene la fecha formateada de la medición
      */

@@ -34,7 +34,7 @@ fun AddGasCylinderDialog(
     var nameError by remember { mutableStateOf(false) }
     var tareError by remember { mutableStateOf(false) }
     var capacityError by remember { mutableStateOf(false) }
-    
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -46,7 +46,7 @@ fun AddGasCylinderDialog(
             ) {
                 OutlinedTextField(
                     value = name,
-                    onValueChange = { 
+                    onValueChange = {
                         name = it
                         nameError = it.isBlank()
                     },
@@ -58,10 +58,10 @@ fun AddGasCylinderDialog(
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
-                
+
                 OutlinedTextField(
                     value = tare,
-                    onValueChange = { 
+                    onValueChange = {
                         tare = it
                         tareError = it.toFloatOrNull() == null || it.toFloatOrNull()!! < 0
                     },
@@ -74,10 +74,10 @@ fun AddGasCylinderDialog(
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
-                
+
                 OutlinedTextField(
                     value = capacity,
-                    onValueChange = { 
+                    onValueChange = {
                         capacity = it
                         capacityError = it.toFloatOrNull() == null || it.toFloatOrNull()!! <= 0
                     },
@@ -90,7 +90,7 @@ fun AddGasCylinderDialog(
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
-                
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -110,15 +110,16 @@ fun AddGasCylinderDialog(
                 onClick = {
                     val tareValue = tare.toFloatOrNull()
                     val capacityValue = capacity.toFloatOrNull()
-                    
-                    if (name.isNotBlank() && tareValue != null && tareValue >= 0 && 
-                        capacityValue != null && capacityValue > 0) {
+
+                    if (name.isNotBlank() && tareValue != null && tareValue >= 0 &&
+                        capacityValue != null && capacityValue > 0
+                    ) {
                         onConfirm(name, tareValue, capacityValue, setAsActive)
                     }
                 },
-                enabled = name.isNotBlank() && 
-                         tare.toFloatOrNull() != null && tare.toFloatOrNull()!! >= 0 &&
-                         capacity.toFloatOrNull() != null && capacity.toFloatOrNull()!! > 0
+                enabled = name.isNotBlank() &&
+                        tare.toFloatOrNull() != null && tare.toFloatOrNull()!! >= 0 &&
+                        capacity.toFloatOrNull() != null && capacity.toFloatOrNull()!! > 0
             ) {
                 Text("Añadir")
             }

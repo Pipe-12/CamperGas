@@ -2,7 +2,6 @@ package com.example.campergas.ui.screens.caravanconfig
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.campergas.domain.model.VehicleConfig
 import com.example.campergas.domain.model.VehicleType
 import com.example.campergas.domain.usecase.GetVehicleConfigUseCase
 import com.example.campergas.domain.usecase.SaveVehicleConfigUseCase
@@ -77,7 +76,7 @@ class CaravanConfigViewModel @Inject constructor(
                     type = _uiState.value.selectedVehicleType,
                     distanceBetweenRearWheels = _uiState.value.distanceBetweenWheels,
                     distanceToFrontSupport = _uiState.value.distanceToFrontSupport,
-                    distanceBetweenFrontWheels = if (_uiState.value.selectedVehicleType == VehicleType.AUTOCARAVANA) 
+                    distanceBetweenFrontWheels = if (_uiState.value.selectedVehicleType == VehicleType.AUTOCARAVANA)
                         _uiState.value.distanceBetweenFrontWheels else null
                 )
                 _uiState.value = _uiState.value.copy(

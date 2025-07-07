@@ -10,39 +10,26 @@ import javax.inject.Singleton
 class GasCylinderRepository @Inject constructor(
     private val gasCylinderDao: GasCylinderDao
 ) {
-    
+
     // CRUD operaciones para bombonas
     fun getAllCylinders(): Flow<List<GasCylinder>> = gasCylinderDao.getAllCylinders()
-    
+
     fun getActiveCylinder(): Flow<GasCylinder?> = gasCylinderDao.getActiveCylinder()
-    
+
     suspend fun getActiveCylinderSync(): GasCylinder? = gasCylinderDao.getActiveCylinderSync()
-    
+
     suspend fun getCylinderById(id: Long): GasCylinder? = gasCylinderDao.getCylinderById(id)
-    
-    suspend fun getGasCylinderById(id: Long): GasCylinder? = gasCylinderDao.getCylinderById(id)
-    
+
     suspend fun getAllCylindersSync(): List<GasCylinder> = gasCylinderDao.getAllCylindersSync()
-    
+
     suspend fun insertCylinder(cylinder: GasCylinder): Long {
         return gasCylinderDao.insertCylinder(cylinder)
     }
-    
-    suspend fun updateCylinder(cylinder: GasCylinder) {
-        gasCylinderDao.updateCylinder(cylinder)
-    }
-    
+
+
     suspend fun setActiveCylinder(cylinderId: Long) {
         gasCylinderDao.setActiveCylinder(cylinderId)
     }
-    
-    suspend fun deactivateAllCylinders() {
-        gasCylinderDao.deactivateAllCylinders()
-    }
-    
-    fun searchCylinders(searchTerm: String): Flow<List<GasCylinder>> {
-        return gasCylinderDao.searchCylinders(searchTerm)
-    }
-    
-    suspend fun getCylinderCount(): Int = gasCylinderDao.getCylinderCount()
+
+
 }

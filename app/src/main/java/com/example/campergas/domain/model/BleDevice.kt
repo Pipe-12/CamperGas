@@ -16,19 +16,19 @@ data class BleDevice(
             rssi >= -85 -> "Regular"
             else -> "Débil"
         }
-    
+
     /**
      * Verifica si este dispositivo es compatible con CamperGas
      */
     val isCompatibleWithCamperGas: Boolean
         get() = CamperGasUuids.isCompatibleDevice(services)
-    
+
     /**
      * Indica si el dispositivo tiene el servicio principal de CamperGas
      */
     val hasCamperGasService: Boolean
         get() = services.any { CamperGasUuids.isSensorService(it) }
-        
+
     /**
      * Obtiene el tipo de dispositivo basado en el nombre
      */

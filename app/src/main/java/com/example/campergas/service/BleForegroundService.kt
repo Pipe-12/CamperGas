@@ -15,44 +15,43 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class BleForegroundService : Service() {
-    
+
     @Inject
     lateinit var bleRepository: BleRepository
-    
+
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val notificationId = 123
     private val channelId = "ble_service_channel"
-    
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
     }
-    
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val notification = createNotification("CamperGas en funcionamiento")
         startForeground(notificationId, notification)
-        
+
         val deviceAddress = intent?.getStringExtra(KEY_DEVICE_ADDRESS)
-        
+
         if (deviceAddress != null) {
             connectToDevice(deviceAddress)
         }
-        
+
         // Retornamos START_STICKY para que el servicio se reinicie automáticamente si el sistema lo mata
         return START_STICKY
     }
-    
+
     private fun connectToDevice(deviceAddress: String) {
         serviceScope.launch {
             try {
                 bleRepository.connectToSensor(deviceAddress)
-                
+
                 // Monitorear las mediciones de combustible y actualizar la notificación
                 launch {
                     bleRepository.fuelMeasurementData.collect { fuelMeasurement ->
@@ -61,16 +60,16 @@ class BleForegroundService : Service() {
                         }
                     }
                 }
-                
+
                 // Guardar la dirección del dispositivo conectado
                 bleRepository.saveLastConnectedDevice(deviceAddress)
-                
+
             } catch (e: Exception) {
                 stopSelf()
             }
         }
     }
-    
+
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "CamperGas BLE Service"
@@ -79,12 +78,13 @@ class BleForegroundService : Service() {
             val channel = NotificationChannel(channelId, name, importance).apply {
                 description = descriptionText
             }
-            
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
-    
+
     private fun createNotification(message: String): Notification {
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("CamperGas")
@@ -93,13 +93,14 @@ class BleForegroundService : Service() {
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
     }
-    
+
     private fun updateNotification(message: String) {
         val notification = createNotification(message)
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(notificationId, notification)
     }
-    
+
     override fun onDestroy() {
         serviceScope.launch {
             bleRepository.disconnectSensor()
@@ -107,24 +108,24 @@ class BleForegroundService : Service() {
         serviceScope.cancel()
         super.onDestroy()
     }
-    
+
     override fun onBind(intent: Intent?): IBinder? = null
-    
+
     companion object {
         const val KEY_DEVICE_ADDRESS = "device_address"
-        
+
         fun startService(context: Context, deviceAddress: String) {
             val intent = Intent(context, BleForegroundService::class.java).apply {
                 putExtra(KEY_DEVICE_ADDRESS, deviceAddress)
             }
-            
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
             } else {
                 context.startService(intent)
             }
         }
-        
+
         fun stopService(context: Context) {
             val intent = Intent(context, BleForegroundService::class.java)
             context.stopService(intent)

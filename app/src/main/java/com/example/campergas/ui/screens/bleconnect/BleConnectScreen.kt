@@ -1,18 +1,46 @@
 package com.example.campergas.ui.screens.bleconnect
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,14 +50,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.campergas.domain.model.BleDevice
-
 import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.model.Inclination
-import com.example.campergas.ui.components.BluetoothPermissionDialog
 import com.example.campergas.ui.components.BluetoothDisabledDialog
-import com.example.campergas.utils.BluetoothPermissionManager
-import java.text.SimpleDateFormat
-import java.util.*
+import com.example.campergas.ui.components.BluetoothPermissionDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,18 +68,18 @@ fun BleConnectScreen(
     val inclinationData by viewModel.inclinationData.collectAsState()
     val historyData by viewModel.historyData.collectAsState()
     val isLoadingHistory by viewModel.isLoadingHistory.collectAsState()
-    
+
     // Estados para controlar diálogos de permisos
     var showPermissionDialog by remember { mutableStateOf(false) }
     var showBluetoothDialog by remember { mutableStateOf(false) }
-    
+
     // Verificar permisos al entrar a la pantalla
     LaunchedEffect(Unit) {
         if (!viewModel.isBluetoothEnabled()) {
             showBluetoothDialog = true
         }
     }
-    
+
     // Diálogo para activar Bluetooth
     if (showBluetoothDialog) {
         BluetoothDisabledDialog(
@@ -67,7 +91,7 @@ fun BleConnectScreen(
             }
         )
     }
-    
+
     // Diálogo para permisos
     if (showPermissionDialog) {
         BluetoothPermissionDialog(
@@ -92,7 +116,7 @@ fun BleConnectScreen(
             connectedDevice = uiState.connectedDevice,
             onDisconnect = { viewModel.disconnectDevice() }
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
 
         // Datos del sensor en tiempo real (solo si está conectado)
@@ -104,7 +128,7 @@ fun BleConnectScreen(
                 historyData = historyData,
                 isLoadingHistory = isLoadingHistory
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
         }
 
@@ -126,7 +150,7 @@ fun BleConnectScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Buscar")
             }
-            
+
             OutlinedButton(
                 onClick = { viewModel.stopScan() },
                 modifier = Modifier.weight(1f),
@@ -135,7 +159,7 @@ fun BleConnectScreen(
                 Text("Detener")
             }
         }
-        
+
         // Filter toggle
         Row(
             modifier = Modifier
@@ -153,7 +177,7 @@ fun BleConnectScreen(
                 onCheckedChange = { viewModel.toggleCompatibleDevicesFilter() }
             )
         }
-        
+
         Spacer(modifier = Modifier.height(16.dp))
 
         // Loading indicator
@@ -223,7 +247,7 @@ fun BleConnectScreen(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            
+
             if (uiState.availableDevices.isEmpty() && !uiState.isScanning) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -289,14 +313,16 @@ private fun AvailableDeviceCard(
     } else {
         CardDefaults.elevatedCardColors()
     }
-    
+
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = if (isCompatible) 6.dp else 2.dp
         ),
         colors = cardColors,
-        onClick = if (!isConnecting && (isCompatible || device.isConnectable)) onConnect else { {} }
+        onClick = if (!isConnecting && (isCompatible || device.isConnectable)) onConnect else {
+            {}
+        }
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -323,7 +349,7 @@ private fun AvailableDeviceCard(
                     }
                 }
             }
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -341,7 +367,7 @@ private fun AvailableDeviceCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -353,7 +379,7 @@ private fun AvailableDeviceCard(
                         modifier = Modifier.size(20.dp),
                         tint = getSignalColor(device.rssi)
                     )
-                    
+
                     if (isConnecting) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(20.dp),
@@ -362,9 +388,9 @@ private fun AvailableDeviceCard(
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             // Device details
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -382,7 +408,7 @@ private fun AvailableDeviceCard(
                     fontWeight = FontWeight.Medium
                 )
             }
-            
+
             if (device.services.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
@@ -391,7 +417,7 @@ private fun AvailableDeviceCard(
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-            
+
             // Información de compatibilidad
             if (device.isCompatibleWithCamperGas) {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -467,7 +493,7 @@ private fun ConnectedDeviceCard(
                     )
                 }
             }
-            
+
             OutlinedButton(
                 onClick = onDisconnect,
                 modifier = Modifier.height(32.dp)
@@ -509,9 +535,9 @@ fun ConnectionStatusCard(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isConnected) 
-                MaterialTheme.colorScheme.primaryContainer 
-            else 
+            containerColor = if (isConnected)
+                MaterialTheme.colorScheme.primaryContainer
+            else
                 MaterialTheme.colorScheme.surface
         )
     ) {
@@ -524,9 +550,9 @@ fun ConnectionStatusCard(
                 Icon(
                     imageVector = if (isConnected) Icons.Default.CheckCircle else Icons.Default.Settings,
                     contentDescription = null,
-                    tint = if (isConnected) 
-                        MaterialTheme.colorScheme.primary 
-                    else 
+                    tint = if (isConnected)
+                        MaterialTheme.colorScheme.primary
+                    else
                         MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(32.dp)
                 )
@@ -547,7 +573,7 @@ fun ConnectionStatusCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 if (isConnected) {
                     OutlinedButton(
                         onClick = onDisconnect,
@@ -567,7 +593,7 @@ fun ConnectionStatusCard(
 fun SensorDataSection(
     fuelMeasurementData: FuelMeasurement?,
     fuelData: FuelMeasurement?,
-    inclinationData: Inclination?, 
+    inclinationData: Inclination?,
     historyData: List<FuelMeasurement>,
     isLoadingHistory: Boolean
 ) {
@@ -618,7 +644,7 @@ fun SensorDataSection(
                     }
                 }
             }
-            
+
             // Tarjeta de combustible
             Card(
                 modifier = Modifier.weight(1f),
@@ -661,9 +687,9 @@ fun SensorDataSection(
                 }
             }
         }
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         // Datos históricos
         Card(
             modifier = Modifier.fillMaxWidth()
@@ -675,37 +701,38 @@ fun SensorDataSection(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
-                ) {                Column {
-                    Text(
-                        text = "Datos Históricos (${historyData.size})",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    if (isLoadingHistory) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                strokeWidth = 2.dp
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
+                ) {
+                    Column {
+                        Text(
+                            text = "Datos Históricos (${historyData.size})",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        if (isLoadingHistory) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    strokeWidth = 2.dp
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Sincronizando automáticamente...",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        } else {
                             Text(
-                                text = "Sincronizando automáticamente...",
+                                text = "🔄 Sincronización automática al conectar",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                    } else {
-                        Text(
-                            text = "🔄 Sincronización automática al conectar",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
                     }
                 }
-                }
-                
+
                 if (isLoadingHistory) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
@@ -724,7 +751,7 @@ fun SensorDataSection(
                         )
                     }
                 }
-                
+
                 if (historyData.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     LazyColumn(

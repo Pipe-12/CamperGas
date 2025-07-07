@@ -11,11 +11,11 @@ class GetGasCylindersUseCase @Inject constructor(
     operator fun invoke(): Flow<List<GasCylinder>> {
         return repository.getAllCylinders()
     }
-    
+
     fun getActiveCylinder(): Flow<GasCylinder?> {
         return repository.getActiveCylinder()
     }
-    
+
     suspend fun getActiveCylinderSync(): GasCylinder? {
         return repository.getActiveCylinderSync()
     }

@@ -5,14 +5,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-
-import com.example.campergas.ui.screens.home.HomeScreen
-import com.example.campergas.ui.screens.weight.WeightScreen
-import com.example.campergas.ui.screens.inclination.InclinationScreen
-import com.example.campergas.ui.screens.consumption.ConsumptionScreen
 import com.example.campergas.ui.screens.bleconnect.BleConnectScreen
-import com.example.campergas.ui.screens.settings.SettingsScreen
 import com.example.campergas.ui.screens.caravanconfig.CaravanConfigScreen
+import com.example.campergas.ui.screens.consumption.ConsumptionScreen
+import com.example.campergas.ui.screens.home.HomeScreen
+import com.example.campergas.ui.screens.inclination.InclinationScreen
+import com.example.campergas.ui.screens.settings.SettingsScreen
+import com.example.campergas.ui.screens.weight.WeightScreen
 
 @Composable
 fun NavGraph(
@@ -27,27 +26,27 @@ fun NavGraph(
         composable(Screen.Home.route) {
             HomeScreen(navController = navController)
         }
-        
+
         composable(Screen.Weight.route) {
             WeightScreen(navController = navController)
         }
-        
+
         composable(Screen.Inclination.route) {
             InclinationScreen(navController = navController)
         }
-        
+
         composable(Screen.Consumption.route) {
             ConsumptionScreen(navController = navController)
         }
-        
+
         composable(Screen.BleConnect.route) {
             BleConnectScreen(navController = navController)
         }
-        
+
         composable(Screen.Settings.route) {
             SettingsScreen(navController = navController)
         }
-        
+
         composable(Screen.CaravanConfig.route) {
             CaravanConfigScreen(navController = navController)
         }

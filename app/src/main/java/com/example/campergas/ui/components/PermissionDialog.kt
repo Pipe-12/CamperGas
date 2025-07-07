@@ -2,7 +2,11 @@ package com.example.campergas.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -20,7 +24,9 @@ fun PermissionDialog(
     dismissible: Boolean = true
 ) {
     AlertDialog(
-        onDismissRequest = if (dismissible) onDismiss else { {} },
+        onDismissRequest = if (dismissible) onDismiss else {
+            {}
+        },
         icon = {
             Icon(
                 imageVector = icon,

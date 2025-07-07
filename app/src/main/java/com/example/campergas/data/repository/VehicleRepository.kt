@@ -17,22 +17,22 @@ class VehicleRepository @Inject constructor(
             entity?.toDomainModel()
         }
     }
-    
+
     suspend fun saveVehicleConfig(config: VehicleConfig) {
         val entity = config.toEntity()
         val exists = vehicleDao.configExists()
-        
+
         if (exists) {
             vehicleDao.updateVehicleConfig(entity)
         } else {
             vehicleDao.insertVehicleConfig(entity)
         }
     }
-    
+
     suspend fun deleteVehicleConfig() {
         vehicleDao.deleteVehicleConfig()
     }
-    
+
     private fun VehicleConfigEntity.toDomainModel(): VehicleConfig {
         return VehicleConfig(
             type = this.type,
@@ -41,7 +41,7 @@ class VehicleRepository @Inject constructor(
             distanceBetweenFrontWheels = this.distanceBetweenFrontWheels
         )
     }
-    
+
     private fun VehicleConfig.toEntity(): VehicleConfigEntity {
         return VehicleConfigEntity(
             type = this.type,

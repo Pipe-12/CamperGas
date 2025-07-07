@@ -13,10 +13,10 @@ import com.example.campergas.domain.model.GasCylinder
     exportSchema = false
 )
 abstract class CamperGasDatabase : RoomDatabase() {
-    
+
     abstract fun gasCylinderDao(): GasCylinderDao
     abstract fun fuelMeasurementDao(): FuelMeasurementDao
-    
+
     companion object {
         const val DATABASE_NAME = "campergas_database"
     }

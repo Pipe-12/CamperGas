@@ -1,8 +1,6 @@
 package com.example.campergas.data.repository
 
-import com.example.campergas.data.repository.FuelMeasurementRepository
 import com.example.campergas.domain.model.Consumption
-import com.example.campergas.domain.model.FuelMeasurement
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -16,7 +14,7 @@ import javax.inject.Singleton
 class ConsumptionRepository @Inject constructor(
     private val fuelMeasurementRepository: FuelMeasurementRepository
 ) {
-    
+
     /**
      * Obtiene todos los registros de consumo ordenados por fecha descendente
      */
@@ -25,7 +23,7 @@ class ConsumptionRepository @Inject constructor(
             measurements.map { Consumption.fromFuelMeasurement(it) }
         }
     }
-    
+
     /**
      * Obtiene los registros de consumo de una bombona específica
      */
@@ -34,16 +32,17 @@ class ConsumptionRepository @Inject constructor(
             measurements.map { Consumption.fromFuelMeasurement(it) }
         }
     }
-    
+
     /**
      * Obtiene los registros de consumo en un rango de fechas
      */
     fun getConsumptionsByDateRange(startDate: Long, endDate: Long): Flow<List<Consumption>> {
-        return fuelMeasurementRepository.getMeasurementsByTimeRange(startDate, endDate).map { measurements ->
-            measurements.map { Consumption.fromFuelMeasurement(it) }
-        }
+        return fuelMeasurementRepository.getMeasurementsByTimeRange(startDate, endDate)
+            .map { measurements ->
+                measurements.map { Consumption.fromFuelMeasurement(it) }
+            }
     }
-    
+
     /**
      * Obtiene los registros de consumo de una bombona en un rango de fechas
      */
@@ -58,7 +57,7 @@ class ConsumptionRepository @Inject constructor(
             measurements.map { Consumption.fromFuelMeasurement(it) }
         }
     }
-    
+
     /**
      * Obtiene los registros de consumo históricos (no mediciones en tiempo real)
      */
@@ -67,7 +66,7 @@ class ConsumptionRepository @Inject constructor(
             measurements.map { Consumption.fromFuelMeasurement(it) }
         }
     }
-    
+
     /**
      * Obtiene los registros de consumo más recientes
      */
@@ -76,14 +75,14 @@ class ConsumptionRepository @Inject constructor(
             measurements.map { Consumption.fromFuelMeasurement(it) }
         }
     }
-    
+
     /**
      * Obtiene el consumo promedio de una bombona en un periodo de tiempo
      */
     suspend fun getAverageConsumption(cylinderId: Long, startTime: Long, endTime: Long): Float? {
         return fuelMeasurementRepository.getAverageFuelConsumption(cylinderId, startTime, endTime)
     }
-    
+
     /**
      * Obtiene el conteo de registros de consumo para una bombona específica
      */

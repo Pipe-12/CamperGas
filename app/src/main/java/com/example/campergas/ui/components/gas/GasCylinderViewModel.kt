@@ -23,13 +23,13 @@ class GasCylinderViewModel @Inject constructor(
     private val addGasCylinderUseCase: AddGasCylinderUseCase,
     private val getActiveCylinderUseCase: GetActiveCylinderUseCase
 ) : ViewModel() {
-    
+
     private val _activeCylinder = MutableStateFlow<GasCylinder?>(null)
     val activeCylinder: StateFlow<GasCylinder?> = _activeCylinder
-    
+
     private val _uiState = MutableStateFlow(GasCylinderUiState())
     val uiState: StateFlow<GasCylinderUiState> = _uiState
-    
+
     init {
         // Observar la bombona activa
         viewModelScope.launch {
@@ -46,14 +46,14 @@ class GasCylinderViewModel @Inject constructor(
             }
         }
     }
-    
+
     fun addCylinder(name: String, tare: Float, capacity: Float, setAsActive: Boolean) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-            
+
             try {
                 val result = addGasCylinderUseCase(name, tare, capacity, setAsActive)
-                
+
                 if (result.isSuccess) {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
@@ -65,7 +65,8 @@ class GasCylinderViewModel @Inject constructor(
                 } else {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message ?: "Error al añadir bombona"
+                        errorMessage = result.exceptionOrNull()?.message
+                            ?: "Error al añadir bombona"
                     )
                 }
             } catch (e: Exception) {
@@ -76,11 +77,5 @@ class GasCylinderViewModel @Inject constructor(
             }
         }
     }
-    
-    fun clearMessages() {
-        _uiState.value = _uiState.value.copy(
-            errorMessage = null,
-            successMessage = null
-        )
-    }
+
 }

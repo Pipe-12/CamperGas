@@ -21,12 +21,12 @@ class PreferencesDataStore @Inject constructor(
     private val lastConnectedDeviceKey = stringPreferencesKey("last_connected_device")
     private val themeModeKey = stringPreferencesKey("theme_mode")
     private val notificationsEnabledKey = booleanPreferencesKey("notifications_enabled")
-    
+
     val lastConnectedDeviceAddress: Flow<String> = context.dataStore.data
         .map { preferences ->
             preferences[lastConnectedDeviceKey] ?: ""
         }
-    
+
     val themeMode: Flow<ThemeMode> = context.dataStore.data
         .map { preferences ->
             val modeString = preferences[themeModeKey] ?: ThemeMode.SYSTEM.name
@@ -36,24 +36,24 @@ class PreferencesDataStore @Inject constructor(
                 ThemeMode.SYSTEM
             }
         }
-    
+
     val areNotificationsEnabled: Flow<Boolean> = context.dataStore.data
         .map { preferences ->
             preferences[notificationsEnabledKey] ?: true
         }
-    
+
     suspend fun saveLastConnectedDevice(address: String) {
         context.dataStore.edit { preferences ->
             preferences[lastConnectedDeviceKey] = address
         }
     }
-    
+
     suspend fun setThemeMode(themeMode: ThemeMode) {
         context.dataStore.edit { preferences ->
             preferences[themeModeKey] = themeMode.name
         }
     }
-    
+
     suspend fun setNotificationsEnabled(enabled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[notificationsEnabledKey] = enabled

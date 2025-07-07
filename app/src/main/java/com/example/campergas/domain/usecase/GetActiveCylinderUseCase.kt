@@ -11,7 +11,7 @@ class GetActiveCylinderUseCase @Inject constructor(
     operator fun invoke(): Flow<GasCylinder?> {
         return repository.getActiveCylinder()
     }
-    
+
     suspend fun getActiveCylinderSync(): GasCylinder? {
         return repository.getActiveCylinderSync()
     }

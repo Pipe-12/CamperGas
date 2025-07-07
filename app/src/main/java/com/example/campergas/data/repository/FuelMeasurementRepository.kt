@@ -17,95 +17,89 @@ class FuelMeasurementRepository @Inject constructor(
             entities.map { it.toDomainModel() }
         }
     }
-    
+
     fun getMeasurementsByCylinder(cylinderId: Long): Flow<List<FuelMeasurement>> {
         return fuelMeasurementDao.getMeasurementsByCylinder(cylinderId).map { entities ->
             entities.map { it.toDomainModel() }
         }
     }
-    
+
     fun getLatestRealTimeMeasurement(): Flow<FuelMeasurement?> {
         return fuelMeasurementDao.getLatestRealTimeMeasurement().map { entity ->
             entity?.toDomainModel()
         }
     }
-    
+
     fun getHistoricalMeasurements(cylinderId: Long): Flow<List<FuelMeasurement>> {
         return fuelMeasurementDao.getHistoricalMeasurements(cylinderId).map { entities ->
             entities.map { it.toDomainModel() }
         }
     }
-    
+
     fun getMeasurementsByTimeRange(startTime: Long, endTime: Long): Flow<List<FuelMeasurement>> {
         return fuelMeasurementDao.getMeasurementsByTimeRange(startTime, endTime).map { entities ->
             entities.map { it.toDomainModel() }
         }
     }
-    
+
     fun getMeasurementsByCylinderAndTimeRange(
         cylinderId: Long,
         startTime: Long,
         endTime: Long
     ): Flow<List<FuelMeasurement>> {
-        return fuelMeasurementDao.getMeasurementsByCylinderAndTimeRange(cylinderId, startTime, endTime).map { entities ->
+        return fuelMeasurementDao.getMeasurementsByCylinderAndTimeRange(
+            cylinderId,
+            startTime,
+            endTime
+        ).map { entities ->
             entities.map { it.toDomainModel() }
         }
     }
-    
+
     fun getRecentMeasurements(limit: Int): Flow<List<FuelMeasurement>> {
         return fuelMeasurementDao.getRecentMeasurements(limit).map { entities ->
             entities.map { it.toDomainModel() }
         }
     }
-    
+
     suspend fun insertMeasurement(measurement: FuelMeasurement): Long {
         return fuelMeasurementDao.insertMeasurement(measurement.toEntity())
     }
-    
+
     suspend fun insertMeasurements(measurements: List<FuelMeasurement>) {
         fuelMeasurementDao.insertMeasurements(measurements.map { it.toEntity() })
     }
-    
-    suspend fun updateMeasurement(measurement: FuelMeasurement) {
-        fuelMeasurementDao.updateMeasurement(measurement.toEntity())
-    }
-    
-    suspend fun deleteMeasurement(measurement: FuelMeasurement) {
-        fuelMeasurementDao.deleteMeasurement(measurement.toEntity())
-    }
-    
-    suspend fun deleteMeasurementById(id: Long) {
-        fuelMeasurementDao.deleteMeasurementById(id)
-    }
-    
+
+
     suspend fun deleteMeasurementsByCylinder(cylinderId: Long) {
         fuelMeasurementDao.deleteMeasurementsByCylinder(cylinderId)
     }
-    
+
     suspend fun deleteOldMeasurements(beforeTimestamp: Long) {
         fuelMeasurementDao.deleteOldMeasurements(beforeTimestamp)
     }
-    
+
     suspend fun deleteAllMeasurements() {
         fuelMeasurementDao.deleteAllMeasurements()
     }
-    
+
     suspend fun getMeasurementCountByCylinder(cylinderId: Long): Int {
         return fuelMeasurementDao.getMeasurementCountByCylinder(cylinderId)
     }
-    
-    suspend fun doesTimestampExist(timestamp: Long): Boolean {
-        return fuelMeasurementDao.doesTimestampExist(timestamp) > 0
-    }
-    
-    suspend fun getAverageFuelConsumption(cylinderId: Long, startTime: Long, endTime: Long): Float? {
+
+
+    suspend fun getAverageFuelConsumption(
+        cylinderId: Long,
+        startTime: Long,
+        endTime: Long
+    ): Float? {
         return fuelMeasurementDao.getAverageFuelConsumption(cylinderId, startTime, endTime)
     }
-    
+
     suspend fun getLastTwoMeasurements(cylinderId: Long): List<FuelMeasurement> {
         return fuelMeasurementDao.getLastTwoMeasurements(cylinderId).map { it.toDomainModel() }
     }
-    
+
     private fun FuelMeasurementEntity.toDomainModel(): FuelMeasurement {
         return FuelMeasurement(
             id = this.id,
@@ -119,7 +113,7 @@ class FuelMeasurementRepository @Inject constructor(
             isHistorical = this.isHistorical
         )
     }
-    
+
     private fun FuelMeasurement.toEntity(): FuelMeasurementEntity {
         return FuelMeasurementEntity(
             id = this.id,

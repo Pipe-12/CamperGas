@@ -2,9 +2,11 @@ package com.example.campergas.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.campergas.data.local.db.*
-import com.example.campergas.data.local.vehicle.VehicleDatabase
+import com.example.campergas.data.local.db.CamperGasDatabase
+import com.example.campergas.data.local.db.FuelMeasurementDao
+import com.example.campergas.data.local.db.GasCylinderDao
 import com.example.campergas.data.local.vehicle.VehicleDao
+import com.example.campergas.data.local.vehicle.VehicleDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -44,8 +46,8 @@ object DatabaseModule {
             VehicleDatabase::class.java,
             "vehicle_database"
         )
-        .addMigrations(VehicleDatabase.MIGRATION_1_2)
-        .build()
+            .addMigrations(VehicleDatabase.MIGRATION_1_2)
+            .build()
     }
 
     @Provides

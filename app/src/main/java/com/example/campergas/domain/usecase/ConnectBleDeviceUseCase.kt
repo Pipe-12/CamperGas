@@ -10,15 +10,15 @@ class ConnectBleDeviceUseCase @Inject constructor(
     suspend operator fun invoke(deviceAddress: String) {
         // Conectamos al sensor unificado
         bleRepository.connectToSensor(deviceAddress)
-        
+
         // Guardamos la dirección del último dispositivo conectado
         bleRepository.saveLastConnectedDevice(deviceAddress)
     }
-    
+
     fun disconnect() {
         bleRepository.disconnectSensor()
     }
-    
+
     fun getLastConnectedDevice(): Flow<String> {
         return bleRepository.lastConnectedDeviceAddress
     }

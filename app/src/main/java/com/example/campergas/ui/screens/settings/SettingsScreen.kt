@@ -30,7 +30,7 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isSystemInDarkTheme = isSystemInDarkTheme()
-    
+
     // Determinar si el switch debe estar activado
     val isDarkModeEnabled = when (uiState.themeMode) {
         ThemeMode.SYSTEM -> isSystemInDarkTheme
@@ -63,7 +63,7 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -80,7 +80,7 @@ fun SettingsScreen(
                         }
                     )
                 }
-                
+
                 // Botón para volver al modo sistema
                 if (uiState.themeMode != ThemeMode.SYSTEM) {
                     TextButton(
@@ -93,7 +93,7 @@ fun SettingsScreen(
                         )
                     }
                 }
-                
+
                 // Texto explicativo del estado actual
                 Text(
                     text = when (uiState.themeMode) {
@@ -122,7 +122,7 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically

@@ -41,7 +41,7 @@ fun WeightScreen(
     val fuelState by viewModel.fuelState.collectAsState()
     val vehicleState by viewModel.vehicleState.collectAsState()
     val activeCylinder by viewModel.activeCylinder.collectAsState()
-    
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -80,43 +80,43 @@ fun WeightScreen(
                                 text = "Medición de Combustible",
                                 style = MaterialTheme.typography.titleMedium
                             )
-                            
+
                             Text(
                                 text = fuelMeasurement.getFormattedFuelKilograms(),
                                 style = MaterialTheme.typography.headlineLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
                             )
-                            
+
                             Text(
                                 text = fuelMeasurement.getFormattedPercentage(),
                                 style = MaterialTheme.typography.headlineMedium,
                                 color = MaterialTheme.colorScheme.secondary
                             )
-                            
+
                             Spacer(modifier = Modifier.height(8.dp))
-                            
+
                             Text(
                                 text = "Peso total: ${"%.1f kg".format(fuelMeasurement.totalWeight)}",
                                 style = MaterialTheme.typography.bodyMedium
                             )
-                            
+
                             Text(
                                 text = "Estado: ${if (fuelMeasurement.isCalibrated) "✅ Calibrado" else "⚠️ No calibrado"}",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = if (fuelMeasurement.isCalibrated) 
-                                    MaterialTheme.colorScheme.primary 
-                                else 
+                                color = if (fuelMeasurement.isCalibrated)
+                                    MaterialTheme.colorScheme.primary
+                                else
                                     MaterialTheme.colorScheme.error
                             )
-                            
+
                             Text(
                                 text = "Última medición: ${formatTimestamp(fuelMeasurement.timestamp)}",
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
                     }
-                    
+
                     // Tarjeta de información de bombona activa
                     activeCylinder?.let { cylinder ->
                         Card(
@@ -132,33 +132,38 @@ fun WeightScreen(
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
-                                
+
                                 Spacer(modifier = Modifier.height(8.dp))
-                                
+
                                 Text(
                                     text = "Nombre: ${cylinder.name}",
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Medium
                                 )
-                                
+
                                 Text(
                                     text = "Peso vacía: ${String.format("%.1f", cylinder.tare)} kg",
                                     style = MaterialTheme.typography.bodySmall
                                 )
-                                
+
                                 Text(
-                                    text = "Capacidad: ${String.format("%.1f", cylinder.capacity)} kg",
+                                    text = "Capacidad: ${
+                                        String.format(
+                                            "%.1f",
+                                            cylinder.capacity
+                                        )
+                                    } kg",
                                     style = MaterialTheme.typography.bodySmall
                                 )
-                                
+
                                 Spacer(modifier = Modifier.height(8.dp))
-                                
+
                                 Text(
                                     text = "Gas actual: ${fuelMeasurement.getFormattedFuelKilograms()}",
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Medium
                                 )
-                                
+
                                 Text(
                                     text = "Nivel de gas: ${fuelMeasurement.getFormattedPercentage()}",
                                     style = MaterialTheme.typography.headlineSmall,
@@ -169,7 +174,7 @@ fun WeightScreen(
                                         else -> MaterialTheme.colorScheme.error
                                     }
                                 )
-                                
+
                                 // Barra de progreso para nivel de gas
                                 Spacer(modifier = Modifier.height(8.dp))
                                 LinearProgressIndicator(
@@ -181,7 +186,7 @@ fun WeightScreen(
                                         else -> MaterialTheme.colorScheme.error
                                     }
                                 )
-                                
+
                                 // Indicadores de estado
                                 Spacer(modifier = Modifier.height(8.dp))
                                 when {
@@ -193,6 +198,7 @@ fun WeightScreen(
                                             fontWeight = FontWeight.Bold
                                         )
                                     }
+
                                     fuelMeasurement.fuelPercentage <= 20 -> {
                                         Text(
                                             text = "⚠️ Nivel bajo de gas",
@@ -201,6 +207,7 @@ fun WeightScreen(
                                             fontWeight = FontWeight.Bold
                                         )
                                     }
+
                                     else -> {
                                         Text(
                                             text = "✅ Nivel de gas adecuado",
@@ -226,16 +233,16 @@ fun WeightScreen(
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
-                                
+
                                 Spacer(modifier = Modifier.height(8.dp))
-                                
+
                                 Text(
                                     text = "⚠️ No hay bombona activa configurada",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.error,
                                     fontWeight = FontWeight.Medium
                                 )
-                                
+
                                 Text(
                                     text = "Añade una bombona desde la pantalla principal para obtener información detallada del gas.",
                                     style = MaterialTheme.typography.bodySmall,
@@ -244,7 +251,7 @@ fun WeightScreen(
                             }
                         }
                     }
-                    
+
                     // Tarjeta de capacidad del tanque
                     vehicleState?.let { vehicle ->
                         Card(
@@ -259,16 +266,16 @@ fun WeightScreen(
                                     text = "Información del Tanque",
                                     style = MaterialTheme.typography.titleMedium
                                 )
-                                
+
                                 Spacer(modifier = Modifier.height(8.dp))
-                                
+
                                 Text(
                                     text = "Capacidad máxima: ${vehicle.gasTankCapacity} kg",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
-                                
+
                                 val remainingPercentage = fuelMeasurement.fuelPercentage.toInt()
-                                
+
                                 Text(
                                     text = "Nivel actual: $remainingPercentage%",
                                     style = MaterialTheme.typography.headlineSmall,
@@ -279,7 +286,7 @@ fun WeightScreen(
                                         else -> MaterialTheme.colorScheme.error
                                     }
                                 )
-                                
+
                                 // Barra de progreso visual
                                 Spacer(modifier = Modifier.height(8.dp))
                                 LinearProgressIndicator(

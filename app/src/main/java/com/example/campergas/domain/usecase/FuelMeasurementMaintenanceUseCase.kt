@@ -11,7 +11,7 @@ class FuelMeasurementMaintenanceUseCase @Inject constructor(
     private val fuelMeasurementRepository: FuelMeasurementRepository,
     private val gasCylinderRepository: GasCylinderRepository
 ) {
-    
+
     /**
      * Elimina mediciones antiguas para mantener el rendimiento de la base de datos
      * @param daysToKeep Número de días de datos a mantener (por defecto 30 días)
@@ -19,19 +19,19 @@ class FuelMeasurementMaintenanceUseCase @Inject constructor(
     suspend fun cleanOldMeasurements(daysToKeep: Int = 30): Result<Int> {
         return try {
             val cutoffTime = System.currentTimeMillis() - (daysToKeep * 24 * 60 * 60 * 1000L)
-            
+
             // Contar mediciones antes de borrar
             val totalBefore = fuelMeasurementRepository.getAllMeasurements()
-            
+
             // Eliminar mediciones antiguas
             fuelMeasurementRepository.deleteOldMeasurements(cutoffTime)
-            
+
             Result.success(daysToKeep)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-    
+
     /**
      * Elimina todas las mediciones de una bombona específica
      */
@@ -43,7 +43,7 @@ class FuelMeasurementMaintenanceUseCase @Inject constructor(
             Result.failure(e)
         }
     }
-    
+
     /**
      * Elimina todas las mediciones
      */
@@ -55,7 +55,7 @@ class FuelMeasurementMaintenanceUseCase @Inject constructor(
             Result.failure(e)
         }
     }
-    
+
     /**
      * Verifica la integridad de los datos y reporta estadísticas
      */
@@ -63,11 +63,11 @@ class FuelMeasurementMaintenanceUseCase @Inject constructor(
         return try {
             val cylinders = gasCylinderRepository.getAllCylindersSync()
             val stats = mutableListOf<CylinderStats>()
-            
+
             cylinders.forEach { cylinder ->
                 val count = fuelMeasurementRepository.getMeasurementCountByCylinder(cylinder.id)
                 val lastTwo = fuelMeasurementRepository.getLastTwoMeasurements(cylinder.id)
-                
+
                 stats.add(
                     CylinderStats(
                         cylinderId = cylinder.id,
@@ -78,7 +78,7 @@ class FuelMeasurementMaintenanceUseCase @Inject constructor(
                     )
                 )
             }
-            
+
             DatabaseStats(
                 cylinderStats = stats,
                 totalCylinders = cylinders.size,
@@ -88,13 +88,13 @@ class FuelMeasurementMaintenanceUseCase @Inject constructor(
             DatabaseStats(emptyList(), 0, 0)
         }
     }
-    
+
     data class DatabaseStats(
         val cylinderStats: List<CylinderStats>,
         val totalCylinders: Int,
         val cylindersWithData: Int
     )
-    
+
     data class CylinderStats(
         val cylinderId: Long,
         val cylinderName: String,
