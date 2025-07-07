@@ -12,7 +12,8 @@ data class Consumption(
     val fuelKilograms: Float,
     val fuelPercentage: Float,
     val totalWeight: Float,
-    val isCalibrated: Boolean = true
+    val isCalibrated: Boolean = true,
+    val isHistorical: Boolean = false // Indica si es un dato histórico/offline
 ) {
     /**
      * Convierte un FuelMeasurement a Consumption
@@ -27,7 +28,8 @@ data class Consumption(
                 fuelKilograms = fuelMeasurement.fuelKilograms,
                 fuelPercentage = fuelMeasurement.fuelPercentage,
                 totalWeight = fuelMeasurement.totalWeight,
-                isCalibrated = fuelMeasurement.isCalibrated
+                isCalibrated = fuelMeasurement.isCalibrated,
+                isHistorical = fuelMeasurement.isHistorical
             )
         }
     }

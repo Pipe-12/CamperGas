@@ -301,6 +301,11 @@ class CamperGasBleService @Inject constructor(
         }
     }
 
+    /**
+     * Procesa datos de medición EN TIEMPO REAL del sensor
+     * Estos datos provienen de la característica WEIGHT_CHARACTERISTIC_UUID
+     * y se marcan automáticamente como isHistorical = false
+     */
     private fun processFuelMeasurementData(data: ByteArray) {
         try {
             val jsonString = String(data, Charsets.UTF_8)
@@ -310,7 +315,8 @@ class CamperGasBleService @Inject constructor(
             val jsonObject = JSONObject(jsonString)
             val totalWeight = jsonObject.getDouble("w").toFloat()
 
-            // Guardar medición de combustible en la base de datos
+            // Guardar medición de combustible EN TIEMPO REAL en la base de datos
+            // Estos datos provienen de WEIGHT_CHARACTERISTIC_UUID y se marcan como isHistorical = false
             serviceScope.launch {
                 try {
                     val result = saveFuelMeasurementUseCase.saveRealTimeMeasurement(
@@ -399,6 +405,11 @@ class CamperGasBleService @Inject constructor(
         }
     }
 
+    /**
+     * Procesa datos OFFLINE/HISTÓRICOS del sensor
+     * Estos datos provienen de la característica OFFLINE_CHARACTERISTIC_UUID
+     * y se marcan automáticamente como isHistorical = true
+     */
     private fun processOfflineData(data: ByteArray) {
         try {
             val jsonString = String(data, Charsets.UTF_8)
@@ -519,6 +530,8 @@ class CamperGasBleService @Inject constructor(
                         try {
                             val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
                             if (activeCylinder != null) {
+                                // Guardar datos HISTÓRICOS/OFFLINE en la base de datos
+                                // Estos datos provienen de OFFLINE_CHARACTERISTIC_UUID y se marcan como isHistorical = true
                                 val result = saveFuelMeasurementUseCase.saveHistoricalMeasurements(
                                     cylinderId = activeCylinder.id,
                                     weightMeasurements = batchHistoricalMeasurements,

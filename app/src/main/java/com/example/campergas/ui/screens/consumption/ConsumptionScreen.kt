@@ -9,25 +9,49 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.OfflinePin
+import androidx.compose.material.icons.filled.Today
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.campergas.domain.model.Consumption
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -38,6 +62,9 @@ fun ConsumptionScreen(
     viewModel: ConsumptionViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    
+    var showStartDatePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -49,6 +76,19 @@ fun ConsumptionScreen(
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(bottom = 8.dp)
         )
+
+        // Filtros de fecha
+        DateFiltersSection(
+            startDate = uiState.startDate,
+            endDate = uiState.endDate,
+            onStartDateClick = { showStartDatePicker = true },
+            onEndDateClick = { showEndDatePicker = true },
+            onClearFilter = { viewModel.clearDateFilter() },
+            onLastWeekClick = { viewModel.setLastWeekFilter() },
+            onLastMonthClick = { viewModel.setLastMonthFilter() }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Información del tracking inteligente
         Card(
@@ -70,6 +110,11 @@ fun ConsumptionScreen(
                 )
                 Text(
                     text = "Solo se guardan registros con cambios ≥1% o cada 15 min",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    text = "📡 Datos online | 💾 Datos offline/históricos",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -104,7 +149,7 @@ fun ConsumptionScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No hay registros de consumo",
+                    text = "No hay registros de consumo${if (uiState.startDate != null || uiState.endDate != null) " en el rango seleccionado" else ""}",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -137,6 +182,213 @@ fun ConsumptionScreen(
                             previousConsumption = previousConsumption
                         )
                     }
+                }
+            }
+        }
+    }
+
+    // Date Pickers
+    if (showStartDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showStartDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = { showStartDatePicker = false }
+                ) {
+                    Text("Aceptar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showStartDatePicker = false }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        ) {
+            val datePickerState = rememberDatePickerState()
+            DatePicker(
+                state = datePickerState,
+                selectableDates = object : SelectableDates {
+                    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                        return utcTimeMillis <= System.currentTimeMillis()
+                    }
+                }
+            )
+            
+            // Aplicar la fecha seleccionada cuando se confirma
+            LaunchedEffect(datePickerState.selectedDateMillis) {
+                datePickerState.selectedDateMillis?.let { selectedDate ->
+                    val startOfDay = selectedDate - (selectedDate % (24 * 60 * 60 * 1000L))
+                    viewModel.setDateRange(startOfDay, uiState.endDate)
+                }
+            }
+        }
+    }
+
+    if (showEndDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showEndDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = { showEndDatePicker = false }
+                ) {
+                    Text("Aceptar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showEndDatePicker = false }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        ) {
+            val datePickerState = rememberDatePickerState()
+            DatePicker(
+                state = datePickerState,
+                selectableDates = object : SelectableDates {
+                    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                        return utcTimeMillis <= System.currentTimeMillis() && 
+                               (uiState.startDate == null || utcTimeMillis >= uiState.startDate!!)
+                    }
+                }
+            )
+            
+            // Aplicar la fecha seleccionada cuando se confirma
+            LaunchedEffect(datePickerState.selectedDateMillis) {
+                datePickerState.selectedDateMillis?.let { selectedDate ->
+                    val endOfDay = selectedDate + (24 * 60 * 60 * 1000L - 1)
+                    viewModel.setDateRange(uiState.startDate, endOfDay)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DateFiltersSection(
+    startDate: Long?,
+    endDate: Long?,
+    onStartDateClick: () -> Unit,
+    onEndDateClick: () -> Unit,
+    onClearFilter: () -> Unit,
+    onLastWeekClick: () -> Unit,
+    onLastMonthClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Filtros de Fecha",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                if (startDate != null || endDate != null) {
+                    FilterChip(
+                        selected = true,
+                        onClick = onClearFilter,
+                        label = { Text("Limpiar") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = "Limpiar filtros",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Filtros rápidos
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(
+                    selected = false,
+                    onClick = onLastWeekClick,
+                    label = { Text("7 días") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Today,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                )
+                
+                FilterChip(
+                    selected = false,
+                    onClick = onLastMonthClick,
+                    label = { Text("30 días") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Selección de fechas específicas
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedButton(
+                    onClick = onStartDateClick,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = if (startDate != null) {
+                            "Desde: ${formatDateOnly(startDate)}"
+                        } else {
+                            "Fecha inicio"
+                        }
+                    )
+                }
+                
+                OutlinedButton(
+                    onClick = onEndDateClick,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = if (endDate != null) {
+                            "Hasta: ${formatDateOnly(endDate)}"
+                        } else {
+                            "Fecha fin"
+                        }
+                    )
                 }
             }
         }
@@ -177,11 +429,72 @@ fun ConsumptionItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = formatDate(consumption.date),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = formatDate(consumption.date),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    
+                    Spacer(modifier = Modifier.width(8.dp))
+                    
+                    // Indicador de offline/histórico
+                    if (consumption.isHistorical) {
+                        Card(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp)),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                            )
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.OfflinePin,
+                                    contentDescription = "Dato offline",
+                                    modifier = Modifier.size(14.dp),
+                                    tint = MaterialTheme.colorScheme.onTertiaryContainer
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Offline",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    } else {
+                        Card(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp)),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer
+                            )
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "📡",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Online",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+                }
 
                 if (isSignificantChange) {
                     Text(
@@ -253,5 +566,15 @@ fun ConsumptionItem(
 
 private fun formatDate(timestamp: Long): String {
     val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+    return sdf.format(Date(timestamp))
+}
+
+private fun formatDateOnly(timestamp: Long): String {
+    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return sdf.format(Date(timestamp))
+}
+
+private fun formatDateOnly(timestamp: Long): String {
+    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     return sdf.format(Date(timestamp))
 }

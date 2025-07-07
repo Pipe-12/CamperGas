@@ -12,8 +12,13 @@ class SaveFuelMeasurementUseCase @Inject constructor(
 ) {
 
     /**
-     * Guarda una medición de combustible calculando automáticamente los kilogramos
-     * y porcentaje basándose en el peso total y la bombona activa
+     * Guarda una medición de combustible en TIEMPO REAL
+     * Estos datos provienen de la característica WEIGHT_CHARACTERISTIC_UUID
+     * y se marcan como isHistorical = false
+     * 
+     * @param totalWeight Peso total medido por el sensor
+     * @param timestamp Timestamp de cuando se tomó la medición (por defecto ahora)
+     * @param isCalibrated Si la medición está calibrada
      */
     suspend fun saveRealTimeMeasurement(
         totalWeight: Float,
@@ -60,7 +65,14 @@ class SaveFuelMeasurementUseCase @Inject constructor(
     }
 
     /**
-     * Guarda una medición histórica (datos provenientes del sensor)
+     * Guarda una medición HISTÓRICA/OFFLINE (datos provenientes del sensor offline)
+     * Estos datos provienen de la característica OFFLINE_CHARACTERISTIC_UUID
+     * y se marcan como isHistorical = true
+     * 
+     * @param cylinderId ID de la bombona específica
+     * @param totalWeight Peso total medido por el sensor
+     * @param timestamp Timestamp histórico de cuando se tomó la medición
+     * @param isCalibrated Si la medición está calibrada
      */
     suspend fun saveHistoricalMeasurement(
         cylinderId: Long,
@@ -108,7 +120,13 @@ class SaveFuelMeasurementUseCase @Inject constructor(
     }
 
     /**
-     * Guarda múltiples mediciones históricas de forma eficiente
+     * Guarda múltiples mediciones HISTÓRICAS/OFFLINE de forma eficiente
+     * Estos datos provienen de la característica OFFLINE_CHARACTERISTIC_UUID
+     * y se marcan como isHistorical = true
+     * 
+     * @param cylinderId ID de la bombona específica
+     * @param weightMeasurements Lista de pares (peso total, timestamp histórico)
+     * @param isCalibrated Si las mediciones están calibradas
      */
     suspend fun saveHistoricalMeasurements(
         cylinderId: Long,
