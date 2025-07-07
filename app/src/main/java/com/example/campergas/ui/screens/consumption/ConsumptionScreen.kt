@@ -14,12 +14,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.OfflinePin
-import androidx.compose.material.icons.filled.Today
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.OfflineBolt
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,7 +31,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -51,7 +50,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.campergas.domain.model.Consumption
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -207,14 +205,7 @@ fun ConsumptionScreen(
             }
         ) {
             val datePickerState = rememberDatePickerState()
-            DatePicker(
-                state = datePickerState,
-                selectableDates = object : SelectableDates {
-                    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                        return utcTimeMillis <= System.currentTimeMillis()
-                    }
-                }
-            )
+            DatePicker(state = datePickerState)
             
             // Aplicar la fecha seleccionada cuando se confirma
             LaunchedEffect(datePickerState.selectedDateMillis) {
@@ -245,15 +236,7 @@ fun ConsumptionScreen(
             }
         ) {
             val datePickerState = rememberDatePickerState()
-            DatePicker(
-                state = datePickerState,
-                selectableDates = object : SelectableDates {
-                    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                        return utcTimeMillis <= System.currentTimeMillis() && 
-                               (uiState.startDate == null || utcTimeMillis >= uiState.startDate!!)
-                    }
-                }
-            )
+            DatePicker(state = datePickerState)
             
             // Aplicar la fecha seleccionada cuando se confirma
             LaunchedEffect(datePickerState.selectedDateMillis) {
@@ -325,7 +308,7 @@ fun DateFiltersSection(
                     label = { Text("7 días") },
                     leadingIcon = {
                         Icon(
-                            imageVector = Icons.Default.Today,
+                            imageVector = Icons.Default.Schedule,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp)
                         )
@@ -338,7 +321,7 @@ fun DateFiltersSection(
                     label = { Text("30 días") },
                     leadingIcon = {
                         Icon(
-                            imageVector = Icons.Default.CalendarMonth,
+                            imageVector = Icons.Default.CalendarToday,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp)
                         )
@@ -454,7 +437,7 @@ fun ConsumptionItem(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.OfflinePin,
+                                    imageVector = Icons.Default.OfflineBolt,
                                     contentDescription = "Dato offline",
                                     modifier = Modifier.size(14.dp),
                                     tint = MaterialTheme.colorScheme.onTertiaryContainer
@@ -566,11 +549,6 @@ fun ConsumptionItem(
 
 private fun formatDate(timestamp: Long): String {
     val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-    return sdf.format(Date(timestamp))
-}
-
-private fun formatDateOnly(timestamp: Long): String {
-    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     return sdf.format(Date(timestamp))
 }
 
