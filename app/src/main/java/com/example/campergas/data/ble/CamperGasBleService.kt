@@ -400,7 +400,6 @@ class CamperGasBleService @Inject constructor(
                 return
             }
             
-            val batchHistoryWeights = mutableListOf<Weight>()
             val batchHistoricalMeasurements = mutableListOf<Pair<Float, Long>>()
             val batchFuelMeasurements = mutableListOf<FuelMeasurement>()
             
@@ -455,22 +454,13 @@ class CamperGasBleService @Inject constructor(
                             Date(actualTimestamp)
                         )})")
                         
-                        // Mantener para compatibilidad
-                        val weight = Weight(
-                            value = weightValue,
-                            timestamp = actualTimestamp,
-                            unit = "kg",
-                            isHistorical = true
-                        )
-                        
-                        batchHistoryWeights.add(weight)
                         batchHistoricalMeasurements.add(Pair(weightValue, actualTimestamp))
                     }
                     
                     // Solo procesar si tenemos datos nuevos para guardar
                     if (batchHistoricalMeasurements.isNotEmpty()) {
                         offlineDataCount++
-                        Log.d(TAG, "📦 Lote ${offlineDataCount} procesado: ${batchHistoryWeights.size} registros históricos")
+                        Log.d(TAG, "📦 Lote ${offlineDataCount} procesado: ${batchHistoricalMeasurements.size} registros históricos")
                         Log.d(TAG, "📈 Total acumulado: ${allHistoryData.size} mediciones de combustible")
                         
                         // Guardar datos históricos del lote actual en la base de datos
@@ -696,7 +686,7 @@ class CamperGasBleService @Inject constructor(
         stopOfflineDataReading()
         
         bluetoothGatt = null
-        weightCharacteristic = null
+        fuelMeasurementCharacteristic = null
         inclinationCharacteristic = null
         offlineCharacteristic = null
         
