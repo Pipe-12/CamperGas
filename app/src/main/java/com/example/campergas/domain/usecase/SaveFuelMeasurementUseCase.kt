@@ -11,14 +11,25 @@ class SaveFuelMeasurementUseCase @Inject constructor(
     private val gasCylinderRepository: GasCylinderRepository
 ) {
 
+    companion object {
+        private const val MIN_TIME_BETWEEN_SAVES_MS = 2 * 60 * 1000L // 2 minutos en milisegundos
+    }
+
+    // Variable para trackear la última vez que se guardó una medición en tiempo real
+    @Volatile
+    private var lastSaveTimestamp: Long = 0L
+
     /**
      * Guarda una medición de combustible en TIEMPO REAL
      * Estos datos provienen de la característica WEIGHT_CHARACTERISTIC_UUID
      * y se marcan como isHistorical = false
      * 
+     * IMPORTANTE: Solo se guardan mediciones cada 2 minutos para evitar spam en la base de datos
+     * 
      * @param totalWeight Peso total medido por el sensor
      * @param timestamp Timestamp de cuando se tomó la medición (por defecto ahora)
      * @param isCalibrated Si la medición está calibrada
+     * @return Result con SaveMeasurementResult o información de por qué no se guardó
      */
     suspend fun saveRealTimeMeasurement(
         totalWeight: Float,
@@ -26,6 +37,22 @@ class SaveFuelMeasurementUseCase @Inject constructor(
         isCalibrated: Boolean = true
     ): Result<SaveMeasurementResult> {
         return try {
+            // Verificar si han pasado al menos 2 minutos desde la última medición guardada
+            val currentTime = System.currentTimeMillis()
+            val timeSinceLastSave = currentTime - lastSaveTimestamp
+            
+            if (lastSaveTimestamp > 0 && timeSinceLastSave < MIN_TIME_BETWEEN_SAVES_MS) {
+                val remainingTimeMs = MIN_TIME_BETWEEN_SAVES_MS - timeSinceLastSave
+                val remainingTimeMinutes = (remainingTimeMs / 1000 / 60).toInt()
+                val remainingTimeSeconds = ((remainingTimeMs / 1000) % 60).toInt()
+                
+                return Result.success(SaveMeasurementResult(
+                    measurementId = -1L, 
+                    processed = false,
+                    reason = "Medición omitida: faltan ${remainingTimeMinutes}m ${remainingTimeSeconds}s"
+                ))
+            }
+
             // Obtener la bombona activa
             val activeCylinder = gasCylinderRepository.getActiveCylinder().first()
                 ?: return Result.failure(Exception("No hay bombona activa configurada"))
@@ -57,8 +84,15 @@ class SaveFuelMeasurementUseCase @Inject constructor(
 
             // Guardar la medición
             val id = fuelMeasurementRepository.insertMeasurement(measurement)
+            
+            // Actualizar el timestamp de la última medición guardada
+            lastSaveTimestamp = currentTime
 
-            Result.success(SaveMeasurementResult(id, true))
+            Result.success(SaveMeasurementResult(
+                measurementId = id, 
+                processed = true,
+                reason = "Medición guardada correctamente"
+            ))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -170,6 +204,7 @@ class SaveFuelMeasurementUseCase @Inject constructor(
 
     data class SaveMeasurementResult(
         val measurementId: Long,
-        val processed: Boolean
+        val processed: Boolean,
+        val reason: String = ""
     )
 }

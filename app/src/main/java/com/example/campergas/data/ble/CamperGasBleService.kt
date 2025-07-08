@@ -326,12 +326,20 @@ class CamperGasBleService @Inject constructor(
 
                     result.fold(
                         onSuccess = { saveResult ->
-                            Log.d(
-                                TAG,
-                                "Medición de combustible guardada (ID: ${saveResult.measurementId})"
-                            )
+                            if (saveResult.processed) {
+                                Log.d(
+                                    TAG,
+                                    "Medición de combustible guardada (ID: ${saveResult.measurementId}) - ${saveResult.reason}"
+                                )
+                            } else {
+                                Log.d(
+                                    TAG,
+                                    "Medición omitida - ${saveResult.reason}"
+                                )
+                            }
 
-                            // Actualizar el StateFlow con los datos de combustible
+                            // Siempre actualizar el StateFlow con los datos de combustible
+                            // independientemente de si se guardó o no en la base de datos
                             val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
                             if (activeCylinder != null) {
                                 val fuelKilograms = maxOf(0f, totalWeight - activeCylinder.tare)
@@ -345,7 +353,7 @@ class CamperGasBleService @Inject constructor(
                                 }
 
                                 val fuelMeasurement = FuelMeasurement(
-                                    id = saveResult.measurementId,
+                                    id = if (saveResult.processed) saveResult.measurementId else -1L,
                                     cylinderId = activeCylinder.id,
                                     cylinderName = activeCylinder.name,
                                     timestamp = System.currentTimeMillis(),
