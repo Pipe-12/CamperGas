@@ -31,14 +31,14 @@ class ConsumptionViewModel @Inject constructor(
     private fun loadConsumptionHistory() {
         // Cancelar job anterior si existe
         loadingJob?.cancel()
-        
+
         loadingJob = viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
                 val currentState = _uiState.value
                 val startDate = currentState.startDate
                 val endDate = currentState.endDate
-                
+
                 getConsumptionHistoryUseCase(startDate, endDate).collect { consumptions ->
                     _uiState.value = _uiState.value.copy(
                         consumptions = consumptions,
@@ -85,10 +85,10 @@ class ConsumptionViewModel @Inject constructor(
     private fun setDateRangeFromCalendar(calendarField: Int, amount: Int) {
         val calendar = Calendar.getInstance()
         val endDate = calendar.timeInMillis
-        
+
         calendar.add(calendarField, amount)
         val startDate = calendar.timeInMillis
-        
+
         setDateRange(startDate, endDate)
     }
 

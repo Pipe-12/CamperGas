@@ -25,7 +25,7 @@ class SaveFuelMeasurementUseCase @Inject constructor(
      * y se marcan como isHistorical = false
      * 
      * IMPORTANTE: Solo se guardan mediciones cada 2 minutos para evitar spam en la base de datos
-     * 
+     *
      * @param totalWeight Peso total medido por el sensor
      * @param timestamp Timestamp de cuando se tomó la medición (por defecto ahora)
      * @param isCalibrated Si la medición está calibrada
@@ -102,7 +102,7 @@ class SaveFuelMeasurementUseCase @Inject constructor(
      * Guarda una medición HISTÓRICA/OFFLINE (datos provenientes del sensor offline)
      * Estos datos provienen de la característica OFFLINE_CHARACTERISTIC_UUID
      * y se marcan como isHistorical = true
-     * 
+     *
      * @param cylinderId ID de la bombona específica
      * @param totalWeight Peso total medido por el sensor
      * @param timestamp Timestamp histórico de cuando se tomó la medición
@@ -157,7 +157,7 @@ class SaveFuelMeasurementUseCase @Inject constructor(
      * Guarda múltiples mediciones HISTÓRICAS/OFFLINE de forma eficiente
      * Estos datos provienen de la característica OFFLINE_CHARACTERISTIC_UUID
      * y se marcan como isHistorical = true
-     * 
+     *
      * @param cylinderId ID de la bombona específica
      * @param weightMeasurements Lista de pares (peso total, timestamp histórico)
      * @param isCalibrated Si las mediciones están calibradas
