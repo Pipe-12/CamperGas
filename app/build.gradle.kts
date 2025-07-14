@@ -53,7 +53,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     // Navigation Compose para Android
-    implementation("androidx.navigation:navigation-compose:2.9.0")
+    implementation("androidx.navigation:navigation-compose:2.9.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
