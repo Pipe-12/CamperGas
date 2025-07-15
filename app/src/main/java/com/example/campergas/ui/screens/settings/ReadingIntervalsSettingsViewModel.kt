@@ -14,11 +14,11 @@ import javax.inject.Inject
 @HiltViewModel
 class ReadingIntervalsSettingsViewModel @Inject constructor(
     private val configureReadingIntervalsUseCase: ConfigureReadingIntervalsUseCase,
-    private val readSensorDataUseCase: ReadSensorDataUseCase
+    readSensorDataUseCase: ReadSensorDataUseCase
 ) : ViewModel() {
 
     // StateFlows para la UI
-    val weightInterval: StateFlow<Int> = 
+    val weightInterval: StateFlow<Int> =
         configureReadingIntervalsUseCase.getWeightReadIntervalSeconds()
             .stateIn(
                 scope = viewModelScope,
@@ -26,7 +26,7 @@ class ReadingIntervalsSettingsViewModel @Inject constructor(
                 initialValue = 5
             )
 
-    val inclinationInterval: StateFlow<Int> = 
+    val inclinationInterval: StateFlow<Int> =
         configureReadingIntervalsUseCase.getInclinationReadIntervalSeconds()
             .stateIn(
                 scope = viewModelScope,
@@ -68,7 +68,10 @@ class ReadingIntervalsSettingsViewModel @Inject constructor(
     fun setBothIntervals(weightSeconds: Int, inclinationSeconds: Int) {
         viewModelScope.launch {
             try {
-                configureReadingIntervalsUseCase.setReadingIntervals(weightSeconds, inclinationSeconds)
+                configureReadingIntervalsUseCase.setReadingIntervals(
+                    weightSeconds,
+                    inclinationSeconds
+                )
             } catch (e: Exception) {
                 // Manejar error si es necesario
             }

@@ -13,7 +13,7 @@ import javax.inject.Inject
 class ReadSensorDataUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
-    
+
     /**
      * Solicita lectura de datos de peso bajo demanda
      * Los datos se actualizarán en el StateFlow correspondiente

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothProfile
 import android.content.Context
@@ -38,7 +37,7 @@ import javax.inject.Singleton
  * - FuelMeasurement: datos de medición de combustible (lectura bajo demanda)
  * - Inclination: datos de inclinación (lectura bajo demanda)
  * - Offline: datos históricos en lotes (lectura continua al conectar)
- * 
+ *
  * IMPORTANTE: El sensor ahora usa modo READ en lugar de notificaciones.
  * La aplicación debe solicitar activamente los datos leyendo las características.
  */
@@ -163,16 +162,20 @@ class CamperGasBleService @Inject constructor(
                     CamperGasUuids.WEIGHT_CHARACTERISTIC_UUID.lowercase() -> {
                         processFuelMeasurementData(value)
                     }
+
                     CamperGasUuids.INCLINATION_CHARACTERISTIC_UUID.lowercase() -> {
                         processInclinationData(value)
                     }
+
                     CamperGasUuids.OFFLINE_CHARACTERISTIC_UUID.lowercase() -> {
                         processOfflineData(value)
                     }
                 }
             } else {
                 Log.e(TAG, "Error al leer característica ${characteristic.uuid}: $status")
-                if (characteristic.uuid.toString().lowercase() == CamperGasUuids.OFFLINE_CHARACTERISTIC_UUID.lowercase()) {
+                if (characteristic.uuid.toString()
+                        .lowercase() == CamperGasUuids.OFFLINE_CHARACTERISTIC_UUID.lowercase()
+                ) {
                     _isLoadingHistory.value = false
                 }
             }
@@ -232,10 +235,10 @@ class CamperGasBleService @Inject constructor(
                 // Cargar configuración desde preferencias
                 val weightInterval = preferencesDataStore.weightReadInterval.first()
                 val inclinationInterval = preferencesDataStore.inclinationReadInterval.first()
-                
+
                 // Aplicar configuración
                 configureReadingIntervals(weightInterval, inclinationInterval)
-                
+
                 // Iniciar lectura periódica
                 startPeriodicDataReading()
             } catch (e: Exception) {
@@ -252,7 +255,7 @@ class CamperGasBleService @Inject constructor(
     private var periodicReadingJob: kotlinx.coroutines.Job? = null
     private var lastWeightReadTime = 0L
     private var lastInclinationReadTime = 0L
-    
+
     // Intervalos configurables (por defecto 5 segundos)
     private var weightReadInterval = 5000L // 5 segundos entre lecturas de peso
     private var inclinationReadInterval = 5000L // 5 segundos entre lecturas de inclinación
@@ -265,7 +268,10 @@ class CamperGasBleService @Inject constructor(
     fun configureReadingIntervals(weightIntervalMs: Long, inclinationIntervalMs: Long) {
         weightReadInterval = weightIntervalMs
         inclinationReadInterval = inclinationIntervalMs
-        Log.d(TAG, "Intervalos configurados - Peso: ${weightIntervalMs}ms, Inclinación: ${inclinationIntervalMs}ms")
+        Log.d(
+            TAG,
+            "Intervalos configurados - Peso: ${weightIntervalMs}ms, Inclinación: ${inclinationIntervalMs}ms"
+        )
     }
 
     /**
@@ -290,27 +296,30 @@ class CamperGasBleService @Inject constructor(
         isPeriodicReadingActive = true
         periodicReadingJob = serviceScope.launch {
             Log.d(TAG, "🔄 Iniciando lectura periódica de datos en tiempo real...")
-            Log.d(TAG, "📊 Intervalo peso: ${weightReadInterval}ms, Intervalo inclinación: ${inclinationReadInterval}ms")
-            
+            Log.d(
+                TAG,
+                "📊 Intervalo peso: ${weightReadInterval}ms, Intervalo inclinación: ${inclinationReadInterval}ms"
+            )
+
             while (isPeriodicReadingActive && isConnected()) {
                 try {
                     val currentTime = System.currentTimeMillis()
-                    
+
                     // Leer peso si han pasado más del intervalo configurado desde la última lectura
                     if (currentTime - lastWeightReadTime > weightReadInterval) {
                         readWeightData()
                         lastWeightReadTime = currentTime
                     }
-                    
+
                     // Pequeña pausa antes de verificar inclinación
                     delay(100)
-                    
+
                     // Leer inclinación si han pasado más del intervalo configurado desde la última lectura
                     if (currentTime - lastInclinationReadTime > inclinationReadInterval) {
                         readInclinationData()
                         lastInclinationReadTime = currentTime
                     }
-                    
+
                     // Pausa entre ciclos de verificación (500ms)
                     delay(500)
                 } catch (e: Exception) {
@@ -318,7 +327,7 @@ class CamperGasBleService @Inject constructor(
                     delay(2000) // Pausa más larga en caso de error
                 }
             }
-            
+
             Log.d(TAG, "Lectura periódica de datos en tiempo real finalizada")
         }
     }
@@ -634,7 +643,7 @@ class CamperGasBleService @Inject constructor(
                         offlineDataCount++
                         Log.d(
                             TAG,
-                            "📦 Lote ${offlineDataCount} procesado: ${batchHistoricalMeasurements.size} registros históricos"
+                            "📦 Lote $offlineDataCount procesado: ${batchHistoricalMeasurements.size} registros históricos"
                         )
                         Log.d(
                             TAG,
@@ -657,7 +666,7 @@ class CamperGasBleService @Inject constructor(
                                     onSuccess = { savedCount ->
                                         Log.d(
                                             TAG,
-                                            "✅ Lote ${offlineDataCount} guardado: $savedCount mediciones de combustible"
+                                            "✅ Lote $offlineDataCount guardado: $savedCount mediciones de combustible"
                                         )
 
                                         // Crear FuelMeasurements para la UI
@@ -757,10 +766,10 @@ class CamperGasBleService @Inject constructor(
 
     fun disconnect() {
         Log.d(TAG, "Desconectando del sensor CamperGas")
-        
+
         // Detener lectura periódica
         stopPeriodicDataReading()
-        
+
         bluetoothGatt?.let { gatt ->
             // Verificar permisos antes de desconectar
             if (bleManager.hasBluetoothConnectPermission()) {
@@ -884,7 +893,7 @@ class CamperGasBleService @Inject constructor(
     private fun cleanup() {
         // Detener lectura offline si está en progreso
         stopOfflineDataReading()
-        
+
         // Detener lectura periódica si está en progreso
         stopPeriodicDataReading()
 

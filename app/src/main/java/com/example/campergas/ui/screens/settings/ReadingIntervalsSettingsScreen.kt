@@ -1,13 +1,36 @@
 package com.example.campergas.ui.screens.settings
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,20 +48,20 @@ fun ReadingIntervalsSettingsScreen(
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
-    
+
     val weightInterval by viewModel.weightInterval.collectAsStateWithLifecycle()
     val inclinationInterval by viewModel.inclinationInterval.collectAsStateWithLifecycle()
     val isConnected by viewModel.isConnected.collectAsStateWithLifecycle()
-    
+
     var weightIntervalText by remember { mutableStateOf("") }
     var inclinationIntervalText by remember { mutableStateOf("") }
     var showResetDialog by remember { mutableStateOf(false) }
-    
+
     // Actualizar campos de texto cuando cambian los valores
     LaunchedEffect(weightInterval) {
         weightIntervalText = weightInterval.toString()
     }
-    
+
     LaunchedEffect(inclinationInterval) {
         inclinationIntervalText = inclinationInterval.toString()
     }
@@ -49,7 +72,7 @@ fun ReadingIntervalsSettingsScreen(
                 title = { Text("Intervalos de Lectura") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
                 actions = {
@@ -116,7 +139,7 @@ fun ReadingIntervalsSettingsScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    
+
                     OutlinedTextField(
                         value = weightIntervalText,
                         onValueChange = { newValue ->
@@ -128,9 +151,9 @@ fun ReadingIntervalsSettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
-                    
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     Button(
                         onClick = {
                             val interval = weightIntervalText.toIntOrNull()
@@ -143,7 +166,7 @@ fun ReadingIntervalsSettingsScreen(
                     ) {
                         Text("Aplicar Intervalo de Peso")
                     }
-                    
+
                     Text(
                         text = "Rango válido: 1-300 segundos",
                         style = MaterialTheme.typography.bodySmall,
@@ -172,7 +195,7 @@ fun ReadingIntervalsSettingsScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    
+
                     OutlinedTextField(
                         value = inclinationIntervalText,
                         onValueChange = { newValue ->
@@ -184,9 +207,9 @@ fun ReadingIntervalsSettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
-                    
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     Button(
                         onClick = {
                             val interval = inclinationIntervalText.toIntOrNull()
@@ -195,11 +218,12 @@ fun ReadingIntervalsSettingsScreen(
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        enabled = inclinationIntervalText.toIntOrNull()?.let { it in 1..300 } == true
+                        enabled = inclinationIntervalText.toIntOrNull()
+                            ?.let { it in 1..300 } == true
                     ) {
                         Text("Aplicar Intervalo de Inclinación")
                     }
-                    
+
                     Text(
                         text = "Rango válido: 1-300 segundos",
                         style = MaterialTheme.typography.bodySmall,
@@ -223,14 +247,15 @@ fun ReadingIntervalsSettingsScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     Button(
                         onClick = {
                             val weightInt = weightIntervalText.toIntOrNull()
                             val inclinationInt = inclinationIntervalText.toIntOrNull()
-                            
+
                             if (weightInt != null && inclinationInt != null &&
-                                weightInt in 1..300 && inclinationInt in 1..300) {
+                                weightInt in 1..300 && inclinationInt in 1..300
+                            ) {
                                 viewModel.setBothIntervals(weightInt, inclinationInt)
                             }
                         },
@@ -255,7 +280,7 @@ fun ReadingIntervalsSettingsScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     Text(
                         text = "• Intervalos más cortos proporcionan datos más frecuentes pero pueden consumir más batería",
                         style = MaterialTheme.typography.bodySmall

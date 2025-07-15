@@ -23,7 +23,7 @@ class SaveFuelMeasurementUseCase @Inject constructor(
      * Guarda una medición de combustible en TIEMPO REAL
      * Estos datos provienen de la característica WEIGHT_CHARACTERISTIC_UUID
      * y se marcan como isHistorical = false
-     * 
+     *
      * IMPORTANTE: Solo se guardan mediciones cada 2 minutos para evitar spam en la base de datos
      *
      * @param totalWeight Peso total medido por el sensor
@@ -40,17 +40,19 @@ class SaveFuelMeasurementUseCase @Inject constructor(
             // Verificar si han pasado al menos 2 minutos desde la última medición guardada
             val currentTime = System.currentTimeMillis()
             val timeSinceLastSave = currentTime - lastSaveTimestamp
-            
+
             if (lastSaveTimestamp > 0 && timeSinceLastSave < MIN_TIME_BETWEEN_SAVES_MS) {
                 val remainingTimeMs = MIN_TIME_BETWEEN_SAVES_MS - timeSinceLastSave
                 val remainingTimeMinutes = (remainingTimeMs / 1000 / 60).toInt()
                 val remainingTimeSeconds = ((remainingTimeMs / 1000) % 60).toInt()
-                
-                return Result.success(SaveMeasurementResult(
-                    measurementId = -1L, 
-                    processed = false,
-                    reason = "Medición omitida: faltan ${remainingTimeMinutes}m ${remainingTimeSeconds}s"
-                ))
+
+                return Result.success(
+                    SaveMeasurementResult(
+                        measurementId = -1L,
+                        processed = false,
+                        reason = "Medición omitida: faltan ${remainingTimeMinutes}m ${remainingTimeSeconds}s"
+                    )
+                )
             }
 
             // Obtener la bombona activa
@@ -84,15 +86,17 @@ class SaveFuelMeasurementUseCase @Inject constructor(
 
             // Guardar la medición
             val id = fuelMeasurementRepository.insertMeasurement(measurement)
-            
+
             // Actualizar el timestamp de la última medición guardada
             lastSaveTimestamp = currentTime
 
-            Result.success(SaveMeasurementResult(
-                measurementId = id, 
-                processed = true,
-                reason = "Medición guardada correctamente"
-            ))
+            Result.success(
+                SaveMeasurementResult(
+                    measurementId = id,
+                    processed = true,
+                    reason = "Medición guardada correctamente"
+                )
+            )
         } catch (e: Exception) {
             Result.failure(e)
         }
