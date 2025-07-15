@@ -75,12 +75,9 @@ class ConfigureReadingIntervalsUseCase @Inject constructor(
     }
 
     /**
-     * Aplicar configuración guardada al servicio BLE
+     * Reinicia la lectura periódica con los intervalos actuales
      */
-    suspend fun applyStoredConfiguration() {
-        val weightInterval = bleRepository.weightReadInterval.first()
-        val inclinationInterval = bleRepository.inclinationReadInterval.first()
-
-        bleRepository.configureReadingIntervals(weightInterval, inclinationInterval)
+    fun restartPeriodicReading() {
+        bleRepository.restartPeriodicDataReading()
     }
 }

@@ -112,51 +112,6 @@ class SaveFuelMeasurementUseCase @Inject constructor(
      * @param timestamp Timestamp histórico de cuando se tomó la medición
      * @param isCalibrated Si la medición está calibrada
      */
-    suspend fun saveHistoricalMeasurement(
-        cylinderId: Long,
-        totalWeight: Float,
-        timestamp: Long,
-        isCalibrated: Boolean = true
-    ): Result<SaveMeasurementResult> {
-        return try {
-            // Obtener la información de la bombona
-            val cylinder = gasCylinderRepository.getCylinderById(cylinderId)
-                ?: return Result.failure(Exception("Bombona no encontrada"))
-
-            // Calcular el combustible disponible
-            val fuelKilograms = maxOf(0f, totalWeight - cylinder.tare)
-            val fuelPercentage = if (cylinder.capacity > 0) {
-                (fuelKilograms / cylinder.capacity * 100).coerceIn(0f, 100f)
-            } else {
-                0f
-            }
-
-            // Crear la medición
-            val measurement = FuelMeasurement(
-                cylinderId = cylinder.id,
-                cylinderName = cylinder.name,
-                timestamp = timestamp,
-                fuelKilograms = fuelKilograms,
-                fuelPercentage = fuelPercentage,
-                totalWeight = totalWeight,
-                isCalibrated = isCalibrated,
-                isHistorical = true
-            )
-
-            // Validar la medición
-            if (!measurement.isValid()) {
-                return Result.failure(Exception("Los datos de la medición no son válidos"))
-            }
-
-            // Guardar la medición
-            val id = fuelMeasurementRepository.insertMeasurement(measurement)
-
-            Result.success(SaveMeasurementResult(id, true))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
     /**
      * Guarda múltiples mediciones HISTÓRICAS/OFFLINE de forma eficiente
      * Estos datos provienen de la característica OFFLINE_CHARACTERISTIC_UUID

@@ -33,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -46,12 +45,12 @@ fun ReadingIntervalsSettingsScreen(
     onNavigateBack: () -> Unit,
     viewModel: ReadingIntervalsSettingsViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     val scrollState = rememberScrollState()
 
     val weightInterval by viewModel.weightInterval.collectAsStateWithLifecycle()
     val inclinationInterval by viewModel.inclinationInterval.collectAsStateWithLifecycle()
     val isConnected by viewModel.isConnected.collectAsStateWithLifecycle()
+    val operationStatus by viewModel.operationStatus.collectAsStateWithLifecycle()
 
     var weightIntervalText by remember { mutableStateOf("") }
     var inclinationIntervalText by remember { mutableStateOf("") }
@@ -91,6 +90,30 @@ fun ReadingIntervalsSettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Mostrar estado de operación si hay uno
+            operationStatus?.let { status ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Estado",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = status,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
+
             // Estado de conexión
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -264,6 +287,19 @@ fun ReadingIntervalsSettingsScreen(
                                 inclinationIntervalText.toIntOrNull()?.let { it in 1..300 } == true
                     ) {
                         Text("Aplicar Ambos Intervalos")
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Botón para reiniciar lectura periódica
+                    Button(
+                        onClick = {
+                            viewModel.restartPeriodicReading()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = isConnected
+                    ) {
+                        Text("Reiniciar Lectura Periódica")
                     }
                 }
             }

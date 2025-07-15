@@ -88,6 +88,13 @@ class BleRepository @Inject constructor(
     }
 
     /**
+     * Reinicia la lectura periódica con los nuevos intervalos
+     */
+    fun restartPeriodicDataReading() {
+        camperGasBleService.restartPeriodicDataReading()
+    }
+
+    /**
      * Obtiene el intervalo actual de lectura de peso
      */
     fun getWeightReadInterval(): Long = camperGasBleService.getWeightReadInterval()
