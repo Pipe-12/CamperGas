@@ -35,6 +35,8 @@ class BleRepository @Inject constructor(
 
     // Preferences
     val lastConnectedDeviceAddress: Flow<String> = preferencesDataStore.lastConnectedDeviceAddress
+    val weightReadInterval: Flow<Long> = preferencesDataStore.weightReadInterval
+    val inclinationReadInterval: Flow<Long> = preferencesDataStore.inclinationReadInterval
 
     fun isBluetoothEnabled(): Boolean = bleManager.isBluetoothEnabled()
 
@@ -68,8 +70,41 @@ class BleRepository @Inject constructor(
 
     fun ensureOfflineDataReading() = camperGasBleService.ensureOfflineDataReading()
 
+    /**
+     * Solicita lectura de datos de peso bajo demanda
+     */
+    fun readWeightDataOnDemand() = camperGasBleService.readWeightDataOnDemand()
+
+    /**
+     * Solicita lectura de datos de inclinación bajo demanda
+     */
+    fun readInclinationDataOnDemand() = camperGasBleService.readInclinationDataOnDemand()
+
+    /**
+     * Configura los intervalos de lectura para peso e inclinación
+     */
+    fun configureReadingIntervals(weightIntervalMs: Long, inclinationIntervalMs: Long) {
+        camperGasBleService.configureReadingIntervals(weightIntervalMs, inclinationIntervalMs)
+    }
+
+    /**
+     * Obtiene el intervalo actual de lectura de peso
+     */
+    fun getWeightReadInterval(): Long = camperGasBleService.getWeightReadInterval()
+
+    /**
+     * Obtiene el intervalo actual de lectura de inclinación
+     */
+    fun getInclinationReadInterval(): Long = camperGasBleService.getInclinationReadInterval()
+
     suspend fun saveLastConnectedDevice(address: String) =
         preferencesDataStore.saveLastConnectedDevice(address)
+
+    suspend fun saveWeightReadInterval(intervalMs: Long) =
+        preferencesDataStore.setWeightReadInterval(intervalMs)
+
+    suspend fun saveInclinationReadInterval(intervalMs: Long) =
+        preferencesDataStore.setInclinationReadInterval(intervalMs)
 
     // Filtrado de dispositivos
     fun setCompatibleDevicesFilter(enabled: Boolean) =

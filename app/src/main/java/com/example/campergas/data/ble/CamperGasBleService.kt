@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.util.Log
+import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.domain.model.CamperGasUuids
 import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.model.Inclination
@@ -21,6 +22,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
@@ -32,16 +34,20 @@ import javax.inject.Singleton
 
 /**
  * Servicio BLE unificado para manejar todas las características del sensor CamperGas
- * El sensor tiene un solo servicio con tres características:
- * - FuelMeasurement: datos de medición de combustible en tiempo real
- * - Inclination: datos de inclinación en tiempo real
- * - Offline: datos históricos en lotes
+ * El sensor tiene un solo servicio con tres características READ-only:
+ * - FuelMeasurement: datos de medición de combustible (lectura bajo demanda)
+ * - Inclination: datos de inclinación (lectura bajo demanda)
+ * - Offline: datos históricos en lotes (lectura continua al conectar)
+ * 
+ * IMPORTANTE: El sensor ahora usa modo READ en lugar de notificaciones.
+ * La aplicación debe solicitar activamente los datos leyendo las características.
  */
 @Singleton
 class CamperGasBleService @Inject constructor(
     private val bleManager: BleManager,
     private val saveFuelMeasurementUseCase: SaveFuelMeasurementUseCase,
     private val getActiveCylinderUseCase: GetActiveCylinderUseCase,
+    private val preferencesDataStore: PreferencesDataStore,
     @ApplicationContext private val context: Context
 ) {
     companion object {
@@ -107,6 +113,8 @@ class CamperGasBleService @Inject constructor(
                     Log.d(TAG, "Desconectado del sensor CamperGas")
                     _connectionState.value = false
                     _isLoadingHistory.value = false
+                    // Detener lectura periódica al desconectar
+                    stopPeriodicDataReading()
                     cleanup()
                 }
 
@@ -116,6 +124,8 @@ class CamperGasBleService @Inject constructor(
 
                 BluetoothProfile.STATE_DISCONNECTING -> {
                     Log.d(TAG, "Desconectando del sensor CamperGas...")
+                    // Detener lectura periódica al iniciar desconexión
+                    stopPeriodicDataReading()
                 }
             }
         }
@@ -142,26 +152,6 @@ class CamperGasBleService @Inject constructor(
             }
         }
 
-        override fun onCharacteristicChanged(
-            gatt: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic,
-            value: ByteArray
-        ) {
-            when (characteristic.uuid.toString().lowercase()) {
-                CamperGasUuids.WEIGHT_CHARACTERISTIC_UUID.lowercase() -> {
-                    processFuelMeasurementData(value)
-                }
-
-                CamperGasUuids.INCLINATION_CHARACTERISTIC_UUID.lowercase() -> {
-                    processInclinationData(value)
-                }
-
-                CamperGasUuids.OFFLINE_CHARACTERISTIC_UUID.lowercase() -> {
-                    processOfflineData(value)
-                }
-            }
-        }
-
         override fun onCharacteristicRead(
             gatt: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic,
@@ -170,39 +160,21 @@ class CamperGasBleService @Inject constructor(
         ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 when (characteristic.uuid.toString().lowercase()) {
+                    CamperGasUuids.WEIGHT_CHARACTERISTIC_UUID.lowercase() -> {
+                        processFuelMeasurementData(value)
+                    }
+                    CamperGasUuids.INCLINATION_CHARACTERISTIC_UUID.lowercase() -> {
+                        processInclinationData(value)
+                    }
                     CamperGasUuids.OFFLINE_CHARACTERISTIC_UUID.lowercase() -> {
                         processOfflineData(value)
                     }
                 }
             } else {
-                Log.e(TAG, "Error al leer característica: $status")
-                _isLoadingHistory.value = false
-            }
-        }
-
-        override fun onDescriptorWrite(
-            gatt: BluetoothGatt,
-            descriptor: BluetoothGattDescriptor,
-            status: Int
-        ) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d(
-                    TAG,
-                    "Descriptor escrito correctamente para ${descriptor.characteristic?.uuid}"
-                )
-
-                // Si se escribió correctamente el descriptor de la característica offline, iniciar lectura
-                if (descriptor.characteristic?.uuid?.toString()?.lowercase() ==
-                    CamperGasUuids.OFFLINE_CHARACTERISTIC_UUID.lowercase()
-                ) {
-                    Log.d(TAG, "Descriptor offline configurado, iniciando lectura de datos...")
-                    serviceScope.launch {
-                        delay(200) // Pequeña pausa para estabilizar
-                        continueOfflineDataReading()
-                    }
+                Log.e(TAG, "Error al leer característica ${characteristic.uuid}: $status")
+                if (characteristic.uuid.toString().lowercase() == CamperGasUuids.OFFLINE_CHARACTERISTIC_UUID.lowercase()) {
+                    _isLoadingHistory.value = false
                 }
-            } else {
-                Log.e(TAG, "Error al escribir descriptor: $status")
             }
         }
     }
@@ -214,76 +186,211 @@ class CamperGasBleService @Inject constructor(
             return
         }
 
-        // Configurar característica de medición de combustible
+        // Configurar característica de medición de combustible (READ-only)
         fuelMeasurementCharacteristic = service.getCharacteristic(
             UUID.fromString(CamperGasUuids.WEIGHT_CHARACTERISTIC_UUID)
         )
         if (fuelMeasurementCharacteristic != null) {
-            Log.d(TAG, "Característica de medición de combustible encontrada")
-            enableNotifications(gatt, fuelMeasurementCharacteristic!!)
+            Log.d(TAG, "Característica de medición de combustible encontrada (READ-only)")
         } else {
             Log.w(TAG, "Característica de medición de combustible no encontrada")
         }
 
-        // Configurar característica de inclinación
+        // Configurar característica de inclinación (READ-only)
         inclinationCharacteristic = service.getCharacteristic(
             UUID.fromString(CamperGasUuids.INCLINATION_CHARACTERISTIC_UUID)
         )
         if (inclinationCharacteristic != null) {
-            Log.d(TAG, "Característica de inclinación encontrada")
-            enableNotifications(gatt, inclinationCharacteristic!!)
+            Log.d(TAG, "Característica de inclinación encontrada (READ-only)")
         } else {
             Log.w(TAG, "Característica de inclinación no encontrada")
         }
 
-        // Configurar característica offline
+        // Configurar característica offline (READ-only)
         offlineCharacteristic = service.getCharacteristic(
             UUID.fromString(CamperGasUuids.OFFLINE_CHARACTERISTIC_UUID)
         )
         if (offlineCharacteristic != null) {
-            Log.d(TAG, "Característica offline encontrada")
+            Log.d(TAG, "Característica offline encontrada (READ-only)")
             // Iniciar lectura automática de datos offline al conectar
             Log.d(TAG, "Iniciando lectura automática de datos offline...")
             startAutomaticOfflineDataReading()
         } else {
             Log.w(TAG, "Característica offline no encontrada")
         }
+
+        // Iniciar lectura periódica de datos en tiempo real
+        loadConfigurationAndStartReading()
     }
 
-    private fun enableNotifications(
-        gatt: BluetoothGatt,
-        characteristic: BluetoothGattCharacteristic
-    ) {
-        // Verificar permisos antes de habilitar notificaciones
-        if (!bleManager.hasBluetoothConnectPermission()) {
-            Log.e(TAG, "No hay permisos para habilitar notificaciones")
+    /**
+     * Carga la configuración guardada e inicia la lectura periódica
+     */
+    private fun loadConfigurationAndStartReading() {
+        serviceScope.launch {
+            try {
+                // Cargar configuración desde preferencias
+                val weightInterval = preferencesDataStore.weightReadInterval.first()
+                val inclinationInterval = preferencesDataStore.inclinationReadInterval.first()
+                
+                // Aplicar configuración
+                configureReadingIntervals(weightInterval, inclinationInterval)
+                
+                // Iniciar lectura periódica
+                startPeriodicDataReading()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al cargar configuración: ${e.message}")
+                // Usar valores por defecto si falla
+                configureReadingIntervals(5000L, 5000L)
+                startPeriodicDataReading()
+            }
+        }
+    }
+
+    // Variables para control de lectura periódica
+    private var isPeriodicReadingActive = false
+    private var periodicReadingJob: kotlinx.coroutines.Job? = null
+    private var lastWeightReadTime = 0L
+    private var lastInclinationReadTime = 0L
+    
+    // Intervalos configurables (por defecto 5 segundos)
+    private var weightReadInterval = 5000L // 5 segundos entre lecturas de peso
+    private var inclinationReadInterval = 5000L // 5 segundos entre lecturas de inclinación
+
+    /**
+     * Configura los intervalos de lectura para peso e inclinación
+     * @param weightIntervalMs Intervalo en milisegundos para lectura de peso
+     * @param inclinationIntervalMs Intervalo en milisegundos para lectura de inclinación
+     */
+    fun configureReadingIntervals(weightIntervalMs: Long, inclinationIntervalMs: Long) {
+        weightReadInterval = weightIntervalMs
+        inclinationReadInterval = inclinationIntervalMs
+        Log.d(TAG, "Intervalos configurados - Peso: ${weightIntervalMs}ms, Inclinación: ${inclinationIntervalMs}ms")
+    }
+
+    /**
+     * Obtiene el intervalo actual de lectura de peso
+     */
+    fun getWeightReadInterval(): Long = weightReadInterval
+
+    /**
+     * Obtiene el intervalo actual de lectura de inclinación
+     */
+    fun getInclinationReadInterval(): Long = inclinationReadInterval
+
+    /**
+     * Inicia la lectura periódica de datos en tiempo real
+     */
+    private fun startPeriodicDataReading() {
+        if (isPeriodicReadingActive) {
+            Log.d(TAG, "La lectura periódica ya está activa")
             return
         }
 
-        @SuppressLint("MissingPermission")
-        val success = gatt.setCharacteristicNotification(characteristic, true)
-
-        if (success) {
-            val descriptor = characteristic.getDescriptor(
-                UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-            )
-
-            descriptor?.let {
-                // Usar el nuevo metodo writeDescriptor con ByteArray (API 33+)
-                @SuppressLint("MissingPermission")
-                val result = gatt.writeDescriptor(
-                    it,
-                    BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                )
-                if (result == BluetoothGatt.GATT_SUCCESS) {
-                    Log.d(TAG, "Habilitando notificaciones para ${characteristic.uuid}")
-                } else {
-                    Log.e(TAG, "Error al escribir descriptor para ${characteristic.uuid}")
+        isPeriodicReadingActive = true
+        periodicReadingJob = serviceScope.launch {
+            Log.d(TAG, "🔄 Iniciando lectura periódica de datos en tiempo real...")
+            Log.d(TAG, "📊 Intervalo peso: ${weightReadInterval}ms, Intervalo inclinación: ${inclinationReadInterval}ms")
+            
+            while (isPeriodicReadingActive && isConnected()) {
+                try {
+                    val currentTime = System.currentTimeMillis()
+                    
+                    // Leer peso si han pasado más del intervalo configurado desde la última lectura
+                    if (currentTime - lastWeightReadTime > weightReadInterval) {
+                        readWeightData()
+                        lastWeightReadTime = currentTime
+                    }
+                    
+                    // Pequeña pausa antes de verificar inclinación
+                    delay(100)
+                    
+                    // Leer inclinación si han pasado más del intervalo configurado desde la última lectura
+                    if (currentTime - lastInclinationReadTime > inclinationReadInterval) {
+                        readInclinationData()
+                        lastInclinationReadTime = currentTime
+                    }
+                    
+                    // Pausa entre ciclos de verificación (500ms)
+                    delay(500)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error en lectura periódica: ${e.message}")
+                    delay(2000) // Pausa más larga en caso de error
                 }
             }
-        } else {
-            Log.e(TAG, "Error al configurar notificaciones para ${characteristic.uuid}")
+            
+            Log.d(TAG, "Lectura periódica de datos en tiempo real finalizada")
         }
+    }
+
+    /**
+     * Detiene la lectura periódica de datos en tiempo real
+     */
+    private fun stopPeriodicDataReading() {
+        isPeriodicReadingActive = false
+        periodicReadingJob?.cancel()
+        periodicReadingJob = null
+        Log.d(TAG, "Lectura periódica de datos en tiempo real detenida")
+    }
+
+    /**
+     * Lee datos de peso desde la característica
+     */
+    private fun readWeightData() {
+        fuelMeasurementCharacteristic?.let { characteristic ->
+            bluetoothGatt?.let { gatt ->
+                if (bleManager.hasBluetoothConnectPermission()) {
+                    @SuppressLint("MissingPermission")
+                    val success = gatt.readCharacteristic(characteristic)
+                    if (!success) {
+                        Log.e(TAG, "Error al leer datos de peso")
+                    }
+                } else {
+                    Log.e(TAG, "No hay permisos para leer datos de peso")
+                }
+            }
+        }
+    }
+
+    /**
+     * Lee datos de inclinación desde la característica
+     */
+    private fun readInclinationData() {
+        inclinationCharacteristic?.let { characteristic ->
+            bluetoothGatt?.let { gatt ->
+                if (bleManager.hasBluetoothConnectPermission()) {
+                    @SuppressLint("MissingPermission")
+                    val success = gatt.readCharacteristic(characteristic)
+                    if (!success) {
+                        Log.e(TAG, "Error al leer datos de inclinación")
+                    }
+                } else {
+                    Log.e(TAG, "No hay permisos para leer datos de inclinación")
+                }
+            }
+        }
+    }
+
+    /**
+     * Función pública para leer datos de peso bajo demanda
+     */
+    fun readWeightDataOnDemand() {
+        if (!isConnected()) {
+            Log.w(TAG, "No hay conexión activa para leer datos de peso")
+            return
+        }
+        readWeightData()
+    }
+
+    /**
+     * Función pública para leer datos de inclinación bajo demanda
+     */
+    fun readInclinationDataOnDemand() {
+        if (!isConnected()) {
+            Log.w(TAG, "No hay conexión activa para leer datos de inclinación")
+            return
+        }
+        readInclinationData()
     }
 
     private fun listAvailableServices(gatt: BluetoothGatt?) {
@@ -650,6 +757,10 @@ class CamperGasBleService @Inject constructor(
 
     fun disconnect() {
         Log.d(TAG, "Desconectando del sensor CamperGas")
+        
+        // Detener lectura periódica
+        stopPeriodicDataReading()
+        
         bluetoothGatt?.let { gatt ->
             // Verificar permisos antes de desconectar
             if (bleManager.hasBluetoothConnectPermission()) {
@@ -683,12 +794,9 @@ class CamperGasBleService @Inject constructor(
                 // Inicializar la lectura continua de datos offline
                 startOfflineDataReading()
 
-                // Habilitar notificaciones para datos offline
-                enableNotifications(gatt, characteristic)
-
-                // Iniciar la primera lectura inmediatamente después de habilitar notificaciones
+                // Iniciar la primera lectura después de una pausa
                 serviceScope.launch {
-                    delay(300) // Pausa para estabilizar la conexión
+                    delay(500) // Pausa para estabilizar la conexión
                     if (isReadingOfflineData) {
                         Log.d(TAG, "Ejecutando primera lectura de datos offline...")
                         continueOfflineDataReading()
@@ -776,6 +884,9 @@ class CamperGasBleService @Inject constructor(
     private fun cleanup() {
         // Detener lectura offline si está en progreso
         stopOfflineDataReading()
+        
+        // Detener lectura periódica si está en progreso
+        stopPeriodicDataReading()
 
         bluetoothGatt = null
         fuelMeasurementCharacteristic = null

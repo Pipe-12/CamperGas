@@ -3,6 +3,7 @@ package com.example.campergas.data.local.preferences
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.campergas.domain.model.ThemeMode
@@ -21,6 +22,8 @@ class PreferencesDataStore @Inject constructor(
     private val lastConnectedDeviceKey = stringPreferencesKey("last_connected_device")
     private val themeModeKey = stringPreferencesKey("theme_mode")
     private val notificationsEnabledKey = booleanPreferencesKey("notifications_enabled")
+    private val weightReadIntervalKey = longPreferencesKey("weight_read_interval")
+    private val inclinationReadIntervalKey = longPreferencesKey("inclination_read_interval")
 
     val lastConnectedDeviceAddress: Flow<String> = context.dataStore.data
         .map { preferences ->
@@ -42,6 +45,16 @@ class PreferencesDataStore @Inject constructor(
             preferences[notificationsEnabledKey] ?: true
         }
 
+    val weightReadInterval: Flow<Long> = context.dataStore.data
+        .map { preferences ->
+            preferences[weightReadIntervalKey] ?: 5000L // 5 segundos por defecto
+        }
+
+    val inclinationReadInterval: Flow<Long> = context.dataStore.data
+        .map { preferences ->
+            preferences[inclinationReadIntervalKey] ?: 5000L // 5 segundos por defecto
+        }
+
     suspend fun saveLastConnectedDevice(address: String) {
         context.dataStore.edit { preferences ->
             preferences[lastConnectedDeviceKey] = address
@@ -57,6 +70,18 @@ class PreferencesDataStore @Inject constructor(
     suspend fun setNotificationsEnabled(enabled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[notificationsEnabledKey] = enabled
+        }
+    }
+
+    suspend fun setWeightReadInterval(intervalMs: Long) {
+        context.dataStore.edit { preferences ->
+            preferences[weightReadIntervalKey] = intervalMs
+        }
+    }
+
+    suspend fun setInclinationReadInterval(intervalMs: Long) {
+        context.dataStore.edit { preferences ->
+            preferences[inclinationReadIntervalKey] = intervalMs
         }
     }
 }
