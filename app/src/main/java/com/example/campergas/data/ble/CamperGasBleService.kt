@@ -503,7 +503,7 @@ class CamperGasBleService @Inject constructor(
         synchronized(readingQueue) {
             if (readingQueue.isNotEmpty() && !isReadingInProgress) {
                 isReadingInProgress = true
-                val nextRead = readingQueue.removeFirst()
+                val nextRead = readingQueue.removeAt(0)
                 
                 // Configurar timeout para la operación de lectura
                 readingTimeoutJob = serviceScope.launch {
