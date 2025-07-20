@@ -8,16 +8,16 @@
     <uses-permission
         android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
-    
+
     <!-- Permisos de Bluetooth para Android 12+ -->
-    <uses-permission 
+    <uses-permission
         android:name="android.permission.BLUETOOTH_CONNECT"
         android:minSdkVersion="31" />
     <uses-permission
         android:name="android.permission.BLUETOOTH_SCAN"
         android:minSdkVersion="31"
         android:usesPermissionFlags="neverForLocation" />
-    <uses-permission 
+    <uses-permission
         android:name="android.permission.BLUETOOTH_ADVERTISE"
         android:minSdkVersion="31" />
 
@@ -25,7 +25,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- Permiso de ubicación en segundo plano para Android 10+ cuando se use BLE en background -->
-    <uses-permission 
+    <uses-permission
         android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
         android:minSdkVersion="29" />
 
@@ -38,12 +38,12 @@
         android:required="true" />
 
     <!-- Permisos de notificaciones para Android 13+ -->
-    <uses-permission 
+    <uses-permission
         android:name="android.permission.POST_NOTIFICATIONS"
         android:minSdkVersion="33" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!-- Permisos de foreground service para Android 14+ -->
-    <uses-permission 
+    <uses-permission
         android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"
         android:minSdkVersion="34" />
 

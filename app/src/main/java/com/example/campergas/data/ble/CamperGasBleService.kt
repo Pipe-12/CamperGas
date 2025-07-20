@@ -86,7 +86,7 @@ class CamperGasBleService @Inject constructor(
     private val allHistoryData = mutableListOf<FuelMeasurement>()
     private val processedOfflineData =
         mutableSetOf<String>() // Para evitar duplicados por peso+tiempo
-    
+
     // Control para serializar operaciones BLE
     private var isReadingInProgress = false
     private val readingQueue = mutableListOf<() -> Unit>()
@@ -164,10 +164,10 @@ class CamperGasBleService @Inject constructor(
         ) {
             // Cancelar el timeout ya que recibimos respuesta
             readingTimeoutJob?.cancel()
-            
+
             // Marcar que ya no hay una lectura en progreso
             isReadingInProgress = false
-            
+
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 when (characteristic.uuid.toString().lowercase()) {
                     CamperGasUuids.WEIGHT_CHARACTERISTIC_UUID.lowercase() -> {
@@ -190,7 +190,7 @@ class CamperGasBleService @Inject constructor(
                     _isLoadingHistory.value = false
                 }
             }
-            
+
             // Procesar el siguiente elemento en la cola
             processNextReadingInQueue()
         }
@@ -285,23 +285,24 @@ class CamperGasBleService @Inject constructor(
     fun configureReadingIntervals(weightIntervalMs: Long, inclinationIntervalMs: Long) {
         val oldWeightInterval = weightReadInterval
         val oldInclinationInterval = inclinationReadInterval
-        
+
         weightReadInterval = weightIntervalMs
         inclinationReadInterval = inclinationIntervalMs
-        
+
         Log.d(
             TAG,
             "Intervalos configurados - Peso: ${weightIntervalMs}ms, Inclinación: ${inclinationIntervalMs}ms"
         )
-        
+
         // Si los intervalos cambiaron y estamos conectados, reiniciar la lectura periódica
-        if ((oldWeightInterval != weightIntervalMs || oldInclinationInterval != inclinationIntervalMs) 
-            && isConnected()) {
+        if ((oldWeightInterval != weightIntervalMs || oldInclinationInterval != inclinationIntervalMs)
+            && isConnected()
+        ) {
             Log.d(TAG, "Reiniciando lectura periódica con nuevos intervalos...")
             restartPeriodicReading()
         }
     }
-    
+
     /**
      * Reinicia la lectura periódica con los nuevos intervalos
      */
@@ -309,7 +310,7 @@ class CamperGasBleService @Inject constructor(
         if (isPeriodicReadingActive) {
             Log.d(TAG, "Deteniendo lectura periódica actual...")
             stopPeriodicDataReading()
-            
+
             // Pequeña pausa antes de reiniciar
             serviceScope.launch {
                 delay(500)
@@ -442,7 +443,10 @@ class CamperGasBleService @Inject constructor(
                         @SuppressLint("MissingPermission")
                         val success = gatt.readCharacteristic(characteristic)
                         if (!success) {
-                            Log.e(TAG, "Error al leer datos de inclinación - readCharacteristic() retornó false")
+                            Log.e(
+                                TAG,
+                                "Error al leer datos de inclinación - readCharacteristic() retornó false"
+                            )
                             isReadingInProgress = false
                             processNextReadingInQueue()
                         } else {
@@ -504,7 +508,7 @@ class CamperGasBleService @Inject constructor(
             if (readingQueue.isNotEmpty() && !isReadingInProgress) {
                 isReadingInProgress = true
                 val nextRead = readingQueue.removeAt(0)
-                
+
                 // Configurar timeout para la operación de lectura
                 readingTimeoutJob = serviceScope.launch {
                     delay(5000) // Timeout de 5 segundos
@@ -514,7 +518,7 @@ class CamperGasBleService @Inject constructor(
                         processNextReadingInQueue()
                     }
                 }
-                
+
                 nextRead()
             }
         }

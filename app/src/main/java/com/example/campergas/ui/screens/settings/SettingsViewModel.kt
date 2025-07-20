@@ -91,12 +91,13 @@ class SettingsViewModel @Inject constructor(
                 val intervalSeconds = intervalMinutes * 60 // Convertir minutos a segundos
                 configureReadingIntervalsUseCase.setWeightReadInterval(intervalSeconds)
                 _operationStatus.value = "Intervalo de peso configurado: ${intervalMinutes} min"
-                
+
                 // Limpiar el mensaje después de un tiempo
                 kotlinx.coroutines.delay(2000)
                 _operationStatus.value = null
             } catch (exception: Exception) {
-                _operationStatus.value = "Error al configurar intervalo de peso: ${exception.message}"
+                _operationStatus.value =
+                    "Error al configurar intervalo de peso: ${exception.message}"
                 kotlinx.coroutines.delay(2000)
                 _operationStatus.value = null
             }
@@ -109,12 +110,13 @@ class SettingsViewModel @Inject constructor(
                 _operationStatus.value = "Configurando intervalo de inclinación..."
                 configureReadingIntervalsUseCase.setInclinationReadInterval(intervalSeconds)
                 _operationStatus.value = "Intervalo de inclinación configurado: ${intervalSeconds}s"
-                
+
                 // Limpiar el mensaje después de un tiempo
                 kotlinx.coroutines.delay(2000)
                 _operationStatus.value = null
             } catch (exception: Exception) {
-                _operationStatus.value = "Error al configurar intervalo de inclinación: ${exception.message}"
+                _operationStatus.value =
+                    "Error al configurar intervalo de inclinación: ${exception.message}"
                 kotlinx.coroutines.delay(2000)
                 _operationStatus.value = null
             }
@@ -130,8 +132,9 @@ class SettingsViewModel @Inject constructor(
                     weightSeconds,
                     inclinationSeconds
                 )
-                _operationStatus.value = "Intervalos configurados: Peso ${weightMinutes} min, Inclinación ${inclinationSeconds}s"
-                
+                _operationStatus.value =
+                    "Intervalos configurados: Peso ${weightMinutes} min, Inclinación ${inclinationSeconds}s"
+
                 // Limpiar el mensaje después de un tiempo
                 kotlinx.coroutines.delay(3000)
                 _operationStatus.value = null
@@ -149,12 +152,13 @@ class SettingsViewModel @Inject constructor(
                 _operationStatus.value = "Restaurando valores por defecto..."
                 configureReadingIntervalsUseCase.resetToDefaultIntervals()
                 _operationStatus.value = "Intervalos restaurados: Peso 1 min, Inclinación 5s"
-                
+
                 // Limpiar el mensaje después de un tiempo
                 kotlinx.coroutines.delay(2000)
                 _operationStatus.value = null
             } catch (exception: Exception) {
-                _operationStatus.value = "Error al restaurar valores por defecto: ${exception.message}"
+                _operationStatus.value =
+                    "Error al restaurar valores por defecto: ${exception.message}"
                 kotlinx.coroutines.delay(2000)
                 _operationStatus.value = null
             }
@@ -167,7 +171,7 @@ class SettingsViewModel @Inject constructor(
                 _operationStatus.value = "Reiniciando lectura periódica..."
                 configureReadingIntervalsUseCase.restartPeriodicReading()
                 _operationStatus.value = "Lectura periódica reiniciada"
-                
+
                 // Limpiar el mensaje después de un tiempo
                 kotlinx.coroutines.delay(2000)
                 _operationStatus.value = null
@@ -175,7 +179,8 @@ class SettingsViewModel @Inject constructor(
                 // Las cancelaciones son normales, no mostrar error
                 _operationStatus.value = null
             } catch (exception: Exception) {
-                _operationStatus.value = "Error al reiniciar lectura periódica: ${exception.message}"
+                _operationStatus.value =
+                    "Error al reiniciar lectura periódica: ${exception.message}"
                 kotlinx.coroutines.delay(2000)
                 _operationStatus.value = null
             }

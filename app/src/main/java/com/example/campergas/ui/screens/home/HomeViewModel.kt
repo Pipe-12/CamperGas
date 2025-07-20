@@ -74,7 +74,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             // Esperar un poco para que la UI se establezca
             kotlinx.coroutines.delay(500)
-            
+
             // Solo hacer la petición si hay conexión activa
             if (_connectionState.value) {
                 try {

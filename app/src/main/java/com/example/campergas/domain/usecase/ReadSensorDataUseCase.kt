@@ -1,8 +1,6 @@
 package com.example.campergas.domain.usecase
 
 import com.example.campergas.data.repository.BleRepository
-import com.example.campergas.domain.model.FuelMeasurement
-import com.example.campergas.domain.model.Inclination
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
