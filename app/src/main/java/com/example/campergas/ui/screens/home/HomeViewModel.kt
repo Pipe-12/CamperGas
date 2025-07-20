@@ -40,7 +40,7 @@ class HomeViewModel @Inject constructor(
                 if (lastDeviceAddress.isNotEmpty() && !_connectionState.value) {
                     try {
                         connectBleDeviceUseCase.invoke(lastDeviceAddress)
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         _connectionState.value = false
                     }
                 }
@@ -60,7 +60,7 @@ class HomeViewModel @Inject constructor(
             try {
                 connectBleDeviceUseCase.disconnect()
                 _connectionState.value = false
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Manejar error
             }
         }
@@ -79,7 +79,7 @@ class HomeViewModel @Inject constructor(
             if (_connectionState.value) {
                 try {
                     readSensorDataUseCase.readAllSensorData()
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     // Manejar error silenciosamente para no afectar la UI
                 }
             }

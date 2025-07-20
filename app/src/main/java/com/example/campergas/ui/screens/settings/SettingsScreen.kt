@@ -12,13 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -56,7 +54,6 @@ fun SettingsScreen(
     // Estados locales para campos de texto
     var weightIntervalText by remember { mutableStateOf("") }
     var inclinationIntervalText by remember { mutableStateOf("") }
-    var showResetDialog by remember { mutableStateOf(false) }
 
     // Actualizar campos de texto cuando cambian los valores
     LaunchedEffect(weightInterval) {
@@ -344,41 +341,6 @@ fun SettingsScreen(
             }
         }
 
-        // Controles adicionales
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = "Controles",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = { viewModel.restartPeriodicReading() },
-                        modifier = Modifier.weight(1f),
-                        enabled = isConnected
-                    ) {
-                        Text("Reiniciar Lectura")
-                    }
-
-                    OutlinedButton(
-                        onClick = { showResetDialog = true },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Restaurar")
-                    }
-                }
-            }
-        }
-
         // Información adicional
         Card(
             modifier = Modifier.fillMaxWidth()
@@ -413,29 +375,5 @@ fun SettingsScreen(
                 )
             }
         }
-    }
-
-    // Diálogo de confirmación para reset
-    if (showResetDialog) {
-        AlertDialog(
-            onDismissRequest = { showResetDialog = false },
-            title = { Text("Restaurar Valores por Defecto") },
-            text = { Text("¿Estás seguro de que quieres restaurar los intervalos a los valores por defecto (Peso: 1 minuto, Inclinación: 5 segundos)?") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.resetIntervalsToDefault()
-                        showResetDialog = false
-                    }
-                ) {
-                    Text("Confirmar")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showResetDialog = false }) {
-                    Text("Cancelar")
-                }
-            }
-        )
     }
 }
