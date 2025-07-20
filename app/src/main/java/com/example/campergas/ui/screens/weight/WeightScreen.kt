@@ -52,7 +52,7 @@ fun GasCylinderVisualizer(
     val emptyColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
     
     Box(
-        modifier = modifier.size(width = 120.dp, height = 200.dp),
+        modifier = modifier.size(width = 140.dp, height = 220.dp),
         contentAlignment = Alignment.Center
     ) {
         Canvas(
@@ -65,18 +65,14 @@ fun GasCylinderVisualizer(
             )
         }
         
-        // Texto del porcentaje encima de la bombona
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.align(Alignment.TopCenter).padding(top = 8.dp)
-        ) {
-            Text(
-                text = "${fuelPercentage.toInt()}%",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = fillColor
-            )
-        }
+        // Texto del porcentaje centrado en la bombona
+        Text(
+            text = "${fuelPercentage.toInt()}%",
+            style = MaterialTheme.typography.displayMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }
 
@@ -85,24 +81,42 @@ private fun DrawScope.drawGasCylinder(
     fillColor: Color,
     emptyColor: Color
 ) {
-    val cylinderWidth = size.width * 0.6f
-    val cylinderHeight = size.height * 0.75f
-    val topCapHeight = size.height * 0.08f
-    val valveWidth = cylinderWidth * 0.3f
-    val valveHeight = size.height * 0.12f
+    val cylinderWidth = size.width * 0.7f
+    val cylinderHeight = size.height * 0.7f
+    val topCapHeight = size.height * 0.06f
+    val bottomCapHeight = size.height * 0.06f
+    val valveWidth = cylinderWidth * 0.25f
+    val valveHeight = size.height * 0.08f
     
     val startX = (size.width - cylinderWidth) / 2f
-    val startY = size.height * 0.15f
+    val startY = size.height * 0.12f
     
-    // Dibujar el cuerpo principal de la bombona (vacío)
+    // Dibujar la base inferior
     drawRoundRect(
-        color = emptyColor,
-        topLeft = Offset(startX, startY + topCapHeight),
-        size = Size(cylinderWidth, cylinderHeight),
-        cornerRadius = CornerRadius(cylinderWidth * 0.1f)
+        color = Color.Gray,
+        topLeft = Offset(startX, startY + topCapHeight + cylinderHeight),
+        size = Size(cylinderWidth, bottomCapHeight),
+        cornerRadius = CornerRadius(cylinderWidth * 0.05f)
     )
     
-    // Dibujar el nivel de gas (lleno)
+    // Dibujar el contorno principal de la bombona (más grueso)
+    val strokeWidth = 8f
+    drawRoundRect(
+        color = Color.Gray,
+        topLeft = Offset(startX - strokeWidth/2, startY + topCapHeight - strokeWidth/2),
+        size = Size(cylinderWidth + strokeWidth, cylinderHeight + strokeWidth),
+        cornerRadius = CornerRadius(cylinderWidth * 0.08f)
+    )
+    
+    // Dibujar el interior vacío (fondo negro/oscuro)
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.8f),
+        topLeft = Offset(startX, startY + topCapHeight),
+        size = Size(cylinderWidth, cylinderHeight),
+        cornerRadius = CornerRadius(cylinderWidth * 0.06f)
+    )
+    
+    // Dibujar el nivel de gas (lleno) desde abajo hacia arriba
     if (fillPercentage > 0) {
         val fillHeight = cylinderHeight * fillPercentage
         val fillY = startY + topCapHeight + (cylinderHeight - fillHeight)
@@ -111,25 +125,36 @@ private fun DrawScope.drawGasCylinder(
             color = fillColor,
             topLeft = Offset(startX, fillY),
             size = Size(cylinderWidth, fillHeight),
-            cornerRadius = CornerRadius(cylinderWidth * 0.1f)
+            cornerRadius = CornerRadius(cylinderWidth * 0.06f)
         )
     }
     
     // Dibujar la tapa superior
     drawRoundRect(
-        color = emptyColor,
+        color = Color.Gray,
         topLeft = Offset(startX, startY),
         size = Size(cylinderWidth, topCapHeight),
-        cornerRadius = CornerRadius(topCapHeight * 0.5f)
+        cornerRadius = CornerRadius(topCapHeight * 0.3f)
     )
     
-    // Dibujar la válvula
+    // Dibujar la válvula superior (más realista)
     val valveX = (size.width - valveWidth) / 2f
     drawRoundRect(
-        color = emptyColor,
-        topLeft = Offset(valveX, startY - valveHeight),
-        size = Size(valveWidth, valveHeight + topCapHeight * 0.5f),
-        cornerRadius = CornerRadius(valveWidth * 0.2f)
+        color = Color.Gray,
+        topLeft = Offset(valveX, startY - valveHeight * 0.7f),
+        size = Size(valveWidth, valveHeight),
+        cornerRadius = CornerRadius(valveWidth * 0.15f)
+    )
+    
+    // Dibujar el pico de la válvula
+    val nozzleWidth = valveWidth * 0.4f
+    val nozzleHeight = valveHeight * 0.3f
+    val nozzleX = (size.width - nozzleWidth) / 2f
+    drawRoundRect(
+        color = Color.Gray,
+        topLeft = Offset(nozzleX, startY - valveHeight * 0.8f - nozzleHeight),
+        size = Size(nozzleWidth, nozzleHeight),
+        cornerRadius = CornerRadius(nozzleWidth * 0.2f)
     )
 }
 
