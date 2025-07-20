@@ -2,22 +2,40 @@ package com.example.campergas.ui.screens.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.campergas.domain.model.ThemeMode
@@ -25,11 +43,31 @@ import com.example.campergas.domain.model.ThemeMode
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = hiltViewModel(),
-    onNavigateToReadingIntervals: () -> Unit = {}
+    viewModel: SettingsViewModel = hiltViewModel()
 ) {
+    val scrollState = rememberScrollState()
     val uiState by viewModel.uiState.collectAsState()
     val isSystemInDarkTheme = isSystemInDarkTheme()
+
+    // Estados para intervalos BLE
+    val weightInterval by viewModel.weightInterval.collectAsState()
+    val inclinationInterval by viewModel.inclinationInterval.collectAsState()
+    val isConnected by viewModel.isConnected.collectAsState()
+    val operationStatus by viewModel.operationStatus.collectAsState()
+
+    // Estados locales para campos de texto
+    var weightIntervalText by remember { mutableStateOf("") }
+    var inclinationIntervalText by remember { mutableStateOf("") }
+    var showResetDialog by remember { mutableStateOf(false) }
+
+    // Actualizar campos de texto cuando cambian los valores
+    LaunchedEffect(weightInterval) {
+        weightIntervalText = weightInterval.toString()
+    }
+
+    LaunchedEffect(inclinationInterval) {
+        inclinationIntervalText = inclinationInterval.toString()
+    }
 
     // Determinar si el switch debe estar activado
     val isDarkModeEnabled = when (uiState.themeMode) {
@@ -41,19 +79,43 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .verticalScroll(scrollState)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
             text = "Configuración",
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 24.dp)
+            modifier = Modifier.padding(bottom = 8.dp)
         )
+
+        // Mostrar estado de operación si hay uno
+        operationStatus?.let { status ->
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Estado",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = status,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        }
 
         // Configuración de tema
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -110,9 +172,7 @@ fun SettingsScreen(
 
         // Configuración de notificaciones
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -139,47 +199,266 @@ fun SettingsScreen(
             }
         }
 
-        // Configuración de intervalos de lectura BLE
+        // Estado de conexión del sensor
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-                .clickable { onNavigateToReadingIntervals() }
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = if (isConnected) MaterialTheme.colorScheme.primaryContainer
+                else MaterialTheme.colorScheme.secondaryContainer
+            )
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Sensor BLE",
+                    text = "Estado del Sensor BLE",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = if (isConnected) "✅ Conectado" else "⚠️ Desconectado",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                if (isConnected) {
+                    Text(
+                        text = "Los cambios se aplicarán inmediatamente",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+        }
+
+        // Configuración de intervalo de peso
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "Lectura de Peso",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Intervalo entre lecturas de peso del sensor",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+
+                OutlinedTextField(
+                    value = weightIntervalText,
+                    onValueChange = { newValue ->
+                        weightIntervalText = newValue
+                    },
+                    label = { Text("Intervalo (segundos)") },
+                    suffix = { Text("seg") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    onClick = {
+                        val interval = weightIntervalText.toIntOrNull()
+                        if (interval != null && interval in 1..300) {
+                            viewModel.setWeightInterval(interval)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = weightIntervalText.toIntOrNull()?.let { it in 1..300 } == true
+                ) {
+                    Text("Aplicar Intervalo de Peso")
+                }
+
+                Text(
+                    text = "Rango válido: 1-300 segundos",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                )
+            }
+        }
+
+        // Configuración de intervalo de inclinación
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "Lectura de Inclinación",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Intervalo entre lecturas de inclinación del sensor",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+
+                OutlinedTextField(
+                    value = inclinationIntervalText,
+                    onValueChange = { newValue ->
+                        inclinationIntervalText = newValue
+                    },
+                    label = { Text("Intervalo (segundos)") },
+                    suffix = { Text("seg") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    onClick = {
+                        val interval = inclinationIntervalText.toIntOrNull()
+                        if (interval != null && interval in 1..300) {
+                            viewModel.setInclinationInterval(interval)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = inclinationIntervalText.toIntOrNull()?.let { it in 1..300 } == true
+                ) {
+                    Text("Aplicar Intervalo de Inclinación")
+                }
+
+                Text(
+                    text = "Rango válido: 1-300 segundos",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                )
+            }
+        }
+
+        // Aplicar configuración completa
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Aplicar Configuración",
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
+                Button(
+                    onClick = {
+                        val weightInt = weightIntervalText.toIntOrNull()
+                        val inclinationInt = inclinationIntervalText.toIntOrNull()
+
+                        if (weightInt != null && inclinationInt != null &&
+                            weightInt in 1..300 && inclinationInt in 1..300
+                        ) {
+                            viewModel.setBothIntervals(weightInt, inclinationInt)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = weightIntervalText.toIntOrNull()?.let { it in 1..300 } == true &&
+                            inclinationIntervalText.toIntOrNull()?.let { it in 1..300 } == true
+                ) {
+                    Text("Aplicar Ambos Intervalos")
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(
+                    OutlinedButton(
+                        onClick = { viewModel.restartPeriodicReading() },
+                        modifier = Modifier.weight(1f),
+                        enabled = isConnected
+                    ) {
+                        Text("Reiniciar Lectura")
+                    }
+
+                    OutlinedButton(
+                        onClick = { showResetDialog = true },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(
-                            text = "Intervalos de Lectura",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Text(
-                            text = "Configurar frecuencia de lectura de peso e inclinación",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Text("Restaurar")
                     }
                 }
             }
         }
 
-        // TODO: Implementar más configuraciones
-        Text(
-            text = "Más configuraciones - En desarrollo",
-            style = MaterialTheme.typography.bodyLarge
+        // Información adicional
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "Información",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                Text(
+                    text = "• Intervalos más cortos proporcionan datos más frecuentes pero pueden consumir más batería",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = "• Intervalos más largos ahorran batería pero proporcionan datos menos frecuentes",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = "• Los valores por defecto son 5 segundos para ambos",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = "• Los cambios se guardan automáticamente",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
+
+    // Diálogo de confirmación para reset
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("Restaurar Valores por Defecto") },
+            text = { Text("¿Estás seguro de que quieres restaurar los intervalos a los valores por defecto (5 segundos)?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.resetIntervalsToDefault()
+                        showResetDialog = false
+                    }
+                ) {
+                    Text("Confirmar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
         )
     }
 }
