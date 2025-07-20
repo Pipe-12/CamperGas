@@ -68,10 +68,10 @@ class ConfigureReadingIntervalsUseCase @Inject constructor(
     }
 
     /**
-     * Resetear intervalos a valores por defecto (5 segundos)
+     * Resetear intervalos a valores por defecto (Peso: 1 minuto, Inclinación: 5 segundos)
      */
     suspend fun resetToDefaultIntervals() {
-        setReadingIntervals(5, 5)
+        setReadingIntervals(60, 5) // Peso: 60 segundos (1 minuto), Inclinación: 5 segundos
     }
 
     /**

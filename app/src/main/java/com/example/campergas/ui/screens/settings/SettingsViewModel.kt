@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,10 +30,11 @@ class SettingsViewModel @Inject constructor(
     // StateFlows para intervalos de lectura BLE
     val weightInterval: StateFlow<Int> =
         configureReadingIntervalsUseCase.getWeightReadIntervalSeconds()
+            .map { it / 60 } // Convertir segundos a minutos
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = 5
+                initialValue = 1 // 1 minuto por defecto
             )
 
     val inclinationInterval: StateFlow<Int> =
@@ -40,7 +42,7 @@ class SettingsViewModel @Inject constructor(
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = 5
+                initialValue = 15  //1 segundo por defecto
             )
 
     val isConnected: StateFlow<Boolean> = readSensorDataUseCase.getConnectionState()
@@ -82,12 +84,13 @@ class SettingsViewModel @Inject constructor(
     }
 
     // Métodos para configurar intervalos de lectura BLE
-    fun setWeightInterval(intervalSeconds: Int) {
+    fun setWeightInterval(intervalMinutes: Int) {
         viewModelScope.launch {
             try {
                 _operationStatus.value = "Configurando intervalo de peso..."
+                val intervalSeconds = intervalMinutes * 60 // Convertir minutos a segundos
                 configureReadingIntervalsUseCase.setWeightReadInterval(intervalSeconds)
-                _operationStatus.value = "Intervalo de peso configurado: ${intervalSeconds}s"
+                _operationStatus.value = "Intervalo de peso configurado: ${intervalMinutes} min"
                 
                 // Limpiar el mensaje después de un tiempo
                 kotlinx.coroutines.delay(2000)
@@ -118,15 +121,16 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun setBothIntervals(weightSeconds: Int, inclinationSeconds: Int) {
+    fun setBothIntervals(weightMinutes: Int, inclinationSeconds: Int) {
         viewModelScope.launch {
             try {
                 _operationStatus.value = "Configurando ambos intervalos..."
+                val weightSeconds = weightMinutes * 60 // Convertir minutos a segundos
                 configureReadingIntervalsUseCase.setReadingIntervals(
                     weightSeconds,
                     inclinationSeconds
                 )
-                _operationStatus.value = "Intervalos configurados: Peso ${weightSeconds}s, Inclinación ${inclinationSeconds}s"
+                _operationStatus.value = "Intervalos configurados: Peso ${weightMinutes} min, Inclinación ${inclinationSeconds}s"
                 
                 // Limpiar el mensaje después de un tiempo
                 kotlinx.coroutines.delay(3000)
@@ -144,7 +148,7 @@ class SettingsViewModel @Inject constructor(
             try {
                 _operationStatus.value = "Restaurando valores por defecto..."
                 configureReadingIntervalsUseCase.resetToDefaultIntervals()
-                _operationStatus.value = "Intervalos restaurados a 5 segundos"
+                _operationStatus.value = "Intervalos restaurados: Peso 1 min, Inclinación 5s"
                 
                 // Limpiar el mensaje después de un tiempo
                 kotlinx.coroutines.delay(2000)
@@ -166,6 +170,9 @@ class SettingsViewModel @Inject constructor(
                 
                 // Limpiar el mensaje después de un tiempo
                 kotlinx.coroutines.delay(2000)
+                _operationStatus.value = null
+            } catch (exception: kotlinx.coroutines.CancellationException) {
+                // Las cancelaciones son normales, no mostrar error
                 _operationStatus.value = null
             } catch (exception: Exception) {
                 _operationStatus.value = "Error al reiniciar lectura periódica: ${exception.message}"

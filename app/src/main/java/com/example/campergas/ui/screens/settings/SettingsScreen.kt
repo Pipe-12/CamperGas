@@ -254,8 +254,8 @@ fun SettingsScreen(
                     onValueChange = { newValue ->
                         weightIntervalText = newValue
                     },
-                    label = { Text("Intervalo (segundos)") },
-                    suffix = { Text("seg") },
+                    label = { Text("Intervalo (minutos)") },
+                    suffix = { Text("min") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
@@ -266,18 +266,18 @@ fun SettingsScreen(
                 Button(
                     onClick = {
                         val interval = weightIntervalText.toIntOrNull()
-                        if (interval != null && interval in 1..300) {
+                        if (interval != null && interval in 1..60) {
                             viewModel.setWeightInterval(interval)
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = weightIntervalText.toIntOrNull()?.let { it in 1..300 } == true
+                    enabled = weightIntervalText.toIntOrNull()?.let { it in 1..60 } == true
                 ) {
                     Text("Aplicar Intervalo de Peso")
                 }
 
                 Text(
-                    text = "Rango válido: 1-300 segundos",
+                    text = "Rango válido: 1-60 minutos",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -346,39 +346,18 @@ fun SettingsScreen(
             }
         }
 
-        // Aplicar configuración completa
+        // Controles adicionales
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Aplicar Configuración",
+                    text = "Controles",
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-
-                Button(
-                    onClick = {
-                        val weightInt = weightIntervalText.toIntOrNull()
-                        val inclinationInt = inclinationIntervalText.toIntOrNull()
-
-                        if (weightInt != null && inclinationInt != null &&
-                            weightInt in 1..300 && inclinationInt in 1..300
-                        ) {
-                            viewModel.setBothIntervals(weightInt, inclinationInt)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = weightIntervalText.toIntOrNull()?.let { it in 1..300 } == true &&
-                            inclinationIntervalText.toIntOrNull()?.let { it in 1..300 } == true
-                ) {
-                    Text("Aplicar Ambos Intervalos")
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -426,7 +405,7 @@ fun SettingsScreen(
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Text(
-                    text = "• Los valores por defecto son 5 segundos para ambos",
+                    text = "• Peso: 1 minuto por defecto, Inclinación: 5 segundos por defecto",
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
@@ -443,7 +422,7 @@ fun SettingsScreen(
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
             title = { Text("Restaurar Valores por Defecto") },
-            text = { Text("¿Estás seguro de que quieres restaurar los intervalos a los valores por defecto (5 segundos)?") },
+            text = { Text("¿Estás seguro de que quieres restaurar los intervalos a los valores por defecto (Peso: 1 minuto, Inclinación: 5 segundos)?") },
             confirmButton = {
                 TextButton(
                     onClick = {
