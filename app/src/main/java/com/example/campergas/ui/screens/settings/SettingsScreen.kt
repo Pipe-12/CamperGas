@@ -221,6 +221,15 @@ fun SettingsScreen(
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.padding(top = 4.dp)
                     )
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Button(
+                        onClick = { viewModel.disconnectSensor() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Desconectar Sensor")
+                    }
                 }
             }
         }

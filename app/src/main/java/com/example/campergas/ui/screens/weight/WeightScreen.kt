@@ -30,6 +30,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -49,7 +50,14 @@ fun GasCylinderVisualizer(
         else -> MaterialTheme.colorScheme.error
     }
     
-    val emptyColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+    // Usar color de superficie según el tema (claro/oscuro)
+    val backgroundColor = MaterialTheme.colorScheme.surface
+    val isDarkTheme = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+    val cylinderBackground = if (isDarkTheme) {
+        Color.Black.copy(alpha = 0.9f)
+    } else {
+        Color.White.copy(alpha = 0.9f)
+    }
     
     Box(
         modifier = modifier.size(width = 140.dp, height = 220.dp),
@@ -61,7 +69,7 @@ fun GasCylinderVisualizer(
             drawGasCylinder(
                 fillPercentage = fuelPercentage / 100f,
                 fillColor = fillColor,
-                emptyColor = emptyColor
+                backgroundColor = cylinderBackground
             )
         }
         
@@ -70,7 +78,7 @@ fun GasCylinderVisualizer(
             text = "${fuelPercentage.toInt()}%",
             style = MaterialTheme.typography.displayMedium,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = if (isDarkTheme) Color.White else Color.Black,
             modifier = Modifier.align(Alignment.Center)
         )
     }
@@ -79,7 +87,7 @@ fun GasCylinderVisualizer(
 private fun DrawScope.drawGasCylinder(
     fillPercentage: Float,
     fillColor: Color,
-    emptyColor: Color
+    backgroundColor: Color
 ) {
     val cylinderWidth = size.width * 0.7f
     val cylinderHeight = size.height * 0.7f
@@ -108,9 +116,9 @@ private fun DrawScope.drawGasCylinder(
         cornerRadius = CornerRadius(cylinderWidth * 0.08f)
     )
     
-    // Dibujar el interior vacío (fondo negro/oscuro)
+    // Dibujar el interior con el color de fondo según el tema
     drawRoundRect(
-        color = Color.Black.copy(alpha = 0.8f),
+        color = backgroundColor,
         topLeft = Offset(startX, startY + topCapHeight),
         size = Size(cylinderWidth, cylinderHeight),
         cornerRadius = CornerRadius(cylinderWidth * 0.06f)
@@ -200,7 +208,9 @@ fun WeightScreen(
                             .padding(vertical = 8.dp)
                     ) {
                         Column(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
@@ -209,16 +219,16 @@ fun WeightScreen(
                                 fontWeight = FontWeight.Bold
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(24.dp))
 
                             // Bombona de gas visual centrada
                             GasCylinderVisualizer(
                                 fuelPercentage = fuelMeasurement.fuelPercentage
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(24.dp))
 
-                            // Información de combustible
+                            // Información de combustible centrada
                             Text(
                                 text = fuelMeasurement.getFormattedFuelKilograms(),
                                 style = MaterialTheme.typography.headlineLarge,
@@ -237,18 +247,18 @@ fun WeightScreen(
                                 }
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
 
-                            // Tiempo de medición
+                            // Tiempo de medición centrado
                             Text(
                                 text = "Última medición: ${formatTimestamp(fuelMeasurement.timestamp)}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
 
-                            // Datos de la bombona actual
+                            // Datos de la bombona actual centrados
                             activeCylinder?.let { cylinder ->
                                 Text(
                                     text = "Bombona Actual",
@@ -256,7 +266,7 @@ fun WeightScreen(
                                     fontWeight = FontWeight.Bold
                                 )
 
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
 
                                 Text(
                                     text = "Nombre: ${cylinder.name}",
