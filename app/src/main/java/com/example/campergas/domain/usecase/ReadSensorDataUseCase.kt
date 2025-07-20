@@ -31,6 +31,15 @@ class ReadSensorDataUseCase @Inject constructor(
     }
 
     /**
+     * Solicita lectura de todos los datos del sensor (peso e inclinación) bajo demanda
+     * Los datos se actualizarán en sus StateFlows correspondientes
+     */
+    fun readAllSensorData() {
+        readWeightData()
+        readInclinationData()
+    }
+
+    /**
      * Obtiene el estado de conexión como StateFlow
      */
     fun getConnectionState(): StateFlow<Boolean> {
