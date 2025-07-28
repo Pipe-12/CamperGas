@@ -46,13 +46,13 @@ class FuelMeasurementTest {
     @Test
     fun `getFormattedFuelKilograms returns correct format`() {
         val measurement = createTestMeasurement(fuelKilograms = 5.25f)
-        assertEquals("5.25 kg", measurement.getFormattedFuelKilograms())
+        assertEquals("5,25 kg", measurement.getFormattedFuelKilograms())
     }
 
     @Test
     fun `getFormattedPercentage returns correct format`() {
         val measurement = createTestMeasurement(fuelPercentage = 52.5f)
-        assertEquals("52.5%", measurement.getFormattedPercentage())
+        assertEquals("52,5%", measurement.getFormattedPercentage())
     }
 
     @Test

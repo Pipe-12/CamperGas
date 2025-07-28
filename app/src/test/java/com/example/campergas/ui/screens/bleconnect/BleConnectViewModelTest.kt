@@ -1,5 +1,6 @@
 package com.example.campergas.ui.screens.bleconnect
 
+import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.campergas.data.repository.BleRepository
 import com.example.campergas.domain.model.BleDevice
@@ -32,6 +33,13 @@ class BleConnectViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         
+        // Mock Android Log
+        mockkStatic(Log::class)
+        every { Log.d(any(), any()) } returns 0
+        every { Log.i(any(), any()) } returns 0
+        every { Log.w(any(), any()) } returns 0
+        every { Log.e(any(), any()) } returns 0
+        
         // Setup basic mock responses
         every { bleRepository.connectionState } returns MutableStateFlow(false)
         every { bleRepository.isBluetoothEnabled() } returns true
@@ -46,6 +54,7 @@ class BleConnectViewModelTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+        unmockkStatic(Log::class)
         clearAllMocks()
     }
 
