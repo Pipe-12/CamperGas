@@ -5,18 +5,32 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.model.GasCylinder
 import com.example.campergas.domain.model.VehicleConfig
+import com.example.campergas.domain.model.VehicleType
 import com.example.campergas.domain.usecase.CheckBleConnectionUseCase
 import com.example.campergas.domain.usecase.GetActiveCylinderUseCase
 import com.example.campergas.domain.usecase.GetFuelDataUseCase
 import com.example.campergas.domain.usecase.GetVehicleConfigUseCase
 import com.example.campergas.domain.usecase.RequestWeightDataUseCase
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -35,7 +49,7 @@ class WeightViewModelTest {
     private val checkBleConnectionUseCase: CheckBleConnectionUseCase = mockk()
 
     private val testDispatcher = UnconfinedTestDispatcher()
-    
+
     // Flujos para los datos simulados
     private val fuelDataFlow = MutableStateFlow<FuelMeasurement?>(null)
     private val vehicleConfigFlow = MutableStateFlow<VehicleConfig?>(null)
@@ -139,27 +153,28 @@ class WeightViewModelTest {
     }
 
     @Test
-    fun `requestWeightDataManually calls the use case and updates isRequestingData state`() = runTest {
-        // Act
-        viewModel.requestWeightDataManually()
-        
-        // Assert
-        verify { requestWeightDataUseCase() }
-        assertTrue(viewModel.isRequestingData.value)
-        
-        // Should reset after delay
-        advanceTimeBy(1600) // 1.6 segundos (más que el delay de 1.5s)
-        assertFalse(viewModel.isRequestingData.value)
-    }
+    fun `requestWeightDataManually calls the use case and updates isRequestingData state`() =
+        runTest {
+            // Act
+            viewModel.requestWeightDataManually()
+
+            // Assert
+            verify { requestWeightDataUseCase() }
+            assertTrue(viewModel.isRequestingData.value)
+
+            // Should reset after delay
+            advanceTimeBy(1600) // 1.6 segundos (más que el delay de 1.5s)
+            assertFalse(viewModel.isRequestingData.value)
+        }
 
     @Test
     fun `requestWeightDataManually blocks repeated rapid calls`() = runTest {
         // Act - First call
         viewModel.requestWeightDataManually()
-        
+
         // Act - Second immediate call should be blocked
         viewModel.requestWeightDataManually()
-        
+
         // Assert - Use case should be called only once
         verify(exactly = 1) { requestWeightDataUseCase() }
     }
@@ -168,10 +183,10 @@ class WeightViewModelTest {
     fun `isConnected delegates to CheckBleConnectionUseCase`() {
         // Arrange
         every { checkBleConnectionUseCase.isConnected() } returns true
-        
+
         // Act
         val result = viewModel.isConnected()
-        
+
         // Assert
         assertTrue(result)
         verify { checkBleConnectionUseCase.isConnected() }
@@ -181,14 +196,14 @@ class WeightViewModelTest {
     fun `canMakeRequest returns false during cooldown period`() = runTest {
         // Arrange - First make a request to start cooldown
         viewModel.requestWeightDataManually()
-        
+
         // Assert - During cooldown, should return false
         assertFalse(viewModel.canMakeRequest())
-        
+
         // Wait partial cooldown - still in cooldown
         advanceTimeBy(1000) // 1 segundo (menos que el cooldown de 2s)
         assertFalse(viewModel.canMakeRequest())
-        
+
         // Wait full cooldown - should now be allowed
         advanceTimeBy(1500) // Total 2.5s (más que el cooldown de 2s)
         assertTrue(viewModel.canMakeRequest())
@@ -198,7 +213,7 @@ class WeightViewModelTest {
     fun `canMakeRequest returns false when request is in progress`() = runTest {
         // Arrange - Make a request to set isRequestingData = true
         viewModel.requestWeightDataManually()
-        
+
         // Assert - While request is in progress (but before cooldown check)
         assertFalse(viewModel.canMakeRequest())
     }

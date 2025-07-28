@@ -4,14 +4,27 @@ import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.campergas.domain.model.Consumption
 import com.example.campergas.domain.usecase.GetConsumptionHistoryUseCase
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -68,11 +81,11 @@ class ConsumptionViewModelTest {
             createTestConsumption(1),
             createTestConsumption(2)
         )
-        
+
         // Act
         consumptionsFlow.value = testConsumptions
         advanceUntilIdle()
-        
+
         // Assert
         val state = viewModel.uiState.value
         assertEquals(testConsumptions, state.consumptions)
@@ -86,13 +99,15 @@ class ConsumptionViewModelTest {
         val startDate = 1000L
         val endDate = 2000L
         val filteredConsumptions = listOf(createTestConsumption(3))
-        
-        every { getConsumptionHistoryUseCase(startDate, endDate) } returns flowOf(filteredConsumptions)
-        
+
+        every { getConsumptionHistoryUseCase(startDate, endDate) } returns flowOf(
+            filteredConsumptions
+        )
+
         // Act
         viewModel.setDateRange(startDate, endDate)
         advanceUntilIdle()
-        
+
         // Assert
         val state = viewModel.uiState.value
         assertEquals(startDate, state.startDate)
@@ -107,22 +122,27 @@ class ConsumptionViewModelTest {
         val startDate = 1000L
         val endDate = 2000L
         every { getConsumptionHistoryUseCase(startDate, endDate) } returns flowOf(emptyList())
-        
+
         viewModel.setDateRange(startDate, endDate)
         advanceUntilIdle()
-        
+
         // Verificar que el filtro se estableció
         assertEquals(startDate, viewModel.uiState.value.startDate)
-        
+
         // Act - Ahora limpiar el filtro
         viewModel.clearDateFilter()
         advanceUntilIdle()
-        
+
         // Assert
         val state = viewModel.uiState.value
         assertNull(state.startDate)
         assertNull(state.endDate)
-        verify(exactly = 2) { getConsumptionHistoryUseCase(null, null) } // Una vez en init y otra en clearDateFilter
+        verify(exactly = 2) {
+            getConsumptionHistoryUseCase(
+                null,
+                null
+            )
+        } // Una vez en init y otra en clearDateFilter
     }
 
     @Test
@@ -130,15 +150,15 @@ class ConsumptionViewModelTest {
         // Arrange
         val mockStartDate = 1000L
         val mockEndDate = 2000L
-        
+
         // Mockear la función setDateRangeFromCalendar que es privada
         // mediante la verificación del método público que la llama
         every { getConsumptionHistoryUseCase(any(), any()) } returns flowOf(emptyList())
-        
+
         // Act
         viewModel.setLastWeekFilter()
         advanceUntilIdle()
-        
+
         // Assert
         verify { getConsumptionHistoryUseCase(any(), any()) }
         assertNotNull(viewModel.uiState.value.startDate)
@@ -150,11 +170,11 @@ class ConsumptionViewModelTest {
     fun `setLastMonthFilter sets correct date range`() = runTest {
         // Arrange
         every { getConsumptionHistoryUseCase(any(), any()) } returns flowOf(emptyList())
-        
+
         // Act
         viewModel.setLastMonthFilter()
         advanceUntilIdle()
-        
+
         // Assert
         verify { getConsumptionHistoryUseCase(any(), any()) }
         assertNotNull(viewModel.uiState.value.startDate)
@@ -167,11 +187,11 @@ class ConsumptionViewModelTest {
         // Arrange
         val errorMessage = "Error cargando datos"
         every { getConsumptionHistoryUseCase(null, null) } throws Exception(errorMessage)
-        
+
         // Act - Recrear el ViewModel para forzar la carga con error
         viewModel = ConsumptionViewModel(getConsumptionHistoryUseCase)
         advanceUntilIdle()
-        
+
         // Assert
         val state = viewModel.uiState.value
         assertEquals(errorMessage, state.error)

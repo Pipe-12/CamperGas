@@ -6,14 +6,27 @@ import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.usecase.ConnectBleDeviceUseCase
 import com.example.campergas.domain.usecase.GetFuelDataUseCase
 import com.example.campergas.domain.usecase.ReadSensorDataUseCase
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,7 +43,7 @@ class HomeViewModelTest {
     private val readSensorDataUseCase: ReadSensorDataUseCase = mockk()
 
     private val testDispatcher = UnconfinedTestDispatcher()
-    
+
     // Flujos para los datos simulados
     private val fuelDataFlow = MutableStateFlow<FuelMeasurement?>(null)
     private val connectionStateFlow = MutableStateFlow(false)
@@ -188,18 +201,19 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `requestSensorDataOnScreenOpen doesn't call readAllSensorData if not connected`() = runTest {
-        // Arrange
-        connectionStateFlow.value = false
+    fun `requestSensorDataOnScreenOpen doesn't call readAllSensorData if not connected`() =
+        runTest {
+            // Arrange
+            connectionStateFlow.value = false
 
-        // Act
-        viewModel.requestSensorDataOnScreenOpen()
-        advanceTimeBy(600) // Más que el delay de 500ms
-        advanceUntilIdle()
+            // Act
+            viewModel.requestSensorDataOnScreenOpen()
+            advanceTimeBy(600) // Más que el delay de 500ms
+            advanceUntilIdle()
 
-        // Assert
-        coVerify(exactly = 0) { readSensorDataUseCase.readAllSensorData() }
-    }
+            // Assert
+            coVerify(exactly = 0) { readSensorDataUseCase.readAllSensorData() }
+        }
 
     // Nota: No podemos probar directamente onCleared porque es protected
     // pero indirectamente ya verificamos que disconnectDevice funciona correctamente

@@ -5,14 +5,27 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +41,7 @@ class SettingsViewModelTest {
     private val configureReadingIntervalsUseCase: ConfigureReadingIntervalsUseCase = mockk()
 
     private val testDispatcher = UnconfinedTestDispatcher()
-    
+
     // Flujos para simular preferencias
     private val themeModeFlow = MutableStateFlow(ThemeMode.SYSTEM)
     private val notificationsEnabledFlow = MutableStateFlow(true)
@@ -46,15 +59,15 @@ class SettingsViewModelTest {
         // Setup mock responses
         every { preferencesDataStore.themeMode } returns themeModeFlow
         every { preferencesDataStore.areNotificationsEnabled } returns notificationsEnabledFlow
-        
+
         coEvery { preferencesDataStore.setThemeMode(any()) } coAnswers {
             themeModeFlow.value = firstArg()
         }
-        
+
         coEvery { preferencesDataStore.setNotificationsEnabled(any()) } coAnswers {
             notificationsEnabledFlow.value = firstArg()
         }
-        
+
         every { configureReadingIntervalsUseCase.getWeightReadIntervalSeconds() } returns weightIntervalFlow
         every { configureReadingIntervalsUseCase.getInclinationReadIntervalSeconds() } returns inclinationIntervalFlow
         coEvery { configureReadingIntervalsUseCase.setWeightReadInterval(any()) } returns Unit
@@ -81,7 +94,7 @@ class SettingsViewModelTest {
         assertTrue(state.notificationsEnabled)
         assertFalse(state.isLoading)
         assertNull(state.error)
-        
+
         // Verify weight and inclination intervals
         assertEquals(1, viewModel.weightInterval.value) // 60s convertido a 1 min
         assertEquals(15, viewModel.inclinationInterval.value)
@@ -92,7 +105,7 @@ class SettingsViewModelTest {
         // Act
         viewModel.setThemeMode(ThemeMode.DARK)
         advanceUntilIdle()
-        
+
         // Assert
         coVerify { preferencesDataStore.setThemeMode(ThemeMode.DARK) }
         assertEquals(ThemeMode.DARK, themeModeFlow.value)
@@ -104,15 +117,15 @@ class SettingsViewModelTest {
         // Act - Toggle from true to false
         viewModel.toggleNotifications()
         advanceUntilIdle()
-        
+
         // Assert
         coVerify { preferencesDataStore.setNotificationsEnabled(false) }
         assertFalse(viewModel.uiState.value.notificationsEnabled)
-        
+
         // Act - Toggle back to true
         viewModel.toggleNotifications()
         advanceUntilIdle()
-        
+
         // Assert
         coVerify { preferencesDataStore.setNotificationsEnabled(true) }
         assertTrue(viewModel.uiState.value.notificationsEnabled)
@@ -123,11 +136,11 @@ class SettingsViewModelTest {
         // Act
         viewModel.setWeightInterval(5) // 5 minutos
         advanceUntilIdle()
-        
+
         // Assert
         coVerify { configureReadingIntervalsUseCase.setWeightReadInterval(300) } // 5*60 = 300s
         assertEquals("Intervalo de peso configurado: 5 min", viewModel.operationStatus.value)
-        
+
         // Verify message is cleared after delay
         advanceTimeBy(2100)
         assertNull(viewModel.operationStatus.value)
@@ -138,11 +151,11 @@ class SettingsViewModelTest {
         // Act
         viewModel.setInclinationInterval(30) // 30 segundos
         advanceUntilIdle()
-        
+
         // Assert
         coVerify { configureReadingIntervalsUseCase.setInclinationReadInterval(30) }
         assertEquals("Intervalo de inclinación configurado: 30s", viewModel.operationStatus.value)
-        
+
         // Verify message is cleared after delay
         advanceTimeBy(2100)
         assertNull(viewModel.operationStatus.value)
@@ -153,17 +166,17 @@ class SettingsViewModelTest {
         // Arrange
         coEvery { configureReadingIntervalsUseCase.setWeightReadInterval(any()) } throws
                 Exception("Error de conexión")
-        
+
         // Act
         viewModel.setWeightInterval(5)
         advanceUntilIdle()
-        
+
         // Assert
         assertEquals(
-            "Error al configurar intervalo de peso: Error de conexión", 
+            "Error al configurar intervalo de peso: Error de conexión",
             viewModel.operationStatus.value
         )
-        
+
         // Verify message is cleared after delay
         advanceTimeBy(2100)
         assertNull(viewModel.operationStatus.value)
@@ -174,17 +187,17 @@ class SettingsViewModelTest {
         // Arrange
         coEvery { configureReadingIntervalsUseCase.setInclinationReadInterval(any()) } throws
                 Exception("Error de conexión")
-        
+
         // Act
         viewModel.setInclinationInterval(10)
         advanceUntilIdle()
-        
+
         // Assert
         assertEquals(
-            "Error al configurar intervalo de inclinación: Error de conexión", 
+            "Error al configurar intervalo de inclinación: Error de conexión",
             viewModel.operationStatus.value
         )
-        
+
         // Verify message is cleared after delay
         advanceTimeBy(2100)
         assertNull(viewModel.operationStatus.value)

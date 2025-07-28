@@ -5,13 +5,27 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.campergas.data.repository.BleRepository
 import com.example.campergas.domain.model.BleDevice
 import com.example.campergas.domain.usecase.ScanBleDevicesUseCase
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,7 +52,7 @@ class BleConnectViewModelTest {
         every { Log.i(any<String>(), any<String>()) } returns 0
         every { Log.w(any<String>(), any<String>()) } returns 0
         every { Log.e(any<String>(), any<String>(), any()) } returns 0
-        
+
         // Setup basic mock responses
         every { bleRepository.connectionState } returns MutableStateFlow(false)
         every { bleRepository.isBluetoothEnabled() } returns true
@@ -255,7 +269,7 @@ class BleConnectViewModelTest {
 
         // Create new viewModel to trigger init block with the flow
         val newViewModel = BleConnectViewModel(scanBleDevicesUseCase, bleRepository)
-        
+
         // Act - simulate connection state change
         connectionStateFlow.value = true
         advanceUntilIdle()

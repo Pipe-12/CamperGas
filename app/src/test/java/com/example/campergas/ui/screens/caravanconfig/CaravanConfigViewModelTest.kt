@@ -6,14 +6,25 @@ import com.example.campergas.domain.model.VehicleConfig
 import com.example.campergas.domain.model.VehicleType
 import com.example.campergas.domain.usecase.GetVehicleConfigUseCase
 import com.example.campergas.domain.usecase.SaveVehicleConfigUseCase
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,7 +40,7 @@ class CaravanConfigViewModelTest {
     private val saveVehicleConfigUseCase: SaveVehicleConfigUseCase = mockk()
 
     private val testDispatcher = UnconfinedTestDispatcher()
-    
+
     // Flujo para simular la configuración del vehículo
     private val vehicleConfigFlow = MutableStateFlow<VehicleConfig?>(null)
 
@@ -80,11 +91,11 @@ class CaravanConfigViewModelTest {
             distanceToFrontSupport = 350f,
             distanceBetweenFrontWheels = 160f
         )
-        
+
         // Act
         vehicleConfigFlow.value = testConfig
         advanceUntilIdle()
-        
+
         // Assert
         val state = viewModel.uiState.value
         assertEquals(VehicleType.AUTOCARAVANA, state.selectedVehicleType)
@@ -98,7 +109,7 @@ class CaravanConfigViewModelTest {
     fun `updateVehicleType updates state with new vehicle type`() {
         // Act
         viewModel.updateVehicleType(VehicleType.AUTOCARAVANA)
-        
+
         // Assert
         assertEquals(VehicleType.AUTOCARAVANA, viewModel.uiState.value.selectedVehicleType)
     }
@@ -107,7 +118,7 @@ class CaravanConfigViewModelTest {
     fun `updateDistanceBetweenWheels updates state with new distance`() {
         // Act
         viewModel.updateDistanceBetweenWheels(200f)
-        
+
         // Assert
         assertEquals(200f, viewModel.uiState.value.distanceBetweenWheels)
     }
@@ -116,7 +127,7 @@ class CaravanConfigViewModelTest {
     fun `updateDistanceToFrontSupport updates state with new distance`() {
         // Act
         viewModel.updateDistanceToFrontSupport(300f)
-        
+
         // Assert
         assertEquals(300f, viewModel.uiState.value.distanceToFrontSupport)
     }
@@ -125,7 +136,7 @@ class CaravanConfigViewModelTest {
     fun `updateDistanceBetweenFrontWheels updates state with new distance`() {
         // Act
         viewModel.updateDistanceBetweenFrontWheels(150f)
-        
+
         // Assert
         assertEquals(150f, viewModel.uiState.value.distanceBetweenFrontWheels)
     }
@@ -136,13 +147,13 @@ class CaravanConfigViewModelTest {
         viewModel.updateVehicleType(VehicleType.CARAVAN)
         viewModel.updateDistanceBetweenWheels(200f)
         viewModel.updateDistanceToFrontSupport(350f)
-        
+
         // Act
         viewModel.saveConfiguration()
         advanceUntilIdle()
-        
+
         // Assert
-        coVerify { 
+        coVerify {
             saveVehicleConfigUseCase(
                 type = VehicleType.CARAVAN,
                 distanceBetweenRearWheels = 200f,
@@ -150,7 +161,7 @@ class CaravanConfigViewModelTest {
                 distanceBetweenFrontWheels = null
             )
         }
-        
+
         assertFalse(viewModel.uiState.value.isSaving)
         assertNull(viewModel.uiState.value.error)
     }
@@ -162,13 +173,13 @@ class CaravanConfigViewModelTest {
         viewModel.updateDistanceBetweenWheels(200f)
         viewModel.updateDistanceToFrontSupport(350f)
         viewModel.updateDistanceBetweenFrontWheels(150f)
-        
+
         // Act
         viewModel.saveConfiguration()
         advanceUntilIdle()
-        
+
         // Assert
-        coVerify { 
+        coVerify {
             saveVehicleConfigUseCase(
                 type = VehicleType.AUTOCARAVANA,
                 distanceBetweenRearWheels = 200f,
@@ -176,7 +187,7 @@ class CaravanConfigViewModelTest {
                 distanceBetweenFrontWheels = 150f
             )
         }
-        
+
         assertFalse(viewModel.uiState.value.isSaving)
         assertNull(viewModel.uiState.value.error)
     }
@@ -185,14 +196,14 @@ class CaravanConfigViewModelTest {
     fun `saveConfiguration handles exceptions`() = runTest {
         // Arrange
         val errorMessage = "Error guardando configuración"
-        coEvery { 
-            saveVehicleConfigUseCase(any(), any(), any(), any()) 
+        coEvery {
+            saveVehicleConfigUseCase(any(), any(), any(), any())
         } throws Exception(errorMessage)
-        
+
         // Act
         viewModel.saveConfiguration()
         advanceUntilIdle()
-        
+
         // Assert
         assertEquals(errorMessage, viewModel.uiState.value.error)
         assertFalse(viewModel.uiState.value.isSaving)
@@ -203,14 +214,14 @@ class CaravanConfigViewModelTest {
         // Arrange
         val errorMessage = "Error cargando configuración"
         every { getVehicleConfigUseCase() } throws Exception(errorMessage)
-        
+
         // Act - Create a new viewModel to trigger init/loadVehicleConfig
         val newViewModel = CaravanConfigViewModel(
             getVehicleConfigUseCase,
             saveVehicleConfigUseCase
         )
         advanceUntilIdle()
-        
+
         // Assert
         assertEquals(errorMessage, newViewModel.uiState.value.error)
         assertFalse(newViewModel.uiState.value.isLoading)

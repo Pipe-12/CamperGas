@@ -6,13 +6,26 @@ import com.example.campergas.domain.model.Inclination
 import com.example.campergas.domain.usecase.CheckBleConnectionUseCase
 import com.example.campergas.domain.usecase.GetInclinationUseCase
 import com.example.campergas.domain.usecase.RequestInclinationDataUseCase
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -45,7 +58,7 @@ class InclinationViewModelTest {
         every { checkBleConnectionUseCase.isConnected() } returns true
 
         viewModel = InclinationViewModel(
-            getInclinationUseCase, 
+            getInclinationUseCase,
             requestInclinationDataUseCase,
             checkBleConnectionUseCase
         )
@@ -74,11 +87,11 @@ class InclinationViewModelTest {
     fun `ui state updates when inclination data is received`() = runTest {
         // Arrange
         val testInclination = Inclination(pitch = 1.5f, roll = 0.5f, timestamp = 12345L)
-        
+
         // Act
         inclinationFlow.value = testInclination
         advanceUntilIdle()
-        
+
         // Assert
         val state = viewModel.uiState.value
         assertEquals(1.5f, state.inclinationPitch)
@@ -93,11 +106,11 @@ class InclinationViewModelTest {
     fun `ui state updates when vehicle is not level`() = runTest {
         // Arrange - Vehicle not level (roll > 2 degrees)
         val testInclination = Inclination(pitch = 1.5f, roll = 3.5f, timestamp = 12345L)
-        
+
         // Act
         inclinationFlow.value = testInclination
         advanceUntilIdle()
-        
+
         // Assert
         val state = viewModel.uiState.value
         assertEquals(1.5f, state.inclinationPitch)
@@ -110,11 +123,11 @@ class InclinationViewModelTest {
     fun `requestInclinationDataManually calls use case`() = runTest {
         // Act
         viewModel.requestInclinationDataManually()
-        
+
         // Assert
         verify { requestInclinationDataUseCase() }
         assertTrue(viewModel.isRequestingData.value)
-        
+
         // Should reset after delay
         advanceTimeBy(1600)  // 1.6 seconds (more than the 1.5s delay)
         assertFalse(viewModel.isRequestingData.value)
@@ -124,10 +137,10 @@ class InclinationViewModelTest {
     fun `requestInclinationDataManually blocks rapid repeated calls`() = runTest {
         // Act - First call
         viewModel.requestInclinationDataManually()
-        
+
         // Request again immediately
         viewModel.requestInclinationDataManually()
-        
+
         // Assert - Should only call once
         verify(exactly = 1) { requestInclinationDataUseCase() }
     }
@@ -136,10 +149,10 @@ class InclinationViewModelTest {
     fun `isConnected delegates to CheckBleConnectionUseCase`() {
         // Arrange
         every { checkBleConnectionUseCase.isConnected() } returns true
-        
+
         // Act
         val result = viewModel.isConnected()
-        
+
         // Assert
         assertTrue(result)
         verify { checkBleConnectionUseCase.isConnected() }
@@ -149,13 +162,13 @@ class InclinationViewModelTest {
     fun `canMakeRequest returns true when not in cooldown and not requesting`() = runTest {
         // Act - First call sets cooldown and requesting flag
         viewModel.requestInclinationDataManually()
-        
+
         // Assert - Should be false immediately after
         assertFalse(viewModel.canMakeRequest())
-        
+
         // Act - Wait for cooldown (2s) and reset requesting flag (1.5s)
         advanceTimeBy(2100)  // > 2 seconds cooldown time
-        
+
         // Assert - Should now be true
         assertTrue(viewModel.canMakeRequest())
     }
