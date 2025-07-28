@@ -208,7 +208,7 @@ class WeightViewModelTest {
         assertFalse(viewModel.canMakeRequest())
 
         // Wait full cooldown - should now be allowed
-        advanceTimeBy(1500) // Total 2.5s (más que el cooldown de 2s y el reset de isRequestingData)
+        advanceTimeBy(1100) // Total 2.1s (más que el cooldown de 2s y el reset de isRequestingData de 1.5s)
         assertTrue(viewModel.canMakeRequest())
     }
 

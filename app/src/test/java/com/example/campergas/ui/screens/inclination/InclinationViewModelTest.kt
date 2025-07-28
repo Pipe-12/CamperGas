@@ -169,8 +169,8 @@ class InclinationViewModelTest {
         // Assert - Should be false immediately after
         assertFalse(viewModel.canMakeRequest())
 
-        // Act - Wait for requesting flag to reset (1.5s) and cooldown (2s)
-        advanceTimeBy(2100)  // > 2 seconds cooldown time
+        // Act - Wait for requesting flag to reset (1.5s) and cooldown (2s) to pass
+        advanceTimeBy(2100)  // 2.1 seconds - more than both cooldown (2s) and requesting reset (1.5s)
 
         // Assert - Should now be true
         assertTrue(viewModel.canMakeRequest())
