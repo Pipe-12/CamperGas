@@ -38,7 +38,8 @@ class SettingsViewModelTest {
 
     private lateinit var viewModel: SettingsViewModel
     private val preferencesDataStore: PreferencesDataStore = mockk(relaxed = true)
-    private val configureReadingIntervalsUseCase: ConfigureReadingIntervalsUseCase = mockk(relaxed = true)
+    private val configureReadingIntervalsUseCase: ConfigureReadingIntervalsUseCase =
+        mockk(relaxed = true)
 
     private val testDispatcher = UnconfinedTestDispatcher()
 

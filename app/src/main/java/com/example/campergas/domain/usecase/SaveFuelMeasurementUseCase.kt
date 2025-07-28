@@ -110,7 +110,7 @@ class SaveFuelMeasurementUseCase @Inject constructor(
      * @param timestamp Timestamp histórico de cuando se tomó la medición
      * @param isCalibrated Si la medición está calibrada
      */
-        /**
+    /**
      * Guarda múltiples mediciones HISTÓRICAS de combustible
      * Estos datos provienen de características HISTORY y se marcan como isHistorical = true
      *

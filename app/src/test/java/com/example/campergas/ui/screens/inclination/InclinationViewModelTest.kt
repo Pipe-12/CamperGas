@@ -162,7 +162,7 @@ class InclinationViewModelTest {
     fun `canMakeRequest returns false when request is in progress`() = runTest {
         // Assert - Initially should be true
         assertTrue(viewModel.canMakeRequest())
-        
+
         // Act - First call sets requesting flag
         viewModel.requestInclinationDataManually()
 
@@ -174,7 +174,7 @@ class InclinationViewModelTest {
 
         // Assert - The requesting flag should now be false
         assertFalse(viewModel.isRequestingData.value)
-        
+
         // Note: The cooldown is based on System.currentTimeMillis() which can't be controlled
         // in tests, so we only verify the isRequestingData behavior
     }

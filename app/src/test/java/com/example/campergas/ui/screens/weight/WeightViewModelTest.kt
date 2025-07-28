@@ -176,7 +176,7 @@ class WeightViewModelTest {
         assertFalse(viewModel.canMakeRequest())
         advanceTimeBy(1600)
         assertFalse(viewModel.isRequestingData.value)
-        
+
 
     }
 

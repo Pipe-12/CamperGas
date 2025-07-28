@@ -500,7 +500,13 @@ fun ConsumptionItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "${String.format(Locale.US, "%.1f", consumption.fuelPercentage)}%",
+                            text = "${
+                                String.format(
+                                    Locale.US,
+                                    "%.1f",
+                                    consumption.fuelPercentage
+                                )
+                            }%",
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium,
                             color = when {
@@ -516,7 +522,13 @@ fun ConsumptionItem(
                             if (kotlin.math.abs(change) >= 0.1f) {
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = if (change > 0) "+${String.format(Locale.US, "%.1f", change)}%"
+                                    text = if (change > 0) "+${
+                                        String.format(
+                                            Locale.US,
+                                            "%.1f",
+                                            change
+                                        )
+                                    }%"
                                     else "${String.format(Locale.US, "%.1f", change)}%",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = if (change > 0) MaterialTheme.colorScheme.primary

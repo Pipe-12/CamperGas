@@ -15,7 +15,6 @@ import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -26,7 +25,6 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -132,7 +130,7 @@ class GasCylinderViewModelTest {
 
         // Act
         viewModel.addCylinder("Test Cylinder", 5.0f, 10.0f, true)
-        
+
         // Assert - Check immediate state after success (before delay clears the message)
         val state = viewModel.uiState.value
         assertFalse(state.isLoading)

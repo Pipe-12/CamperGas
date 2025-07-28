@@ -71,25 +71,25 @@ class WeightViewModel @Inject constructor(
      */
     fun requestWeightDataManually() {
         val currentTime = System.currentTimeMillis()
-        
+
         // Verificar si ha pasado suficiente tiempo desde la última petición
         if (currentTime - lastRequestTime < requestCooldownMs) {
             android.util.Log.d("WeightViewModel", "⏱️ Petición bloqueada - cooldown activo")
             return
         }
-        
+
         // Verificar si ya hay una petición en curso
         if (_isRequestingData.value) {
             android.util.Log.d("WeightViewModel", "⏱️ Petición bloqueada - ya hay una en curso")
             return
         }
-        
+
         android.util.Log.d("WeightViewModel", "📊 Solicitando datos de peso manualmente")
         _isRequestingData.value = true
         lastRequestTime = currentTime
-        
+
         requestWeightDataUseCase()
-        
+
         // Resetear el estado después de un tiempo razonable
         viewModelScope.launch {
             kotlinx.coroutines.delay(1500) // 1.5 segundos

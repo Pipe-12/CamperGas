@@ -72,7 +72,7 @@ class ConsumptionViewModelTest {
         assertNull(state.error)
         assertNull(state.startDate)
         assertNull(state.endDate)
-        
+
         // Después de avanzar hasta que termine la corrutina inicial
         advanceUntilIdle()
         assertFalse(viewModel.uiState.value.isLoading)

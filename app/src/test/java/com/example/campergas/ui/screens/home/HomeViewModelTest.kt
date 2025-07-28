@@ -142,21 +142,21 @@ class HomeViewModelTest {
     @Test
     fun `init block doesn't connect if already connected`() = runTest {
         // Arrange - Set up initial state where device is already connected
-        connectionStateFlow.value = true 
+        connectionStateFlow.value = true
         lastConnectedDeviceFlow.value = "AA:BB:CC:DD:EE:FF"
-        
+
         // Create separate mock to verify connection attempts
         val connectUseCase = mockk<ConnectBleDeviceUseCase>(relaxed = true)
         every { connectUseCase.getLastConnectedDevice() } returns lastConnectedDeviceFlow
         coEvery { connectUseCase.invoke(any()) } returns Unit
-        
+
         // Act - Create new viewModel
         val newViewModel = HomeViewModel(
             getFuelDataUseCase,
             connectUseCase,
             readSensorDataUseCase
         )
-        
+
         // Allow enough time for all flows to be processed
         advanceUntilIdle()
 

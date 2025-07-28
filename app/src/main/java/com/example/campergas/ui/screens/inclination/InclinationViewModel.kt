@@ -68,25 +68,28 @@ class InclinationViewModel @Inject constructor(
      */
     fun requestInclinationDataManually() {
         val currentTime = System.currentTimeMillis()
-        
+
         // Verificar si ha pasado suficiente tiempo desde la última petición
         if (currentTime - lastRequestTime < requestCooldownMs) {
             android.util.Log.d("InclinationViewModel", "⏱️ Petición bloqueada - cooldown activo")
             return
         }
-        
+
         // Verificar si ya hay una petición en curso
         if (_isRequestingData.value) {
-            android.util.Log.d("InclinationViewModel", "⏱️ Petición bloqueada - ya hay una en curso")
+            android.util.Log.d(
+                "InclinationViewModel",
+                "⏱️ Petición bloqueada - ya hay una en curso"
+            )
             return
         }
-        
+
         android.util.Log.d("InclinationViewModel", "📊 Solicitando datos de inclinación manualmente")
         _isRequestingData.value = true
         lastRequestTime = currentTime
-        
+
         requestInclinationDataUseCase()
-        
+
         // Resetear el estado después de un tiempo razonable
         viewModelScope.launch {
             kotlinx.coroutines.delay(1500) // 1.5 segundos
