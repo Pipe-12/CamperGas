@@ -178,6 +178,7 @@ fun WeightScreen(
 ) {
     val fuelState by viewModel.fuelState.collectAsState()
     val activeCylinder by viewModel.activeCylinder.collectAsState()
+    val isRequestingData by viewModel.isRequestingData.collectAsState()
 
     Scaffold(
         topBar = {
@@ -268,15 +269,22 @@ fun WeightScreen(
                                 Button(
                                     onClick = { viewModel.requestWeightDataManually() },
                                     modifier = Modifier.weight(1f),
-                                    enabled = viewModel.isConnected()
+                                    enabled = viewModel.isConnected() && viewModel.canMakeRequest()
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Refresh,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(18.dp)
-                                    )
+                                    if (isRequestingData) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(18.dp),
+                                            strokeWidth = 2.dp
+                                        )
+                                    } else {
+                                        Icon(
+                                            imageVector = Icons.Default.Refresh,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Actualizar Peso")
+                                    Text(if (isRequestingData) "Solicitando..." else "Actualizar Peso")
                                 }
                             }
 
@@ -286,6 +294,13 @@ fun WeightScreen(
                                     text = "⚠️ Sensor no conectado",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
+                                )
+                            } else if (!viewModel.canMakeRequest()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "⏱️ Espera 2 segundos entre peticiones",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
 
@@ -354,15 +369,22 @@ fun WeightScreen(
                         // Botón para solicitar datos cuando no hay datos disponibles
                         OutlinedButton(
                             onClick = { viewModel.requestWeightDataManually() },
-                            enabled = viewModel.isConnected()
+                            enabled = viewModel.isConnected() && viewModel.canMakeRequest()
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
+                            if (isRequestingData) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(18.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Solicitar Datos")
+                            Text(if (isRequestingData) "Solicitando..." else "Solicitar Datos")
                         }
 
                         if (!viewModel.isConnected()) {
@@ -371,6 +393,13 @@ fun WeightScreen(
                                 text = "⚠️ Conecta el sensor primero",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.error
+                            )
+                        } else if (!viewModel.canMakeRequest()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "⏱️ Espera 2 segundos entre peticiones",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }

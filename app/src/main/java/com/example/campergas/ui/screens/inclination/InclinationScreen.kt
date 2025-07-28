@@ -46,6 +46,7 @@ fun InclinationScreen(
     viewModel: InclinationViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val isRequestingData by viewModel.isRequestingData.collectAsState()
 
     Scaffold(
         topBar = {
@@ -78,15 +79,22 @@ fun InclinationScreen(
                     // Botón para solicitar datos cuando está cargando
                     OutlinedButton(
                         onClick = { viewModel.requestInclinationDataManually() },
-                        enabled = viewModel.isConnected()
+                        enabled = viewModel.isConnected() && viewModel.canMakeRequest()
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
+                        if (isRequestingData) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Solicitar Datos")
+                        Text(if (isRequestingData) "Solicitando..." else "Solicitar Datos")
                     }
 
                     if (!viewModel.isConnected()) {
@@ -95,6 +103,13 @@ fun InclinationScreen(
                             text = "⚠️ Conecta el sensor primero",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error
+                        )
+                    } else if (!viewModel.canMakeRequest()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "⏱️ Espera 2 segundos entre peticiones",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -231,15 +246,22 @@ fun InclinationScreen(
                     Button(
                         onClick = { viewModel.requestInclinationDataManually() },
                         modifier = Modifier.fillMaxWidth(),
-                        enabled = viewModel.isConnected()
+                        enabled = viewModel.isConnected() && viewModel.canMakeRequest()
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
+                        if (isRequestingData) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Actualizar Inclinación")
+                        Text(if (isRequestingData) "Solicitando..." else "Actualizar Inclinación")
                     }
 
                     if (!viewModel.isConnected()) {
@@ -248,6 +270,14 @@ fun InclinationScreen(
                             text = "⚠️ Sensor no conectado",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else if (!viewModel.canMakeRequest()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "⏱️ Espera 2 segundos entre peticiones",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
