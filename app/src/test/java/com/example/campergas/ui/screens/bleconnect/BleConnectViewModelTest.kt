@@ -7,6 +7,7 @@ import com.example.campergas.domain.usecase.ScanBleDevicesUseCase
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*
 import org.junit.After
@@ -32,7 +33,7 @@ class BleConnectViewModelTest {
         Dispatchers.setMain(testDispatcher)
         
         // Setup basic mock responses
-        every { bleRepository.connectionState } returns flowOf(false)
+        every { bleRepository.connectionState } returns MutableStateFlow(false)
         every { bleRepository.isBluetoothEnabled() } returns true
         every { scanBleDevicesUseCase.isBluetoothEnabled() } returns true
         every { scanBleDevicesUseCase.isCompatibleFilterEnabled() } returns false
@@ -64,7 +65,7 @@ class BleConnectViewModelTest {
     @Test
     fun `startScan sets isScanning to true`() = runTest {
         // Arrange
-        every { scanBleDevicesUseCase() } returns flowOf(emptyList())
+        every { scanBleDevicesUseCase() } returns MutableStateFlow(emptyList())
 
         // Act
         viewModel.startScan()
@@ -95,10 +96,10 @@ class BleConnectViewModelTest {
     fun `startScan collects devices from use case`() = runTest {
         // Arrange
         val testDevices = listOf(
-            BleDevice("Test Device 1", "00:11:22:33:44:55"),
-            BleDevice("Test Device 2", "AA:BB:CC:DD:EE:FF")
+            BleDevice("Test Device 1", "00:11:22:33:44:55", -60),
+            BleDevice("Test Device 2", "AA:BB:CC:DD:EE:FF", -70)
         )
-        every { scanBleDevicesUseCase() } returns flowOf(testDevices)
+        every { scanBleDevicesUseCase() } returns MutableStateFlow(testDevices)
 
         // Act
         viewModel.startScan()
@@ -114,7 +115,7 @@ class BleConnectViewModelTest {
     @Test
     fun `stopScan sets isScanning to false`() = runTest {
         // Arrange - start scanning first
-        every { scanBleDevicesUseCase() } returns flowOf(emptyList())
+        every { scanBleDevicesUseCase() } returns MutableStateFlow(emptyList())
         viewModel.startScan()
         advanceUntilIdle()
 
@@ -131,7 +132,7 @@ class BleConnectViewModelTest {
     @Test
     fun `connectToDevice sets connecting state`() = runTest {
         // Arrange
-        val testDevice = BleDevice("Test Device", "00:11:22:33:44:55")
+        val testDevice = BleDevice("Test Device", "00:11:22:33:44:55", -65)
         coEvery { bleRepository.connectToSensor(any()) } returns Unit
         coEvery { bleRepository.saveLastConnectedDevice(any()) } returns Unit
 
@@ -153,7 +154,7 @@ class BleConnectViewModelTest {
     @Test
     fun `connectToDevice with bluetooth disabled shows error`() = runTest {
         // Arrange
-        val testDevice = BleDevice("Test Device", "00:11:22:33:44:55")
+        val testDevice = BleDevice("Test Device", "00:11:22:33:44:55", -65)
         every { bleRepository.isBluetoothEnabled() } returns false
 
         // Act
@@ -169,7 +170,7 @@ class BleConnectViewModelTest {
     @Test
     fun `disconnectDevice clears connected device`() = runTest {
         // Arrange - first connect a device
-        val testDevice = BleDevice("Test Device", "00:11:22:33:44:55")
+        val testDevice = BleDevice("Test Device", "00:11:22:33:44:55", -65)
         coEvery { bleRepository.connectToSensor(any()) } returns Unit
         coEvery { bleRepository.saveLastConnectedDevice(any()) } returns Unit
         coEvery { bleRepository.disconnectSensor() } returns Unit
@@ -241,7 +242,7 @@ class BleConnectViewModelTest {
     @Test
     fun `connection state flow updates ui state`() = runTest {
         // Arrange
-        every { bleRepository.connectionState } returns flowOf(true)
+        every { bleRepository.connectionState } returns MutableStateFlow(true)
         
         // Create new viewModel to trigger init block with new connection state
         val newViewModel = BleConnectViewModel(scanBleDevicesUseCase, bleRepository)

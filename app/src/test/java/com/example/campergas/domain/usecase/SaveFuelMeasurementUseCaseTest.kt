@@ -190,7 +190,7 @@ class SaveFuelMeasurementUseCaseTestFixed {
             Pair(14.0f, 1640995260000L)
         )
 
-        every { gasCylinderRepository.getCylinderById(cylinderId) } returns cylinder
+        coEvery { gasCylinderRepository.getCylinderById(cylinderId) } returns cylinder
         coEvery { fuelMeasurementRepository.insertMeasurements(any()) } returns Unit
 
         // Act
@@ -232,7 +232,7 @@ class SaveFuelMeasurementUseCaseTestFixed {
         val cylinderId = 999L
         val weightMeasurements = listOf(Pair(15.0f, 1640995200000L))
 
-        every { gasCylinderRepository.getCylinderById(cylinderId) } returns null
+        coEvery { gasCylinderRepository.getCylinderById(cylinderId) } returns null
 
         // Act
         val result = saveFuelMeasurementUseCase.saveHistoricalMeasurements(
@@ -263,7 +263,7 @@ class SaveFuelMeasurementUseCaseTestFixed {
             Pair(14.0f, 1640995320000L) // Valid
         )
 
-        every { gasCylinderRepository.getCylinderById(cylinderId) } returns cylinder
+        coEvery { gasCylinderRepository.getCylinderById(cylinderId) } returns cylinder
         coEvery { fuelMeasurementRepository.insertMeasurements(any()) } returns Unit
 
         // Act

@@ -1,7 +1,10 @@
 package com.example.campergas
 
-import com.example.campergas.domain.usecase.*
-import com.example.campergas.domain.model.*
+import com.example.campergas.domain.usecase.SaveFuelMeasurementUseCaseTest
+import com.example.campergas.domain.usecase.GetActiveCylinderUseCaseTest
+import com.example.campergas.domain.usecase.AddGasCylinderUseCaseTest
+import com.example.campergas.domain.model.GasCylinderTest
+import com.example.campergas.domain.model.FuelMeasurementTest
 import com.example.campergas.ui.screens.bleconnect.BleConnectViewModelTest
 import com.example.campergas.ui.screens.consumption.ConsumptionViewModelTest
 import com.example.campergas.ui.screens.inclination.InclinationViewModelTest
