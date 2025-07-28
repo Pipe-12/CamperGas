@@ -151,10 +151,6 @@ class ConsumptionViewModelTest {
 
     @Test
     fun `setLastWeekFilter sets correct date range`() = runTest {
-        // Arrange
-        val mockStartDate = 1000L
-        val mockEndDate = 2000L
-
         // Mockear la función setDateRangeFromCalendar que es privada
         // mediante la verificación del método público que la llama
         every { getConsumptionHistoryUseCase(any(), any()) } returns flowOf(emptyList())

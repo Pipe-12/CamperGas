@@ -128,6 +128,7 @@ class HomeViewModelTest {
         connectionStateFlow.value = false
 
         // Act - Create new viewModel which will trigger init
+        @Suppress("UNUSED_VARIABLE")
         val newViewModel = HomeViewModel(
             getFuelDataUseCase,
             connectBleDeviceUseCase,
@@ -151,6 +152,7 @@ class HomeViewModelTest {
         coEvery { connectUseCase.invoke(any()) } returns Unit
 
         // Act - Create new viewModel
+        @Suppress("UNUSED_VARIABLE")
         val newViewModel = HomeViewModel(
             getFuelDataUseCase,
             connectUseCase,
@@ -171,6 +173,7 @@ class HomeViewModelTest {
         connectionStateFlow.value = false
 
         // Act - Create new viewModel which will trigger init
+        @Suppress("UNUSED_VARIABLE")
         val newViewModel = HomeViewModel(
             getFuelDataUseCase,
             connectBleDeviceUseCase,

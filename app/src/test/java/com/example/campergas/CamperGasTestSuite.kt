@@ -21,7 +21,7 @@ import org.junit.runners.Suite
  * - Tests de ViewModels
  * - Tests de lógica de negocio
  */
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExperimentalCoroutinesApi
 @RunWith(Suite::class)
 @Suite.SuiteClasses(
 //    // Use Cases Tests
