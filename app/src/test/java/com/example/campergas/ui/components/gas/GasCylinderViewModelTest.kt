@@ -133,10 +133,7 @@ class GasCylinderViewModelTest {
         // Act
         viewModel.addCylinder("Test Cylinder", 5.0f, 10.0f, true)
         
-        // Let the coroutine complete before asserting the final state
-        advanceUntilIdle()
-
-        // Assert - Check immediate state after success
+        // Assert - Check immediate state after success (before delay clears the message)
         val state = viewModel.uiState.value
         assertFalse(state.isLoading)
         assertEquals("Bombona añadida correctamente", state.successMessage)

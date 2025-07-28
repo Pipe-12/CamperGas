@@ -135,13 +135,10 @@ class SettingsViewModelTest {
     fun `setWeightInterval converts minutes to seconds and updates use case`() = runTest {
         // Act
         viewModel.setWeightInterval(5) // 5 minutos
-        
-        // Wait for the operation to complete
-        advanceUntilIdle()
 
-        // Assert
-        coVerify { configureReadingIntervalsUseCase.setWeightReadInterval(300) } // 5*60 = 300s
+        // Assert - Check the status message is set before delay
         assertEquals("Intervalo de peso configurado: 5 min", viewModel.operationStatus.value)
+        coVerify { configureReadingIntervalsUseCase.setWeightReadInterval(300) } // 5*60 = 300s
 
         // Verify message is cleared after delay
         advanceTimeBy(2100)
@@ -152,13 +149,10 @@ class SettingsViewModelTest {
     fun `setInclinationInterval updates use case directly with seconds`() = runTest {
         // Act
         viewModel.setInclinationInterval(30) // 30 segundos
-        
-        // Wait for the operation to complete
-        advanceUntilIdle()
 
-        // Assert
-        coVerify { configureReadingIntervalsUseCase.setInclinationReadInterval(30) }
+        // Assert - Check the status message is set before delay
         assertEquals("Intervalo de inclinación configurado: 30s", viewModel.operationStatus.value)
+        coVerify { configureReadingIntervalsUseCase.setInclinationReadInterval(30) }
 
         // Verify message is cleared after delay
         advanceTimeBy(2100)
@@ -173,9 +167,8 @@ class SettingsViewModelTest {
 
         // Act
         viewModel.setWeightInterval(5)
-        advanceUntilIdle()
 
-        // Assert
+        // Assert - Check the error message is set before delay
         assertEquals(
             "Error al configurar intervalo de peso: Error de conexión",
             viewModel.operationStatus.value
@@ -194,9 +187,8 @@ class SettingsViewModelTest {
 
         // Act
         viewModel.setInclinationInterval(10)
-        advanceUntilIdle()
 
-        // Assert
+        // Assert - Check the error message is set before delay
         assertEquals(
             "Error al configurar intervalo de inclinación: Error de conexión",
             viewModel.operationStatus.value

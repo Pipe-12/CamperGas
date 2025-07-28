@@ -194,6 +194,9 @@ class WeightViewModelTest {
 
     @Test
     fun `canMakeRequest returns false during cooldown period`() = runTest {
+        // Create a StandardTestDispatcher for better control over timing
+        val testScheduler = testScheduler
+        
         // Assert - Initially should be true
         assertTrue(viewModel.canMakeRequest())
         
@@ -204,11 +207,13 @@ class WeightViewModelTest {
         assertFalse(viewModel.canMakeRequest())
 
         // Wait partial cooldown - still in cooldown
-        advanceTimeBy(1000) // 1 segundo (menos que el cooldown de 2s)
+        testScheduler.advanceTimeBy(1000) // 1 segundo (menos que el cooldown de 2s)
+        testScheduler.runCurrent()
         assertFalse(viewModel.canMakeRequest())
 
         // Wait full cooldown - should now be allowed
-        advanceTimeBy(1100) // Total 2.1s (más que el cooldown de 2s y el reset de isRequestingData de 1.5s)
+        testScheduler.advanceTimeBy(1100) // Total 2.1s (más que el cooldown de 2s y el reset de isRequestingData de 1.5s)
+        testScheduler.runCurrent()
         assertTrue(viewModel.canMakeRequest())
     }
 
