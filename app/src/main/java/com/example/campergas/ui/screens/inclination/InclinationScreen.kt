@@ -168,7 +168,7 @@ fun InclinationScreen(
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Text(
-                                    text = "${String.format("%.1f", uiState.inclinationPitch)}°",
+                                    text = "${String.format(Locale.US, "%.1f", uiState.inclinationPitch)}°",
                                     style = MaterialTheme.typography.headlineMedium,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -192,7 +192,7 @@ fun InclinationScreen(
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Text(
-                                    text = "${String.format("%.1f", uiState.inclinationRoll)}°",
+                                    text = "${String.format(Locale.US, "%.1f", uiState.inclinationRoll)}°",
                                     style = MaterialTheme.typography.headlineMedium,
                                     fontWeight = FontWeight.Bold
                                 )

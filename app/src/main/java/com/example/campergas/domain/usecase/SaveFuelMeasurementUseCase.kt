@@ -28,13 +28,11 @@ class SaveFuelMeasurementUseCase @Inject constructor(
      *
      * @param totalWeight Peso total medido por el sensor
      * @param timestamp Timestamp de cuando se tomó la medición (por defecto ahora)
-     * @param isCalibrated Si la medición está calibrada
      * @return Result con SaveMeasurementResult o información de por qué no se guardó
      */
     suspend fun saveRealTimeMeasurement(
         totalWeight: Float,
-        timestamp: Long = System.currentTimeMillis(),
-        isCalibrated: Boolean = true
+        timestamp: Long = System.currentTimeMillis()
     ): Result<SaveMeasurementResult> {
         return try {
             // Verificar si han pasado al menos 2 minutos desde la última medición guardada
@@ -75,7 +73,7 @@ class SaveFuelMeasurementUseCase @Inject constructor(
                 fuelKilograms = fuelKilograms,
                 fuelPercentage = fuelPercentage,
                 totalWeight = totalWeight,
-                isCalibrated = isCalibrated,
+                isCalibrated = true,
                 isHistorical = false
             )
 
@@ -112,19 +110,16 @@ class SaveFuelMeasurementUseCase @Inject constructor(
      * @param timestamp Timestamp histórico de cuando se tomó la medición
      * @param isCalibrated Si la medición está calibrada
      */
-    /**
-     * Guarda múltiples mediciones HISTÓRICAS/OFFLINE de forma eficiente
-     * Estos datos provienen de la característica OFFLINE_CHARACTERISTIC_UUID
-     * y se marcan como isHistorical = true
+        /**
+     * Guarda múltiples mediciones HISTÓRICAS de combustible
+     * Estos datos provienen de características HISTORY y se marcan como isHistorical = true
      *
-     * @param cylinderId ID de la bombona específica
-     * @param weightMeasurements Lista de pares (peso total, timestamp histórico)
-     * @param isCalibrated Si las mediciones están calibradas
+     * @param cylinderId ID de la bombona a la que pertenecen las mediciones
+     * @param weightMeasurements Lista de pares (peso total, timestamp)
      */
     suspend fun saveHistoricalMeasurements(
         cylinderId: Long,
-        weightMeasurements: List<Pair<Float, Long>>, // Peso total y timestamp
-        isCalibrated: Boolean = true
+        weightMeasurements: List<Pair<Float, Long>> // Peso total y timestamp
     ): Result<Int> {
         return try {
             // Obtener la información de la bombona
@@ -147,7 +142,7 @@ class SaveFuelMeasurementUseCase @Inject constructor(
                     fuelKilograms = fuelKilograms,
                     fuelPercentage = fuelPercentage,
                     totalWeight = totalWeight,
-                    isCalibrated = isCalibrated,
+                    isCalibrated = true,
                     isHistorical = true
                 )
             }.filter { it.isValid() } // Filtrar solo mediciones válidas
