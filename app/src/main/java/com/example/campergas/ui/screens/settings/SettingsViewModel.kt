@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
-import com.example.campergas.domain.usecase.ConnectBleDeviceUseCase
 import com.example.campergas.domain.usecase.ReadSensorDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +21,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val preferencesDataStore: PreferencesDataStore,
     private val configureReadingIntervalsUseCase: ConfigureReadingIntervalsUseCase,
-    private val readSensorDataUseCase: ReadSensorDataUseCase,
-    private val connectBleDeviceUseCase: ConnectBleDeviceUseCase
+    private val readSensorDataUseCase: ReadSensorDataUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -119,24 +117,6 @@ class SettingsViewModel @Inject constructor(
             } catch (exception: Exception) {
                 _operationStatus.value =
                     "Error al configurar intervalo de inclinación: ${exception.message}"
-                kotlinx.coroutines.delay(2000)
-                _operationStatus.value = null
-            }
-        }
-    }
-
-    fun disconnectSensor() {
-        viewModelScope.launch {
-            try {
-                _operationStatus.value = "Desconectando sensor..."
-                connectBleDeviceUseCase.disconnect()
-                _operationStatus.value = "Sensor desconectado correctamente"
-
-                // Limpiar el mensaje después de un tiempo
-                kotlinx.coroutines.delay(2000)
-                _operationStatus.value = null
-            } catch (exception: Exception) {
-                _operationStatus.value = "Error al desconectar sensor: ${exception.message}"
                 kotlinx.coroutines.delay(2000)
                 _operationStatus.value = null
             }

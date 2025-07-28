@@ -194,46 +194,6 @@ fun SettingsScreen(
             }
         }
 
-        // Estado de conexión del sensor
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = if (isConnected) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.secondaryContainer
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = "Estado del Sensor BLE",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Text(
-                    text = if (isConnected) "✅ Conectado" else "⚠️ Desconectado",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                if (isConnected) {
-                    Text(
-                        text = "Los cambios se aplicarán inmediatamente",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                    
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    Button(
-                        onClick = { viewModel.disconnectSensor() },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Desconectar Sensor")
-                    }
-                }
-            }
-        }
-
         // Configuración de intervalo de peso
         Card(
             modifier = Modifier.fillMaxWidth()

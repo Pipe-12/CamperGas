@@ -565,7 +565,7 @@ fun ConnectionStatusCard(
                     )
                     Text(
                         text = when {
-                            isConnected && connectedDevice != null -> connectedDevice.name
+                            isConnected && connectedDevice != null -> "${connectedDevice.name} • Para cambiar de sensor, desconecta primero"
                             isScanning -> "Escaneando dispositivos..."
                             else -> "Buscar dispositivos BLE"
                         },

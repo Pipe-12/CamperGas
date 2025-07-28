@@ -136,11 +136,26 @@ class BleConnectViewModel @Inject constructor(
     fun disconnectDevice() {
         viewModelScope.launch {
             try {
+                // Detener escaneo si está activo
+                if (_uiState.value.isScanning) {
+                    stopScan()
+                }
+                
+                // Desconectar del dispositivo
                 bleRepository.disconnectSensor()
+                
+                // Limpiar estado de conexión y dispositivo conectado
                 _uiState.value = _uiState.value.copy(
                     connectedDevice = null,
-                    isConnecting = null
+                    isConnecting = null,
+                    error = null
                 )
+                
+                // Opcional: limpiar la lista de dispositivos para forzar un nuevo escaneo
+                _uiState.value = _uiState.value.copy(
+                    availableDevices = emptyList()
+                )
+                
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     error = e.message ?: "Error al desconectar dispositivo"
