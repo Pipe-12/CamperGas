@@ -9,7 +9,7 @@ import org.junit.Test
 class TimestampCalculationTest {
 
     @Test
-    fun `test calculateHistoricalTimestamp works correctly`() {
+    fun testCalculateHistoricalTimestampWorksCorrectly() {
         // Simular que estamos en un momento específico
         val currentTime = 1704556800000L // 2024-01-06 12:00:00 UTC
 
@@ -28,7 +28,7 @@ class TimestampCalculationTest {
     }
 
     @Test
-    fun `test timestamp calculation with different intervals`() {
+    fun testTimestampCalculationWithDifferentIntervals() {
         val currentTime = System.currentTimeMillis()
 
         // Test con diferentes intervalos

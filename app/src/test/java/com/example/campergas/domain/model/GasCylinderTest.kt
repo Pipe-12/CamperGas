@@ -6,243 +6,136 @@ import org.junit.Assert.*
 class GasCylinderTest {
 
     @Test
-    fun `calculateFuelKilograms returns correct amount`() {
+    fun `data class properties are set correctly`() {
         // Arrange
-        val cylinder = GasCylinder(
-            id = 1L,
-            name = "Test Cylinder",
-            capacity = 11.0f,
-            tare = 5.0f,
-            isActive = true
-        )
-        val totalWeight = 10.5f
+        val id = 123L
+        val name = "Test Cylinder"
+        val tare = 10.0f
+        val capacity = 15.0f
+        val isActive = true
+        val createdAt = 1640995200000L
 
         // Act
-        val fuelKg = cylinder.calculateFuelKilograms(totalWeight)
+        val cylinder = GasCylinder(
+            id = id,
+            name = name,
+            tare = tare,
+            capacity = capacity,
+            isActive = isActive,
+            createdAt = createdAt
+        )
 
         // Assert
-        assertEquals(5.5f, fuelKg, 0.01f)
+        assertEquals(id, cylinder.id)
+        assertEquals(name, cylinder.name)
+        assertEquals(tare, cylinder.tare, 0.01f)
+        assertEquals(capacity, cylinder.capacity, 0.01f)
+        assertEquals(isActive, cylinder.isActive)
+        assertEquals(createdAt, cylinder.createdAt)
     }
 
     @Test
-    fun `calculateFuelKilograms returns zero when weight less than tare`() {
-        // Arrange
-        val cylinder = GasCylinder(
-            id = 1L,
-            name = "Test Cylinder",
-            capacity = 11.0f,
-            tare = 5.0f,
-            isActive = true
-        )
-        val totalWeight = 4.0f
-
-        // Act
-        val fuelKg = cylinder.calculateFuelKilograms(totalWeight)
-
-        // Assert
-        assertEquals(0.0f, fuelKg, 0.01f)
+    fun `calculateGasContent returns correct value`() {
+        val cylinder = createTestCylinder(tare = 10.0f)
+        val totalWeight = 15.0f
+        val expected = 5.0f // 15 - 10
+        assertEquals(expected, cylinder.calculateGasContent(totalWeight), 0.01f)
     }
 
     @Test
-    fun `calculateFuelPercentage returns correct percentage`() {
-        // Arrange
-        val cylinder = GasCylinder(
-            id = 1L,
-            name = "Test Cylinder",
-            capacity = 11.0f,
-            tare = 5.0f,
-            isActive = true
-        )
-        val fuelKg = 5.5f
-
-        // Act
-        val percentage = cylinder.calculateFuelPercentage(fuelKg)
-
-        // Assert
-        assertEquals(50.0f, percentage, 0.01f)
+    fun `calculateGasContent returns zero for negative values`() {
+        val cylinder = createTestCylinder(tare = 10.0f)
+        val totalWeight = 8.0f // Less than tare
+        assertEquals(0f, cylinder.calculateGasContent(totalWeight), 0.01f)
     }
 
     @Test
-    fun `calculateFuelPercentage returns zero when capacity is zero`() {
-        // Arrange
-        val cylinder = GasCylinder(
-            id = 1L,
-            name = "Test Cylinder",
-            capacity = 0.0f,
-            tare = 5.0f,
-            isActive = true
-        )
-        val fuelKg = 5.5f
-
-        // Act
-        val percentage = cylinder.calculateFuelPercentage(fuelKg)
-
-        // Assert
-        assertEquals(0.0f, percentage, 0.01f)
+    fun `calculateGasPercentage returns correct percentage`() {
+        val cylinder = createTestCylinder(tare = 10.0f, capacity = 5.0f)
+        val totalWeight = 12.5f // 2.5kg gas / 5kg capacity = 50%
+        assertEquals(50.0f, cylinder.calculateGasPercentage(totalWeight), 0.01f)
     }
 
     @Test
-    fun `calculateFuelPercentage clamps to 100 percent`() {
-        // Arrange
-        val cylinder = GasCylinder(
-            id = 1L,
-            name = "Test Cylinder",
-            capacity = 10.0f,
-            tare = 5.0f,
-            isActive = true
-        )
-        val fuelKg = 15.0f // More than capacity
-
-        // Act
-        val percentage = cylinder.calculateFuelPercentage(fuelKg)
-
-        // Assert
-        assertEquals(100.0f, percentage, 0.01f)
+    fun `calculateGasPercentage returns zero for zero capacity`() {
+        val cylinder = createTestCylinder(capacity = 0f)
+        assertEquals(0f, cylinder.calculateGasPercentage(15.0f), 0.01f)
     }
 
     @Test
-    fun `calculateFuelPercentage clamps to 0 percent`() {
-        // Arrange
-        val cylinder = GasCylinder(
-            id = 1L,
-            name = "Test Cylinder",
-            capacity = 10.0f,
-            tare = 5.0f,
-            isActive = true
-        )
-        val fuelKg = -1.0f // Negative fuel
-
-        // Act
-        val percentage = cylinder.calculateFuelPercentage(fuelKg)
-
-        // Assert
-        assertEquals(0.0f, percentage, 0.01f)
+    fun `calculateGasPercentage caps at 100 percent`() {
+        val cylinder = createTestCylinder(tare = 10.0f, capacity = 5.0f)
+        val totalWeight = 20.0f // More than full capacity
+        assertEquals(100.0f, cylinder.calculateGasPercentage(totalWeight), 0.01f)
     }
 
     @Test
-    fun `isEmpty returns true when fuel is zero`() {
-        // Arrange
-        val cylinder = GasCylinder(
-            id = 1L,
-            name = "Test Cylinder",
-            capacity = 11.0f,
-            tare = 5.0f,
-            isActive = true
-        )
-        val totalWeight = 5.0f // Equal to tare
-
-        // Act
-        val isEmpty = cylinder.isEmpty(totalWeight)
-
-        // Assert
-        assertTrue(isEmpty)
+    fun `isEmpty returns true when percentage below 5`() {
+        val cylinder = createTestCylinder(tare = 10.0f, capacity = 10.0f)
+        val totalWeight = 10.2f // 0.2kg gas / 10kg capacity = 2%
+        assertTrue(cylinder.isEmpty(totalWeight))
     }
 
     @Test
-    fun `isEmpty returns false when fuel is present`() {
-        // Arrange
-        val cylinder = GasCylinder(
-            id = 1L,
-            name = "Test Cylinder",
-            capacity = 11.0f,
-            tare = 5.0f,
-            isActive = true
-        )
-        val totalWeight = 8.0f // Greater than tare
-
-        // Act
-        val isEmpty = cylinder.isEmpty(totalWeight)
-
-        // Assert
-        assertFalse(isEmpty)
+    fun `isEmpty returns false when percentage above 5`() {
+        val cylinder = createTestCylinder(tare = 10.0f, capacity = 10.0f)
+        val totalWeight = 11.0f // 1kg gas / 10kg capacity = 10%
+        assertFalse(cylinder.isEmpty(totalWeight))
     }
 
     @Test
-    fun `isFull returns true when fuel equals capacity`() {
-        // Arrange
-        val cylinder = GasCylinder(
-            id = 1L,
-            name = "Test Cylinder",
-            capacity = 11.0f,
-            tare = 5.0f,
-            isActive = true
-        )
-        val totalWeight = 16.0f // Tare + capacity
-
-        // Act
-        val isFull = cylinder.isFull(totalWeight)
-
-        // Assert
-        assertTrue(isFull)
+    fun `isLowGas returns true when percentage below 20`() {
+        val cylinder = createTestCylinder(tare = 10.0f, capacity = 10.0f)
+        val totalWeight = 11.5f // 1.5kg gas / 10kg capacity = 15%
+        assertTrue(cylinder.isLowGas(totalWeight))
     }
 
     @Test
-    fun `isFull returns false when fuel is less than capacity`() {
-        // Arrange
-        val cylinder = GasCylinder(
-            id = 1L,
-            name = "Test Cylinder",
-            capacity = 11.0f,
-            tare = 5.0f,
-            isActive = true
-        )
-        val totalWeight = 10.0f // Less than tare + capacity
-
-        // Act
-        val isFull = cylinder.isFull(totalWeight)
-
-        // Assert
-        assertFalse(isFull)
+    fun `isLowGas returns false when percentage above 20`() {
+        val cylinder = createTestCylinder(tare = 10.0f, capacity = 10.0f)
+        val totalWeight = 13.0f // 3kg gas / 10kg capacity = 30%
+        assertFalse(cylinder.isLowGas(totalWeight))
     }
 
     @Test
-    fun `data class equality works correctly`() {
-        // Arrange
-        val cylinder1 = GasCylinder(
-            id = 1L,
+    fun `getDisplayName returns formatted string`() {
+        val cylinder = createTestCylinder(
             name = "Test Cylinder",
-            capacity = 11.0f,
-            tare = 5.0f,
-            isActive = true
+            tare = 10.0f,
+            capacity = 15.0f
         )
-        val cylinder2 = GasCylinder(
-            id = 1L,
-            name = "Test Cylinder",
-            capacity = 11.0f,
-            tare = 5.0f,
-            isActive = true
-        )
-        val cylinder3 = GasCylinder(
-            id = 2L,
-            name = "Test Cylinder",
-            capacity = 11.0f,
-            tare = 5.0f,
-            isActive = true
-        )
-
-        // Assert
-        assertEquals(cylinder1, cylinder2)
-        assertNotEquals(cylinder1, cylinder3)
-        assertEquals(cylinder1.hashCode(), cylinder2.hashCode())
+        assertEquals("Test Cylinder (10.0kg + 15.0kg)", cylinder.getDisplayName())
     }
 
     @Test
-    fun `toString contains relevant information`() {
-        // Arrange
+    fun `default values are set correctly`() {
         val cylinder = GasCylinder(
-            id = 1L,
-            name = "Test Cylinder",
-            capacity = 11.0f,
-            tare = 5.0f,
-            isActive = true
+            name = "Test",
+            tare = 10.0f,
+            capacity = 5.0f
         )
-
-        // Act
-        val toString = cylinder.toString()
-
-        // Assert
-        assertTrue(toString.contains("Test Cylinder"))
-        assertTrue(toString.contains("11.0"))
-        assertTrue(toString.contains("5.0"))
+        
+        assertEquals(0L, cylinder.id) // Default id
+        assertFalse(cylinder.isActive) // Default isActive
+        // createdAt should be around current time (within reasonable range)
+        val now = System.currentTimeMillis()
+        assertTrue("createdAt should be recent", 
+            Math.abs(now - cylinder.createdAt) < 1000) // Within 1 second
     }
+
+    private fun createTestCylinder(
+        id: Long = 1L,
+        name: String = "Test Cylinder",
+        tare: Float = 10.0f,
+        capacity: Float = 15.0f,
+        isActive: Boolean = false,
+        createdAt: Long = System.currentTimeMillis()
+    ) = GasCylinder(
+        id = id,
+        name = name,
+        tare = tare,
+        capacity = capacity,
+        isActive = isActive,
+        createdAt = createdAt
+    )
 }

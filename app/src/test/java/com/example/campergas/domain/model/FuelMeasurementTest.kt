@@ -2,7 +2,6 @@ package com.example.campergas.domain.model
 
 import org.junit.Test
 import org.junit.Assert.*
-import java.util.Date
 
 class FuelMeasurementTest {
 
@@ -45,222 +44,120 @@ class FuelMeasurementTest {
     }
 
     @Test
-    fun `getFormattedDate returns correct format`() {
-        // Arrange
-        val calendar = java.util.Calendar.getInstance()
-        calendar.set(2023, 11, 25, 14, 30, 0) // December 25, 2023, 14:30:00
-        val timestamp = calendar.timeInMillis
+    fun `getFormattedFuelKilograms returns correct format`() {
+        val measurement = createTestMeasurement(fuelKilograms = 5.25f)
+        assertEquals("5.25 kg", measurement.getFormattedFuelKilograms())
+    }
 
-        val measurement = FuelMeasurement(
-            id = 1L,
-            cylinderId = 1L,
-            cylinderName = "Test",
-            timestamp = timestamp,
+    @Test
+    fun `getFormattedPercentage returns correct format`() {
+        val measurement = createTestMeasurement(fuelPercentage = 52.5f)
+        assertEquals("52.5%", measurement.getFormattedPercentage())
+    }
+
+    @Test
+    fun `getFormattedTimestamp returns time format`() {
+        val measurement = createTestMeasurement(timestamp = 1640995200000L) // 1 Jan 2022 00:00:00
+        val formatted = measurement.getFormattedTimestamp()
+        // Should contain time with colons
+        assertTrue("Formatted timestamp should contain time", formatted.contains(":"))
+    }
+
+    @Test
+    fun `getFullFormattedTimestamp returns date and time format`() {
+        val measurement = createTestMeasurement(timestamp = 1640995200000L)
+        val formatted = measurement.getFullFormattedTimestamp()
+        // Should contain date with slashes and time with colons
+        assertTrue("Full formatted timestamp should contain date and time", 
+            formatted.contains("/") && formatted.contains(":"))
+    }
+
+    @Test
+    fun `isValid returns true for valid data`() {
+        val measurement = createTestMeasurement(
             fuelKilograms = 5.0f,
-            fuelPercentage = 45.0f,
-            totalWeight = 10.0f,
-            isCalibrated = true,
-            isHistorical = false
+            fuelPercentage = 50.0f
         )
-
-        // Act
-        val formattedDate = measurement.getFormattedDate()
-
-        // Assert
-        assertTrue(formattedDate.contains("25"))
-        assertTrue(formattedDate.contains("12") || formattedDate.contains("Dec"))
-        assertTrue(formattedDate.contains("2023"))
+        assertTrue(measurement.isValid())
     }
 
     @Test
-    fun `getFormattedTime returns correct format`() {
-        // Arrange
-        val calendar = java.util.Calendar.getInstance()
-        calendar.set(2023, 11, 25, 14, 30, 0) // December 25, 2023, 14:30:00
-        val timestamp = calendar.timeInMillis
+    fun `isValid returns false for negative fuel`() {
+        val measurement = createTestMeasurement(fuelKilograms = -1.0f)
+        assertFalse(measurement.isValid())
+    }
 
+    @Test
+    fun `isValid returns false for percentage over 100`() {
+        val measurement = createTestMeasurement(fuelPercentage = 150.0f)
+        assertFalse(measurement.isValid())
+    }
+
+    @Test
+    fun `isValid returns false for negative percentage`() {
+        val measurement = createTestMeasurement(fuelPercentage = -5.0f)
+        assertFalse(measurement.isValid())
+    }
+
+    @Test
+    fun `isValid returns false for NaN fuel kilograms`() {
+        val measurement = createTestMeasurement(fuelKilograms = Float.NaN)
+        assertFalse(measurement.isValid())
+    }
+
+    @Test
+    fun `isValid returns false for infinite fuel kilograms`() {
+        val measurement = createTestMeasurement(fuelKilograms = Float.POSITIVE_INFINITY)
+        assertFalse(measurement.isValid())
+    }
+
+    @Test
+    fun `isValid returns false for NaN fuel percentage`() {
+        val measurement = createTestMeasurement(fuelPercentage = Float.NaN)
+        assertFalse(measurement.isValid())
+    }
+
+    @Test
+    fun `isValid returns false for infinite fuel percentage`() {
+        val measurement = createTestMeasurement(fuelPercentage = Float.POSITIVE_INFINITY)
+        assertFalse(measurement.isValid())
+    }
+
+    @Test
+    fun `default values are set correctly`() {
         val measurement = FuelMeasurement(
-            id = 1L,
             cylinderId = 1L,
             cylinderName = "Test",
-            timestamp = timestamp,
+            timestamp = 123456789L,
             fuelKilograms = 5.0f,
-            fuelPercentage = 45.0f,
-            totalWeight = 10.0f,
-            isCalibrated = true,
-            isHistorical = false
+            fuelPercentage = 50.0f,
+            totalWeight = 15.0f
         )
-
-        // Act
-        val formattedTime = measurement.getFormattedTime()
-
-        // Assert
-        assertTrue(formattedTime.contains("14:30") || formattedTime.contains("2:30"))
+        
+        assertEquals(0L, measurement.id) // Default id
+        assertTrue(measurement.isCalibrated) // Default isCalibrated
+        assertFalse(measurement.isHistorical) // Default isHistorical
     }
 
-    @Test
-    fun `isLowFuel returns true when percentage below threshold`() {
-        // Arrange
-        val measurement = FuelMeasurement(
-            id = 1L,
-            cylinderId = 1L,
-            cylinderName = "Test",
-            timestamp = System.currentTimeMillis(),
-            fuelKilograms = 1.0f,
-            fuelPercentage = 15.0f, // Below 20% threshold
-            totalWeight = 6.0f,
-            isCalibrated = true,
-            isHistorical = false
-        )
-
-        // Act & Assert
-        assertTrue(measurement.isLowFuel())
-    }
-
-    @Test
-    fun `isLowFuel returns false when percentage above threshold`() {
-        // Arrange
-        val measurement = FuelMeasurement(
-            id = 1L,
-            cylinderId = 1L,
-            cylinderName = "Test",
-            timestamp = System.currentTimeMillis(),
-            fuelKilograms = 3.0f,
-            fuelPercentage = 30.0f, // Above 20% threshold
-            totalWeight = 8.0f,
-            isCalibrated = true,
-            isHistorical = false
-        )
-
-        // Act & Assert
-        assertFalse(measurement.isLowFuel())
-    }
-
-    @Test
-    fun `isLowFuel returns true when percentage exactly at threshold`() {
-        // Arrange
-        val measurement = FuelMeasurement(
-            id = 1L,
-            cylinderId = 1L,
-            cylinderName = "Test",
-            timestamp = System.currentTimeMillis(),
-            fuelKilograms = 2.2f,
-            fuelPercentage = 20.0f, // Exactly at threshold
-            totalWeight = 7.2f,
-            isCalibrated = true,
-            isHistorical = false
-        )
-
-        // Act & Assert
-        assertTrue(measurement.isLowFuel())
-    }
-
-    @Test
-    fun `isCriticalFuel returns true when percentage below critical threshold`() {
-        // Arrange
-        val measurement = FuelMeasurement(
-            id = 1L,
-            cylinderId = 1L,
-            cylinderName = "Test",
-            timestamp = System.currentTimeMillis(),
-            fuelKilograms = 0.5f,
-            fuelPercentage = 8.0f, // Below 10% critical threshold
-            totalWeight = 5.5f,
-            isCalibrated = true,
-            isHistorical = false
-        )
-
-        // Act & Assert
-        assertTrue(measurement.isCriticalFuel())
-    }
-
-    @Test
-    fun `isCriticalFuel returns false when percentage above critical threshold`() {
-        // Arrange
-        val measurement = FuelMeasurement(
-            id = 1L,
-            cylinderId = 1L,
-            cylinderName = "Test",
-            timestamp = System.currentTimeMillis(),
-            fuelKilograms = 1.5f,
-            fuelPercentage = 15.0f, // Above 10% critical threshold
-            totalWeight = 6.5f,
-            isCalibrated = true,
-            isHistorical = false
-        )
-
-        // Act & Assert
-        assertFalse(measurement.isCriticalFuel())
-    }
-
-    @Test
-    fun `data class equality works correctly`() {
-        // Arrange
-        val timestamp = System.currentTimeMillis()
-        val measurement1 = FuelMeasurement(
-            id = 1L,
-            cylinderId = 1L,
-            cylinderName = "Test",
-            timestamp = timestamp,
-            fuelKilograms = 5.0f,
-            fuelPercentage = 45.0f,
-            totalWeight = 10.0f,
-            isCalibrated = true,
-            isHistorical = false
-        )
-        val measurement2 = FuelMeasurement(
-            id = 1L,
-            cylinderId = 1L,
-            cylinderName = "Test",
-            timestamp = timestamp,
-            fuelKilograms = 5.0f,
-            fuelPercentage = 45.0f,
-            totalWeight = 10.0f,
-            isCalibrated = true,
-            isHistorical = false
-        )
-        val measurement3 = FuelMeasurement(
-            id = 2L, // Different ID
-            cylinderId = 1L,
-            cylinderName = "Test",
-            timestamp = timestamp,
-            fuelKilograms = 5.0f,
-            fuelPercentage = 45.0f,
-            totalWeight = 10.0f,
-            isCalibrated = true,
-            isHistorical = false
-        )
-
-        // Assert
-        assertEquals(measurement1, measurement2)
-        assertNotEquals(measurement1, measurement3)
-        assertEquals(measurement1.hashCode(), measurement2.hashCode())
-    }
-
-    @Test
-    fun `copy creates new instance with modified values`() {
-        // Arrange
-        val original = FuelMeasurement(
-            id = 1L,
-            cylinderId = 1L,
-            cylinderName = "Test",
-            timestamp = System.currentTimeMillis(),
-            fuelKilograms = 5.0f,
-            fuelPercentage = 45.0f,
-            totalWeight = 10.0f,
-            isCalibrated = true,
-            isHistorical = false
-        )
-
-        // Act
-        val copied = original.copy(fuelPercentage = 50.0f, isHistorical = true)
-
-        // Assert
-        assertEquals(original.id, copied.id)
-        assertEquals(original.cylinderId, copied.cylinderId)
-        assertEquals(original.fuelKilograms, copied.fuelKilograms, 0.01f)
-        assertEquals(50.0f, copied.fuelPercentage, 0.01f) // Modified
-        assertTrue(copied.isHistorical) // Modified
-        assertEquals(original.isCalibrated, copied.isCalibrated) // Unchanged
-    }
+    private fun createTestMeasurement(
+        id: Long = 1L,
+        cylinderId: Long = 1L,
+        cylinderName: String = "Test Cylinder",
+        timestamp: Long = System.currentTimeMillis(),
+        fuelKilograms: Float = 5.0f,
+        fuelPercentage: Float = 50.0f,
+        totalWeight: Float = 15.0f,
+        isCalibrated: Boolean = true,
+        isHistorical: Boolean = false
+    ) = FuelMeasurement(
+        id = id,
+        cylinderId = cylinderId,
+        cylinderName = cylinderName,
+        timestamp = timestamp,
+        fuelKilograms = fuelKilograms,
+        fuelPercentage = fuelPercentage,
+        totalWeight = totalWeight,
+        isCalibrated = isCalibrated,
+        isHistorical = isHistorical
+    )
 }

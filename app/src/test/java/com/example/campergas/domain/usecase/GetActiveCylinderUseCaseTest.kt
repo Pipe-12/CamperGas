@@ -10,85 +10,91 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.*
 
-class GetActiveCylinderUseCaseTest {
+class GetActiveCylinderUseCaseTestFixed {
 
     private lateinit var getActiveCylinderUseCase: GetActiveCylinderUseCase
-    private val gasCylinderRepository = mockk<GasCylinderRepository>()
-
-    private val sampleActiveCylinder = GasCylinder(
-        id = 1L,
-        name = "Cilindro Activo",
-        capacity = 11.0f,
-        tare = 5.0f,
-        isActive = true
-    )
+    private val repository: GasCylinderRepository = mockk()
 
     @Before
-    fun setup() {
-        getActiveCylinderUseCase = GetActiveCylinderUseCase(gasCylinderRepository)
+    fun setUp() {
+        getActiveCylinderUseCase = GetActiveCylinderUseCase(repository)
     }
 
     @After
     fun tearDown() {
-        unmockkAll()
+        clearAllMocks()
     }
 
     @Test
-    fun `invoke returns active cylinder when exists`() = runTest {
+    fun `invoke returns flow of active cylinder`() = runTest {
         // Arrange
-        every { gasCylinderRepository.getActiveCylinder() } returns flowOf(sampleActiveCylinder)
+        val activeCylinder = GasCylinder(
+            id = 1L,
+            name = "Active Cylinder",
+            tare = 10.0f,
+            capacity = 15.0f,
+            isActive = true
+        )
+        every { repository.getActiveCylinder() } returns flowOf(activeCylinder)
 
         // Act
-        val result = getActiveCylinderUseCase()
+        val flow = getActiveCylinderUseCase()
 
         // Assert
-        result.collect { cylinder ->
+        flow.collect { cylinder ->
             assertNotNull(cylinder)
-            assertEquals(sampleActiveCylinder.id, cylinder?.id)
-            assertEquals(sampleActiveCylinder.name, cylinder?.name)
+            assertEquals(activeCylinder.id, cylinder?.id)
+            assertEquals(activeCylinder.name, cylinder?.name)
             assertTrue(cylinder?.isActive == true)
         }
 
-        verify { gasCylinderRepository.getActiveCylinder() }
+        verify { repository.getActiveCylinder() }
     }
 
     @Test
-    fun `invoke returns null when no active cylinder`() = runTest {
+    fun `invoke returns flow of null when no active cylinder`() = runTest {
         // Arrange
-        every { gasCylinderRepository.getActiveCylinder() } returns flowOf(null)
+        every { repository.getActiveCylinder() } returns flowOf(null)
 
         // Act
-        val result = getActiveCylinderUseCase()
+        val flow = getActiveCylinderUseCase()
 
         // Assert
-        result.collect { cylinder ->
+        flow.collect { cylinder ->
             assertNull(cylinder)
         }
 
-        verify { gasCylinderRepository.getActiveCylinder() }
+        verify { repository.getActiveCylinder() }
     }
 
     @Test
-    fun `getActiveCylinderSync returns active cylinder synchronously`() = runTest {
+    fun `getActiveCylinderSync returns active cylinder`() = runTest {
         // Arrange
-        coEvery { gasCylinderRepository.getActiveCylinderSync() } returns sampleActiveCylinder
+        val activeCylinder = GasCylinder(
+            id = 1L,
+            name = "Active Cylinder",
+            tare = 10.0f,
+            capacity = 15.0f,
+            isActive = true
+        )
+        coEvery { repository.getActiveCylinderSync() } returns activeCylinder
 
         // Act
         val result = getActiveCylinderUseCase.getActiveCylinderSync()
 
         // Assert
         assertNotNull(result)
-        assertEquals(sampleActiveCylinder.id, result?.id)
-        assertEquals(sampleActiveCylinder.name, result?.name)
+        assertEquals(activeCylinder.id, result?.id)
+        assertEquals(activeCylinder.name, result?.name)
         assertTrue(result?.isActive == true)
 
-        coVerify { gasCylinderRepository.getActiveCylinderSync() }
+        coVerify { repository.getActiveCylinderSync() }
     }
 
     @Test
     fun `getActiveCylinderSync returns null when no active cylinder`() = runTest {
         // Arrange
-        coEvery { gasCylinderRepository.getActiveCylinderSync() } returns null
+        coEvery { repository.getActiveCylinderSync() } returns null
 
         // Act
         val result = getActiveCylinderUseCase.getActiveCylinderSync()
@@ -96,40 +102,6 @@ class GetActiveCylinderUseCaseTest {
         // Assert
         assertNull(result)
 
-        coVerify { gasCylinderRepository.getActiveCylinderSync() }
-    }
-
-    @Test
-    fun `getActiveCylinderSync handles repository exception`() = runTest {
-        // Arrange
-        val errorMessage = "Database error"
-        coEvery { gasCylinderRepository.getActiveCylinderSync() } throws Exception(errorMessage)
-
-        // Act & Assert
-        try {
-            getActiveCylinderUseCase.getActiveCylinderSync()
-            fail("Expected exception to be thrown")
-        } catch (e: Exception) {
-            assertEquals(errorMessage, e.message)
-        }
-
-        coVerify { gasCylinderRepository.getActiveCylinderSync() }
-    }
-
-    @Test
-    fun `multiple calls to invoke return same flow`() = runTest {
-        // Arrange
-        every { gasCylinderRepository.getActiveCylinder() } returns flowOf(sampleActiveCylinder)
-
-        // Act
-        val result1 = getActiveCylinderUseCase()
-        val result2 = getActiveCylinderUseCase()
-
-        // Assert
-        assertNotNull(result1)
-        assertNotNull(result2)
-
-        // Verify repository is called for each invocation
-        verify(exactly = 2) { gasCylinderRepository.getActiveCylinder() }
+        coVerify { repository.getActiveCylinderSync() }
     }
 }

@@ -12,277 +12,211 @@ import org.junit.Assert.*
 class AddGasCylinderUseCaseTest {
 
     private lateinit var addGasCylinderUseCase: AddGasCylinderUseCase
-    private val gasCylinderRepository = mockk<GasCylinderRepository>()
+    private val repository: GasCylinderRepository = mockk()
 
     @Before
-    fun setup() {
-        addGasCylinderUseCase = AddGasCylinderUseCase(gasCylinderRepository)
+    fun setUp() {
+        addGasCylinderUseCase = AddGasCylinderUseCase(repository)
     }
 
     @After
     fun tearDown() {
-        unmockkAll()
+        clearAllMocks()
     }
 
     @Test
-    fun `invoke creates cylinder successfully with valid data`() = runTest {
+    fun invokeCreatesCylinderSuccessfully() = runTest {
         // Arrange
-        val name = "Cilindro Test"
-        val capacity = 11.0f
-        val tare = 5.0f
+        val name = "Test Cylinder"
+        val tare = 10.0f
+        val capacity = 15.0f
         val expectedId = 123L
 
-        coEvery { gasCylinderRepository.insertCylinder(any()) } returns expectedId
+        coEvery { repository.insertCylinder(any()) } returns expectedId
 
         // Act
-        val result = addGasCylinderUseCase(
-            name = name,
-            capacity = capacity,
-            tare = tare
-        )
+        val result = addGasCylinderUseCase(name, tare, capacity, false)
 
         // Assert
         assertTrue(result.isSuccess)
-        assertEquals(expectedId, result.getOrThrow())
+        assertEquals(expectedId, result.getOrNull())
 
-        // Verify correct data passed to repository
-        coVerify { 
-            gasCylinderRepository.insertCylinder(
-                match { cylinder ->
-                    cylinder.name == name &&
-                    cylinder.capacity == capacity &&
-                    cylinder.tare == tare &&
-                    !cylinder.isActive // Should be inactive by default
+        coVerify {
+            repository.insertCylinder(
+                withArg { cylinder ->
+                    assertEquals(name, cylinder.name)
+                    assertEquals(tare, cylinder.tare, 0.01f)
+                    assertEquals(capacity, cylinder.capacity, 0.01f)
+                    assertFalse(cylinder.isActive)
                 }
             )
         }
     }
 
     @Test
-    fun `invoke fails with empty name`() = runTest {
+    fun invokeCreatesAndActivatesCylinderWhenSetAsActiveIsTrue() = runTest {
         // Arrange
-        val name = ""
-        val capacity = 11.0f
-        val tare = 5.0f
-
-        // Act
-        val result = addGasCylinderUseCase(
-            name = name,
-            capacity = capacity,
-            tare = tare
-        )
-
-        // Assert
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull()?.message?.contains("El nombre no puede estar vacío") == true)
-
-        // Verify no interaction with repository
-        coVerify(exactly = 0) { gasCylinderRepository.insertCylinder(any()) }
-    }
-
-    @Test
-    fun `invoke fails with blank name`() = runTest {
-        // Arrange
-        val name = "   "
-        val capacity = 11.0f
-        val tare = 5.0f
-
-        // Act
-        val result = addGasCylinderUseCase(
-            name = name,
-            capacity = capacity,
-            tare = tare
-        )
-
-        // Assert
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull()?.message?.contains("El nombre no puede estar vacío") == true)
-
-        coVerify(exactly = 0) { gasCylinderRepository.insertCylinder(any()) }
-    }
-
-    @Test
-    fun `invoke fails with negative capacity`() = runTest {
-        // Arrange
-        val name = "Cilindro Test"
-        val capacity = -1.0f
-        val tare = 5.0f
-
-        // Act
-        val result = addGasCylinderUseCase(
-            name = name,
-            capacity = capacity,
-            tare = tare
-        )
-
-        // Assert
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull()?.message?.contains("La capacidad debe ser mayor que 0") == true)
-
-        coVerify(exactly = 0) { gasCylinderRepository.insertCylinder(any()) }
-    }
-
-    @Test
-    fun `invoke fails with zero capacity`() = runTest {
-        // Arrange
-        val name = "Cilindro Test"
-        val capacity = 0.0f
-        val tare = 5.0f
-
-        // Act
-        val result = addGasCylinderUseCase(
-            name = name,
-            capacity = capacity,
-            tare = tare
-        )
-
-        // Assert
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull()?.message?.contains("La capacidad debe ser mayor que 0") == true)
-
-        coVerify(exactly = 0) { gasCylinderRepository.insertCylinder(any()) }
-    }
-
-    @Test
-    fun `invoke fails with negative tare`() = runTest {
-        // Arrange
-        val name = "Cilindro Test"
-        val capacity = 11.0f
-        val tare = -1.0f
-
-        // Act
-        val result = addGasCylinderUseCase(
-            name = name,
-            capacity = capacity,
-            tare = tare
-        )
-
-        // Assert
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull()?.message?.contains("La tara debe ser mayor o igual que 0") == true)
-
-        coVerify(exactly = 0) { gasCylinderRepository.insertCylinder(any()) }
-    }
-
-    @Test
-    fun `invoke accepts zero tare`() = runTest {
-        // Arrange
-        val name = "Cilindro Test"
-        val capacity = 11.0f
-        val tare = 0.0f
+        val name = "Test Cylinder"
+        val tare = 10.0f
+        val capacity = 15.0f
         val expectedId = 123L
 
-        coEvery { gasCylinderRepository.insertCylinder(any()) } returns expectedId
+        coEvery { repository.insertCylinder(any()) } returns expectedId
+        coEvery { repository.setActiveCylinder(expectedId) } returns Unit
 
         // Act
-        val result = addGasCylinderUseCase(
-            name = name,
-            capacity = capacity,
-            tare = tare
-        )
+        val result = addGasCylinderUseCase(name, tare, capacity, true)
 
         // Assert
         assertTrue(result.isSuccess)
-        assertEquals(expectedId, result.getOrThrow())
+        assertEquals(expectedId, result.getOrNull())
 
-        coVerify { gasCylinderRepository.insertCylinder(any()) }
+        coVerify {
+            repository.insertCylinder(
+                withArg { cylinder ->
+                    assertEquals(name, cylinder.name)
+                    assertTrue(cylinder.isActive)
+                }
+            )
+            repository.setActiveCylinder(expectedId)
+        }
     }
 
     @Test
-    fun `invoke fails when tare is greater than capacity`() = runTest {
+    fun invokeTrimsWhitespaceFromName() = runTest {
         // Arrange
-        val name = "Cilindro Test"
-        val capacity = 5.0f
-        val tare = 6.0f
-
-        // Act
-        val result = addGasCylinderUseCase(
-            name = name,
-            capacity = capacity,
-            tare = tare
-        )
-
-        // Assert
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull()?.message?.contains("La tara no puede ser mayor que la capacidad") == true)
-
-        coVerify(exactly = 0) { gasCylinderRepository.insertCylinder(any()) }
-    }
-
-    @Test
-    fun `invoke accepts tare equal to capacity`() = runTest {
-        // Arrange
-        val name = "Cilindro Test"
-        val capacity = 5.0f
-        val tare = 5.0f
+        val name = "  Test Cylinder  "
+        val tare = 10.0f
+        val capacity = 15.0f
         val expectedId = 123L
 
-        coEvery { gasCylinderRepository.insertCylinder(any()) } returns expectedId
+        coEvery { repository.insertCylinder(any()) } returns expectedId
 
         // Act
-        val result = addGasCylinderUseCase(
-            name = name,
-            capacity = capacity,
-            tare = tare
-        )
-
-        // Assert
-        assertTrue(result.isSuccess)
-        assertEquals(expectedId, result.getOrThrow())
-
-        coVerify { gasCylinderRepository.insertCylinder(any()) }
-    }
-
-    @Test
-    fun `invoke handles repository exception`() = runTest {
-        // Arrange
-        val name = "Cilindro Test"
-        val capacity = 11.0f
-        val tare = 5.0f
-        val errorMessage = "Database error"
-
-        coEvery { gasCylinderRepository.insertCylinder(any()) } throws Exception(errorMessage)
-
-        // Act
-        val result = addGasCylinderUseCase(
-            name = name,
-            capacity = capacity,
-            tare = tare
-        )
-
-        // Assert
-        assertTrue(result.isFailure)
-        assertEquals(errorMessage, result.exceptionOrNull()?.message)
-
-        coVerify { gasCylinderRepository.insertCylinder(any()) }
-    }
-
-    @Test
-    fun `invoke trims whitespace from name`() = runTest {
-        // Arrange
-        val name = "  Cilindro Test  "
-        val expectedTrimmedName = "Cilindro Test"
-        val capacity = 11.0f
-        val tare = 5.0f
-        val expectedId = 123L
-
-        coEvery { gasCylinderRepository.insertCylinder(any()) } returns expectedId
-
-        // Act
-        val result = addGasCylinderUseCase(
-            name = name,
-            capacity = capacity,
-            tare = tare
-        )
+        val result = addGasCylinderUseCase(name, tare, capacity, false)
 
         // Assert
         assertTrue(result.isSuccess)
 
-        // Verify trimmed name is used
-        coVerify { 
-            gasCylinderRepository.insertCylinder(
-                match { cylinder -> cylinder.name == expectedTrimmedName }
+        coVerify {
+            repository.insertCylinder(
+                withArg { cylinder ->
+                    assertEquals("Test Cylinder", cylinder.name) // Trimmed
+                }
             )
         }
+    }
+
+    @Test
+    fun invokeFailsWithBlankName() = runTest {
+        // Arrange
+        val name = "   "
+        val tare = 10.0f
+        val capacity = 15.0f
+
+        // Act
+        val result = addGasCylinderUseCase(name, tare, capacity, false)
+
+        // Assert
+        assertTrue(result.isFailure)
+        assertEquals("El nombre no puede estar vacío", result.exceptionOrNull()?.message)
+
+        coVerify(exactly = 0) { repository.insertCylinder(any()) }
+    }
+
+    @Test
+    fun invokeFailsWithEmptyName() = runTest {
+        // Arrange
+        val name = ""
+        val tare = 10.0f
+        val capacity = 15.0f
+
+        // Act
+        val result = addGasCylinderUseCase(name, tare, capacity, false)
+
+        // Assert
+        assertTrue(result.isFailure)
+        assertEquals("El nombre no puede estar vacío", result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun invokeFailsWithNegativeTare() = runTest {
+        // Arrange
+        val name = "Test Cylinder"
+        val tare = -5.0f
+        val capacity = 15.0f
+
+        // Act
+        val result = addGasCylinderUseCase(name, tare, capacity, false)
+
+        // Assert
+        assertTrue(result.isFailure)
+        assertEquals("La tara no puede ser negativa", result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun invokeAllowsZeroTare() = runTest {
+        // Arrange
+        val name = "Test Cylinder"
+        val tare = 0.0f
+        val capacity = 15.0f
+        val expectedId = 123L
+
+        coEvery { repository.insertCylinder(any()) } returns expectedId
+
+        // Act
+        val result = addGasCylinderUseCase(name, tare, capacity, false)
+
+        // Assert
+        assertTrue(result.isSuccess)
+        assertEquals(expectedId, result.getOrNull())
+    }
+
+    @Test
+    fun invokeFailsWithZeroCapacity() = runTest {
+        // Arrange
+        val name = "Test Cylinder"
+        val tare = 10.0f
+        val capacity = 0.0f
+
+        // Act
+        val result = addGasCylinderUseCase(name, tare, capacity, false)
+
+        // Assert
+        assertTrue(result.isFailure)
+        assertEquals("La capacidad debe ser mayor que cero", result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun invokeFailsWithNegativeCapacity() = runTest {
+        // Arrange
+        val name = "Test Cylinder"
+        val tare = 10.0f
+        val capacity = -5.0f
+
+        // Act
+        val result = addGasCylinderUseCase(name, tare, capacity, false)
+
+        // Assert
+        assertTrue(result.isFailure)
+        assertEquals("La capacidad debe ser mayor que cero", result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun invokeHandlesRepositoryException() = runTest {
+        // Arrange
+        val name = "Test Cylinder"
+        val tare = 10.0f
+        val capacity = 15.0f
+        val exception = RuntimeException("Database error")
+
+        coEvery { repository.insertCylinder(any()) } throws exception
+
+        // Act
+        val result = addGasCylinderUseCase(name, tare, capacity, false)
+
+        // Assert
+        assertTrue(result.isFailure)
+        assertEquals(exception, result.exceptionOrNull())
     }
 }
