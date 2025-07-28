@@ -48,7 +48,6 @@ fun SettingsScreen(
     // Estados para intervalos BLE
     val weightInterval by viewModel.weightInterval.collectAsState()
     val inclinationInterval by viewModel.inclinationInterval.collectAsState()
-    val isConnected by viewModel.isConnected.collectAsState()
     val operationStatus by viewModel.operationStatus.collectAsState()
 
     // Estados locales para campos de texto
@@ -193,7 +192,6 @@ fun SettingsScreen(
                 }
             }
         }
-
         // Configuración de intervalo de peso
         Card(
             modifier = Modifier.fillMaxWidth()

@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
-import com.example.campergas.domain.usecase.ReadSensorDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,8 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val preferencesDataStore: PreferencesDataStore,
-    private val configureReadingIntervalsUseCase: ConfigureReadingIntervalsUseCase,
-    private val readSensorDataUseCase: ReadSensorDataUseCase
+    private val configureReadingIntervalsUseCase: ConfigureReadingIntervalsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -44,9 +42,6 @@ class SettingsViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = 15  //1 segundo por defecto
             )
-
-    val isConnected: StateFlow<Boolean> = readSensorDataUseCase.getConnectionState()
-
     // Estado para feedback visual de operaciones BLE
     private val _operationStatus = MutableStateFlow<String?>(null)
     val operationStatus: StateFlow<String?> = _operationStatus.asStateFlow()
@@ -90,7 +85,7 @@ class SettingsViewModel @Inject constructor(
                 _operationStatus.value = "Configurando intervalo de peso..."
                 val intervalSeconds = intervalMinutes * 60 // Convertir minutos a segundos
                 configureReadingIntervalsUseCase.setWeightReadInterval(intervalSeconds)
-                _operationStatus.value = "Intervalo de peso configurado: ${intervalMinutes} min"
+                _operationStatus.value = "Intervalo de peso configurado: $intervalMinutes min"
 
                 // Limpiar el mensaje después de un tiempo
                 kotlinx.coroutines.delay(2000)
