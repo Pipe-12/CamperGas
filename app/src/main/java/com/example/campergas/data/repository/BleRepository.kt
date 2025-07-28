@@ -70,6 +70,8 @@ class BleRepository @Inject constructor(
 
     fun verifyConnection(): Boolean = camperGasBleService.verifyConnection()
 
+    fun forceDisconnect() = camperGasBleService.forceDisconnect()
+
     fun ensureOfflineDataReading() = camperGasBleService.ensureOfflineDataReading()
 
     /**

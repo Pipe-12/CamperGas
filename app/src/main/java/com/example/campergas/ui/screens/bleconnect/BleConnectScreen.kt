@@ -34,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -83,9 +84,9 @@ fun BleConnectScreen(
     // Verificar conexión periódicamente cuando está conectado
     LaunchedEffect(connectionState) {
         if (connectionState) {
-            // Verificar cada 10 segundos si realmente está conectado
+            // Verificar cada 5 segundos si realmente está conectado
             while (connectionState) {
-                kotlinx.coroutines.delay(10000) // 10 segundos
+                kotlinx.coroutines.delay(5000) // 5 segundos
                 viewModel.verifyConnection()
             }
         }
@@ -125,7 +126,8 @@ fun BleConnectScreen(
             isConnected = connectionState,
             isScanning = uiState.isScanning,
             connectedDevice = uiState.connectedDevice,
-            onDisconnect = { viewModel.disconnectDevice() }
+            onDisconnect = { viewModel.disconnectDevice() },
+            onForceDisconnect = { viewModel.forceDisconnect() }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -540,7 +542,8 @@ fun ConnectionStatusCard(
     isConnected: Boolean,
     isScanning: Boolean,
     connectedDevice: BleDevice?,
-    onDisconnect: () -> Unit
+    onDisconnect: () -> Unit,
+    onForceDisconnect: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -586,13 +589,30 @@ fun ConnectionStatusCard(
                 }
 
                 if (isConnected) {
-                    OutlinedButton(
-                        onClick = onDisconnect,
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.error
-                        )
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Text("Desconectar")
+                        OutlinedButton(
+                            onClick = onDisconnect,
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text("Desconectar")
+                        }
+                        
+                        TextButton(
+                            onClick = onForceDisconnect,
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text(
+                                text = "Forzar",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
                     }
                 }
             }

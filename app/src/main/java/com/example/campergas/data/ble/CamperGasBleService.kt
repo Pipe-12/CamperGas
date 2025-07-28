@@ -115,8 +115,16 @@ class CamperGasBleService @Inject constructor(
                 }
 
                 BluetoothProfile.STATE_DISCONNECTED -> {
-                    Log.d(TAG, "❌ Desconectado del sensor CamperGas (status: $status)")
-                    _connectionState.value = false
+                    Log.d(TAG, "❌ Callback: Desconectado del sensor CamperGas (status: $status)")
+                    
+                    // Solo actualizar si no hemos forzado ya la desconexión
+                    if (_connectionState.value) {
+                        Log.d(TAG, "❌ Actualizando estado de conexión desde callback")
+                        _connectionState.value = false
+                    } else {
+                        Log.d(TAG, "❌ Estado ya había sido actualizado manualmente")
+                    }
+                    
                     _isLoadingHistory.value = false
                     // Detener lectura periódica al desconectar
                     stopPeriodicDataReading()
@@ -900,26 +908,39 @@ class CamperGasBleService @Inject constructor(
         // Detener lectura periódica
         stopPeriodicDataReading()
 
+        // IMPORTANTE: Actualizar el estado inmediatamente
+        // No esperar al callback porque a veces no se ejecuta
+        _connectionState.value = false
+        Log.d(TAG, "🔌 Estado de conexión actualizado a: false")
+
         bluetoothGatt?.let { gatt ->
             // Verificar permisos antes de desconectar
             if (bleManager.hasBluetoothConnectPermission()) {
                 Log.d(TAG, "🔌 Desconectando GATT...")
                 @SuppressLint("MissingPermission")
                 gatt.disconnect()
-                @SuppressLint("MissingPermission")
-                gatt.close()
-                Log.d(TAG, "🔌 GATT desconectado y cerrado")
+                
+                // Pequeña pausa antes de cerrar
+                serviceScope.launch {
+                    delay(100)
+                    if (bleManager.hasBluetoothConnectPermission()) {
+                        @SuppressLint("MissingPermission")
+                        gatt.close()
+                    }
+                    cleanup()
+                }
+                
+                Log.d(TAG, "🔌 GATT desconectado")
             } else {
                 Log.w(TAG, "🔌 No hay permisos para desconectar, forzando limpieza")
-                // Forzar limpieza local aunque no tengamos permisos
-                _connectionState.value = false
                 cleanup()
             }
         } ?: run {
-            Log.w(TAG, "🔌 bluetoothGatt es null, actualizando estado y limpiando")
-            _connectionState.value = false
+            Log.w(TAG, "🔌 bluetoothGatt es null, limpiando recursos")
             cleanup()
         }
+        
+        Log.d(TAG, "🔌 Desconexión completada - Estado final: ${_connectionState.value}")
     }
 
     /**
@@ -1075,12 +1096,70 @@ class CamperGasBleService @Inject constructor(
         // Si hay inconsistencia, corregir el estado
         if (!gattConnected && stateConnected) {
             Log.w(TAG, "⚠️ Inconsistencia detectada: GATT es null pero estado dice conectado")
+            Log.w(TAG, "⚠️ Forzando desconexión y limpieza...")
             _connectionState.value = false
             cleanup()
             return false
         }
         
+        // Verificar si el GATT está realmente conectado
+        if (gattConnected && stateConnected) {
+            // Intentar una operación simple para verificar que la conexión está viva
+            try {
+                // Si tenemos permisos, verificar que podemos acceder al dispositivo
+                if (bleManager.hasBluetoothConnectPermission()) {
+                    val device = bluetoothGatt?.device
+                    if (device == null) {
+                        Log.w(TAG, "⚠️ GATT device es null, conexión probablemente perdida")
+                        _connectionState.value = false
+                        cleanup()
+                        return false
+                    }
+                }
+                return true
+            } catch (e: Exception) {
+                Log.w(TAG, "⚠️ Error al verificar conexión GATT: ${e.message}")
+                _connectionState.value = false
+                cleanup()
+                return false
+            }
+        }
+        
         return gattConnected && stateConnected
+    }
+
+    /**
+     * Fuerza la desconexión y limpieza completa del estado
+     * Útil cuando se detecta una conexión fantasma
+     */
+    fun forceDisconnect() {
+        Log.w(TAG, "🚨 Forzando desconexión completa...")
+        
+        // Actualizar estado inmediatamente
+        _connectionState.value = false
+        
+        // Detener todas las operaciones
+        stopPeriodicDataReading()
+        stopOfflineDataReading()
+        
+        // Limpiar GATT si existe
+        bluetoothGatt?.let { gatt ->
+            try {
+                if (bleManager.hasBluetoothConnectPermission()) {
+                    @SuppressLint("MissingPermission")
+                    gatt.disconnect()
+                    @SuppressLint("MissingPermission")
+                    gatt.close()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al cerrar GATT durante forzado: ${e.message}")
+            }
+        }
+        
+        // Limpieza completa
+        cleanup()
+        
+        Log.w(TAG, "🚨 Desconexión forzada completada")
     }
 
     /**
