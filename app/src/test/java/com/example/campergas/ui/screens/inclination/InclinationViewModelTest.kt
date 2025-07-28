@@ -159,3 +159,4 @@ class InclinationViewModelTest {
         // Assert - Should now be true
         assertTrue(viewModel.canMakeRequest())
     }
+}

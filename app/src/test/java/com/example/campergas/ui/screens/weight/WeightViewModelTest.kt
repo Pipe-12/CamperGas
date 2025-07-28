@@ -106,11 +106,9 @@ class WeightViewModelTest {
     fun `updates vehicle state when data is received`() = runTest {
         // Arrange
         val testVehicle = VehicleConfig(
-            id = 1L,
-            name = "Test Vehicle",
-            weightLimitFront = 1000.0f,
-            weightLimitRear = 1500.0f,
-            weightLimitTotal = 2500.0f
+            type = VehicleType.CARAVAN,
+            distanceBetweenRearWheels = 180f,
+            distanceToFrontSupport = 350f
         )
 
         // Act

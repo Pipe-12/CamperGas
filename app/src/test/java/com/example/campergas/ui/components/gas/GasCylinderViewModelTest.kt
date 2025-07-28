@@ -110,7 +110,7 @@ class GasCylinderViewModelTest {
     @Test
     fun `addCylinder success updates uiState with success message`() = runTest {
         // Arrange
-        coEvery { addGasCylinderUseCase(any(), any(), any(), any()) } returns Result.success(Unit)
+        coEvery { addGasCylinderUseCase(any(), any(), any(), any()) } returns Result.success(1L)
         
         // Act
         viewModel.addCylinder("Test Cylinder", 5.0f, 10.0f, true)

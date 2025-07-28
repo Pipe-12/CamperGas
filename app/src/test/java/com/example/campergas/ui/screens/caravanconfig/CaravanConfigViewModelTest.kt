@@ -75,15 +75,10 @@ class CaravanConfigViewModelTest {
     fun `loadVehicleConfig updates state with config values`() = runTest {
         // Arrange
         val testConfig = VehicleConfig(
-            id = 1,
-            name = "Test Vehicle",
             type = VehicleType.AUTOCARAVANA,
             distanceBetweenRearWheels = 180f,
             distanceToFrontSupport = 350f,
-            distanceBetweenFrontWheels = 160f,
-            weightLimitFront = 1000f,
-            weightLimitRear = 1500f,
-            weightLimitTotal = 2500f
+            distanceBetweenFrontWheels = 160f
         )
         
         // Act
