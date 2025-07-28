@@ -171,6 +171,22 @@ class BleConnectViewModel @Inject constructor(
         }
     }
 
+    fun clearError() {
+        _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    fun checkBluetoothPermissions(): Boolean {
+        return scanBleDevicesUseCase.isBluetoothEnabled()
+    }
+
+    fun isBluetoothEnabled(): Boolean {
+        return scanBleDevicesUseCase.isBluetoothEnabled()
+    }
+
+    fun requiresPermissions(): Boolean {
+        return !scanBleDevicesUseCase.isBluetoothEnabled()
+    }
+
     // Gestión de filtros
     fun toggleCompatibleDevicesFilter() {
         scanBleDevicesUseCase.toggleCompatibleDevicesFilter()
