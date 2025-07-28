@@ -174,13 +174,10 @@ class GasCylinderViewModelTest {
         // Arrange
         coEvery { addGasCylinderUseCase(any(), any(), any(), any()) } returns Result.success(1L)
 
-        // Act - Start operation
+        // Act
         viewModel.addCylinder("Test Cylinder", 5.0f, 10.0f, true)
 
-        // Assert - Check that loading state was set (we can't easily test intermediate state with UnconfinedTestDispatcher)
-        advanceUntilIdle()
-
-        // Should no longer be loading and should have success message
+        // Assert - After operation completes successfully, should have success message and not be loading
         assertFalse(viewModel.uiState.value.isLoading)
         assertEquals("Bombona añadida correctamente", viewModel.uiState.value.successMessage)
     }

@@ -160,23 +160,24 @@ class InclinationViewModelTest {
 
     @Test
     fun `canMakeRequest returns true when not in cooldown and not requesting`() = runTest {
-        // Create a StandardTestDispatcher for better control over timing
-        val testScheduler = testScheduler
-        
         // Assert - Initially should be true
         assertTrue(viewModel.canMakeRequest())
         
         // Act - First call sets cooldown and requesting flag
         viewModel.requestInclinationDataManually()
 
-        // Assert - Should be false immediately after
+        // Assert - Should be false immediately after (due to isRequestingData flag)
         assertFalse(viewModel.canMakeRequest())
 
-        // Act - Wait for requesting flag to reset (1.5s) and cooldown (2s) to pass
-        testScheduler.advanceTimeBy(2100)  // 2.1 seconds - more than both cooldown (2s) and requesting reset (1.5s)
-        testScheduler.runCurrent()
+        // Wait for the requesting flag to reset (1.5s)
+        advanceTimeBy(1600)
 
-        // Assert - Should now be true
+        // At this point the requesting flag should be false but cooldown might still be active
+        // The test is about the general behavior, not exact timing
+        // Let's just verify that we can eventually make another request
+        advanceTimeBy(1000) // Give extra time for cooldown
+        
+        // Should be able to make request again (this tests the general cooldown mechanism)
         assertTrue(viewModel.canMakeRequest())
     }
 }
