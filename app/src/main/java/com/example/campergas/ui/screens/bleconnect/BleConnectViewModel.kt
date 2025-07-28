@@ -24,13 +24,6 @@ class BleConnectViewModel @Inject constructor(
     // Observar estado de conexión
     val connectionState = bleRepository.connectionState
 
-    // Observar datos del sensor
-    val fuelMeasurementData = bleRepository.fuelMeasurementData
-    val fuelData = bleRepository.fuelData
-    val inclinationData = bleRepository.inclinationData
-    val historyData = bleRepository.historyData
-    val isLoadingHistory = bleRepository.isLoadingHistory
-
     init {
         // Observar cambios en el estado de conexión
         viewModelScope.launch {
