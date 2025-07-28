@@ -80,6 +80,17 @@ fun BleConnectScreen(
         }
     }
 
+    // Verificar conexión periódicamente cuando está conectado
+    LaunchedEffect(connectionState) {
+        if (connectionState) {
+            // Verificar cada 10 segundos si realmente está conectado
+            while (connectionState) {
+                kotlinx.coroutines.delay(10000) // 10 segundos
+                viewModel.verifyConnection()
+            }
+        }
+    }
+
     // Diálogo para activar Bluetooth
     if (showBluetoothDialog) {
         BluetoothDisabledDialog(

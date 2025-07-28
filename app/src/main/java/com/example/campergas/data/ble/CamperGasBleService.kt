@@ -99,35 +99,41 @@ class CamperGasBleService @Inject constructor(
 
     private val gattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
+            Log.d(TAG, "🔄 onConnectionStateChange - status: $status, newState: $newState")
             when (newState) {
                 BluetoothProfile.STATE_CONNECTED -> {
-                    Log.d(TAG, "Conectado al sensor CamperGas")
+                    Log.d(TAG, "✅ Conectado al sensor CamperGas")
                     _connectionState.value = true
                     // Descubrir servicios solo si tenemos permisos
                     if (bleManager.hasBluetoothConnectPermission()) {
                         @SuppressLint("MissingPermission")
                         gatt?.discoverServices()
                     } else {
-                        Log.e(TAG, "No hay permisos para descubrir servicios")
+                        Log.e(TAG, "❌ No hay permisos para descubrir servicios")
                         disconnect()
                     }
                 }
 
                 BluetoothProfile.STATE_DISCONNECTED -> {
-                    Log.d(TAG, "Desconectado del sensor CamperGas")
+                    Log.d(TAG, "❌ Desconectado del sensor CamperGas (status: $status)")
                     _connectionState.value = false
                     _isLoadingHistory.value = false
                     // Detener lectura periódica al desconectar
                     stopPeriodicDataReading()
                     cleanup()
+                    
+                    // Si la desconexión fue inesperada (status != 0), loguear
+                    if (status != BluetoothGatt.GATT_SUCCESS) {
+                        Log.w(TAG, "⚠️ Desconexión inesperada - status: $status")
+                    }
                 }
 
                 BluetoothProfile.STATE_CONNECTING -> {
-                    Log.d(TAG, "Conectando al sensor CamperGas...")
+                    Log.d(TAG, "🔄 Conectando al sensor CamperGas...")
                 }
 
                 BluetoothProfile.STATE_DISCONNECTING -> {
-                    Log.d(TAG, "Desconectando del sensor CamperGas...")
+                    Log.d(TAG, "🔄 Desconectando del sensor CamperGas...")
                     // Detener lectura periódica al iniciar desconexión
                     stopPeriodicDataReading()
                 }
@@ -888,7 +894,8 @@ class CamperGasBleService @Inject constructor(
     }
 
     fun disconnect() {
-        Log.d(TAG, "Desconectando del sensor CamperGas")
+        Log.d(TAG, "🔌 Iniciando desconexión del sensor CamperGas")
+        Log.d(TAG, "🔌 Estado actual de conexión: ${_connectionState.value}")
 
         // Detener lectura periódica
         stopPeriodicDataReading()
@@ -896,17 +903,23 @@ class CamperGasBleService @Inject constructor(
         bluetoothGatt?.let { gatt ->
             // Verificar permisos antes de desconectar
             if (bleManager.hasBluetoothConnectPermission()) {
+                Log.d(TAG, "🔌 Desconectando GATT...")
                 @SuppressLint("MissingPermission")
                 gatt.disconnect()
                 @SuppressLint("MissingPermission")
                 gatt.close()
+                Log.d(TAG, "🔌 GATT desconectado y cerrado")
             } else {
-                Log.w(TAG, "No hay permisos para desconectar, forzando limpieza")
+                Log.w(TAG, "🔌 No hay permisos para desconectar, forzando limpieza")
                 // Forzar limpieza local aunque no tengamos permisos
+                _connectionState.value = false
                 cleanup()
             }
+        } ?: run {
+            Log.w(TAG, "🔌 bluetoothGatt es null, actualizando estado y limpiando")
+            _connectionState.value = false
+            cleanup()
         }
-        cleanup()
     }
 
     /**
@@ -1018,6 +1031,8 @@ class CamperGasBleService @Inject constructor(
     }
 
     private fun cleanup() {
+        Log.d(TAG, "🧹 Iniciando limpieza de recursos BLE")
+        
         // Detener lectura offline si está en progreso
         stopOfflineDataReading()
 
@@ -1042,9 +1057,31 @@ class CamperGasBleService @Inject constructor(
         _fuelData.value = null
         _inclinationData.value = null
         processedOfflineData.clear() // Limpiar datos procesados al desconectar
+        
+        Log.d(TAG, "🧹 Limpieza completada - Estado conexión: ${_connectionState.value}")
     }
 
     fun isConnected(): Boolean = _connectionState.value
+
+    /**
+     * Verifica si realmente hay una conexión activa verificando el GATT
+     */
+    fun verifyConnection(): Boolean {
+        val gattConnected = bluetoothGatt != null
+        val stateConnected = _connectionState.value
+        
+        Log.d(TAG, "🔍 Verificando conexión - GATT: $gattConnected, Estado: $stateConnected")
+        
+        // Si hay inconsistencia, corregir el estado
+        if (!gattConnected && stateConnected) {
+            Log.w(TAG, "⚠️ Inconsistencia detectada: GATT es null pero estado dice conectado")
+            _connectionState.value = false
+            cleanup()
+            return false
+        }
+        
+        return gattConnected && stateConnected
+    }
 
     /**
      * Fuerza la verificación y lectura de datos offline si hay conexión activa
