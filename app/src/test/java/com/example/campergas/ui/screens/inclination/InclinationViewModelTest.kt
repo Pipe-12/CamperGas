@@ -1,9 +1,9 @@
 package com.example.campergas.ui.screens.inclination
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
-import org.junit.Assert.*
 
 class InclinationViewModelTest {
 

@@ -1,13 +1,12 @@
 package com.example.campergas.domain.usecase
 
 import com.example.campergas.data.repository.GasCylinderRepository
-import com.example.campergas.domain.model.GasCylinder
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
 
 class AddGasCylinderUseCaseTest {
 

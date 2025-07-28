@@ -1,7 +1,9 @@
 package com.example.campergas.domain.model
 
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.junit.Assert.*
 
 class GasCylinderTest {
 
@@ -114,13 +116,15 @@ class GasCylinderTest {
             tare = 10.0f,
             capacity = 5.0f
         )
-        
+
         assertEquals(0L, cylinder.id) // Default id
         assertFalse(cylinder.isActive) // Default isActive
         // createdAt should be around current time (within reasonable range)
         val now = System.currentTimeMillis()
-        assertTrue("createdAt should be recent", 
-            Math.abs(now - cylinder.createdAt) < 1000) // Within 1 second
+        assertTrue(
+            "createdAt should be recent",
+            Math.abs(now - cylinder.createdAt) < 1000
+        ) // Within 1 second
     }
 
     private fun createTestCylinder(

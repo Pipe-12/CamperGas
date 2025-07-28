@@ -6,11 +6,11 @@ import io.mockk.*
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
 
-class GetActiveCylinderUseCaseTestFixed {
+class GetActiveCylinderUseCaseTest {
 
     private lateinit var getActiveCylinderUseCase: GetActiveCylinderUseCase
     private val repository: GasCylinderRepository = mockk()

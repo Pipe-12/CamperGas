@@ -9,13 +9,12 @@ import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*
 import org.junit.After
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.Assert.*
 
 @ExperimentalCoroutinesApi
 class BleConnectViewModelTest {
@@ -32,13 +31,13 @@ class BleConnectViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        
+
         // Mock Android Log
         mockkStatic(Log::class)
-        every { Log.d(any(), any()) } returns 0
-        every { Log.i(any(), any()) } returns 0
-        every { Log.w(any(), any()) } returns 0
-        every { Log.e(any(), any()) } returns 0
+        every { Log.d(any<String>(), any<String>()) } returns 0
+        every { Log.i(any<String>(), any<String>()) } returns 0
+        every { Log.w(any<String>(), any<String>()) } returns 0
+        every { Log.e(any<String>(), any<String>()) } returns 0
         
         // Setup basic mock responses
         every { bleRepository.connectionState } returns MutableStateFlow(false)
@@ -47,7 +46,7 @@ class BleConnectViewModelTest {
         every { scanBleDevicesUseCase.isCompatibleFilterEnabled() } returns false
         every { scanBleDevicesUseCase.stopScan() } returns Unit
         every { scanBleDevicesUseCase.toggleCompatibleDevicesFilter() } returns Unit
-        
+
         viewModel = BleConnectViewModel(scanBleDevicesUseCase, bleRepository)
     }
 
@@ -153,8 +152,8 @@ class BleConnectViewModelTest {
         val state = viewModel.uiState.value
         assertEquals(testDevice, state.connectedDevice)
         assertNull(state.error)
-        
-        coVerify { 
+
+        coVerify {
             bleRepository.connectToSensor(testDevice.address)
             bleRepository.saveLastConnectedDevice(testDevice.address)
         }
@@ -183,7 +182,7 @@ class BleConnectViewModelTest {
         coEvery { bleRepository.connectToSensor(any()) } returns Unit
         coEvery { bleRepository.saveLastConnectedDevice(any()) } returns Unit
         coEvery { bleRepository.disconnectSensor() } returns Unit
-        
+
         viewModel.connectToDevice(testDevice)
         advanceUntilIdle()
 
@@ -197,7 +196,7 @@ class BleConnectViewModelTest {
         assertNull(state.isConnecting)
         assertNull(state.error)
         assertEquals(emptyList<BleDevice>(), state.availableDevices)
-        
+
         coVerify { bleRepository.disconnectSensor() }
     }
 
@@ -241,8 +240,8 @@ class BleConnectViewModelTest {
         // Assert
         val state = viewModel.uiState.value
         assertTrue(state.showOnlyCompatibleDevices)
-        
-        verify { 
+
+        verify {
             scanBleDevicesUseCase.toggleCompatibleDevicesFilter()
             scanBleDevicesUseCase.isCompatibleFilterEnabled()
         }
@@ -252,7 +251,7 @@ class BleConnectViewModelTest {
     fun `connection state flow updates ui state`() = runTest {
         // Arrange
         every { bleRepository.connectionState } returns MutableStateFlow(true)
-        
+
         // Create new viewModel to trigger init block with new connection state
         val newViewModel = BleConnectViewModel(scanBleDevicesUseCase, bleRepository)
         advanceUntilIdle()

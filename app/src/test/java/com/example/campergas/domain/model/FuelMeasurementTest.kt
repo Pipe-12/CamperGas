@@ -1,7 +1,9 @@
 package com.example.campergas.domain.model
 
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.junit.Assert.*
 
 class FuelMeasurementTest {
 
@@ -68,8 +70,10 @@ class FuelMeasurementTest {
         val measurement = createTestMeasurement(timestamp = 1640995200000L)
         val formatted = measurement.getFullFormattedTimestamp()
         // Should contain date with slashes and time with colons
-        assertTrue("Full formatted timestamp should contain date and time", 
-            formatted.contains("/") && formatted.contains(":"))
+        assertTrue(
+            "Full formatted timestamp should contain date and time",
+            formatted.contains("/") && formatted.contains(":")
+        )
     }
 
     @Test
@@ -133,7 +137,7 @@ class FuelMeasurementTest {
             fuelPercentage = 50.0f,
             totalWeight = 15.0f
         )
-        
+
         assertEquals(0L, measurement.id) // Default id
         assertTrue(measurement.isCalibrated) // Default isCalibrated
         assertFalse(measurement.isHistorical) // Default isHistorical

@@ -2,17 +2,16 @@ package com.example.campergas.domain.usecase
 
 import com.example.campergas.data.repository.FuelMeasurementRepository
 import com.example.campergas.data.repository.GasCylinderRepository
-import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.model.GasCylinder
 import io.mockk.*
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
 
-class SaveFuelMeasurementUseCaseTestFixed {
+class SaveFuelMeasurementUseCaseTest {
 
     private lateinit var saveFuelMeasurementUseCase: SaveFuelMeasurementUseCase
     private val fuelMeasurementRepository: FuelMeasurementRepository = mockk()
@@ -207,7 +206,7 @@ class SaveFuelMeasurementUseCaseTestFixed {
             fuelMeasurementRepository.insertMeasurements(
                 withArg { measurements ->
                     assertEquals(2, measurements.size)
-                    
+
                     val first = measurements[0]
                     assertEquals(cylinderId, first.cylinderId)
                     assertEquals("Test Cylinder", first.cylinderName)
@@ -216,7 +215,7 @@ class SaveFuelMeasurementUseCaseTestFixed {
                     assertEquals(15.0f, first.totalWeight, 0.01f)
                     assertTrue(first.isCalibrated)
                     assertTrue(first.isHistorical)
-                    
+
                     val second = measurements[1]
                     assertEquals(4.0f, second.fuelKilograms, 0.01f)
                     assertEquals(80.0f, second.fuelPercentage, 0.01f)
