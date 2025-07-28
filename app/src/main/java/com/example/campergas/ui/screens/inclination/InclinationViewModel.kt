@@ -2,7 +2,9 @@ package com.example.campergas.ui.screens.inclination
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.campergas.domain.usecase.CheckBleConnectionUseCase
 import com.example.campergas.domain.usecase.GetInclinationUseCase
+import com.example.campergas.domain.usecase.RequestInclinationDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +16,9 @@ import kotlin.math.abs
 
 @HiltViewModel
 class InclinationViewModel @Inject constructor(
-    private val getInclinationUseCase: GetInclinationUseCase
+    private val getInclinationUseCase: GetInclinationUseCase,
+    private val requestInclinationDataUseCase: RequestInclinationDataUseCase,
+    private val checkBleConnectionUseCase: CheckBleConnectionUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(InclinationUiState())
@@ -49,6 +53,20 @@ class InclinationViewModel @Inject constructor(
     private fun isVehicleLevel(pitch: Float, roll: Float): Boolean {
         val levelThreshold = 2.0f // 2 grados de tolerancia
         return abs(pitch) <= levelThreshold && abs(roll) <= levelThreshold
+    }
+
+    /**
+     * Solicita una lectura manual de datos de inclinación del sensor BLE
+     */
+    fun requestInclinationDataManually() {
+        requestInclinationDataUseCase()
+    }
+
+    /**
+     * Verifica si hay una conexión BLE activa
+     */
+    fun isConnected(): Boolean {
+        return checkBleConnectionUseCase.isConnected()
     }
 }
 

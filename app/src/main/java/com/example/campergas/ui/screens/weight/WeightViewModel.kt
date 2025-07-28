@@ -5,9 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.model.GasCylinder
 import com.example.campergas.domain.model.VehicleConfig
+import com.example.campergas.domain.usecase.CheckBleConnectionUseCase
 import com.example.campergas.domain.usecase.GetActiveCylinderUseCase
 import com.example.campergas.domain.usecase.GetFuelDataUseCase
 import com.example.campergas.domain.usecase.GetVehicleConfigUseCase
+import com.example.campergas.domain.usecase.RequestWeightDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +21,9 @@ import javax.inject.Inject
 class WeightViewModel @Inject constructor(
     private val getFuelDataUseCase: GetFuelDataUseCase,
     private val getVehicleConfigUseCase: GetVehicleConfigUseCase,
-    private val getActiveCylinderUseCase: GetActiveCylinderUseCase
+    private val getActiveCylinderUseCase: GetActiveCylinderUseCase,
+    private val requestWeightDataUseCase: RequestWeightDataUseCase,
+    private val checkBleConnectionUseCase: CheckBleConnectionUseCase
 ) : ViewModel() {
 
     private val _fuelState = MutableStateFlow<FuelMeasurement?>(null)
@@ -52,5 +56,19 @@ class WeightViewModel @Inject constructor(
                 _fuelState.value = fuel
             }
         }
+    }
+
+    /**
+     * Solicita una lectura manual de datos de peso del sensor BLE
+     */
+    fun requestWeightDataManually() {
+        requestWeightDataUseCase()
+    }
+
+    /**
+     * Verifica si hay una conexión BLE activa
+     */
+    fun isConnected(): Boolean {
+        return checkBleConnectionUseCase.isConnected()
     }
 }
