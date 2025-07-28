@@ -88,7 +88,6 @@ class WeightViewModelTest {
 
     @Test
     fun `initial state is null for all values`() = runTest {
-        // Assert
         assertNull(viewModel.fuelState.value)
         assertNull(viewModel.vehicleState.value)
         assertNull(viewModel.activeCylinder.value)
@@ -97,7 +96,6 @@ class WeightViewModelTest {
 
     @Test
     fun `updates fuel state when data is received`() = runTest {
-        // Arrange
         val testFuel = FuelMeasurement(
             cylinderId = 1L,
             cylinderName = "Test Cylinder",
@@ -107,35 +105,25 @@ class WeightViewModelTest {
             totalWeight = 10.0f,
             isCalibrated = true
         )
-
-        // Act
         fuelDataFlow.value = testFuel
         advanceUntilIdle()
-
-        // Assert
         assertEquals(testFuel, viewModel.fuelState.value)
     }
 
     @Test
     fun `updates vehicle state when data is received`() = runTest {
-        // Arrange
         val testVehicle = VehicleConfig(
             type = VehicleType.CARAVAN,
             distanceBetweenRearWheels = 180f,
             distanceToFrontSupport = 350f
         )
-
-        // Act
         vehicleConfigFlow.value = testVehicle
         advanceUntilIdle()
-
-        // Assert
         assertEquals(testVehicle, viewModel.vehicleState.value)
     }
 
     @Test
     fun `updates active cylinder when data is received`() = runTest {
-        // Arrange
         val testCylinder = GasCylinder(
             id = 1L,
             name = "Test Cylinder",
@@ -143,82 +131,54 @@ class WeightViewModelTest {
             capacity = 10.0f,
             isActive = true
         )
-
-        // Act
         activeCylinderFlow.value = testCylinder
         advanceUntilIdle()
-
-        // Assert
         assertEquals(testCylinder, viewModel.activeCylinder.value)
     }
 
     @Test
     fun `requestWeightDataManually calls the use case and updates isRequestingData state`() =
         runTest {
-            // Act
-            viewModel.requestWeightDataManually()
 
-            // Assert
+            viewModel.requestWeightDataManually()
             verify { requestWeightDataUseCase() }
             assertTrue(viewModel.isRequestingData.value)
-
-            // Should reset after delay
-            advanceTimeBy(1600) // 1.6 segundos (más que el delay de 1.5s)
+            advanceTimeBy(1600)
             assertFalse(viewModel.isRequestingData.value)
         }
 
     @Test
     fun `requestWeightDataManually blocks repeated rapid calls`() = runTest {
-        // Act - First call
+
         viewModel.requestWeightDataManually()
 
-        // Act - Second immediate call should be blocked
+
         viewModel.requestWeightDataManually()
 
-        // Assert - Use case should be called only once
+
         verify(exactly = 1) { requestWeightDataUseCase() }
     }
 
     @Test
     fun `isConnected delegates to CheckBleConnectionUseCase`() {
-        // Arrange
+
         every { checkBleConnectionUseCase.isConnected() } returns true
-
-        // Act
         val result = viewModel.isConnected()
-
-        // Assert
         assertTrue(result)
         verify { checkBleConnectionUseCase.isConnected() }
     }
 
     @Test
     fun `canMakeRequest returns false when request is in progress`() = runTest {
-        // Assert - Initially should be true
+
         assertTrue(viewModel.canMakeRequest())
-        
-        // Arrange - First make a request to start requesting flag
         viewModel.requestWeightDataManually()
-
-        // Assert - Should return false (due to isRequestingData flag)
         assertFalse(viewModel.canMakeRequest())
-
-        // Wait for requesting flag to reset (1.5s)
         advanceTimeBy(1600)
-
-        // Assert - The requesting flag should now be false
         assertFalse(viewModel.isRequestingData.value)
         
-        // Note: The cooldown is based on System.currentTimeMillis() which can't be controlled
-        // in tests, so we only verify the isRequestingData behavior
+
     }
 
-    @Test
-    fun `canMakeRequest returns false when request is in progress`() = runTest {
-        // Arrange - Make a request to set isRequestingData = true
-        viewModel.requestWeightDataManually()
 
-        // Assert - While request is in progress (but before cooldown check)
-        assertFalse(viewModel.canMakeRequest())
-    }
 }
