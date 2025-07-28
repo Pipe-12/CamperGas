@@ -72,7 +72,7 @@ class BleConnectViewModel @Inject constructor(
                         error = null
                     )
                 }
-            } catch (e: SecurityException) {
+            } catch (_: SecurityException) {
                 _uiState.value = _uiState.value.copy(
                     isScanning = false,
                     error = "Permisos de Bluetooth requeridos para escanear dispositivos"
@@ -90,7 +90,7 @@ class BleConnectViewModel @Inject constructor(
         try {
             scanBleDevicesUseCase.stopScan()
             _uiState.value = _uiState.value.copy(isScanning = false)
-        } catch (e: SecurityException) {
+        } catch (_: SecurityException) {
             _uiState.value = _uiState.value.copy(
                 isScanning = false,
                 error = "Permisos de Bluetooth requeridos para detener el escaneo"
@@ -127,7 +127,7 @@ class BleConnectViewModel @Inject constructor(
                     connectedDevice = device,
                     error = null
                 )
-            } catch (e: SecurityException) {
+            } catch (_: SecurityException) {
                 _uiState.value = _uiState.value.copy(
                     isConnecting = null,
                     error = "Permisos de Bluetooth requeridos para conectar"
@@ -190,16 +190,8 @@ class BleConnectViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(error = null)
     }
 
-    fun checkBluetoothPermissions(): Boolean {
-        return scanBleDevicesUseCase.isBluetoothEnabled()
-    }
-
     fun isBluetoothEnabled(): Boolean {
         return scanBleDevicesUseCase.isBluetoothEnabled()
-    }
-
-    fun requiresPermissions(): Boolean {
-        return !scanBleDevicesUseCase.isBluetoothEnabled()
     }
 
     // Gestión de filtros
@@ -208,16 +200,6 @@ class BleConnectViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             showOnlyCompatibleDevices = scanBleDevicesUseCase.isCompatibleFilterEnabled()
         )
-    }
-
-    fun enableCompatibleDevicesFilter() {
-        scanBleDevicesUseCase.enableCompatibleDevicesFilter()
-        _uiState.value = _uiState.value.copy(showOnlyCompatibleDevices = true)
-    }
-
-    fun disableCompatibleDevicesFilter() {
-        scanBleDevicesUseCase.disableCompatibleDevicesFilter()
-        _uiState.value = _uiState.value.copy(showOnlyCompatibleDevices = false)
     }
 }
 

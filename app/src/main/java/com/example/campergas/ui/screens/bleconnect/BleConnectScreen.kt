@@ -59,7 +59,7 @@ import com.example.campergas.ui.components.BluetoothPermissionDialog
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BleConnectScreen(
-    navController: NavController,
+    @Suppress("UNUSED_PARAMETER") navController: NavController,
     viewModel: BleConnectViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -452,60 +452,6 @@ private fun AvailableDeviceCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ConnectedDeviceCard(
-    device: BleDevice,
-    onDisconnect: () -> Unit
-) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Text(
-                        text = device.name,
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = device.address,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            OutlinedButton(
-                onClick = onDisconnect,
-                modifier = Modifier.height(32.dp)
-            ) {
-                Text("Desconectar", style = MaterialTheme.typography.bodySmall)
-            }
-        }
-    }
-}
-
 @Composable
 private fun getSignalIcon(rssi: Int): ImageVector {
     return when {
@@ -595,7 +541,7 @@ fun ConnectionStatusCard(
 fun SensorDataSection(
     fuelMeasurementData: FuelMeasurement?,
     fuelData: FuelMeasurement?,
-    inclinationData: Inclination?,
+    @Suppress("UNUSED_PARAMETER") inclinationData: Inclination?,
     historyData: List<FuelMeasurement>,
     isLoadingHistory: Boolean
 ) {
