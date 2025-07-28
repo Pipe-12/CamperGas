@@ -81,17 +81,6 @@ fun BleConnectScreen(
         }
     }
 
-    // Verificar conexión periódicamente cuando está conectado
-    LaunchedEffect(connectionState) {
-        if (connectionState) {
-            // Verificar cada 5 segundos si realmente está conectado
-            while (connectionState) {
-                kotlinx.coroutines.delay(5000) // 5 segundos
-                viewModel.verifyConnection()
-            }
-        }
-    }
-
     // Diálogo para activar Bluetooth
     if (showBluetoothDialog) {
         BluetoothDisabledDialog(
@@ -126,8 +115,7 @@ fun BleConnectScreen(
             isConnected = connectionState,
             isScanning = uiState.isScanning,
             connectedDevice = uiState.connectedDevice,
-            onDisconnect = { viewModel.disconnectDevice() },
-            onForceDisconnect = { viewModel.forceDisconnect() }
+            onDisconnect = { viewModel.disconnectDevice() }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -542,8 +530,7 @@ fun ConnectionStatusCard(
     isConnected: Boolean,
     isScanning: Boolean,
     connectedDevice: BleDevice?,
-    onDisconnect: () -> Unit,
-    onForceDisconnect: () -> Unit
+    onDisconnect: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -589,30 +576,13 @@ fun ConnectionStatusCard(
                 }
 
                 if (isConnected) {
-                    Column(
-                        horizontalAlignment = Alignment.End,
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    OutlinedButton(
+                        onClick = onDisconnect,
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
                     ) {
-                        OutlinedButton(
-                            onClick = onDisconnect,
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = MaterialTheme.colorScheme.error
-                            )
-                        ) {
-                            Text("Desconectar")
-                        }
-                        
-                        TextButton(
-                            onClick = onForceDisconnect,
-                            colors = ButtonDefaults.textButtonColors(
-                                contentColor = MaterialTheme.colorScheme.error
-                            )
-                        ) {
-                            Text(
-                                text = "Forzar",
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
+                        Text("Desconectar")
                     }
                 }
             }

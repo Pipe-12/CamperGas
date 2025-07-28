@@ -171,58 +171,6 @@ class BleConnectViewModel @Inject constructor(
         }
     }
 
-    fun clearError() {
-        _uiState.value = _uiState.value.copy(error = null)
-    }
-
-    fun checkBluetoothPermissions(): Boolean {
-        return scanBleDevicesUseCase.isBluetoothEnabled()
-    }
-
-    fun isBluetoothEnabled(): Boolean {
-        return scanBleDevicesUseCase.isBluetoothEnabled()
-    }
-
-    fun requiresPermissions(): Boolean {
-        return !scanBleDevicesUseCase.isBluetoothEnabled()
-    }
-
-    fun verifyConnection() {
-        android.util.Log.d("BleConnectViewModel", "🔍 Verificando estado de conexión...")
-        val isActuallyConnected = bleRepository.verifyConnection()
-        android.util.Log.d("BleConnectViewModel", "🔍 Resultado de verificación: $isActuallyConnected")
-        
-        // Si detectamos inconsistencias, forzar desconexión
-        if (!isActuallyConnected && connectionState.value) {
-            android.util.Log.w("BleConnectViewModel", "🚨 Detectada conexión fantasma, forzando desconexión...")
-            forceDisconnect()
-        }
-    }
-
-    fun forceDisconnect() {
-        android.util.Log.w("BleConnectViewModel", "🚨 Forzando desconexión desde ViewModel...")
-        viewModelScope.launch {
-            try {
-                bleRepository.forceDisconnect()
-                
-                // Limpiar estado local
-                _uiState.value = _uiState.value.copy(
-                    connectedDevice = null,
-                    isConnecting = null,
-                    error = null,
-                    availableDevices = emptyList()
-                )
-                
-                android.util.Log.w("BleConnectViewModel", "🚨 Desconexión forzada completada")
-            } catch (e: Exception) {
-                android.util.Log.e("BleConnectViewModel", "🚨 Error en desconexión forzada: ${e.message}")
-                _uiState.value = _uiState.value.copy(
-                    error = "Error al forzar desconexión: ${e.message}"
-                )
-            }
-        }
-    }
-
     // Gestión de filtros
     fun toggleCompatibleDevicesFilter() {
         scanBleDevicesUseCase.toggleCompatibleDevicesFilter()
