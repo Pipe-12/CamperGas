@@ -62,6 +62,19 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Testing dependencies
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("io.mockk:mockk-android:1.13.12")
+    testImplementation("app.cash.turbine:turbine:1.1.0")
+
+    // Hilt testing
+    testImplementation("com.google.dagger:hilt-android-testing:2.56.2")
+    kspTest("com.google.dagger:hilt-compiler:2.56.2")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.56.2")
+    kspAndroidTest("com.google.dagger:hilt-compiler:2.56.2")
+
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
