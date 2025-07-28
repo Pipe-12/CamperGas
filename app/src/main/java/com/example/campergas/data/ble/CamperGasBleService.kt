@@ -795,8 +795,7 @@ class CamperGasBleService @Inject constructor(
                                 // Estos datos provienen de OFFLINE_CHARACTERISTIC_UUID y se marcan como isHistorical = true
                                 val result = saveFuelMeasurementUseCase.saveHistoricalMeasurements(
                                     cylinderId = activeCylinder.id,
-                                    weightMeasurements = batchHistoricalMeasurements,
-                                    isCalibrated = true
+                                    weightMeasurements = batchHistoricalMeasurements
                                 )
 
                                 result.fold(
