@@ -160,13 +160,16 @@ class InclinationViewModelTest {
 
     @Test
     fun `canMakeRequest returns true when not in cooldown and not requesting`() = runTest {
+        // Assert - Initially should be true
+        assertTrue(viewModel.canMakeRequest())
+        
         // Act - First call sets cooldown and requesting flag
         viewModel.requestInclinationDataManually()
 
         // Assert - Should be false immediately after
         assertFalse(viewModel.canMakeRequest())
 
-        // Act - Wait for cooldown (2s) and reset requesting flag (1.5s)
+        // Act - Wait for requesting flag to reset (1.5s) and cooldown (2s)
         advanceTimeBy(2100)  // > 2 seconds cooldown time
 
         // Assert - Should now be true

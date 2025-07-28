@@ -194,6 +194,9 @@ class WeightViewModelTest {
 
     @Test
     fun `canMakeRequest returns false during cooldown period`() = runTest {
+        // Assert - Initially should be true
+        assertTrue(viewModel.canMakeRequest())
+        
         // Arrange - First make a request to start cooldown
         viewModel.requestWeightDataManually()
 
@@ -205,7 +208,7 @@ class WeightViewModelTest {
         assertFalse(viewModel.canMakeRequest())
 
         // Wait full cooldown - should now be allowed
-        advanceTimeBy(1500) // Total 2.5s (más que el cooldown de 2s)
+        advanceTimeBy(1500) // Total 2.5s (más que el cooldown de 2s y el reset de isRequestingData)
         assertTrue(viewModel.canMakeRequest())
     }
 

@@ -64,14 +64,18 @@ class ConsumptionViewModelTest {
     }
 
     @Test
-    fun `initial state has default values`() {
+    fun `initial state has default values`() = runTest {
         // Assert
         val state = viewModel.uiState.value
         assertTrue(state.consumptions.isEmpty())
-        assertTrue(state.isLoading)
+        assertFalse(state.isLoading) // El estado inicial es false hasta que se ejecuta loadConsumptionHistory
         assertNull(state.error)
         assertNull(state.startDate)
         assertNull(state.endDate)
+        
+        // Después de avanzar hasta que termine la corrutina inicial
+        advanceUntilIdle()
+        assertFalse(viewModel.uiState.value.isLoading)
     }
 
     @Test

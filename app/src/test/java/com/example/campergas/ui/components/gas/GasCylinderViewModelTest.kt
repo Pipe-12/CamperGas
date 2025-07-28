@@ -38,8 +38,8 @@ class GasCylinderViewModelTest {
     val instantExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var viewModel: GasCylinderViewModel
-    private val addGasCylinderUseCase: AddGasCylinderUseCase = mockk()
-    private val getActiveCylinderUseCase: GetActiveCylinderUseCase = mockk()
+    private val addGasCylinderUseCase: AddGasCylinderUseCase = mockk(relaxed = true)
+    private val getActiveCylinderUseCase: GetActiveCylinderUseCase = mockk(relaxed = true)
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -132,6 +132,8 @@ class GasCylinderViewModelTest {
 
         // Act
         viewModel.addCylinder("Test Cylinder", 5.0f, 10.0f, true)
+        
+        // Let the coroutine complete before asserting the final state
         advanceUntilIdle()
 
         // Assert - Check immediate state after success

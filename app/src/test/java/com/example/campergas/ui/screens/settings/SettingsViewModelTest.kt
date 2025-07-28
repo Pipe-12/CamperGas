@@ -135,6 +135,8 @@ class SettingsViewModelTest {
     fun `setWeightInterval converts minutes to seconds and updates use case`() = runTest {
         // Act
         viewModel.setWeightInterval(5) // 5 minutos
+        
+        // Wait for the operation to complete
         advanceUntilIdle()
 
         // Assert
@@ -150,6 +152,8 @@ class SettingsViewModelTest {
     fun `setInclinationInterval updates use case directly with seconds`() = runTest {
         // Act
         viewModel.setInclinationInterval(30) // 30 segundos
+        
+        // Wait for the operation to complete
         advanceUntilIdle()
 
         // Assert
