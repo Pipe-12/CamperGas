@@ -51,7 +51,6 @@ fun GasCylinderVisualizer(
     }
 
     // Usar color de superficie según el tema (claro/oscuro)
-    val backgroundColor = MaterialTheme.colorScheme.surface
     val isDarkTheme = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     val cylinderBackground = if (isDarkTheme) {
         Color.Black.copy(alpha = 0.9f)
@@ -173,7 +172,6 @@ fun WeightScreen(
     viewModel: WeightViewModel = hiltViewModel()
 ) {
     val fuelState by viewModel.fuelState.collectAsState()
-    val vehicleState by viewModel.vehicleState.collectAsState()
     val activeCylinder by viewModel.activeCylinder.collectAsState()
 
     Scaffold(
@@ -276,6 +274,7 @@ fun WeightScreen(
                                 Text(
                                     text = "Capacidad: ${
                                         String.format(
+                                            Locale.getDefault(),
                                             "%.1f",
                                             cylinder.capacity
                                         )
@@ -284,7 +283,7 @@ fun WeightScreen(
                                 )
 
                                 Text(
-                                    text = "Peso vacía: ${String.format("%.1f", cylinder.tare)} kg",
+                                    text = "Peso vacía: ${String.format(Locale.getDefault(), "%.1f", cylinder.tare)} kg",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             } ?: run {
