@@ -116,7 +116,7 @@ class CamperGasBleService @Inject constructor(
 
                 BluetoothProfile.STATE_DISCONNECTED -> {
                     Log.d(TAG, "❌ Callback: Desconectado del sensor CamperGas (status: $status)")
-                    
+
                     // Solo actualizar si no hemos forzado ya la desconexión
                     if (_connectionState.value) {
                         Log.d(TAG, "❌ Actualizando estado de conexión desde callback")
@@ -124,12 +124,12 @@ class CamperGasBleService @Inject constructor(
                     } else {
                         Log.d(TAG, "❌ Estado ya había sido actualizado manualmente")
                     }
-                    
+
                     _isLoadingHistory.value = false
                     // Detener lectura periódica al desconectar
                     stopPeriodicDataReading()
                     cleanup()
-                    
+
                     // Si la desconexión fue inesperada (status != 0), loguear
                     if (status != BluetoothGatt.GATT_SUCCESS) {
                         Log.w(TAG, "⚠️ Desconexión inesperada - status: $status")
@@ -919,7 +919,7 @@ class CamperGasBleService @Inject constructor(
                 Log.d(TAG, "🔌 Desconectando GATT...")
                 @SuppressLint("MissingPermission")
                 gatt.disconnect()
-                
+
                 // Pequeña pausa antes de cerrar
                 serviceScope.launch {
                     delay(100)
@@ -929,7 +929,7 @@ class CamperGasBleService @Inject constructor(
                     }
                     cleanup()
                 }
-                
+
                 Log.d(TAG, "🔌 GATT desconectado")
             } else {
                 Log.w(TAG, "🔌 No hay permisos para desconectar, forzando limpieza")
@@ -939,7 +939,7 @@ class CamperGasBleService @Inject constructor(
             Log.w(TAG, "🔌 bluetoothGatt es null, limpiando recursos")
             cleanup()
         }
-        
+
         Log.d(TAG, "🔌 Desconexión completada - Estado final: ${_connectionState.value}")
     }
 
@@ -1053,7 +1053,7 @@ class CamperGasBleService @Inject constructor(
 
     private fun cleanup() {
         Log.d(TAG, "🧹 Iniciando limpieza de recursos BLE")
-        
+
         // Detener lectura offline si está en progreso
         stopOfflineDataReading()
 
@@ -1078,7 +1078,7 @@ class CamperGasBleService @Inject constructor(
         _fuelData.value = null
         _inclinationData.value = null
         processedOfflineData.clear() // Limpiar datos procesados al desconectar
-        
+
         Log.d(TAG, "🧹 Limpieza completada - Estado conexión: ${_connectionState.value}")
     }
 

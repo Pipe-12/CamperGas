@@ -42,6 +42,7 @@ class SettingsViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = 15  //1 segundo por defecto
             )
+
     // Estado para feedback visual de operaciones BLE
     private val _operationStatus = MutableStateFlow<String?>(null)
     val operationStatus: StateFlow<String?> = _operationStatus.asStateFlow()

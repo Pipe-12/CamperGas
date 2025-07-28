@@ -318,7 +318,13 @@ fun WeightScreen(
                                 )
 
                                 Text(
-                                    text = "Peso vacía: ${String.format(Locale.getDefault(), "%.1f", cylinder.tare)} kg",
+                                    text = "Peso vacía: ${
+                                        String.format(
+                                            Locale.getDefault(),
+                                            "%.1f",
+                                            cylinder.tare
+                                        )
+                                    } kg",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             } ?: run {

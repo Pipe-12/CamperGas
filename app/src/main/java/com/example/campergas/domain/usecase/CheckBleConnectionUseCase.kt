@@ -16,7 +16,7 @@ class CheckBleConnectionUseCase @Inject constructor(
     operator fun invoke(): StateFlow<Boolean> {
         return bleRepository.connectionState
     }
-    
+
     /**
      * Verifica si hay una conexión BLE activa en este momento
      */
