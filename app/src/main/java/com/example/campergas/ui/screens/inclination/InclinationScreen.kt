@@ -170,10 +170,10 @@ fun InclinationScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Vista del Vehículo",
+                                text = "🚐 Visualización del Nivelado",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                modifier = Modifier.padding(bottom = 12.dp)
                             )
                             
                             VehicleInclinationView(
@@ -183,8 +183,15 @@ fun InclinationScreen(
                                 modifier = Modifier.fillMaxWidth()
                             )
                             
+                            Spacer(modifier = Modifier.height(8.dp))
+                            
                             Text(
-                                text = "${uiState.vehicleType.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                                text = "Tipo de vehículo: ${
+                                    when(uiState.vehicleType) {
+                                        VehicleType.CARAVAN -> "Caravana"
+                                        VehicleType.AUTOCARAVANA -> "Autocaravana"
+                                    }
+                                }",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
