@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.campergas.domain.model.VehicleType
 import com.example.campergas.ui.components.VehicleInclinationView
 import com.example.campergas.ui.components.WheelElevationsDisplay
 import java.text.SimpleDateFormat
