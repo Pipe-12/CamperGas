@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
@@ -35,6 +37,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.campergas.ui.components.VehicleInclinationView
+import com.example.campergas.ui.components.WheelElevationsDisplay
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -60,57 +64,64 @@ fun InclinationScreen(
             )
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
         ) {
             if (uiState.isLoading) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Esperando datos del sensor...")
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Botón para solicitar datos cuando está cargando
-                    OutlinedButton(
-                        onClick = { viewModel.requestInclinationDataManually() },
-                        enabled = viewModel.isConnected() && viewModel.canMakeRequest()
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        if (isRequestingData) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(18.dp),
-                                strokeWidth = 2.dp
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("Esperando datos del sensor...")
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Botón para solicitar datos cuando está cargando
+                        OutlinedButton(
+                            onClick = { viewModel.requestInclinationDataManually() },
+                            enabled = viewModel.isConnected() && viewModel.canMakeRequest()
+                        ) {
+                            if (isRequestingData) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(18.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(if (isRequestingData) "Solicitando..." else "Solicitar Datos")
+                        }
+
+                        if (!viewModel.isConnected()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "⚠️ Conecta el sensor primero",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
                             )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
+                        } else if (!viewModel.canMakeRequest()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "⏱️ Espera 2 segundos entre peticiones",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(if (isRequestingData) "Solicitando..." else "Solicitar Datos")
-                    }
-
-                    if (!viewModel.isConnected()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "⚠️ Conecta el sensor primero",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    } else if (!viewModel.canMakeRequest()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "⏱️ Espera 2 segundos entre peticiones",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
                     }
                 }
             } else {
@@ -144,6 +155,38 @@ fun InclinationScreen(
                                     MaterialTheme.colorScheme.onPrimaryContainer
                                 else
                                     MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Visualización del vehículo inclinado
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Vista del Vehículo",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            
+                            VehicleInclinationView(
+                                vehicleType = uiState.vehicleType,
+                                pitchAngle = uiState.inclinationPitch,
+                                rollAngle = uiState.inclinationRoll,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            
+                            Text(
+                                text = "${uiState.vehicleType.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -217,6 +260,40 @@ fun InclinationScreen(
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
+
+                    // Mostrar elevaciones de ruedas solo si hay configuración
+                    if (uiState.distanceBetweenRearWheels > 0 && uiState.distanceToFrontSupport > 0) {
+                        WheelElevationsDisplay(
+                            vehicleType = uiState.vehicleType,
+                            wheelElevations = uiState.wheelElevations,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                    } else {
+                        // Mensaje para configurar el vehículo
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text(
+                                    text = "⚙️ Configuración Requerida",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = "Para mostrar las estimaciones de elevación de ruedas, configura las dimensiones del vehículo en la sección de configuración.",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
 
                     // Información adicional
                     Card(
@@ -313,7 +390,9 @@ fun InclinationScreen(
                             Text(
                                 text = "• Tolerancia de nivelación: ±2°\n" +
                                         "• Pitch: Inclinación frontal/trasera (cabeceo)\n" +
-                                        "• Roll: Inclinación lateral (alabeo)",
+                                        "• Roll: Inclinación lateral (alabeo)\n" +
+                                        "• Pitch + = frente hacia arriba\n" +
+                                        "• Roll + = derecha hacia arriba",
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
