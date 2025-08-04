@@ -17,7 +17,7 @@ roomVersion = "2.7.2"
 scanner = "1.6.0"
 ui = "1.8.3"
 uiToolingPreview = "1.8.3"
-navigationComposeJvmstubs = "2.9.2"
+navigationComposeJvmstubs = "2.9.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
