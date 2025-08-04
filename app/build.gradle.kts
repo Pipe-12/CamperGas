@@ -77,10 +77,10 @@ dependencies {
     testImplementation("org.robolectric:robolectric:4.11.1")
 
     // Hilt testing
-    testImplementation("com.google.dagger:hilt-android-testing:2.56.2")
-    kspTest("com.google.dagger:hilt-compiler:2.56.2")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.56.2")
-    kspAndroidTest("com.google.dagger:hilt-compiler:2.56.2")
+    testImplementation("com.google.dagger:hilt-android-testing:2.57")
+    kspTest("com.google.dagger:hilt-compiler:2.57")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.57")
+    kspAndroidTest("com.google.dagger:hilt-compiler:2.57")
 
     // Hilt
     implementation(libs.hilt.android)
