@@ -74,7 +74,7 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.12")
     testImplementation("io.mockk:mockk-android:1.13.12")
     testImplementation("app.cash.turbine:turbine:1.1.0")
-    testImplementation("org.robolectric:robolectric:4.11.1")
+    testImplementation("org.robolectric:robolectric:4.15.1")
 
     // Hilt testing
     testImplementation("com.google.dagger:hilt-android-testing:2.56.2")
