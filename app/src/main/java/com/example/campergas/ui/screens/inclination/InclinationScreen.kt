@@ -1,9 +1,7 @@
 package com.example.campergas.ui.screens.inclination
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -197,74 +195,6 @@ fun InclinationScreen(
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Datos de inclinación
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        // Inclinación Pitch (Cabeceo)
-                        Card(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "Cabeceo (Pitch)",
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                                Text(
-                                    text = "${
-                                        String.format(
-                                            Locale.US,
-                                            "%.1f",
-                                            uiState.inclinationPitch
-                                        )
-                                    }°",
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    text = "Adelante/Atrás",
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
-                        }
-
-                        // Inclinación Roll (Alabeo)
-                        Card(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "Alabeo (Roll)",
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                                Text(
-                                    text = "${
-                                        String.format(
-                                            Locale.US,
-                                            "%.1f",
-                                            uiState.inclinationRoll
-                                        )
-                                    }°",
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    text = "Lado a lado",
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
                         }
                     }
 
