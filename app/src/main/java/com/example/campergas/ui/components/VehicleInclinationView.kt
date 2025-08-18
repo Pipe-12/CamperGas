@@ -111,23 +111,6 @@ fun VehicleInclinationSideView(
                     end = Offset(size.width - 20f, groundLevel),
                     strokeWidth = 2.dp.toPx()
                 )
-                
-                // Líneas de referencia adicionales cada 5 grados
-                for (angle in listOf(-10, -5, 5, 10)) {
-                    val angleRad = (angle * PI / 180).toFloat()
-                    val lineLength = 40f
-                    val startX = centerX - lineLength
-                    val endX = centerX + lineLength
-                    val y = groundLevel - (lineLength * sin(angleRad))
-                    
-                    drawLine(
-                        color = Color.Gray.copy(alpha = 0.3f),
-                        start = Offset(startX, y),
-                        end = Offset(endX, y),
-                        strokeWidth = 1.dp.toPx()
-                    )
-                }
-
                 // Aplicar solo rotación de pitch, centrado en el nivel del suelo
                 translate(centerX, groundLevel) {
                     rotate(pitchAngle, pivot = Offset.Zero) {
@@ -197,23 +180,6 @@ fun VehicleInclinationRearView(
                     end = Offset(size.width - 20f, groundLevel),
                     strokeWidth = 2.dp.toPx()
                 )
-                
-                // Líneas de referencia adicionales cada 5 grados
-                for (angle in listOf(-10, -5, 5, 10)) {
-                    val angleRad = (angle * PI / 180).toFloat()
-                    val lineLength = 40f
-                    val startX = centerX - lineLength
-                    val endX = centerX + lineLength
-                    val y = groundLevel - (lineLength * sin(angleRad))
-                    
-                    drawLine(
-                        color = Color.Gray.copy(alpha = 0.3f),
-                        start = Offset(startX, y),
-                        end = Offset(endX, y),
-                        strokeWidth = 1.dp.toPx()
-                    )
-                }
-
                 // Aplicar solo rotación de roll, centrado en el nivel del suelo
                 translate(centerX, groundLevel) {
                     rotate(rollAngle, pivot = Offset.Zero) {
@@ -236,7 +202,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
     val height = 100f // Aumentado
     val wheelRadius = 16f // Aumentado
     val strokeWidth = 2.dp.toPx()
-    val bodyOffsetY = -height / 2 - wheelRadius + 8f // Ajustado para mejor posición
+    val bodyOffsetY = -height  - wheelRadius + 8f // Ajustado para mejor posición
 
     // Sombra del vehículo
     drawRoundRect(
@@ -377,12 +343,13 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         )
     }
 
-    // Timón/enganche delantero (más proporcionado)
-    val hitchWidth = 40f // Reducido para mejor proporción
+    // Timón/enganche delantero
+    val hitchWidth = 40f
     val hitchHeight = 18f
+
     drawRoundRect(
         color = secondaryColor,
-        topLeft = Offset(-width / 2 - hitchWidth, -hitchHeight / 2),
+        topLeft = Offset(-width / 2 - hitchWidth, -hitchHeight * 2),
         size = Size(hitchWidth, hitchHeight),
         cornerRadius = CornerRadius(4f, 4f)
     )
@@ -394,13 +361,13 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         center = Offset(-width / 2 - hitchWidth + 5f, 0f)
     )
 
-    // Ruedín delantero con soporte (más proporcionado)
+    // Ruedín delantero con soporte
     val jockeyWheelCenter = Offset(-width / 2 - hitchWidth - 8f, 0f)
     
     // Soporte del ruedín
     drawLine(
         color = Color.Gray,
-        start = Offset(-width / 2 - 15f, bodyOffsetY + height - 15f),
+        start = Offset(-width / 2 - 15f, bodyOffsetY + height / 1.5f - 15f),
         end = jockeyWheelCenter,
         strokeWidth = 4.dp.toPx()
     )
@@ -448,7 +415,7 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
     val height = 110f // Aumentado
     val wheelRadius = 16f // Aumentado
     val strokeWidth = 2.dp.toPx()
-    val bodyOffsetY = -height / 2 - wheelRadius + 8f // Ajustado para mejor posición
+    val bodyOffsetY = -height  - wheelRadius + 8f // Ajustado para mejor posición
 
     // Sombra del vehículo
     drawRoundRect(
@@ -672,7 +639,7 @@ private fun DrawScope.drawCaravanRearView(primaryColor: Color) {
     val height = 110f // Aumentado
     val wheelRadius = 16f // Aumentado
     val strokeWidth = 2.dp.toPx()
-    val bodyOffsetY = -height / 2 - wheelRadius + 8f // Ajustado para mejor posición
+    val bodyOffsetY = -height - wheelRadius + 8f // Ajustado para mejor posición
 
     // Sombra del vehículo
     drawRoundRect(
@@ -846,7 +813,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
     val height = 120f // Aumentado
     val wheelRadius = 16f // Aumentado
     val strokeWidth = 2.dp.toPx()
-    val bodyOffsetY = -height / 2 - wheelRadius + 8f // Ajustado para mejor posición
+    val bodyOffsetY = -height  - wheelRadius + 8f // Ajustado para mejor posición
 
     // Sombra del vehículo
     drawRoundRect(
