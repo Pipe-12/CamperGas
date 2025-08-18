@@ -703,12 +703,12 @@ private fun DrawScope.drawCaravanRearView(primaryColor: Color) {
         center = Offset(20f, bodyOffsetY + height / 2 + 8f)
     )
 
-    // Ruedas traseras detalladas - Posicionadas para tocar la línea de referencia
+    // Ruedas traseras rectangulares - Posicionadas para tocar la línea de referencia
     val leftWheelCenter = Offset(-width / 2 + 35, 0f) // Altura 0 para estar en la línea de referencia
     val rightWheelCenter = Offset(width / 2 - 35, 0f)
     
-    drawDetailedWheel(leftWheelCenter, wheelRadius)
-    drawDetailedWheel(rightWheelCenter, wheelRadius)
+    drawRearViewWheel(leftWheelCenter)
+    drawRearViewWheel(rightWheelCenter)
 
     // Luces traseras (más grandes y visibles)
     val lightRadius = 7f
@@ -901,12 +901,12 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         cornerRadius = CornerRadius(3f, 3f)
     )
 
-    // Ruedas traseras detalladas - Posicionadas para tocar la línea de referencia
+    // Ruedas traseras rectangulares - Posicionadas para tocar la línea de referencia
     val leftWheelCenter = Offset(-width / 2 + 35, 0f) // Altura 0 para estar en la línea de referencia
     val rightWheelCenter = Offset(width / 2 - 35, 0f)
     
-    drawDetailedWheel(leftWheelCenter, wheelRadius)
-    drawDetailedWheel(rightWheelCenter, wheelRadius)
+    drawRearViewWheel(leftWheelCenter)
+    drawRearViewWheel(rightWheelCenter)
 
     // Sistema de luces traseras más completo y grande
     val lightRadius = 8f
@@ -1036,5 +1036,45 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         color = Color.Red.copy(alpha = 0.7f),
         topLeft = Offset(width / 2 - 3f, bodyOffsetY + height / 2),
         size = Size(6f, 20f)
+    )
+}
+
+// Función para dibujar ruedas en vista trasera (rectangulares)
+private fun DrawScope.drawRearViewWheel(center: Offset, width: Float = 20f, height: Float = 35f) {
+    // Sombra de la rueda
+    drawRect(
+        color = Color.Black.copy(alpha = 0.3f),
+        topLeft = Offset(center.x - width / 2 + 2f, center.y - height / 2 + 2f),
+        size = Size(width, height)
+    )
+    
+    // Rueda principal (rectángulo negro vertical)
+    drawRect(
+        color = Color.Black,
+        topLeft = Offset(center.x - width / 2, center.y - height / 2),
+        size = Size(width, height)
+    )
+    
+    // Borde metálico de la llanta
+    drawRect(
+        color = Color.Gray,
+        topLeft = Offset(center.x - width / 2 + 2f, center.y - height / 2 + 2f),
+        size = Size(width - 4f, height - 4f)
+    )
+    
+    // Línea central de la banda de rodadura
+    drawLine(
+        color = Color.DarkGray,
+        start = Offset(center.x, center.y - height / 2 + 3f),
+        end = Offset(center.x, center.y + height / 2 - 3f),
+        strokeWidth = 1.5.dp.toPx()
+    )
+    
+    // Contorno exterior
+    drawRect(
+        color = Color.Black,
+        topLeft = Offset(center.x - width / 2, center.y - height / 2),
+        size = Size(width, height),
+        style = Stroke(width = 1.5.dp.toPx())
     )
 }
