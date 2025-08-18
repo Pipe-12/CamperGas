@@ -4,9 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.example.campergas.data.repository.BleRepository
@@ -64,25 +62,23 @@ class BleForegroundService : Service() {
                 // Guardar la dirección del dispositivo conectado
                 bleRepository.saveLastConnectedDevice(deviceAddress)
 
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 stopSelf()
             }
         }
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "CamperGas BLE Service"
-            val descriptionText = "Canal para el servicio BLE de CamperGas"
-            val importance = NotificationManager.IMPORTANCE_LOW
-            val channel = NotificationChannel(channelId, name, importance).apply {
-                description = descriptionText
-            }
-
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+        val name = "CamperGas BLE Service"
+        val descriptionText = "Canal para el servicio BLE de CamperGas"
+        val importance = NotificationManager.IMPORTANCE_LOW
+        val channel = NotificationChannel(channelId, name, importance).apply {
+            description = descriptionText
         }
+
+        val notificationManager =
+            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 
     private fun createNotification(message: String): Notification {
@@ -97,7 +93,7 @@ class BleForegroundService : Service() {
     private fun updateNotification(message: String) {
         val notification = createNotification(message)
         val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(notificationId, notification)
     }
 
@@ -114,21 +110,21 @@ class BleForegroundService : Service() {
     companion object {
         const val KEY_DEVICE_ADDRESS = "device_address"
 
-        fun startService(context: Context, deviceAddress: String) {
-            val intent = Intent(context, BleForegroundService::class.java).apply {
-                putExtra(KEY_DEVICE_ADDRESS, deviceAddress)
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
-            }
-        }
-
-        fun stopService(context: Context) {
-            val intent = Intent(context, BleForegroundService::class.java)
-            context.stopService(intent)
-        }
+//        fun startService(context: Context, deviceAddress: String) {
+//            val intent = Intent(context, BleForegroundService::class.java).apply {
+//                putExtra(KEY_DEVICE_ADDRESS, deviceAddress)
+//            }
+//
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                context.startForegroundService(intent)
+//            } else {
+//                context.startService(intent)
+//            }
+//        }
+//
+//        fun stopService(context: Context) {
+//            val intent = Intent(context, BleForegroundService::class.java)
+//            context.stopService(intent)
+//        }
     }
 }

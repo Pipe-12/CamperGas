@@ -1,8 +1,17 @@
 package com.example.campergas.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,7 +87,7 @@ private fun CaravanWheelElevations(wheelElevations: WheelElevations) {
                 icon = "⬅️",
                 modifier = Modifier.weight(1f)
             )
-            
+
             WheelElevationItem(
                 wheelName = "🛞 Trasera Der.",
                 elevation = wheelElevations.rearRight,
@@ -99,7 +108,7 @@ private fun MotorHomeWheelElevations(wheelElevations: WheelElevations) {
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(bottom = 4.dp)
         )
-        
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -110,7 +119,7 @@ private fun MotorHomeWheelElevations(wheelElevations: WheelElevations) {
                 icon = "⬅️",
                 modifier = Modifier.weight(1f)
             )
-            
+
             WheelElevationItem(
                 wheelName = "🛞 Delant. Der.",
                 elevation = wheelElevations.frontRight,
@@ -128,7 +137,7 @@ private fun MotorHomeWheelElevations(wheelElevations: WheelElevations) {
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(bottom = 4.dp)
         )
-        
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -139,7 +148,7 @@ private fun MotorHomeWheelElevations(wheelElevations: WheelElevations) {
                 icon = "⬅️",
                 modifier = Modifier.weight(1f)
             )
-            
+
             WheelElevationItem(
                 wheelName = "🛞 Trasera Der.",
                 elevation = wheelElevations.rearRight,
@@ -176,14 +185,14 @@ private fun WheelElevationItem(
                 text = icon,
                 style = MaterialTheme.typography.titleMedium
             )
-            
+
             Text(
                 text = wheelName,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Medium
             )
-            
+
             Text(
                 text = "${String.format(Locale.US, "%.1f", elevation)} cm",
                 style = MaterialTheme.typography.titleSmall,
@@ -194,7 +203,7 @@ private fun WheelElevationItem(
                     else -> MaterialTheme.colorScheme.onErrorContainer
                 }
             )
-            
+
             Text(
                 text = when {
                     abs(elevation) < 0.5f -> "OK"

@@ -163,6 +163,7 @@ fun InclinationScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Visualización del vehículo inclinado
+
                     Card(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -176,19 +177,19 @@ fun InclinationScreen(
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(bottom = 12.dp)
                             )
-                            
+
                             VehicleInclinationView(
                                 vehicleType = uiState.vehicleType,
                                 pitchAngle = uiState.inclinationPitch,
                                 rollAngle = uiState.inclinationRoll,
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            
+
                             Spacer(modifier = Modifier.height(8.dp))
-                            
+
                             Text(
                                 text = "Tipo de vehículo: ${
-                                    when(uiState.vehicleType) {
+                                    when (uiState.vehicleType) {
                                         VehicleType.CARAVAN -> "Caravana"
                                         VehicleType.AUTOCARAVANA -> "Autocaravana"
                                     }

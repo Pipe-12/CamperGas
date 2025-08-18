@@ -386,7 +386,7 @@ fun ConsumptionItem(
         val timeDifferenceMinutes = timeDifference / (60 * 1000)
 
         percentageChange >= 1.0f || timeDifferenceMinutes >= 15L
-    } ?: true // Primera medición siempre es significativa
+    } != false // Primera medición siempre es significativa
 
     Card(
         modifier = Modifier

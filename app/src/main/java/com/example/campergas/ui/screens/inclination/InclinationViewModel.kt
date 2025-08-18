@@ -14,8 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.abs
-import kotlin.math.sin
 import kotlin.math.tan
 
 @HiltViewModel
@@ -39,7 +37,7 @@ class InclinationViewModel @Inject constructor(
     init {
         // Cargar configuración del vehículo
         loadVehicleConfig()
-        
+
         // Obtener datos de inclinación en tiempo real
         viewModelScope.launch {
             getInclinationUseCase().collectLatest { inclination ->
@@ -96,14 +94,14 @@ class InclinationViewModel @Inject constructor(
 
         // Calcular elevaciones basándose en las distancias configuradas
         val halfRearWheelDistance = state.distanceBetweenRearWheels / 2
-        
+
         // Para el roll (alabeo lateral)
         val rearLeftElevationRoll = halfRearWheelDistance * tan(rollRad)
         val rearRightElevationRoll = -halfRearWheelDistance * tan(rollRad)
-        
+
         // Para el pitch (cabeceo frontal/trasero)
         val frontElevationPitch = state.distanceToFrontSupport * tan(pitchRad)
-        
+
         return when (state.vehicleType) {
             VehicleType.CARAVAN -> {
                 // Caravana: ruedas traseras + ruedín delantero
@@ -113,12 +111,13 @@ class InclinationViewModel @Inject constructor(
                     frontSupport = frontElevationPitch.toFloat()
                 )
             }
+
             VehicleType.AUTOCARAVANA -> {
                 // Autocaravana: 4 ruedas
                 val halfFrontWheelDistance = state.distanceBetweenFrontWheels / 2
                 val frontLeftElevationRoll = halfFrontWheelDistance * tan(rollRad)
                 val frontRightElevationRoll = -halfFrontWheelDistance * tan(rollRad)
-                
+
                 WheelElevations(
                     rearLeft = rearLeftElevationRoll.toFloat(),
                     rearRight = rearRightElevationRoll.toFloat(),
@@ -127,14 +126,6 @@ class InclinationViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    /**
-     * Determina si el vehículo está nivelado basándose en los valores de inclinación pitch y roll
-     */
-    private fun isVehicleLevel(pitch: Float, roll: Float): Boolean {
-        val levelThreshold = 2.0f // 2 grados de tolerancia
-        return abs(pitch) <= levelThreshold && abs(roll) <= levelThreshold
     }
 
     /**

@@ -5,6 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.campergas.domain.model.Inclination
 import com.example.campergas.domain.usecase.CheckBleConnectionUseCase
 import com.example.campergas.domain.usecase.GetInclinationUseCase
+import com.example.campergas.domain.usecase.GetVehicleConfigUseCase
 import com.example.campergas.domain.usecase.RequestInclinationDataUseCase
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -15,6 +16,7 @@ import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -40,6 +42,7 @@ class InclinationViewModelTest {
     private val getInclinationUseCase: GetInclinationUseCase = mockk()
     private val requestInclinationDataUseCase: RequestInclinationDataUseCase = mockk()
     private val checkBleConnectionUseCase: CheckBleConnectionUseCase = mockk()
+    private val getVehicleConfigUseCase: GetVehicleConfigUseCase = mockk()
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private val inclinationFlow = MutableStateFlow<Inclination?>(null)
@@ -56,11 +59,14 @@ class InclinationViewModelTest {
         every { getInclinationUseCase() } returns inclinationFlow
         every { requestInclinationDataUseCase() } returns Unit
         every { checkBleConnectionUseCase.isConnected() } returns true
+        every { getVehicleConfigUseCase() } returns flowOf(null)
+
 
         viewModel = InclinationViewModel(
             getInclinationUseCase,
             requestInclinationDataUseCase,
-            checkBleConnectionUseCase
+            checkBleConnectionUseCase,
+            getVehicleConfigUseCase
         )
     }
 

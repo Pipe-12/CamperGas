@@ -35,14 +35,14 @@ class PreferencesDataStore @Inject constructor(
             val modeString = preferences[themeModeKey] ?: ThemeMode.SYSTEM.name
             try {
                 ThemeMode.valueOf(modeString)
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 ThemeMode.SYSTEM
             }
         }
 
     val areNotificationsEnabled: Flow<Boolean> = context.dataStore.data
         .map { preferences ->
-            preferences[notificationsEnabledKey] ?: true
+            preferences[notificationsEnabledKey] != false
         }
 
     val weightReadInterval: Flow<Long> = context.dataStore.data
