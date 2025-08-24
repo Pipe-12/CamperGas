@@ -44,7 +44,7 @@ fun NavGraph(
         }
 
         composable(Screen.Settings.route) {
-            SettingsScreen()
+            SettingsScreen(navController = navController)
         }
 
         composable(Screen.CaravanConfig.route) {
