@@ -1,5 +1,6 @@
 package com.example.campergas.ui.screens.consumption
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -95,6 +100,19 @@ fun ConsumptionScreen(
             customPeriodConsumption = uiState.customPeriodConsumption,
             hasCustomPeriod = uiState.startDate != null && uiState.endDate != null
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Gráfico de consumo
+        if (uiState.startDate != null && uiState.endDate != null && uiState.chartData.isNotEmpty()) {
+            ConsumptionChartSection(
+                chartData = uiState.chartData,
+                startDate = uiState.startDate!!,
+                endDate = uiState.endDate!!
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -700,6 +718,136 @@ fun ConsumptionSummaryItem(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+fun ConsumptionChartSection(
+    chartData: List<ChartDataPoint>,
+    startDate: Long,
+    endDate: Long
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Gráfico de Consumo",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Text(
+                text = "Consumo por día (${formatDateOnly(startDate)} - ${formatDateOnly(endDate)})",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            ConsumptionChart(
+                data = chartData,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun ConsumptionChart(
+    data: List<ChartDataPoint>,
+    modifier: Modifier = Modifier
+) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+    
+    if (data.isEmpty()) {
+        Box(
+            modifier = modifier,
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "No hay datos para mostrar",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        return
+    }
+    
+    Canvas(
+        modifier = modifier
+    ) {
+        val canvasWidth = size.width
+        val canvasHeight = size.height
+        val padding = 40f
+        
+        // Chart area
+        val chartWidth = canvasWidth - padding * 2
+        val chartHeight = canvasHeight - padding * 2
+        
+        if (data.isNotEmpty()) {
+            // Find min and max values
+            val minConsumption = 0f
+            val maxConsumption = data.maxOfOrNull { it.consumption } ?: 1f
+            val paddedMax = maxConsumption * 1.1f // Add 10% padding at top
+            
+            val minDate = data.minOfOrNull { it.date } ?: 0L
+            val maxDate = data.maxOfOrNull { it.date } ?: 1L
+            val dateRange = maxDate - minDate
+            
+            // Draw axes
+            // X-axis
+            drawLine(
+                color = onSurfaceColor,
+                start = Offset(padding, canvasHeight - padding),
+                end = Offset(canvasWidth - padding, canvasHeight - padding),
+                strokeWidth = 2.dp.toPx()
+            )
+            
+            // Y-axis
+            drawLine(
+                color = onSurfaceColor,
+                start = Offset(padding, padding),
+                end = Offset(padding, canvasHeight - padding),
+                strokeWidth = 2.dp.toPx()
+            )
+            
+            // Draw data points and lines
+            val path = Path()
+            data.forEachIndexed { index, point ->
+                val x = padding + (point.date - minDate).toFloat() / dateRange.toFloat() * chartWidth
+                val y = canvasHeight - padding - (point.consumption / paddedMax) * chartHeight
+                
+                if (index == 0) {
+                    path.moveTo(x, y)
+                } else {
+                    path.lineTo(x, y)
+                }
+                
+                // Draw data point
+                drawCircle(
+                    color = primaryColor,
+                    radius = 4.dp.toPx(),
+                    center = Offset(x, y)
+                )
+            }
+            
+            // Draw line connecting points
+            drawPath(
+                path = path,
+                color = primaryColor,
+                style = Stroke(width = 2.dp.toPx())
             )
         }
     }

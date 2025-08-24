@@ -106,7 +106,8 @@ class ConsumptionViewModel @Inject constructor(
                     lastDayConsumption = lastDayConsumption,
                     lastWeekConsumption = lastWeekConsumption,
                     lastMonthConsumption = lastMonthConsumption,
-                    customPeriodConsumption = customPeriodConsumption
+                    customPeriodConsumption = customPeriodConsumption,
+                    chartData = generateChartData()
                 )
             } catch (e: Exception) {
                 // Handle errors silently for summaries to not interfere with main data loading
@@ -157,6 +158,69 @@ class ConsumptionViewModel @Inject constructor(
         }
     }
 
+    private suspend fun generateChartData(): List<ChartDataPoint> {
+        return try {
+            val currentState = _uiState.value
+            val startDate = currentState.startDate
+            val endDate = currentState.endDate
+            
+            if (startDate != null && endDate != null) {
+                val chartData = mutableListOf<ChartDataPoint>()
+                
+                getConsumptionHistoryUseCase(startDate, endDate).collect { consumptions ->
+                    if (consumptions.isNotEmpty()) {
+                        // Group by day and calculate daily consumption
+                        val dailyConsumption = mutableMapOf<Long, Float>()
+                        
+                        // Sort consumptions by date
+                        val sortedConsumptions = consumptions.sortedBy { it.date }
+                        
+                        // Group by day (ignoring time)
+                        val groupedByDay = sortedConsumptions.groupBy { consumption ->
+                            // Round down to start of day
+                            val dayInMillis = 24 * 60 * 60 * 1000L
+                            (consumption.date / dayInMillis) * dayInMillis
+                        }
+                        
+                        // Calculate consumption for each day
+                        groupedByDay.forEach { (dayStart, dayConsumptions) ->
+                            val groupedByCylinder = dayConsumptions.groupBy { it.cylinderId }
+                            var dayTotal = 0f
+                            
+                            groupedByCylinder.forEach { (_, cylinderConsumptions) ->
+                                val sortedCylinderConsumptions = cylinderConsumptions.sortedBy { it.date }
+                                if (sortedCylinderConsumptions.size > 1) {
+                                    val firstMeasurement = sortedCylinderConsumptions.first()
+                                    val lastMeasurement = sortedCylinderConsumptions.last()
+                                    val consumption = firstMeasurement.fuelKilograms - lastMeasurement.fuelKilograms
+                                    if (consumption > 0) {
+                                        dayTotal += consumption
+                                    }
+                                }
+                            }
+                            
+                            if (dayTotal > 0) {
+                                dailyConsumption[dayStart] = dayTotal
+                            }
+                        }
+                        
+                        // Convert to chart data points
+                        chartData.addAll(
+                            dailyConsumption.map { (date, consumption) ->
+                                ChartDataPoint(date, consumption)
+                            }.sortedBy { it.date }
+                        )
+                    }
+                }
+                
+                chartData
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+
     /**
      * Método helper para reducir duplicación de código en filtros de fecha
      */
@@ -185,5 +249,6 @@ data class ConsumptionUiState(
     val lastDayConsumption: Float = 0f,
     val lastWeekConsumption: Float = 0f,
     val lastMonthConsumption: Float = 0f,
-    val customPeriodConsumption: Float = 0f
+    val customPeriodConsumption: Float = 0f,
+    val chartData: List<ChartDataPoint> = emptyList()
 )
