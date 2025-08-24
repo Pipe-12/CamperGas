@@ -76,11 +76,12 @@ class GetConsumptionHistoryUseCase @Inject constructor(
                 if (sortedConsumptions.size < 2) return@map 0f
                 
                 // Calcular la diferencia entre la primera y última medición del período
-                val firstMeasurement = sortedConsumptions.first()
-                val lastMeasurement = sortedConsumptions.last()
+                val firstMeasurement = sortedConsumptions.first()  // Más reciente
+                val lastMeasurement = sortedConsumptions.last()    // Más antigua
                 
-                // El consumo es la diferencia (puede ser negativa si se recargó)
-                kotlin.math.max(0f, lastMeasurement.fuelKilograms - firstMeasurement.fuelKilograms)
+                // El consumo es la diferencia: medición inicial - medición final
+                // Como se crea un nuevo cilindro al rellenar, no debería haber valores negativos
+                lastMeasurement.fuelKilograms - firstMeasurement.fuelKilograms
             }
             .sum()
     }
