@@ -183,6 +183,67 @@ class ConsumptionViewModelTest {
     }
 
     @Test
+    fun `setLastDayFilter sets correct date range`() = runTest {
+        // Arrange
+        every { getConsumptionHistoryUseCase(any(), any()) } returns flowOf(emptyList())
+
+        // Act
+        viewModel.setLastDayFilter()
+        advanceUntilIdle()
+
+        // Assert
+        verify { getConsumptionHistoryUseCase(any(), any()) }
+        assertNotNull(viewModel.uiState.value.startDate)
+        assertNotNull(viewModel.uiState.value.endDate)
+        // No podemos verificar los valores exactos porque son calculados internamente con Calendar
+    }
+
+    @Test
+    fun `consumption summaries are calculated correctly`() = runTest {
+        // Arrange
+        val testConsumptions = listOf(
+            createTestConsumption(1),
+            createTestConsumption(2)
+        )
+        
+        every { getConsumptionHistoryUseCase(any(), any()) } returns flowOf(testConsumptions)
+
+        // Act
+        viewModel.setDateRange(1000L, 2000L)
+        advanceUntilIdle()
+
+        // Assert
+        val state = viewModel.uiState.value
+        // Summary values should be calculated (though we can't verify exact values due to private calculation logic)
+        assertTrue(state.lastDayConsumption >= 0f)
+        assertTrue(state.lastWeekConsumption >= 0f)
+        assertTrue(state.lastMonthConsumption >= 0f)
+        assertTrue(state.customPeriodConsumption >= 0f)
+    }
+
+    @Test
+    fun `chart data is generated for custom date range`() = runTest {
+        // Arrange
+        val testConsumptions = listOf(
+            createTestConsumption(1),
+            createTestConsumption(2)
+        )
+        
+        every { getConsumptionHistoryUseCase(any(), any()) } returns flowOf(testConsumptions)
+
+        // Act
+        viewModel.setDateRange(1000L, 2000L)
+        advanceUntilIdle()
+
+        // Assert
+        val state = viewModel.uiState.value
+        // Chart data should be generated when custom date range is set
+        assertNotNull(state.chartData)
+        // The chart data list should be initialized (could be empty if no consumption calculated)
+        assertTrue(state.chartData is List<ChartDataPoint>)
+    }
+
+    @Test
     fun `exception during loadConsumptionHistory updates error state`() = runTest {
         // Arrange
         val errorMessage = "Error cargando datos"

@@ -804,7 +804,7 @@ fun ConsumptionChart(
             
             val minDate = data.minOfOrNull { it.date } ?: 0L
             val maxDate = data.maxOfOrNull { it.date } ?: 1L
-            val dateRange = maxDate - minDate
+            val dateRange = if (maxDate > minDate) maxDate - minDate else 1L
             
             // Draw axes
             // X-axis
@@ -824,31 +824,48 @@ fun ConsumptionChart(
             )
             
             // Draw data points and lines
-            val path = Path()
-            data.forEachIndexed { index, point ->
-                val x = padding + (point.date - minDate).toFloat() / dateRange.toFloat() * chartWidth
-                val y = canvasHeight - padding - (point.consumption / paddedMax) * chartHeight
-                
-                if (index == 0) {
-                    path.moveTo(x, y)
-                } else {
-                    path.lineTo(x, y)
+            if (data.size > 1) {
+                val path = Path()
+                data.forEachIndexed { index, point ->
+                    val x = if (dateRange > 0) {
+                        padding + (point.date - minDate).toFloat() / dateRange.toFloat() * chartWidth
+                    } else {
+                        padding + chartWidth / 2f
+                    }
+                    val y = canvasHeight - padding - (point.consumption / paddedMax) * chartHeight
+                    
+                    if (index == 0) {
+                        path.moveTo(x, y)
+                    } else {
+                        path.lineTo(x, y)
+                    }
+                    
+                    // Draw data point
+                    drawCircle(
+                        color = primaryColor,
+                        radius = 4.dp.toPx(),
+                        center = Offset(x, y)
+                    )
                 }
                 
-                // Draw data point
+                // Draw line connecting points
+                drawPath(
+                    path = path,
+                    color = primaryColor,
+                    style = Stroke(width = 2.dp.toPx())
+                )
+            } else if (data.size == 1) {
+                // Just draw a single point
+                val point = data[0]
+                val x = padding + chartWidth / 2f
+                val y = canvasHeight - padding - (point.consumption / paddedMax) * chartHeight
+                
                 drawCircle(
                     color = primaryColor,
                     radius = 4.dp.toPx(),
                     center = Offset(x, y)
                 )
             }
-            
-            // Draw line connecting points
-            drawPath(
-                path = path,
-                color = primaryColor,
-                style = Stroke(width = 2.dp.toPx())
-            )
         }
     }
 }
