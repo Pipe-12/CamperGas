@@ -43,6 +43,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -498,7 +501,7 @@ fun ConsumptionChart(
                     data = chartData,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp)
+                        .height(200.dp) // Increased height for axis labels
                 )
             }
         }
@@ -512,13 +515,14 @@ fun SimpleLineChart(
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
     val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
+    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
     
     Canvas(modifier = modifier.background(surfaceVariant)) {
         if (data.size < 2) return@Canvas
         
         val chartWidth = size.width
         val chartHeight = size.height
-        val padding = 40f
+        val padding = 60f // Increased padding for labels
         
         // Calculate bounds
         val minValue = data.minOf { it.kilograms }
@@ -529,16 +533,77 @@ fun SimpleLineChart(
         val maxDate = data.maxOf { it.date }
         val dateRange = max(maxDate - minDate, 1L) // Avoid division by zero
         
-        // Draw grid lines (horizontal)
+        // Draw grid lines (horizontal) and Y-axis labels
         val gridLines = 4
         for (i in 0..gridLines) {
             val y = padding + (i * (chartHeight - 2 * padding) / gridLines)
+            
+            // Draw horizontal grid line
             drawLine(
                 color = Color.Gray.copy(alpha = 0.3f),
                 start = Offset(padding, y),
                 end = Offset(chartWidth - padding, y),
                 strokeWidth = 1f
             )
+            
+            // Draw Y-axis labels (kg values)
+            val kgValue = maxValue - (i * valueRange / gridLines)
+            drawIntoCanvas { canvas ->
+                val paint = android.graphics.Paint().apply {
+                    color = onSurfaceVariant.toArgb()
+                    textSize = 28f
+                    textAlign = android.graphics.Paint.Align.RIGHT
+                }
+                canvas.nativeCanvas.drawText(
+                    String.format("%.1f kg", kgValue),
+                    padding - 10f,
+                    y + 5f,
+                    paint
+                )
+            }
+        }
+        
+        // Draw vertical grid lines and X-axis labels (dates)
+        val xAxisLabels = 4 // Show 4 date labels
+        for (i in 0..xAxisLabels) {
+            val x = padding + (i * (chartWidth - 2 * padding) / xAxisLabels)
+            
+            // Draw vertical grid line
+            drawLine(
+                color = Color.Gray.copy(alpha = 0.3f),
+                start = Offset(x, padding),
+                end = Offset(x, chartHeight - padding),
+                strokeWidth = 1f
+            )
+            
+            // Draw X-axis labels (dates)
+            if (i < data.size || data.size <= xAxisLabels) {
+                val dateIndex = if (data.size <= xAxisLabels) {
+                    // If we have few data points, show each one
+                    minOf(i, data.size - 1)
+                } else {
+                    // If we have many data points, sample across the range
+                    (i * (data.size - 1) / xAxisLabels)
+                }
+                
+                val timestamp = data[dateIndex].date
+                val dateFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
+                val dateLabel = dateFormat.format(Date(timestamp))
+                
+                drawIntoCanvas { canvas ->
+                    val paint = android.graphics.Paint().apply {
+                        color = onSurfaceVariant.toArgb()
+                        textSize = 24f
+                        textAlign = android.graphics.Paint.Align.CENTER
+                    }
+                    canvas.nativeCanvas.drawText(
+                        dateLabel,
+                        x,
+                        chartHeight - padding + 25f,
+                        paint
+                    )
+                }
+            }
         }
         
         // Calculate points
