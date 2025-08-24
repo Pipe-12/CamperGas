@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -79,8 +80,20 @@ fun ConsumptionScreen(
             onStartDateClick = { showStartDatePicker = true },
             onEndDateClick = { showEndDatePicker = true },
             onClearFilter = { viewModel.clearDateFilter() },
+            onLastDayClick = { viewModel.setLastDayFilter() },
             onLastWeekClick = { viewModel.setLastWeekFilter() },
             onLastMonthClick = { viewModel.setLastMonthFilter() }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Resumen de consumo
+        ConsumptionSummarySection(
+            lastDayConsumption = uiState.lastDayConsumption,
+            lastWeekConsumption = uiState.lastWeekConsumption,
+            lastMonthConsumption = uiState.lastMonthConsumption,
+            customPeriodConsumption = uiState.customPeriodConsumption,
+            hasCustomPeriod = uiState.startDate != null && uiState.endDate != null
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -253,6 +266,7 @@ fun DateFiltersSection(
     onStartDateClick: () -> Unit,
     onEndDateClick: () -> Unit,
     onClearFilter: () -> Unit,
+    onLastDayClick: () -> Unit,
     onLastWeekClick: () -> Unit,
     onLastMonthClick: () -> Unit
 ) {
@@ -299,6 +313,19 @@ fun DateFiltersSection(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                FilterChip(
+                    selected = false,
+                    onClick = onLastDayClick,
+                    label = { Text("1 día") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                )
+
                 FilterChip(
                     selected = false,
                     onClick = onLastWeekClick,
@@ -564,4 +591,116 @@ private fun formatDate(timestamp: Long): String {
 private fun formatDateOnly(timestamp: Long): String {
     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     return sdf.format(Date(timestamp))
+}
+
+@Composable
+fun ConsumptionSummarySection(
+    lastDayConsumption: Float,
+    lastWeekConsumption: Float,
+    lastMonthConsumption: Float,
+    customPeriodConsumption: Float,
+    hasCustomPeriod: Boolean
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Resumen de Consumo",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            // Summary grid
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                ConsumptionSummaryItem(
+                    title = "Último día",
+                    consumption = lastDayConsumption,
+                    modifier = Modifier.weight(1f)
+                )
+                
+                Spacer(modifier = Modifier.width(8.dp))
+                
+                ConsumptionSummaryItem(
+                    title = "Última semana",
+                    consumption = lastWeekConsumption,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                ConsumptionSummaryItem(
+                    title = "Último mes",
+                    consumption = lastMonthConsumption,
+                    modifier = Modifier.weight(1f)
+                )
+                
+                Spacer(modifier = Modifier.width(8.dp))
+                
+                if (hasCustomPeriod) {
+                    ConsumptionSummaryItem(
+                        title = "Período custom",
+                        consumption = customPeriodConsumption,
+                        modifier = Modifier.weight(1f)
+                    )
+                } else {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ConsumptionSummaryItem(
+    title: String,
+    consumption: Float,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Text(
+                text = "${String.format(Locale.US, "%.2f", consumption)} kg",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
 }
