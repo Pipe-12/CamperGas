@@ -52,6 +52,13 @@ class ConsumptionViewModelTest {
         // Por defecto, cuando se llama al use case sin fechas, devuelve todas las consumptions
         every { getConsumptionHistoryUseCase(null, null) } returns consumptionsFlow
 
+        // Mock the new summary methods
+        every { getConsumptionHistoryUseCase.getLastDayConsumption() } returns flowOf(emptyList())
+        every { getConsumptionHistoryUseCase.getLastWeekConsumption() } returns flowOf(emptyList())
+        every { getConsumptionHistoryUseCase.getLastMonthConsumption() } returns flowOf(emptyList())
+        every { getConsumptionHistoryUseCase.calculateTotalConsumption(any()) } returns 0f
+        every { getConsumptionHistoryUseCase.prepareChartData(any()) } returns emptyList()
+
         // Inicializar el ViewModel, que llamará a loadConsumptionHistory en init
         viewModel = ConsumptionViewModel(getConsumptionHistoryUseCase)
     }
@@ -72,6 +79,11 @@ class ConsumptionViewModelTest {
         assertNull(state.error)
         assertNull(state.startDate)
         assertNull(state.endDate)
+        assertEquals(0f, state.lastDayConsumption, 0.01f)
+        assertEquals(0f, state.lastWeekConsumption, 0.01f)
+        assertEquals(0f, state.lastMonthConsumption, 0.01f)
+        assertEquals(0f, state.customPeriodConsumption, 0.01f)
+        assertTrue(state.chartData.isEmpty())
 
         // Después de avanzar hasta que termine la corrutina inicial
         advanceUntilIdle()
@@ -117,7 +129,8 @@ class ConsumptionViewModelTest {
         assertEquals(startDate, state.startDate)
         assertEquals(endDate, state.endDate)
         assertEquals(filteredConsumptions, state.consumptions)
-        verify(exactly = 1) { getConsumptionHistoryUseCase(startDate, endDate) }
+        // Verificar que se llama el método al menos una vez (puede ser más debido a updateCustomPeriodSummary)
+        verify(atLeast = 1) { getConsumptionHistoryUseCase(startDate, endDate) }
     }
 
     @Test
@@ -173,6 +186,22 @@ class ConsumptionViewModelTest {
 
         // Act
         viewModel.setLastMonthFilter()
+        advanceUntilIdle()
+
+        // Assert
+        verify { getConsumptionHistoryUseCase(any(), any()) }
+        assertNotNull(viewModel.uiState.value.startDate)
+        assertNotNull(viewModel.uiState.value.endDate)
+        // No podemos verificar los valores exactos porque son calculados internamente con Calendar
+    }
+
+    @Test
+    fun `setLastDayFilter sets correct date range`() = runTest {
+        // Arrange
+        every { getConsumptionHistoryUseCase(any(), any()) } returns flowOf(emptyList())
+
+        // Act
+        viewModel.setLastDayFilter()
         advanceUntilIdle()
 
         // Assert
