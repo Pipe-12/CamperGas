@@ -9,11 +9,11 @@ plugins {
 
 android {
     namespace = "com.example.campergas"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.campergas"
-        minSdk = 29
+        minSdk = 28
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -59,7 +59,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     // Navigation Compose para Android
-    implementation("androidx.navigation:navigation-compose:2.9.2")
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,24 +69,24 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Testing dependencies
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
-    testImplementation("androidx.arch.core:core-testing:2.2.0")
-    testImplementation("io.mockk:mockk:1.13.12")
-    testImplementation("io.mockk:mockk-android:1.13.12")
-    testImplementation("app.cash.turbine:turbine:1.1.0")
-    testImplementation("org.robolectric:robolectric:4.11.1")
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.turbine)
+    testImplementation(libs.robolectric)
 
     // Hilt testing
-    testImplementation("com.google.dagger:hilt-android-testing:2.56.2")
-    kspTest("com.google.dagger:hilt-compiler:2.56.2")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.56.2")
-    kspAndroidTest("com.google.dagger:hilt-compiler:2.56.2")
+    testImplementation(libs.hilt.android.testing)
+    kspTest(libs.hilt.compiler)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.compiler)
 
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     ksp(libs.androidx.hilt.compiler)
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation(libs.androidx.hilt.navigation.compose)
 
     // Room
 
@@ -108,6 +108,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
     // DataStore Preferences
-    implementation("androidx.datastore:datastore-preferences:1.1.7")
-    implementation("androidx.datastore:datastore-core:1.1.7")
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.core)
 }
