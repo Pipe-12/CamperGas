@@ -52,6 +52,7 @@ import androidx.navigation.NavController
 import com.example.campergas.domain.model.BleDevice
 import com.example.campergas.ui.components.BluetoothDisabledDialog
 import com.example.campergas.ui.components.BluetoothPermissionDialog
+import com.example.campergas.ui.theme.CamperGreenLight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -444,10 +445,10 @@ private fun getSignalIcon(rssi: Int): ImageVector {
 @Composable
 private fun getSignalColor(rssi: Int): Color {
     return when {
-        rssi >= -50 -> Color(0xFF4CAF50) // Verde
-        rssi >= -70 -> Color(0xFF8BC34A) // Verde claro
-        rssi >= -85 -> Color(0xFFFF9800) // Naranja
-        else -> Color(0xFFF44336) // Rojo
+        rssi >= -50 -> MaterialTheme.colorScheme.secondary // Excellent signal - green
+        rssi >= -70 -> CamperGreenLight // Good signal - light green
+        rssi >= -85 -> MaterialTheme.colorScheme.tertiary // Fair signal - orange
+        else -> MaterialTheme.colorScheme.error // Poor signal - red
     }
 }
 

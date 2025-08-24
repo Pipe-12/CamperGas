@@ -55,12 +55,12 @@ fun GasCylinderVisualizer(
         else -> MaterialTheme.colorScheme.error
     }
 
-    // Usar color de superficie según el tema (claro/oscuro)
+    // Use theme-appropriate colors for better consistency
     val isDarkTheme = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     val cylinderBackground = if (isDarkTheme) {
-        Color.Black.copy(alpha = 0.9f)
+        MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
     } else {
-        Color.White.copy(alpha = 0.9f)
+        MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
     }
 
     Box(
@@ -77,12 +77,12 @@ fun GasCylinderVisualizer(
             )
         }
 
-        // Texto del porcentaje centrado en la bombona
+        // Percentage text with theme-aware coloring
         Text(
             text = "${fuelPercentage.toInt()}%",
             style = MaterialTheme.typography.displayMedium,
             fontWeight = FontWeight.Bold,
-            color = if (isDarkTheme) Color.White else Color.Black,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.align(Alignment.Center)
         )
     }

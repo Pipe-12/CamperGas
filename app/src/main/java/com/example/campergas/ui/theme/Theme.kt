@@ -16,26 +16,48 @@ private val DarkColorScheme = darkColorScheme(
     primary = CamperBlueLight,
     secondary = CamperGreenLight,
     tertiary = CamperOrangeLight,
-    background = Color(0xFF121212),
-    surface = Color(0xFF1E1E1E),
+    error = CamperErrorLight,
+    background = CamperBackgroundDark,
+    surface = CamperSurfaceDark,
     onPrimary = Color.Black,
     onSecondary = Color.Black,
     onTertiary = Color.Black,
+    onError = Color.Black,
     onBackground = Color.White,
-    onSurface = Color.White
+    onSurface = Color.White,
+    // Additional semantic colors for better UX
+    primaryContainer = CamperBlueDark,
+    onPrimaryContainer = Color.White,
+    secondaryContainer = CamperGreenDark,
+    onSecondaryContainer = Color.White,
+    tertiaryContainer = CamperOrangeDark,
+    onTertiaryContainer = Color.White,
+    surfaceVariant = Color(0xFF2A2A2A),
+    onSurfaceVariant = Color(0xFFE0E0E0)
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = CamperBlue,
     secondary = CamperGreen,
     tertiary = CamperOrange,
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+    error = CamperError,
+    background = CamperBackgroundLight,
+    surface = CamperSurfaceLight,
     onPrimary = Color.White,
     onSecondary = Color.White,
     onTertiary = Color.White,
+    onError = Color.White,
     onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F)
+    onSurface = Color(0xFF1C1B1F),
+    // Additional semantic colors for better UX
+    primaryContainer = Color(0xFFE3F2FD),
+    onPrimaryContainer = CamperBlueDark,
+    secondaryContainer = Color(0xFFE8F5E8),
+    onSecondaryContainer = CamperGreenDark,
+    tertiaryContainer = Color(0xFFFFF3E0),
+    onTertiaryContainer = CamperOrangeDark,
+    surfaceVariant = Color(0xFFEEEEEE),
+    onSurfaceVariant = Color(0xFF5F5F5F)
 )
 
 @Composable
