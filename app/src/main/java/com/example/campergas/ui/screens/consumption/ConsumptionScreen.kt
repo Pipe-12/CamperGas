@@ -467,7 +467,7 @@ fun ConsumptionChart(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -478,7 +478,7 @@ fun ConsumptionChart(
                 text = "📈 Gráfico de Consumo Diario",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -493,7 +493,7 @@ fun ConsumptionChart(
                     Text(
                         text = "Se necesitan al menos 2 días de datos para mostrar el gráfico",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
             } else {
@@ -514,10 +514,10 @@ fun SimpleLineChart(
     modifier: Modifier = Modifier
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
-    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
-    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
+    val surface = MaterialTheme.colorScheme.surface
+    val onSurface = MaterialTheme.colorScheme.onSurface
     
-    Canvas(modifier = modifier.background(surfaceVariant)) {
+    Canvas(modifier = modifier.background(surface)) {
         if (data.size < 2) return@Canvas
         
         val chartWidth = size.width
@@ -550,7 +550,7 @@ fun SimpleLineChart(
             val kgValue = maxValue - (i * valueRange / gridLines)
             drawIntoCanvas { canvas ->
                 val paint = android.graphics.Paint().apply {
-                    color = onSurfaceVariant.toArgb()
+                    color = onSurface.toArgb()
                     textSize = 28f
                     textAlign = android.graphics.Paint.Align.RIGHT
                 }
@@ -592,7 +592,7 @@ fun SimpleLineChart(
                 
                 drawIntoCanvas { canvas ->
                     val paint = android.graphics.Paint().apply {
-                        color = onSurfaceVariant.toArgb()
+                        color = onSurface.toArgb()
                         textSize = 24f
                         textAlign = android.graphics.Paint.Align.CENTER
                     }
