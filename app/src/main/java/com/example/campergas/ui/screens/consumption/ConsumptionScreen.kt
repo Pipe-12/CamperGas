@@ -427,9 +427,9 @@ fun ConsumptionSummarySection(
 @Composable
 fun SummaryItem(
     title: String,
+    modifier: Modifier = Modifier,
     subtitle: String? = null,
-    value: Float,
-    modifier: Modifier = Modifier
+    value: Float
 ) {
     Card(
         modifier = modifier,
@@ -568,7 +568,7 @@ fun SimpleLineChart(
                     textAlign = android.graphics.Paint.Align.RIGHT
                 }
                 canvas.nativeCanvas.drawText(
-                    String.format("%.1f kg", kgValue),
+                    String.format(Locale.getDefault(), "%.1f kg", kgValue),
                     padding - 10f,
                     y + 5f,
                     paint
