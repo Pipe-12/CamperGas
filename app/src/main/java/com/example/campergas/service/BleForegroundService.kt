@@ -7,8 +7,11 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.example.campergas.R
 import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.data.repository.BleRepository
+import com.example.campergas.widget.GasCylinderWidgetProvider
+import com.example.campergas.widget.VehicleStabilityWidgetProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -70,6 +73,19 @@ class BleForegroundService : Service() {
                             
                             // Verificar umbral de gas para alertas
                             checkGasLevelThreshold(fuelMeasurement.fuelPercentage)
+                            
+                            // Actualizar widget de bombona de gas
+                            GasCylinderWidgetProvider.updateAllWidgets(this@BleForegroundService)
+                        }
+                    }
+                }
+
+                // Monitorear datos de inclinación para actualizar widget
+                launch {
+                    bleRepository.inclinationData.collect { inclinationData ->
+                        if (inclinationData != null) {
+                            // Actualizar widget de estabilidad del vehículo
+                            VehicleStabilityWidgetProvider.updateAllWidgets(this@BleForegroundService)
                         }
                     }
                 }
@@ -113,7 +129,7 @@ class BleForegroundService : Service() {
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("CamperGas")
             .setContentText(message)
-            // .setSmallIcon(R.drawable.ic_notification) // Debes crear este icono
+            .setSmallIcon(R.drawable.ic_notification)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
     }
@@ -160,6 +176,7 @@ class BleForegroundService : Service() {
         val alertNotification = NotificationCompat.Builder(this, alertChannelId)
             .setContentTitle(title)
             .setContentText(message)
+            .setSmallIcon(R.drawable.ic_notification)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .build()

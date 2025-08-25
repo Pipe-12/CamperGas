@@ -74,6 +74,16 @@
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
 
+        <!-- Widget Configuration Activity -->
+        <activity
+            android:name=".widget.WidgetConfigActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CamperGas">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
         <!-- Gas Cylinder Widget -->
         <receiver 
             android:name=".widget.GasCylinderWidgetProvider"
