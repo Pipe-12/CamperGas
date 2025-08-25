@@ -85,10 +85,15 @@ class WidgetManager @Inject constructor(
      */
     private fun ensureBleServiceRunning() {
         try {
-            com.example.campergas.service.BleForegroundService.startForWidgets(context)
-            Log.d(TAG, "Servicio BLE asegurado para widgets")
+            val serviceStarted = com.example.campergas.service.BleForegroundService.startForWidgets(context)
+            if (serviceStarted) {
+                Log.d(TAG, "Servicio BLE asegurado para widgets")
+            } else {
+                Log.w(TAG, "No se pudo iniciar servicio BLE - continuando sin servicio de fondo")
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error al asegurar servicio BLE", e)
+            // Don't rethrow - this prevents issues when called from widgets
         }
     }
     

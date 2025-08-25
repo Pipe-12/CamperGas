@@ -64,10 +64,15 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
     
     private fun ensureBleServiceRunning(context: Context) {
         try {
-            com.example.campergas.service.BleForegroundService.startForWidgets(context)
-            Log.d("GasCylinderWidget", "Servicio BLE iniciado para widgets")
+            val serviceStarted = com.example.campergas.service.BleForegroundService.startForWidgets(context)
+            if (serviceStarted) {
+                Log.d("GasCylinderWidget", "Servicio BLE iniciado para widgets")
+            } else {
+                Log.w("GasCylinderWidget", "No se pudo iniciar servicio BLE - continuando sin servicio de fondo")
+            }
         } catch (e: Exception) {
             Log.e("GasCylinderWidget", "Error al iniciar servicio BLE", e)
+            // Don't rethrow - this prevents infinite loops
         }
     }
     

@@ -57,10 +57,15 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
     
     private fun ensureBleServiceRunning(context: Context) {
         try {
-            com.example.campergas.service.BleForegroundService.startForWidgets(context)
-            Log.d("VehicleStabilityWidget", "Servicio BLE iniciado para widgets")
+            val serviceStarted = com.example.campergas.service.BleForegroundService.startForWidgets(context)
+            if (serviceStarted) {
+                Log.d("VehicleStabilityWidget", "Servicio BLE iniciado para widgets")
+            } else {
+                Log.w("VehicleStabilityWidget", "No se pudo iniciar servicio BLE - continuando sin servicio de fondo")
+            }
         } catch (e: Exception) {
             Log.e("VehicleStabilityWidget", "Error al iniciar servicio BLE", e)
+            // Don't rethrow - this prevents infinite loops
         }
     }
     
