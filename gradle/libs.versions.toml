@@ -23,7 +23,7 @@ navigationCompose = "2.9.3"
 robolectric = "4.11.1"
 roomVersion = "2.7.2"
 scanner = "1.6.0"
-turbine = "1.1.0"
+turbine = "1.2.1"
 ui = "1.9.0"
 uiToolingPreview = "1.9.0"
 
