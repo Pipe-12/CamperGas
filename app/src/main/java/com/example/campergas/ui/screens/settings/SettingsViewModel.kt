@@ -55,11 +55,13 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 preferencesDataStore.themeMode,
-                preferencesDataStore.areNotificationsEnabled
-            ) { themeMode, notificationsEnabled ->
+                preferencesDataStore.areNotificationsEnabled,
+                preferencesDataStore.gasLevelThreshold
+            ) { themeMode, notificationsEnabled, gasLevelThreshold ->
                 SettingsUiState(
                     themeMode = themeMode,
-                    notificationsEnabled = notificationsEnabled
+                    notificationsEnabled = notificationsEnabled,
+                    gasLevelThreshold = gasLevelThreshold
                 )
             }.collect { settings ->
                 _uiState.value = settings
@@ -76,6 +78,12 @@ class SettingsViewModel @Inject constructor(
     fun toggleNotifications() {
         viewModelScope.launch {
             preferencesDataStore.setNotificationsEnabled(!_uiState.value.notificationsEnabled)
+        }
+    }
+
+    fun setGasLevelThreshold(threshold: Float) {
+        viewModelScope.launch {
+            preferencesDataStore.setGasLevelThreshold(threshold)
         }
     }
 
@@ -123,6 +131,7 @@ class SettingsViewModel @Inject constructor(
 data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val notificationsEnabled: Boolean = true,
+    val gasLevelThreshold: Float = 15.0f,
     val isLoading: Boolean = false,
     val error: String? = null
 )
