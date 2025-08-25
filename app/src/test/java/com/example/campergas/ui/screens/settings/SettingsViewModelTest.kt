@@ -46,6 +46,7 @@ class SettingsViewModelTest {
     // Flujos para simular preferencias
     private val themeModeFlow = MutableStateFlow(ThemeMode.SYSTEM)
     private val notificationsEnabledFlow = MutableStateFlow(true)
+    private val gasLevelThresholdFlow = MutableStateFlow(15.0f)
     private val weightIntervalFlow = MutableStateFlow(60) // 60 segundos = 1 minuto
     private val inclinationIntervalFlow = MutableStateFlow(15) // 15 segundos
 
@@ -60,6 +61,7 @@ class SettingsViewModelTest {
         // Setup mock responses
         every { preferencesDataStore.themeMode } returns themeModeFlow
         every { preferencesDataStore.areNotificationsEnabled } returns notificationsEnabledFlow
+        every { preferencesDataStore.gasLevelThreshold } returns gasLevelThresholdFlow
 
         coEvery { preferencesDataStore.setThemeMode(any()) } coAnswers {
             themeModeFlow.value = firstArg()
@@ -67,6 +69,10 @@ class SettingsViewModelTest {
 
         coEvery { preferencesDataStore.setNotificationsEnabled(any()) } coAnswers {
             notificationsEnabledFlow.value = firstArg()
+        }
+
+        coEvery { preferencesDataStore.setGasLevelThreshold(any()) } coAnswers {
+            gasLevelThresholdFlow.value = firstArg()
         }
 
         every { configureReadingIntervalsUseCase.getWeightReadIntervalSeconds() } returns weightIntervalFlow
@@ -93,6 +99,7 @@ class SettingsViewModelTest {
         val state = viewModel.uiState.value
         assertEquals(ThemeMode.SYSTEM, state.themeMode)
         assertTrue(state.notificationsEnabled)
+        assertEquals(15.0f, state.gasLevelThreshold, 0.01f)
         assertFalse(state.isLoading)
         assertNull(state.error)
 
@@ -130,6 +137,18 @@ class SettingsViewModelTest {
         // Assert
         coVerify { preferencesDataStore.setNotificationsEnabled(true) }
         assertTrue(viewModel.uiState.value.notificationsEnabled)
+    }
+
+    @Test
+    fun `setGasLevelThreshold updates preferences`() = runTest {
+        // Act
+        viewModel.setGasLevelThreshold(20.0f)
+        advanceUntilIdle()
+
+        // Assert
+        coVerify { preferencesDataStore.setGasLevelThreshold(20.0f) }
+        assertEquals(20.0f, gasLevelThresholdFlow.value, 0.01f)
+        assertEquals(20.0f, viewModel.uiState.value.gasLevelThreshold, 0.01f)
     }
 
     @Test

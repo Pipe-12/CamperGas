@@ -3,6 +3,7 @@ package com.example.campergas.data.local.preferences
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -22,6 +23,7 @@ class PreferencesDataStore @Inject constructor(
     private val lastConnectedDeviceKey = stringPreferencesKey("last_connected_device")
     private val themeModeKey = stringPreferencesKey("theme_mode")
     private val notificationsEnabledKey = booleanPreferencesKey("notifications_enabled")
+    private val gasLevelThresholdKey = floatPreferencesKey("gas_level_threshold")
     private val weightReadIntervalKey = longPreferencesKey("weight_read_interval")
     private val inclinationReadIntervalKey = longPreferencesKey("inclination_read_interval")
 
@@ -43,6 +45,11 @@ class PreferencesDataStore @Inject constructor(
     val areNotificationsEnabled: Flow<Boolean> = context.dataStore.data
         .map { preferences ->
             preferences[notificationsEnabledKey] != false
+        }
+
+    val gasLevelThreshold: Flow<Float> = context.dataStore.data
+        .map { preferences ->
+            preferences[gasLevelThresholdKey] ?: 15.0f // 15% por defecto
         }
 
     val weightReadInterval: Flow<Long> = context.dataStore.data
@@ -70,6 +77,12 @@ class PreferencesDataStore @Inject constructor(
     suspend fun setNotificationsEnabled(enabled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[notificationsEnabledKey] = enabled
+        }
+    }
+
+    suspend fun setGasLevelThreshold(threshold: Float) {
+        context.dataStore.edit { preferences ->
+            preferences[gasLevelThresholdKey] = threshold
         }
     }
 

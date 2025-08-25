@@ -60,6 +60,7 @@ fun SettingsScreen(
     // Estados locales para campos de texto
     var weightIntervalText by remember { mutableStateOf("") }
     var inclinationIntervalText by remember { mutableStateOf("") }
+    var gasThresholdText by remember { mutableStateOf("") }
 
     // Actualizar campos de texto cuando cambian los valores
     LaunchedEffect(weightInterval) {
@@ -68,6 +69,11 @@ fun SettingsScreen(
 
     LaunchedEffect(inclinationInterval) {
         inclinationIntervalText = inclinationInterval.toString()
+    }
+
+    // Actualizar campo de texto del umbral de gas
+    LaunchedEffect(uiState.gasLevelThreshold) {
+        gasThresholdText = uiState.gasLevelThreshold.toString()
     }
 
     // Determinar si el switch debe estar activado
@@ -205,6 +211,50 @@ fun SettingsScreen(
                     Switch(
                         checked = uiState.notificationsEnabled,
                         onCheckedChange = { viewModel.toggleNotifications() }
+                    )
+                }
+
+                if (uiState.notificationsEnabled) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Text(
+                        text = "Umbral de alerta de gas",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    OutlinedTextField(
+                        value = gasThresholdText,
+                        onValueChange = { newValue ->
+                            gasThresholdText = newValue
+                        },
+                        label = { Text("Porcentaje de gas mínimo") },
+                        suffix = { Text("%") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(
+                        onClick = {
+                            val threshold = gasThresholdText.toFloatOrNull()
+                            if (threshold != null && threshold in 1.0f..50.0f) {
+                                viewModel.setGasLevelThreshold(threshold)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Guardar umbral")
+                    }
+
+                    Text(
+                        text = "Se enviará una notificación cuando el gas baje del ${uiState.gasLevelThreshold.toInt()}%",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
             }
