@@ -427,9 +427,9 @@ fun ConsumptionSummarySection(
 @Composable
 fun SummaryItem(
     title: String,
+    modifier: Modifier = Modifier,
     subtitle: String? = null,
-    value: Float,
-    modifier: Modifier = Modifier
+    value: Float
 ) {
     Card(
         modifier = modifier,
@@ -568,7 +568,7 @@ fun SimpleLineChart(
                     textAlign = android.graphics.Paint.Align.RIGHT
                 }
                 canvas.nativeCanvas.drawText(
-                    String.format("%.1f kg", kgValue),
+                    String.format(Locale.getDefault(), "%.1f kg", kgValue),
                     padding - 10f,
                     y + 5f,
                     paint
@@ -590,31 +590,33 @@ fun SimpleLineChart(
             )
             
             // Draw X-axis labels (dates)
-            if (i < data.size || data.size <= xAxisLabels) {
+            if (data.isNotEmpty()) {
                 val dateIndex = if (data.size <= xAxisLabels) {
                     // If we have few data points, show each one
-                    minOf(i, data.size - 1)
+                    if (i < data.size) i else -1
                 } else {
                     // If we have many data points, sample across the range
                     (i * (data.size - 1) / xAxisLabels)
                 }
                 
-                val timestamp = data[dateIndex].date
-                val dateFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
-                val dateLabel = dateFormat.format(Date(timestamp))
-                
-                drawIntoCanvas { canvas ->
-                    val paint = android.graphics.Paint().apply {
-                        color = onSurface.toArgb()
-                        textSize = 24f
-                        textAlign = android.graphics.Paint.Align.CENTER
+                if (dateIndex >= 0 && dateIndex < data.size) {
+                    val timestamp = data[dateIndex].date
+                    val dateFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
+                    val dateLabel = dateFormat.format(Date(timestamp))
+                    
+                    drawIntoCanvas { canvas ->
+                        val paint = android.graphics.Paint().apply {
+                            color = onSurface.toArgb()
+                            textSize = 24f
+                            textAlign = android.graphics.Paint.Align.CENTER
+                        }
+                        canvas.nativeCanvas.drawText(
+                            dateLabel,
+                            x,
+                            chartHeight - padding + 25f,
+                            paint
+                        )
                     }
-                    canvas.nativeCanvas.drawText(
-                        dateLabel,
-                        x,
-                        chartHeight - padding + 25f,
-                        paint
-                    )
                 }
             }
         }

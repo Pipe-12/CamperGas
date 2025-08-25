@@ -1,6 +1,7 @@
 package com.example.campergas.utils
 
 import android.Manifest
+import android.annotation.TargetApi
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
@@ -55,6 +56,7 @@ class BluetoothPermissionManager(
         }
 
         // Launcher para solicitar permisos
+        @TargetApi(Build.VERSION_CODES.Q)
         requestPermissionsLauncher = activity.registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
@@ -132,6 +134,7 @@ class BluetoothPermissionManager(
         enableLocationLauncher.launch(enableLocationIntent)
     }
 
+    @TargetApi(Build.VERSION_CODES.Q)
     private fun checkAndRequestPermissions() {
         val requiredPermissions = getRequiredPermissions()
 
@@ -192,12 +195,10 @@ class BluetoothPermissionManager(
         }
 
         // Permiso de ubicación siempre necesario para BLE (desde API 23)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
 
-            // ACCESS_COARSE_LOCATION también puede ser útil
-            permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
-        }
+        // ACCESS_COARSE_LOCATION también puede ser útil
+        permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
 
         // Permiso de ubicación en segundo plano para Android 10+ si se usa BLE en background
         // IMPORTANTE: Este permiso debe solicitarse por separado en Android 11+
