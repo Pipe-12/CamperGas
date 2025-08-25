@@ -34,8 +34,56 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        // Asegurar que el servicio BLE está ejecutándose para las solicitudes periódicas
+        ensureBleServiceRunning(context)
+        
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
+        }
+    }
+    
+    override fun onEnabled(context: Context) {
+        // Este método se llama cuando se agrega el primer widget de este tipo
+        Log.d("VehicleStabilityWidget", "Primer widget añadido - iniciando servicio BLE")
+        ensureBleServiceRunning(context)
+    }
+    
+    override fun onDisabled(context: Context) {
+        // Este método se llama cuando se elimina el último widget de este tipo
+        Log.d("VehicleStabilityWidget", "Último widget eliminado")
+        // Verificar si queda algún widget activo antes de detener el servicio
+        checkAndStopServiceIfNoWidgets(context)
+    }
+    
+    private fun ensureBleServiceRunning(context: Context) {
+        try {
+            com.example.campergas.service.BleForegroundService.startForWidgets(context)
+            Log.d("VehicleStabilityWidget", "Servicio BLE iniciado para widgets")
+        } catch (e: Exception) {
+            Log.e("VehicleStabilityWidget", "Error al iniciar servicio BLE", e)
+        }
+    }
+    
+    private fun checkAndStopServiceIfNoWidgets(context: Context) {
+        scope.launch {
+            try {
+                // Verificar si hay widgets de gas activos
+                val widgetManager = AppWidgetManager.getInstance(context)
+                val gasComponentName = ComponentName(context, GasCylinderWidgetProvider::class.java)
+                val gasWidgetIds = widgetManager.getAppWidgetIds(gasComponentName)
+                
+                // Verificar si hay widgets de estabilidad activos
+                val stabilityComponentName = ComponentName(context, VehicleStabilityWidgetProvider::class.java)
+                val stabilityWidgetIds = widgetManager.getAppWidgetIds(stabilityComponentName)
+                
+                // Si no hay widgets activos, detener el servicio
+                if (gasWidgetIds.isEmpty() && stabilityWidgetIds.isEmpty()) {
+                    Log.d("VehicleStabilityWidget", "No hay widgets activos - deteniendo servicio BLE")
+                    com.example.campergas.service.BleForegroundService.stopService(context)
+                }
+            } catch (e: Exception) {
+                Log.e("VehicleStabilityWidget", "Error al verificar widgets activos", e)
+            }
         }
     }
 
