@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">CamperGas</string>
+    
+    <!-- Widget descriptions -->
+    <string name="gas_cylinder_widget_description">Monitorea el nivel de gas de tu bombona desde la pantalla de inicio</string>
+    <string name="vehicle_stability_widget_description">Verifica la estabilidad de tu vehículo en tiempo real</string>
 </resources>

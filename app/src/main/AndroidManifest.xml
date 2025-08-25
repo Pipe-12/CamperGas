@@ -73,6 +73,32 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
+
+        <!-- Gas Cylinder Widget -->
+        <receiver 
+            android:name=".widget.GasCylinderWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.example.campergas.widget.REQUEST_DATA" />
+            </intent-filter>
+            <meta-data 
+                android:name="android.appwidget.provider"
+                android:resource="@xml/gas_cylinder_widget_info" />
+        </receiver>
+
+        <!-- Vehicle Stability Widget -->
+        <receiver 
+            android:name=".widget.VehicleStabilityWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.example.campergas.widget.REQUEST_INCLINATION_DATA" />
+            </intent-filter>
+            <meta-data 
+                android:name="android.appwidget.provider"
+                android:resource="@xml/vehicle_stability_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

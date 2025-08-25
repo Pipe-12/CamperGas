@@ -81,6 +81,16 @@ class BleRepository @Inject constructor(
     fun readInclinationDataOnDemand() = camperGasBleService.readInclinationDataOnDemand()
 
     /**
+     * Solicita lectura de datos de peso bajo demanda (método para widgets)
+     */
+    fun requestWeightDataManually() = camperGasBleService.readWeightDataOnDemand()
+
+    /**
+     * Solicita lectura de datos de inclinación bajo demanda (método para widgets)
+     */
+    fun requestInclinationDataManually() = camperGasBleService.readInclinationDataOnDemand()
+
+    /**
      * Configura los intervalos de lectura para peso e inclinación
      */
     fun configureReadingIntervals(weightIntervalMs: Long, inclinationIntervalMs: Long) {
