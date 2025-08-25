@@ -1,5 +1,5 @@
 [versions]
-agp = "8.10.1"
+agp = "8.12.1"
 ble = "2.10.2"
 coreTesting = "2.2.0"
 datastorePreferences = "1.1.7"
