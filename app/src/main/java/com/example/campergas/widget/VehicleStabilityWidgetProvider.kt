@@ -177,7 +177,7 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
                 scope.launch {
                     try {
                         // Solicitar datos de inclinación manualmente
-                        bleRepository.requestInclinationDataManually()
+                        bleRepository.readInclinationDataOnDemand()
                         
                         // Actualizar todos los widgets
                         val appWidgetManager = AppWidgetManager.getInstance(context)

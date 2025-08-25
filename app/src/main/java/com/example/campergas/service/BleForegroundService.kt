@@ -281,7 +281,7 @@ class BleForegroundService : Service() {
                     // Solicitar datos de peso si han pasado más del intervalo configurado
                     if (currentTime - lastWeightRequestTime > weightRequestInterval) {
                         Log.d(TAG, "Solicitando datos de peso...")
-                        bleRepository.requestWeightDataManually()
+                        bleRepository.readWeightDataOnDemand()
                         lastWeightRequestTime = currentTime
                     }
                     
@@ -291,7 +291,7 @@ class BleForegroundService : Service() {
                     // Solicitar datos de inclinación si han pasado más del intervalo configurado
                     if (currentTime - lastInclinationRequestTime > inclinationRequestInterval) {
                         Log.d(TAG, "Solicitando datos de inclinación...")
-                        bleRepository.requestInclinationDataManually()
+                        bleRepository.readInclinationDataOnDemand()
                         lastInclinationRequestTime = currentTime
                     }
                     

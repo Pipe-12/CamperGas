@@ -176,7 +176,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                 scope.launch {
                     try {
                         // Solicitar datos de peso manualmente
-                        bleRepository.requestWeightDataManually()
+                        bleRepository.readWeightDataOnDemand()
                         
                         // Actualizar todos los widgets
                         val appWidgetManager = AppWidgetManager.getInstance(context)
