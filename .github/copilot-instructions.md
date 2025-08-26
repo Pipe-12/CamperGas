@@ -14,17 +14,17 @@ chmod +x ./gradlew
 
 **Daily development workflow:**
 ```bash
-# Build (NEVER CANCEL - 5-8 min first time, 30-60s incremental)
+# Build (NEVER CANCEL - 4-6 min first time, 15-30s incremental)
 ./gradlew assembleDebug
 
-# Test (NEVER CANCEL - 2-3 min)  
+# Test (NEVER CANCEL - 30-60s)  
 ./gradlew testDebugUnitTest
 
-# Lint (NEVER CANCEL - 1-2 min)
+# Lint (NEVER CANCEL - 1 min)
 ./gradlew lintDebug
 ```
 
-**Always use timeouts of 15+ minutes for builds, 10+ minutes for tests.**
+**Always use timeouts of 10+ minutes for builds, 5+ minutes for tests.**
 
 ## Critical Environment Setup Requirements
 
@@ -65,21 +65,21 @@ echo $PATH | grep android  # Must include Android tools
 # Bootstrap - Make gradlew executable
 chmod +x ./gradlew
 
-# Build debug APK - takes approximately 5-8 minutes on first run
+# Build debug APK - takes approximately 4-6 minutes on first run
 ./gradlew assembleDebug
-# NEVER CANCEL: Build takes 5-8 minutes. Set timeout to 15+ minutes.
+# NEVER CANCEL: Build takes 4-6 minutes. Set timeout to 10+ minutes.
 
-# Run unit tests - takes approximately 2-3 minutes  
+# Run unit tests - takes approximately 30-60 seconds  
 ./gradlew testDebugUnitTest
-# NEVER CANCEL: Tests take 2-3 minutes. Set timeout to 10+ minutes.
+# NEVER CANCEL: Tests take 30-60 seconds. Set timeout to 5+ minutes.
 
-# Run lint checks - takes approximately 1-2 minutes
+# Run lint checks - takes approximately 1 minute
 ./gradlew lintDebug
-# NEVER CANCEL: Lint takes 1-2 minutes. Set timeout to 5+ minutes.
+# NEVER CANCEL: Lint takes 1 minute. Set timeout to 5+ minutes.
 
-# Full build (includes all above) - takes approximately 8-12 minutes
+# Full build (includes all above) - takes approximately 2-3 minutes
 ./gradlew build
-# NEVER CANCEL: Full build takes 8-12 minutes. Set timeout to 20+ minutes.
+# NEVER CANCEL: Full build takes 2-3 minutes. Set timeout to 10+ minutes.
 
 # Clean build when needed
 ./gradlew clean
@@ -87,20 +87,20 @@ chmod +x ./gradlew
 
 ### Testing Commands
 ```bash
-# Run all unit tests (currently limited to ViewModel tests)
-./gradlew test
+# Run all unit tests (196 tests across all test classes)
+./gradlew testDebugUnitTest
 
-# Run specific test class
-./gradlew test --tests "com.example.campergas.ui.screens.settings.SettingsViewModelTest"
+# Run specific test class (CORRECT SYNTAX)
+./gradlew testDebugUnitTest --tests "com.example.campergas.ui.screens.settings.SettingsViewModelTest"
 
-# Run available test suite (NOTE: many domain/use case tests are commented out)
-./gradlew test --tests "com.example.campergas.CamperGasTestSuite"
+# Run test suite with all tests
+./gradlew testDebugUnitTest --tests "com.example.campergas.CamperGasTestSuite"
 
-# Available test classes:
-# - BleConnectViewModelTest
-# - ConsumptionViewModelTest  
-# - InclinationViewModelTest
-# - SettingsViewModelTest
+# Available test classes include:
+# - All ViewModel tests (BleConnect, Consumption, Inclination, Settings, Home, Weight, CaravanConfig)
+# - Domain model tests (GasCylinder, FuelMeasurement) 
+# - Use case tests (AddGasCylinder, GetActiveCylinder, SaveFuelMeasurement)
+# - UI component tests (GasCylinderViewModel)
 
 # Run instrumented tests (requires Android emulator or device)
 ./gradlew connectedAndroidTest
@@ -108,12 +108,14 @@ chmod +x ./gradlew
 
 ### Test Coverage Status
 **Current test implementation:**
-- ✅ ViewModel tests for main screens (BLE, Consumption, Inclination, Settings)
-- ❌ Domain model tests (commented out - GasCylinderTest, FuelMeasurementTest)
-- ❌ Use case tests (commented out - AddGasCylinderUseCaseTest, etc.)
+- ✅ ViewModel tests for all screens (BLE, Consumption, Inclination, Settings, Home, Weight, CaravanConfig)
+- ✅ Domain model tests (GasCylinderTest, FuelMeasurementTest)
+- ✅ Use case tests (AddGasCylinderUseCaseTest, GetActiveCylinderUseCaseTest, SaveFuelMeasurementUseCaseTest)
+- ✅ UI component tests (GasCylinderViewModelTest)
 - ✅ Basic instrumented test (ExampleInstrumentedTest)
+- **Total: 196 tests running successfully**
 
-**When adding new features, prioritize creating ViewModel tests first as they have established patterns.**
+**When adding new features, follow the established test patterns for comprehensive coverage.**
 
 ## Application Architecture
 
@@ -125,7 +127,7 @@ chmod +x ./gradlew
 - **Database**: Room 2.7.2 with SQLite
 - **Bluetooth**: Nordic BLE library 2.10.2
 - **Testing**: JUnit 4, MockK, Coroutines Test, Robolectric
-- **Build**: Gradle 8.11.1, Android Gradle Plugin 8.2.2
+- **Build**: Gradle 8.11.1, Android Gradle Plugin 8.10.1
 
 ### Key Project Structure
 ```
@@ -250,18 +252,18 @@ app/src/main/java/com/example/campergas/
 ## Build Times and Expectations
 
 ### Typical Build Times (First Run)
-- **Clean Build**: 8-12 minutes (includes dependency download)
-- **Incremental Build**: 30-60 seconds
-- **Unit Tests**: 2-3 minutes  
-- **Lint Check**: 1-2 minutes
-- **Full CI Pipeline**: 10-15 minutes
+- **Clean Build**: 2-3 minutes (includes dependency download)
+- **Incremental Build**: 15-30 seconds
+- **Unit Tests**: 30-60 seconds  
+- **Lint Check**: 1 minute
+- **Full CI Pipeline**: 5-8 minutes
 
 ### Subsequent Builds (Gradle Daemon Active)
-- **Incremental Build**: 15-30 seconds
-- **Unit Tests**: 30-60 seconds
+- **Incremental Build**: 10-20 seconds
+- **Unit Tests**: 20-40 seconds
 - **Lint Check**: 30-45 seconds
 
-**CRITICAL**: Always set timeouts of 20+ minutes for full builds and 10+ minutes for test runs to prevent premature cancellation.
+**CRITICAL**: Always set timeouts of 10+ minutes for full builds and 5+ minutes for test runs to prevent premature cancellation.
 
 ## Troubleshooting
 
@@ -302,21 +304,21 @@ The project uses GitHub Actions (`.github/workflows/android-ci.yml`) with these 
 
 2. **Project Health Check**:
    ```bash
-   ./gradlew assembleDebug  # Verify project builds (NEVER CANCEL - 5-8 min)
-   ./gradlew testDebugUnitTest  # Verify tests pass (NEVER CANCEL - 2-3 min)
-   ./gradlew lintDebug  # Verify code quality (NEVER CANCEL - 1-2 min)
+   ./gradlew assembleDebug  # Verify project builds (NEVER CANCEL - 4-6 min)
+   ./gradlew testDebugUnitTest  # Verify tests pass (NEVER CANCEL - 30-60s)
+   ./gradlew lintDebug  # Verify code quality (NEVER CANCEL - 1 min)
    ```
 
 ### After Making Changes
 1. **Build Validation**:
    ```bash
-   ./gradlew clean assembleDebug  # Clean build (NEVER CANCEL - 8-12 min)
+   ./gradlew clean assembleDebug  # Clean build (NEVER CANCEL - 2-3 min)
    ```
 
 2. **Test Validation**:
    ```bash
-   ./gradlew test  # All unit tests
-   ./gradlew test --tests "*ViewModel*"  # Focus on ViewModel tests
+   ./gradlew testDebugUnitTest  # All unit tests (196 tests)
+   ./gradlew testDebugUnitTest --tests "*ViewModel*"  # Focus on ViewModel tests
    ```
 
 3. **Code Quality**:
@@ -326,7 +328,7 @@ The project uses GitHub Actions (`.github/workflows/android-ci.yml`) with these 
 
 4. **Dependency Verification**:
    ```bash
-   ./gradlew dependencies  # Check dependency tree
+   ./gradlew app:dependencies --configuration debugRuntimeClasspath  # Check dependency tree
    ```
 
 ### Manual Feature Testing
