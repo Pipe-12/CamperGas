@@ -16,7 +16,6 @@ import android.widget.RemoteViews
 import com.example.campergas.MainActivity
 import com.example.campergas.R
 import com.example.campergas.data.repository.BleRepository
-import com.example.campergas.data.repository.FuelMeasurementRepository
 import com.example.campergas.data.repository.GasCylinderRepository
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
@@ -102,12 +101,11 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
             try {
                 // Get repositories using EntryPoint
                 val entryPoint = getEntryPoint(context)
-                val fuelMeasurementRepository = entryPoint.fuelMeasurementRepository()
                 val gasCylinderRepository = entryPoint.gasCylinderRepository()
                 val bleRepository = entryPoint.bleRepository()
                 
-                // Obtener datos actuales
-                val latestFuelMeasurement = fuelMeasurementRepository.getLatestRealTimeMeasurement().first()
+                // Obtener solo datos actuales del sensor BLE
+                val currentFuelMeasurement = bleRepository.fuelMeasurementData.first()
                 val activeCylinder = gasCylinderRepository.getActiveCylinder().first()
                 val isConnected = bleRepository.connectionState.first()
 
@@ -115,13 +113,13 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                 val views = RemoteViews(context.packageName, R.layout.gas_cylinder_widget)
 
                 // Configurar textos
-                if (activeCylinder != null && latestFuelMeasurement != null) {
+                if (activeCylinder != null && currentFuelMeasurement != null) {
                     views.setTextViewText(R.id.widget_cylinder_name, activeCylinder.name)
-                    views.setTextViewText(R.id.widget_fuel_percentage, latestFuelMeasurement.getFormattedPercentage())
-                    views.setTextViewText(R.id.widget_fuel_kg, latestFuelMeasurement.getFormattedFuelKilograms())
+                    views.setTextViewText(R.id.widget_fuel_percentage, currentFuelMeasurement.getFormattedPercentage())
+                    views.setTextViewText(R.id.widget_fuel_kg, currentFuelMeasurement.getFormattedFuelKilograms())
                     
                     // Crear imagen de la bombona
-                    val cylinderBitmap = createCylinderBitmap(latestFuelMeasurement.fuelPercentage / 100f)
+                    val cylinderBitmap = createCylinderBitmap(currentFuelMeasurement.fuelPercentage / 100f)
                     views.setImageViewBitmap(R.id.widget_cylinder_image, cylinderBitmap)
                 } else {
                     views.setTextViewText(R.id.widget_cylinder_name, "Sin bombona activa")
@@ -164,45 +162,11 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         views.setOnClickPendingIntent(R.id.widget_container, openAppPendingIntent)
-
-        // Intent para solicitar datos manualmente
-        val requestDataIntent = Intent(context, GasCylinderWidgetProvider::class.java).apply {
-            action = ACTION_REQUEST_DATA
-        }
-        val requestDataPendingIntent = PendingIntent.getBroadcast(
-            context, 1, requestDataIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        views.setOnClickPendingIntent(R.id.widget_refresh_button, requestDataPendingIntent)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        
-        when (intent.action) {
-            ACTION_REQUEST_DATA -> {
-                Log.d("GasCylinderWidget", "Manual data request from widget")
-                scope.launch {
-                    try {
-                        // Get repositories using EntryPoint
-                        val entryPoint = getEntryPoint(context)
-                        val bleRepository = entryPoint.bleRepository()
-                        
-                        // Solicitar datos de peso manualmente
-                        bleRepository.readWeightDataOnDemand()
-                        
-                        // Actualizar todos los widgets
-                        val appWidgetManager = AppWidgetManager.getInstance(context)
-                        val componentName = ComponentName(context, GasCylinderWidgetProvider::class.java)
-                        val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
-                        onUpdate(context, appWidgetManager, appWidgetIds)
-                        
-                    } catch (e: Exception) {
-                        Log.e("GasCylinderWidget", "Error requesting data", e)
-                    }
-                }
-            }
-        }
+        // Solo manejar eventos estándar del widget
     }
 
     private fun createCylinderBitmap(fillPercentage: Float): Bitmap {
@@ -268,8 +232,6 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
-        const val ACTION_REQUEST_DATA = "com.example.campergas.widget.REQUEST_DATA"
-        
         fun updateAllWidgets(context: Context) {
             val intent = Intent(context, GasCylinderWidgetProvider::class.java).apply {
                 action = AppWidgetManager.ACTION_APPWIDGET_UPDATE

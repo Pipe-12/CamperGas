@@ -6,17 +6,11 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
 import android.util.Log
 import android.widget.RemoteViews
 import com.example.campergas.MainActivity
 import com.example.campergas.R
 import com.example.campergas.data.repository.BleRepository
-import com.example.campergas.domain.model.Inclination
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope
@@ -115,14 +109,11 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
                     views.setTextViewText(R.id.widget_pitch_value, "P: %.1f°".format(inclinationData.pitch))
                     views.setTextViewText(R.id.widget_roll_value, "R: %.1f°".format(inclinationData.roll))
                     
-                    // Estado de nivelación
+                    // Estado de nivelación con indicador simple
                     val stabilityText = if (inclinationData.isLevel) "✅ ESTABLE" else "⚠️ INCLINADO"
-                    val stabilityColor = if (inclinationData.isLevel) "#4CAF50" else "#FF9800"
+                    val stabilityIndicator = if (inclinationData.isLevel) "✓" else "✗"
                     views.setTextViewText(R.id.widget_stability_status, stabilityText)
-                    
-                    // Crear imagen del vehículo inclinado
-                    val vehicleBitmap = createVehicleBitmap(inclinationData.pitch, inclinationData.roll, inclinationData.isLevel)
-                    views.setImageViewBitmap(R.id.widget_vehicle_image, vehicleBitmap)
+                    views.setTextViewText(R.id.widget_stability_indicator, stabilityIndicator)
                     
                     // Timestamp
                     views.setTextViewText(R.id.widget_last_update, "Actualizado: ${inclinationData.getFormattedTimestamp()}")
@@ -130,11 +121,8 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
                     views.setTextViewText(R.id.widget_pitch_value, "P: --°")
                     views.setTextViewText(R.id.widget_roll_value, "R: --°")
                     views.setTextViewText(R.id.widget_stability_status, "⚠️ SIN DATOS")
+                    views.setTextViewText(R.id.widget_stability_indicator, "❓")
                     views.setTextViewText(R.id.widget_last_update, "Sin datos disponibles")
-                    
-                    // Imagen del vehículo sin datos
-                    val vehicleBitmap = createVehicleBitmap(0f, 0f, false)
-                    views.setImageViewBitmap(R.id.widget_vehicle_image, vehicleBitmap)
                 }
 
                 // Configurar estado de conexión
@@ -208,108 +196,6 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
                 }
             }
         }
-    }
-
-    private fun createVehicleBitmap(pitch: Float, roll: Float, isStable: Boolean): Bitmap {
-        val width = 300
-        val height = 200
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-
-        val paint = Paint().apply {
-            isAntiAlias = true
-        }
-
-        // Fondo transparente
-        canvas.drawColor(Color.TRANSPARENT)
-
-        // Calcular transformaciones basadas en pitch y roll
-        val centerX = width / 2f
-        val centerY = height / 2f
-        
-        // Vehículo base (caravana)
-        val vehicleWidth = 200f
-        val vehicleHeight = 80f
-        
-        // Color del vehículo según estabilidad
-        val vehicleColor = when {
-            isStable -> Color.parseColor("#4CAF50") // Verde estable
-            kotlin.math.abs(pitch) > 5 || kotlin.math.abs(roll) > 5 -> Color.parseColor("#F44336") // Rojo peligroso
-            else -> Color.parseColor("#FF9800") // Naranja advertencia
-        }
-
-        // Guardar estado del canvas
-        canvas.save()
-        
-        // Rotar según roll e inclinar según pitch
-        canvas.rotate(roll, centerX, centerY)
-        
-        // Efecto de pitch simulado moviendo verticalmente
-        val pitchOffset = pitch * 2f
-        
-        // Dibujar el cuerpo del vehículo
-        paint.color = vehicleColor
-        paint.style = Paint.Style.FILL
-        val vehicleRect = RectF(
-            centerX - vehicleWidth / 2,
-            centerY - vehicleHeight / 2 + pitchOffset,
-            centerX + vehicleWidth / 2,
-            centerY + vehicleHeight / 2 + pitchOffset
-        )
-        canvas.drawRoundRect(vehicleRect, 15f, 15f, paint)
-
-        // Contorno del vehículo
-        paint.color = Color.BLACK
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 3f
-        canvas.drawRoundRect(vehicleRect, 15f, 15f, paint)
-
-        // Ventanas del vehículo
-        paint.color = Color.parseColor("#87CEEB") // Azul claro para ventanas
-        paint.style = Paint.Style.FILL
-        
-        // Ventana frontal
-        val windowRect1 = RectF(
-            centerX - vehicleWidth / 2 + 20,
-            centerY - vehicleHeight / 2 + 15 + pitchOffset,
-            centerX - vehicleWidth / 2 + 60,
-            centerY + vehicleHeight / 2 - 15 + pitchOffset
-        )
-        canvas.drawRoundRect(windowRect1, 8f, 8f, paint)
-        
-        // Ventana trasera
-        val windowRect2 = RectF(
-            centerX + vehicleWidth / 2 - 60,
-            centerY - vehicleHeight / 2 + 15 + pitchOffset,
-            centerX + vehicleWidth / 2 - 20,
-            centerY + vehicleHeight / 2 - 15 + pitchOffset
-        )
-        canvas.drawRoundRect(windowRect2, 8f, 8f, paint)
-
-        // Ruedas
-        paint.color = Color.BLACK
-        paint.style = Paint.Style.FILL
-        val wheelRadius = 15f
-        
-        // Rueda trasera izquierda
-        canvas.drawCircle(centerX - vehicleWidth / 2 + 30, centerY + vehicleHeight / 2 + 10 + pitchOffset, wheelRadius, paint)
-        // Rueda trasera derecha
-        canvas.drawCircle(centerX - vehicleWidth / 2 + 30, centerY - vehicleHeight / 2 - 10 + pitchOffset, wheelRadius, paint)
-        
-        // Rueda delantera (una sola para caravana)
-        canvas.drawCircle(centerX + vehicleWidth / 2 - 30, centerY + pitchOffset, wheelRadius, paint)
-
-        // Restaurar estado del canvas
-        canvas.restore()
-
-        // Línea de referencia horizontal (nivel)
-        paint.color = Color.GRAY
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 2f
-        paint.pathEffect = android.graphics.DashPathEffect(floatArrayOf(10f, 5f), 0f)
-        canvas.drawLine(50f, centerY, width - 50f, centerY, paint)
-
-        return bitmap
     }
 
     companion object {
