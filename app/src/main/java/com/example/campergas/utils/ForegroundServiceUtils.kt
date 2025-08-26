@@ -60,6 +60,33 @@ object ForegroundServiceUtils {
     }
     
     /**
+     * Verifica si un servicio específico está actualmente ejecutándose
+     */
+    fun isServiceRunning(context: Context, serviceClass: Class<*>): Boolean {
+        return try {
+            val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            
+            // Para Android 7.0+ (API 24), usar getRunningServices con límite menor por rendimiento
+            val maxServices = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) 100 else Integer.MAX_VALUE
+            @Suppress("DEPRECATION") // Necesario para compatibilidad con widgets
+            val runningServices = activityManager.getRunningServices(maxServices)
+            
+            val serviceName = serviceClass.name
+            val isRunning = runningServices.any { service ->
+                service.service.className == serviceName
+            }
+            
+            Log.d(TAG, "Servicio ${serviceClass.simpleName} ejecutándose: $isRunning")
+            return isRunning
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al verificar si el servicio está ejecutándose", e)
+            // En caso de error, asumimos que no está ejecutándose para permitir reintentos
+            false
+        }
+    }
+    
+    /**
      * Intenta iniciar un servicio en primer plano de forma segura, con respaldo a servicio regular
      * Devuelve true si algún servicio se inició exitosamente
      */
@@ -107,6 +134,24 @@ object ForegroundServiceUtils {
                 Log.e(TAG, "Error al iniciar servicio", e)
                 false
             }
+        }
+    }
+    
+    /**
+     * Intenta iniciar un servicio de forma segura solo si no está ya ejecutándose
+     * Evita múltiples intentos de inicio que pueden causar bucles infinitos
+     */
+    fun startServiceSafelyIfNotRunning(
+        context: Context,
+        serviceClass: Class<*>,
+        configureIntent: (android.content.Intent) -> Unit = {}
+    ): Boolean {
+        return if (isServiceRunning(context, serviceClass)) {
+            Log.d(TAG, "Servicio ${serviceClass.simpleName} ya está ejecutándose - no se requiere acción")
+            true
+        } else {
+            Log.d(TAG, "Servicio ${serviceClass.simpleName} no está ejecutándose - iniciando...")
+            startServiceSafely(context, serviceClass, configureIntent)
         }
     }
 }
