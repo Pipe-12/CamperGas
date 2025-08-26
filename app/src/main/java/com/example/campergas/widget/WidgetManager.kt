@@ -39,23 +39,19 @@ class WidgetManager @Inject constructor(
     }
     
     /**
-     * Solicita datos de peso manualmente y actualiza widgets
-     * También asegura que el servicio BLE esté ejecutándose
+     * Asegura que el servicio BLE esté ejecutándose y actualiza widgets
      */
-    fun requestWeightDataAndUpdateWidgets() {
+    fun ensureBleServiceAndUpdateWidgets() {
         try {
             // Asegurar que el servicio BLE está ejecutándose
             ensureBleServiceRunning()
             
-            // Enviar broadcast para solicitar datos
-            val intent = Intent(context, GasCylinderWidgetProvider::class.java).apply {
-                action = GasCylinderWidgetProvider.ACTION_REQUEST_DATA
-            }
-            context.sendBroadcast(intent)
+            // Actualizar todos los widgets con los datos actuales
+            updateAllWidgets()
             
-            Log.d(TAG, "Solicitud de datos de peso enviada")
+            Log.d(TAG, "Servicio BLE asegurado y widgets actualizados")
         } catch (e: Exception) {
-            Log.e(TAG, "Error al solicitar datos de peso", e)
+            Log.e(TAG, "Error al asegurar servicio BLE y actualizar widgets", e)
         }
     }
     
