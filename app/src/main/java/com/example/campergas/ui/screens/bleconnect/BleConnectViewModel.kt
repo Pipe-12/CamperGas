@@ -2,8 +2,9 @@ package com.example.campergas.ui.screens.bleconnect
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.campergas.data.repository.BleRepository
 import com.example.campergas.domain.model.BleDevice
+import com.example.campergas.domain.usecase.CheckBleConnectionUseCase
+import com.example.campergas.domain.usecase.ConnectBleDeviceUseCase
 import com.example.campergas.domain.usecase.ScanBleDevicesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,14 +16,15 @@ import javax.inject.Inject
 @HiltViewModel
 class BleConnectViewModel @Inject constructor(
     private val scanBleDevicesUseCase: ScanBleDevicesUseCase,
-    private val bleRepository: BleRepository
+    private val connectBleDeviceUseCase: ConnectBleDeviceUseCase,
+    private val checkBleConnectionUseCase: CheckBleConnectionUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BleConnectUiState())
     val uiState: StateFlow<BleConnectUiState> = _uiState.asStateFlow()
 
     // Observar estado de conexión
-    val connectionState = bleRepository.connectionState
+    val connectionState = checkBleConnectionUseCase()
 
     init {
         // Observar cambios en el estado de conexión
@@ -46,7 +48,7 @@ class BleConnectViewModel @Inject constructor(
 
     fun startScan() {
         // Verificar que tenemos permisos antes de escanear
-        if (!bleRepository.isBluetoothEnabled()) {
+        if (!scanBleDevicesUseCase.isBluetoothEnabled()) {
             _uiState.value = _uiState.value.copy(
                 error = "Bluetooth no está habilitado"
             )
@@ -97,7 +99,7 @@ class BleConnectViewModel @Inject constructor(
     }
 
     fun connectToDevice(device: BleDevice) {
-        if (!bleRepository.isBluetoothEnabled()) {
+        if (!scanBleDevicesUseCase.isBluetoothEnabled()) {
             _uiState.value = _uiState.value.copy(
                 error = "Bluetooth no está habilitado"
             )
@@ -110,11 +112,8 @@ class BleConnectViewModel @Inject constructor(
                 error = null
             )
             try {
-                // Usar el repositorio unificado para conectar
-                bleRepository.connectToSensor(device.address)
-
-                // Guardar dispositivo como último conectado
-                bleRepository.saveLastConnectedDevice(device.address)
+                // Usar el use case para conectar y guardar dispositivo
+                connectBleDeviceUseCase(device.address)
 
                 _uiState.value = _uiState.value.copy(
                     connectedDevice = device,
@@ -150,11 +149,11 @@ class BleConnectViewModel @Inject constructor(
 
                 android.util.Log.d(
                     "BleConnectViewModel",
-                    "🔌 Llamando a bleRepository.disconnectSensor()"
+                    "🔌 Llamando a connectBleDeviceUseCase.disconnect()"
                 )
                 // Desconectar del dispositivo - el estado se actualizará automáticamente
-                // a través del observable connectionState del repositorio
-                bleRepository.disconnectSensor()
+                // a través del observable connectionState del use case
+                connectBleDeviceUseCase.disconnect()
 
                 android.util.Log.d("BleConnectViewModel", "🔌 Limpiando estado local del ViewModel")
                 // Solo limpiar datos locales del UI, no el estado de conexión
