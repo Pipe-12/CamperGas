@@ -61,7 +61,7 @@ class BleForegroundService : Service() {
         const val ACTION_START_FOR_WIDGETS = "START_FOR_WIDGETS"
         
         fun startForWidgets(context: Context): Boolean {
-            return ForegroundServiceUtils.startServiceSafely(
+            return ForegroundServiceUtils.startServiceSafelyIfNotRunning(
                 context,
                 BleForegroundService::class.java
             ) { intent ->
@@ -92,11 +92,15 @@ class BleForegroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Try to start as foreground service if possible
+        // Try to start as foreground service if possible using the same safe logic as starting the service
         try {
-            val notification = createNotification("CamperGas en funcionamiento")
-            startForeground(notificationId, notification)
-            Log.d(TAG, "Service started as foreground service")
+            if (ForegroundServiceUtils.canStartForegroundService(this)) {
+                val notification = createNotification("CamperGas en funcionamiento")
+                startForeground(notificationId, notification)
+                Log.d(TAG, "Service started as foreground service")
+            } else {
+                Log.d(TAG, "Service started as regular service (foreground not allowed)")
+            }
         } catch (e: Exception) {
             Log.w(TAG, "Could not start as foreground service, running as regular service", e)
             // Continue as regular service - widgets will still be updated when app is in foreground
