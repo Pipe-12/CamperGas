@@ -389,10 +389,12 @@ class BleForegroundService : Service() {
                     // Reset del estado de alerta cuando el gas está por encima del umbral
                     if (hasAlertBeenSent) {
                         hasAlertBeenSent = false
+                        lastAlertThreshold = null // Reset the threshold to allow notifications for same threshold again
                     }
                 }
             } catch (e: Exception) {
                 // Manejar errores silenciosamente para no afectar el servicio principal
+                Log.e(TAG, "Error checking gas level threshold: ${e.message}")
             }
         }
     }
@@ -400,6 +402,8 @@ class BleForegroundService : Service() {
     private fun sendGasAlert(currentPercentage: Float, threshold: Float) {
         val title = "⚠️ Nivel de Gas Bajo"
         val message = "El gas está al ${currentPercentage.toInt()}% (por debajo del ${threshold.toInt()}%)"
+        
+        Log.d(TAG, "Enviando notificación de gas bajo: $message")
         
         val alertNotification = NotificationCompat.Builder(this, alertChannelId)
             .setContentTitle(title)
@@ -412,6 +416,8 @@ class BleForegroundService : Service() {
         val notificationManager =
             getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(alertNotificationId, alertNotification)
+        
+        Log.d(TAG, "Notificación de gas bajo enviada con ID: $alertNotificationId")
     }
 
     override fun onDestroy() {

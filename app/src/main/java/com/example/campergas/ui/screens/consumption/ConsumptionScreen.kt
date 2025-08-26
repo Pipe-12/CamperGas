@@ -119,14 +119,12 @@ fun ConsumptionScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Gráfico de consumo
-        if (uiState.chartData.isNotEmpty()) {
-            ConsumptionChart(
-                chartData = uiState.chartData,
-                modifier = Modifier.height(200.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
+        // Gráfico de consumo - Always show chart component which handles empty data internally
+        ConsumptionChart(
+            chartData = uiState.chartData,
+            modifier = Modifier.height(200.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
     }
 
     // Date Pickers
@@ -475,8 +473,6 @@ fun ConsumptionChart(
     chartData: List<ChartDataPoint>,
     modifier: Modifier = Modifier
 ) {
-    if (chartData.isEmpty()) return
-
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -496,26 +492,45 @@ fun ConsumptionChart(
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            if (chartData.size < 2) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Se necesitan al menos 2 días de datos para mostrar el gráfico",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
+            when {
+                chartData.isEmpty() -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No hay datos de consumo para el período seleccionado",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                }
+                chartData.size < 2 -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Se necesitan al menos 2 días de datos para mostrar el gráfico",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                }
+                else -> {
+                    SimpleLineChart(
+                        data = chartData,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp) // Increased height for axis labels
                     )
                 }
-            } else {
-                SimpleLineChart(
-                    data = chartData,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp) // Increased height for axis labels
-                )
             }
         }
     }
