@@ -19,26 +19,24 @@ import com.example.campergas.data.repository.BleRepository
 import com.example.campergas.data.repository.FuelMeasurementRepository
 import com.example.campergas.data.repository.GasCylinderRepository
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class GasCylinderWidgetProvider : AppWidgetProvider() {
 
-    @Inject
-    lateinit var bleRepository: BleRepository
-    
-    @Inject
-    lateinit var fuelMeasurementRepository: FuelMeasurementRepository
-    
-    @Inject
-    lateinit var gasCylinderRepository: GasCylinderRepository
-
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    /**
+     * Get repositories using Hilt EntryPoint pattern for reliable dependency injection in widgets
+     */
+    private fun getEntryPoint(context: Context): WidgetEntryPoint {
+        return EntryPointAccessors.fromApplication(context, WidgetEntryPoint::class.java)
+    }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         // Asegurar que el servicio BLE está ejecutándose para las solicitudes periódicas
@@ -102,6 +100,12 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
     private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
         scope.launch {
             try {
+                // Get repositories using EntryPoint
+                val entryPoint = getEntryPoint(context)
+                val fuelMeasurementRepository = entryPoint.fuelMeasurementRepository()
+                val gasCylinderRepository = entryPoint.gasCylinderRepository()
+                val bleRepository = entryPoint.bleRepository()
+                
                 // Obtener datos actuales
                 val latestFuelMeasurement = fuelMeasurementRepository.getLatestRealTimeMeasurement().first()
                 val activeCylinder = gasCylinderRepository.getActiveCylinder().first()
@@ -180,6 +184,10 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                 Log.d("GasCylinderWidget", "Manual data request from widget")
                 scope.launch {
                     try {
+                        // Get repositories using EntryPoint
+                        val entryPoint = getEntryPoint(context)
+                        val bleRepository = entryPoint.bleRepository()
+                        
                         // Solicitar datos de peso manualmente
                         bleRepository.readWeightDataOnDemand()
                         
