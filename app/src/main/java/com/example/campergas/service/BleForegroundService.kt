@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import com.example.campergas.R
 import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.data.repository.BleRepository
+import com.example.campergas.utils.ForegroundServiceUtils
 import com.example.campergas.widget.GasCylinderWidgetProvider
 import com.example.campergas.widget.VehicleStabilityWidgetProvider
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,27 +60,21 @@ class BleForegroundService : Service() {
         const val KEY_DEVICE_ADDRESS = "device_address"
         const val ACTION_START_FOR_WIDGETS = "START_FOR_WIDGETS"
         
-        fun startForWidgets(context: Context) {
-            val intent = Intent(context, BleForegroundService::class.java).apply {
-                action = ACTION_START_FOR_WIDGETS
-            }
-            
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
+        fun startForWidgets(context: Context): Boolean {
+            return ForegroundServiceUtils.startServiceSafely(
+                context,
+                BleForegroundService::class.java
+            ) { intent ->
+                intent.action = ACTION_START_FOR_WIDGETS
             }
         }
         
-        fun startWithDevice(context: Context, deviceAddress: String) {
-            val intent = Intent(context, BleForegroundService::class.java).apply {
-                putExtra(KEY_DEVICE_ADDRESS, deviceAddress)
-            }
-            
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
+        fun startWithDevice(context: Context, deviceAddress: String): Boolean {
+            return ForegroundServiceUtils.startServiceSafely(
+                context,
+                BleForegroundService::class.java
+            ) { intent ->
+                intent.putExtra(KEY_DEVICE_ADDRESS, deviceAddress)
             }
         }
         
@@ -97,8 +92,15 @@ class BleForegroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification = createNotification("CamperGas en funcionamiento")
-        startForeground(notificationId, notification)
+        // Try to start as foreground service if possible
+        try {
+            val notification = createNotification("CamperGas en funcionamiento")
+            startForeground(notificationId, notification)
+            Log.d(TAG, "Service started as foreground service")
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not start as foreground service, running as regular service", e)
+            // Continue as regular service - widgets will still be updated when app is in foreground
+        }
 
         when (intent?.action) {
             ACTION_START_FOR_WIDGETS -> {
