@@ -52,6 +52,11 @@ class BleForegroundService : Service() {
     private var lastWeightRequestTime = 0L
     private var lastInclinationRequestTime = 0L
     
+    // Control para deduplicación de requests
+    private var isWeightRequestInProgress = false
+    private var isInclinationRequestInProgress = false
+    private val minimumRequestInterval = 1000L // Mínimo 1 segundo entre requests del mismo tipo
+    
     // Intervalos configurables (se cargan desde preferencias)
     private var weightRequestInterval = 5000L // 5 segundos por defecto
     private var inclinationRequestInterval = 5000L // 5 segundos por defecto
@@ -72,6 +77,20 @@ class BleForegroundService : Service() {
         fun stopService(context: Context) {
             val intent = Intent(context, BleForegroundService::class.java)
             context.stopService(intent)
+        }
+        
+        /**
+         * Solicita datos frescos del sensor si el servicio está corriendo
+         * Método seguro que no causa duplicación de requests
+         */
+        fun requestFreshSensorData(context: Context) {
+            val intent = Intent(context, BleForegroundService::class.java)
+            intent.action = "REQUEST_FRESH_DATA"
+            try {
+                context.startService(intent)
+            } catch (e: Exception) {
+                Log.w(TAG, "No se pudo solicitar datos frescos", e)
+            }
         }
     }
 
@@ -102,6 +121,10 @@ class BleForegroundService : Service() {
                 Log.d(TAG, "Servicio iniciado para widgets")
                 // Intentar conectar al último dispositivo conocido
                 connectToLastKnownDevice()
+            }
+            "REQUEST_FRESH_DATA" -> {
+                Log.d(TAG, "Solicitud de datos frescos recibida")
+                requestFreshSensorDataIfConnected()
             }
             else -> {
                 Log.d(TAG, "Servicio iniciado - conectando al último dispositivo conocido")
@@ -271,9 +294,7 @@ class BleForegroundService : Service() {
                     
                     // Solicitar datos de peso si han pasado más del intervalo configurado
                     if (currentTime - lastWeightRequestTime > weightRequestInterval) {
-                        Log.d(TAG, "Solicitando datos de peso...")
-                        bleRepository.readWeightDataOnDemand()
-                        lastWeightRequestTime = currentTime
+                        requestWeightDataSafely()
                     }
                     
                     // Esperar un poco antes de solicitar inclinación para evitar conflictos BLE
@@ -281,9 +302,7 @@ class BleForegroundService : Service() {
                     
                     // Solicitar datos de inclinación si han pasado más del intervalo configurado
                     if (currentTime - lastInclinationRequestTime > inclinationRequestInterval) {
-                        Log.d(TAG, "Solicitando datos de inclinación...")
-                        bleRepository.readInclinationDataOnDemand()
-                        lastInclinationRequestTime = currentTime
+                        requestInclinationDataSafely()
                     }
                     
                     // Pausa entre ciclos de verificación (1000ms)
@@ -323,6 +342,92 @@ class BleForegroundService : Service() {
                 if (bleRepository.connectionState.first()) {
                     startPeriodicBleRequests()
                 }
+            }
+        }
+    }
+    
+    /**
+     * Solicita datos frescos del sensor si hay conexión activa
+     * Implementa deduplicación para evitar requests duplicados
+     */
+    private fun requestFreshSensorDataIfConnected() {
+        serviceScope.launch {
+            try {
+                val isConnected = bleRepository.connectionState.first()
+                if (!isConnected) {
+                    Log.d(TAG, "No hay conexión BLE, no se pueden solicitar datos frescos")
+                    return@launch
+                }
+                
+                val currentTime = System.currentTimeMillis()
+                
+                // Solicitar peso si no hay request en progreso y ha pasado el tiempo mínimo
+                if (!isWeightRequestInProgress && 
+                    currentTime - lastWeightRequestTime > minimumRequestInterval) {
+                    requestWeightDataSafely()
+                }
+                
+                // Esperar un poco antes de solicitar inclinación
+                delay(300)
+                
+                // Solicitar inclinación si no hay request en progreso y ha pasado el tiempo mínimo
+                if (!isInclinationRequestInProgress && 
+                    currentTime - lastInclinationRequestTime > minimumRequestInterval) {
+                    requestInclinationDataSafely()
+                }
+                
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al solicitar datos frescos: ${e.message}")
+            }
+        }
+    }
+    
+    /**
+     * Solicita datos de peso de forma segura con deduplicación
+     */
+    private fun requestWeightDataSafely() {
+        if (isWeightRequestInProgress) {
+            Log.d(TAG, "Solicitud de peso ya en progreso, omitiendo...")
+            return
+        }
+        
+        serviceScope.launch {
+            try {
+                isWeightRequestInProgress = true
+                Log.d(TAG, "Solicitando datos de peso...")
+                bleRepository.readWeightDataOnDemand()
+                lastWeightRequestTime = System.currentTimeMillis()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al solicitar datos de peso: ${e.message}")
+            } finally {
+                // Liberar el lock después de un pequeño delay
+                delay(200)
+                isWeightRequestInProgress = false
+            }
+        }
+    }
+    
+    /**
+     * Solicita datos de inclinación de forma segura con deduplicación
+     */
+    private fun requestInclinationDataSafely() {
+        if (isInclinationRequestInProgress) {
+            Log.d(TAG, "Solicitud de inclinación ya en progreso, omitiendo...")
+            return
+        }
+        
+        serviceScope.launch {
+            try {
+                isInclinationRequestInProgress = true
+                Log.d(TAG, "Solicitando datos de inclinación...")
+                bleRepository.readInclinationDataOnDemand()
+                lastInclinationRequestTime = System.currentTimeMillis()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al solicitar datos de inclinación: ${e.message}")
+            } finally {
+                // Liberar el lock después de un pequeño delay
+                delay(200)
+                isInclinationRequestInProgress = false
             }
         }
     }

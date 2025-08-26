@@ -1,12 +1,15 @@
 package com.example.campergas.ui.screens.home
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.domain.model.FuelMeasurement
+import com.example.campergas.domain.usecase.CheckBleConnectionUseCase
 import com.example.campergas.domain.usecase.ConnectBleDeviceUseCase
 import com.example.campergas.domain.usecase.GetFuelDataUseCase
-import com.example.campergas.domain.usecase.ReadSensorDataUseCase
+import com.example.campergas.service.BleForegroundService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -15,9 +18,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val getFuelDataUseCase: GetFuelDataUseCase,
     private val connectBleDeviceUseCase: ConnectBleDeviceUseCase,
-    private val readSensorDataUseCase: ReadSensorDataUseCase
+    private val checkBleConnectionUseCase: CheckBleConnectionUseCase
 ) : ViewModel() {
 
     private val _connectionState = MutableStateFlow(false)
@@ -27,9 +31,9 @@ class HomeViewModel @Inject constructor(
     val fuelData: StateFlow<FuelMeasurement?> = _fuelData
 
     init {
-        // Observar el estado de conexión desde ReadSensorDataUseCase
+        // Observar el estado de conexión desde CheckBleConnectionUseCase
         viewModelScope.launch {
-            readSensorDataUseCase.getConnectionState().collectLatest { isConnected ->
+            checkBleConnectionUseCase().collectLatest { isConnected ->
                 _connectionState.value = isConnected
             }
         }
@@ -67,7 +71,7 @@ class HomeViewModel @Inject constructor(
     }
 
     /**
-     * Solicita una lectura única de todos los datos del sensor
+     * Solicita datos frescos del sensor a través del servicio centralizado
      * Se llama cada vez que se abre la pantalla Home
      */
     fun requestSensorDataOnScreenOpen() {
@@ -78,7 +82,9 @@ class HomeViewModel @Inject constructor(
             // Solo hacer la petición si hay conexión activa
             if (_connectionState.value) {
                 try {
-                    readSensorDataUseCase.readAllSensorData()
+                    // Solicitar datos frescos a través del servicio centralizado
+                    // que maneja deduplicación automáticamente
+                    BleForegroundService.requestFreshSensorData(context)
                 } catch (_: Exception) {
                     // Manejar error silenciosamente para no afectar la UI
                 }
