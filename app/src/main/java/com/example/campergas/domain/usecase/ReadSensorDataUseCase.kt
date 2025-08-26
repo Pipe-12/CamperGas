@@ -1,6 +1,7 @@
 package com.example.campergas.domain.usecase
 
 import com.example.campergas.data.repository.BleRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
@@ -31,9 +32,12 @@ class ReadSensorDataUseCase @Inject constructor(
     /**
      * Solicita lectura de todos los datos del sensor (peso e inclinación) bajo demanda
      * Los datos se actualizarán en sus StateFlows correspondientes
+     * Incluye un pequeño delay entre lecturas para evitar conflictos BLE
      */
-    fun readAllSensorData() {
+    suspend fun readAllSensorData() {
         readWeightData()
+        // Pequeño delay para evitar conflictos BLE entre solicitudes simultáneas
+        delay(300)
         readInclinationData()
     }
 
