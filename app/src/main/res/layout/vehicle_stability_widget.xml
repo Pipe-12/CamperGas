@@ -45,15 +45,17 @@
         android:gravity="center"
         android:layout_marginTop="4dp" />
 
-    <!-- Imagen del vehículo -->
-    <ImageView
-        android:id="@+id/widget_vehicle_image"
+    <!-- Indicador de estabilidad visual simple -->
+    <TextView
+        android:id="@+id/widget_stability_indicator"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginVertical="8dp"
-        android:contentDescription="Vehicle Inclination"
-        android:scaleType="fitCenter" />
+        android:text="❓"
+        android:textSize="48sp"
+        android:gravity="center"
+        android:contentDescription="Stability Indicator" />
 
     <!-- Valores de inclinación -->
     <LinearLayout

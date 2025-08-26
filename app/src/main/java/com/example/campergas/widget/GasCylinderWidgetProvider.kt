@@ -106,22 +106,26 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                 val gasCylinderRepository = entryPoint.gasCylinderRepository()
                 val bleRepository = entryPoint.bleRepository()
                 
-                // Obtener datos actuales
-                val latestFuelMeasurement = fuelMeasurementRepository.getLatestRealTimeMeasurement().first()
+                // Obtener datos actuales - priorizar datos BLE en tiempo real
+                val realTimeBleData = bleRepository.fuelMeasurementData.first()
+                val latestDbMeasurement = fuelMeasurementRepository.getLatestRealTimeMeasurement().first()
                 val activeCylinder = gasCylinderRepository.getActiveCylinder().first()
                 val isConnected = bleRepository.connectionState.first()
+
+                // Usar datos BLE en tiempo real si están disponibles, sino usar datos de la BD
+                val currentFuelMeasurement = realTimeBleData ?: latestDbMeasurement
 
                 // Crear las vistas remotas
                 val views = RemoteViews(context.packageName, R.layout.gas_cylinder_widget)
 
                 // Configurar textos
-                if (activeCylinder != null && latestFuelMeasurement != null) {
+                if (activeCylinder != null && currentFuelMeasurement != null) {
                     views.setTextViewText(R.id.widget_cylinder_name, activeCylinder.name)
-                    views.setTextViewText(R.id.widget_fuel_percentage, latestFuelMeasurement.getFormattedPercentage())
-                    views.setTextViewText(R.id.widget_fuel_kg, latestFuelMeasurement.getFormattedFuelKilograms())
+                    views.setTextViewText(R.id.widget_fuel_percentage, currentFuelMeasurement.getFormattedPercentage())
+                    views.setTextViewText(R.id.widget_fuel_kg, currentFuelMeasurement.getFormattedFuelKilograms())
                     
                     // Crear imagen de la bombona
-                    val cylinderBitmap = createCylinderBitmap(latestFuelMeasurement.fuelPercentage / 100f)
+                    val cylinderBitmap = createCylinderBitmap(currentFuelMeasurement.fuelPercentage / 100f)
                     views.setImageViewBitmap(R.id.widget_cylinder_image, cylinderBitmap)
                 } else {
                     views.setTextViewText(R.id.widget_cylinder_name, "Sin bombona activa")
