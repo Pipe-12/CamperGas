@@ -145,8 +145,6 @@ class BleForegroundService : Service() {
                 launch {
                     bleRepository.fuelMeasurementData.collect { fuelMeasurement ->
                         if (fuelMeasurement != null) {
-                            updateNotification("Combustible: ${fuelMeasurement.getFormattedFuelKilograms()} (${fuelMeasurement.getFormattedPercentage()})")
-                            
                             // Verificar umbral de gas para alertas
                             checkGasLevelThreshold(fuelMeasurement.fuelPercentage)
                             
