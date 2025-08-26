@@ -18,20 +18,24 @@ import com.example.campergas.R
 import com.example.campergas.data.repository.BleRepository
 import com.example.campergas.domain.model.Inclination
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class VehicleStabilityWidgetProvider : AppWidgetProvider() {
 
-    @Inject
-    lateinit var bleRepository: BleRepository
-
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    /**
+     * Get repositories using Hilt EntryPoint pattern for reliable dependency injection in widgets
+     */
+    private fun getEntryPoint(context: Context): WidgetEntryPoint {
+        return EntryPointAccessors.fromApplication(context, WidgetEntryPoint::class.java)
+    }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         // Asegurar que el servicio BLE está ejecutándose para las solicitudes periódicas
@@ -95,6 +99,10 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
     private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
         scope.launch {
             try {
+                // Get repositories using EntryPoint
+                val entryPoint = getEntryPoint(context)
+                val bleRepository = entryPoint.bleRepository()
+                
                 // Obtener datos de inclinación actuales
                 val inclinationData = bleRepository.inclinationData.first()
                 val isConnected = bleRepository.connectionState.first()
@@ -181,6 +189,10 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
                 Log.d("VehicleStabilityWidget", "Manual inclination data request from widget")
                 scope.launch {
                     try {
+                        // Get repositories using EntryPoint
+                        val entryPoint = getEntryPoint(context)
+                        val bleRepository = entryPoint.bleRepository()
+                        
                         // Solicitar datos de inclinación manualmente
                         bleRepository.readInclinationDataOnDemand()
                         
