@@ -23,6 +23,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -57,7 +58,6 @@ class BleForegroundService : Service() {
 
     companion object {
         private const val TAG = "BleForegroundService"
-        const val KEY_DEVICE_ADDRESS = "device_address"
         const val ACTION_START_FOR_WIDGETS = "START_FOR_WIDGETS"
         
         fun startForWidgets(context: Context): Boolean {
@@ -66,15 +66,6 @@ class BleForegroundService : Service() {
                 BleForegroundService::class.java
             ) { intent ->
                 intent.action = ACTION_START_FOR_WIDGETS
-            }
-        }
-        
-        fun startWithDevice(context: Context, deviceAddress: String): Boolean {
-            return ForegroundServiceUtils.startServiceSafely(
-                context,
-                BleForegroundService::class.java
-            ) { intent ->
-                intent.putExtra(KEY_DEVICE_ADDRESS, deviceAddress)
             }
         }
         
@@ -113,14 +104,8 @@ class BleForegroundService : Service() {
                 connectToLastKnownDevice()
             }
             else -> {
-                val deviceAddress = intent?.getStringExtra(KEY_DEVICE_ADDRESS)
-                if (deviceAddress != null) {
-                    Log.d(TAG, "Servicio iniciado con dispositivo: $deviceAddress")
-                    connectToDevice(deviceAddress)
-                } else {
-                    Log.d(TAG, "Servicio iniciado sin dispositivo específico")
-                    connectToLastKnownDevice()
-                }
+                Log.d(TAG, "Servicio iniciado - conectando al último dispositivo conocido")
+                connectToLastKnownDevice()
             }
         }
 
@@ -272,7 +257,7 @@ class BleForegroundService : Service() {
             Log.d(TAG, "🔄 Iniciando solicitudes periódicas de datos BLE...")
             Log.d(TAG, "📊 Intervalo peso: ${weightRequestInterval}ms, Intervalo inclinación: ${inclinationRequestInterval}ms")
             
-            while (isPeriodicRequestsActive && !periodicRequestsJob!!.isCancelled) {
+            while (isPeriodicRequestsActive && isActive) {
                 try {
                     val currentTime = System.currentTimeMillis()
                     
