@@ -12,7 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -85,16 +86,29 @@ fun HomeScreen(
             TopAppBar(
                 title = {
                     Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Home,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Home,
+                                contentDescription = null,
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                            Text(
+                                "CamperGas",
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        
+                        // Connection status in topbar
                         Text(
-                            "CamperGas",
-                            fontWeight = FontWeight.Bold
+                            text = if (connectionState) "✅ Conectado" else "❌ Desconectado",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 },
@@ -110,89 +124,75 @@ fun HomeScreen(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(paddingValues)
         ) {
-            // Estado de conexión y información de la app
-            item {
-                ElevatedCard(
+            // Main content area - scrollable for smaller screens
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Top section: Weight and History buttons side by side
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    // Weight button (left)
+                    NavigationButtonWithPreview(
+                        title = "Monitoreo de Peso",
+                        description = "Ver peso actual y estadísticas",
+                        onClick = { navController.navigate(Screen.Weight.route) },
+                        modifier = Modifier.weight(1f)
                     ) {
-                        Text(
-                            text = "Estado de Conexión",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
+                        // Mostrar la bombona con el porcentaje actual
+                        fuelData?.let { fuel ->
+                            GasCylinderVisualizer(
+                                fuelPercentage = fuel.fuelPercentage,
+                                modifier = Modifier.size(60.dp, 90.dp)
+                            )
+                        } ?: run {
+                            // Bombona vacía si no hay datos
+                            GasCylinderVisualizer(
+                                fuelPercentage = 0f,
+                                modifier = Modifier.size(60.dp, 90.dp)
+                            )
+                        }
+                    }
 
-                        Text(
-                            text = "BLE: ${if (connectionState) "✅ Conectado" else "❌ Desconectado"}",
-                            style = MaterialTheme.typography.bodyLarge
+                    // History button (right)
+                    NavigationButtonWithPreview(
+                        title = "Historial de Consumo",
+                        description = "Ver consumo de gas histórico",
+                        onClick = { navController.navigate(Screen.Consumption.route) },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        // Mostrar resumen compacto de consumo
+                        ConsumptionPreview(
+                            lastDayConsumption = lastDayConsumption,
+                            lastWeekConsumption = lastWeekConsumption
                         )
                     }
                 }
-            }
 
-            // Botón que lleva a la vista de peso con bombona visualizada
-            item {
-                NavigationButtonWithPreview(
-                    title = "Monitoreo de Peso",
-                    description = "Ver peso actual y estadísticas",
-                    onClick = { navController.navigate(Screen.Weight.route) }
-                ) {
-                    // Mostrar la bombona con el porcentaje actual
-                    fuelData?.let { fuel ->
-                        GasCylinderVisualizer(
-                            fuelPercentage = fuel.fuelPercentage,
-                            modifier = Modifier.size(80.dp, 120.dp)
-                        )
-                    } ?: run {
-                        // Bombona vacía si no hay datos
-                        GasCylinderVisualizer(
-                            fuelPercentage = 0f,
-                            modifier = Modifier.size(80.dp, 120.dp)
-                        )
-                    }
-                }
-            }
-
-            // Botón de historial con resumen de consumo
-            item {
-                NavigationButtonWithPreview(
-                    title = "Historial de Consumo",
-                    description = "Ver consumo de gas histórico",
-                    onClick = { navController.navigate(Screen.Consumption.route) }
-                ) {
-                    // Mostrar resumen compacto de consumo
-                    ConsumptionPreview(
-                        lastDayConsumption = lastDayConsumption,
-                        lastWeekConsumption = lastWeekConsumption
-                    )
-                }
-            }
-
-            // Botón de inclinación con vista del vehículo
-            item {
+                // Bottom section: Inclination button with larger space for drawing
                 NavigationButtonWithPreview(
                     title = "Inclinación",
                     description = "Verificar nivelación del vehículo",
-                    onClick = { navController.navigate(Screen.Inclination.route) }
+                    onClick = { navController.navigate(Screen.Inclination.route) },
+                    isLargeButton = true
                 ) {
-                    // Mostrar vista compacta del vehículo con inclinación
+                    // Mostrar vista más grande del vehículo con inclinación
                     vehicleConfig?.let { config ->
                         VehicleInclinationView(
                             vehicleType = config.type,
                             pitchAngle = inclinationPitch,
                             rollAngle = inclinationRoll,
-                            modifier = Modifier.height(100.dp)
+                            modifier = Modifier.height(160.dp)
                         )
                     } ?: run {
                         // Vista por defecto si no hay configuración
@@ -200,37 +200,38 @@ fun HomeScreen(
                             vehicleType = VehicleType.CARAVAN,
                             pitchAngle = inclinationPitch,
                             rollAngle = inclinationRoll,
-                            modifier = Modifier.height(100.dp)
+                            modifier = Modifier.height(160.dp)
                         )
                     }
                 }
             }
 
-            // Título de funciones adicionales
-            item {
+            // Static bottom configuration buttons
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
                 Text(
                     text = "Configuración",
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
-            }
-
-            // Botones de configuración con iconos apropiados
-            item {
+                
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Botón de conexión BLE con símbolo Bluetooth
+                    // Botón de conexión BLE
                     ConfigurationButton(
                         title = "Conectar BLE",
-                        text = "🔗", // Connection symbol for Bluetooth
+                        text = "🔗",
                         onClick = { navController.navigate(Screen.BleConnect.route) },
                         modifier = Modifier.weight(1f)
                     )
 
-                    // Botón de configuración con icono engranaje
+                    // Botón de configuración
                     ConfigurationButton(
                         title = "Configuración",
                         icon = Icons.Default.Settings,
@@ -238,7 +239,7 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f)
                     )
 
-                    // Botón de ajustes de vehículo con emoji apropiado
+                    // Botón de ajustes de vehículo
                     val vehicleIcon = getVehicleIcon(vehicleConfig?.type)
                     ConfigurationButton(
                         title = "Ajustes del Vehículo",
@@ -257,12 +258,16 @@ private fun NavigationButtonWithPreview(
     title: String,
     description: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isLargeButton: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    val buttonHeight = if (isLargeButton) 200.dp else 120.dp
+    
     ElevatedCard(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .height(140.dp),
+            .height(buttonHeight),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
         onClick = onClick
     ) {
@@ -291,7 +296,7 @@ private fun NavigationButtonWithPreview(
             
             // Contenido del preview (bombona, gráfico, etc.)
             Box(
-                modifier = Modifier.width(120.dp),
+                modifier = Modifier.width(if (isLargeButton) 160.dp else 80.dp),
                 contentAlignment = Alignment.Center
             ) {
                 content()
