@@ -294,9 +294,9 @@ private fun NavigationButtonWithPreview(
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Column(
                 modifier = Modifier.weight(1f),
@@ -305,18 +305,23 @@ private fun NavigationButtonWithPreview(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 2,
+                    lineHeight = MaterialTheme.typography.titleMedium.lineHeight
                 )
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 3,
+                    lineHeight = MaterialTheme.typography.bodySmall.lineHeight
                 )
             }
             
             // Contenido del preview (bombona, gráfico, etc.)
             Box(
-                modifier = Modifier.width(if (isLargeButton) 160.dp else 80.dp),
+                modifier = Modifier.width(if (isLargeButton) 140.dp else 80.dp),
                 contentAlignment = Alignment.Center
             ) {
                 content()
