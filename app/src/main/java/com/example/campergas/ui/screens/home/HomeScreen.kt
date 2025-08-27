@@ -15,8 +15,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,7 +45,6 @@ import androidx.navigation.NavController
 import com.example.campergas.domain.model.VehicleType
 import com.example.campergas.ui.components.VehicleInclinationView
 import com.example.campergas.ui.components.gas.AddGasCylinderDialog
-import com.example.campergas.ui.components.gas.GasCylinderFloatingActionButton
 import com.example.campergas.ui.components.gas.GasCylinderViewModel
 import com.example.campergas.ui.navigation.Screen
 import com.example.campergas.ui.screens.weight.GasCylinderVisualizer
@@ -116,11 +117,6 @@ fun HomeScreen(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            )
-        },
-        floatingActionButton = {
-            GasCylinderFloatingActionButton(
-                onClick = { showAddCylinderDialog = true }
             )
         }
     ) { paddingValues ->
@@ -206,6 +202,26 @@ fun HomeScreen(
                 }
             }
 
+            // Add cylinder button section - positioned above configuration
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 8.dp)
+            ) {
+                Button(
+                    onClick = { showAddCylinderDialog = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text("Añadir Bombona")
+                }
+            }
+
             // Static bottom configuration buttons
             Column(
                 modifier = Modifier
@@ -262,7 +278,7 @@ private fun NavigationButtonWithPreview(
     isLargeButton: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val buttonHeight = if (isLargeButton) 200.dp else 120.dp
+    val buttonHeight = if (isLargeButton) 240.dp else 160.dp
     
     ElevatedCard(
         modifier = modifier
