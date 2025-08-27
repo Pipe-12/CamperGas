@@ -143,7 +143,8 @@ fun HomeScreen(
                         title = "Monitoreo de Peso",
                         description = "Ver peso actual y estadísticas",
                         onClick = { navController.navigate(Screen.Weight.route) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        isLargeButton = true
                     ) {
                         // Mostrar la bombona con el porcentaje actual
                         fuelData?.let { fuel ->
@@ -165,7 +166,8 @@ fun HomeScreen(
                         title = "Historial de Consumo",
                         description = "Ver consumo de gas histórico",
                         onClick = { navController.navigate(Screen.Consumption.route) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        isLargeButton = true
                     ) {
                         // Mostrar resumen compacto de consumo
                         ConsumptionPreview(
