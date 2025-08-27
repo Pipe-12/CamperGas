@@ -141,7 +141,7 @@ fun HomeScreen(
                     // Weight button (left)
                     NavigationButtonWithPreview(
                         title = "Monitoreo de Peso",
-                        description = "Toca para acceder a la vista de peso actual y estadísticas",
+                        description = "Toca para acceder a la vista de peso actual",
                         onClick = { navController.navigate(Screen.Weight.route) },
                         modifier = Modifier.weight(1f),
                         isLargeButton = true
