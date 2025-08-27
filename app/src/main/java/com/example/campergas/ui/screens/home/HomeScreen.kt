@@ -109,7 +109,8 @@ fun HomeScreen(
                         Text(
                             text = if (connectionState) "✅ Conectado" else "❌ Desconectado",
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(end = 8.dp)
                         )
                     }
                 },
