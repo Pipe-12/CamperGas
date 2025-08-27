@@ -244,10 +244,10 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Botón de conexión BLE con icono Settings como Bluetooth
+                    // Botón de conexión BLE con símbolo Bluetooth
                     ConfigurationButton(
                         title = "Conectar BLE",
-                        icon = Icons.Default.Settings,
+                        text = "🔗", // Connection symbol for Bluetooth
                         onClick = { navController.navigate(Screen.BleConnect.route) },
                         modifier = Modifier.weight(1f)
                     )
