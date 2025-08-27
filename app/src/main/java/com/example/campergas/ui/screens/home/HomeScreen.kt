@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CardDefaults
@@ -44,10 +43,8 @@ import com.example.campergas.domain.model.VehicleType
 import com.example.campergas.ui.components.VehicleInclinationView
 import com.example.campergas.ui.components.gas.AddGasCylinderDialog
 import com.example.campergas.ui.components.gas.GasCylinderFloatingActionButton
-import com.example.campergas.ui.components.gas.GasCylinderInfoCard
 import com.example.campergas.ui.components.gas.GasCylinderViewModel
 import com.example.campergas.ui.navigation.Screen
-import com.example.campergas.ui.screens.consumption.ConsumptionSummarySection
 import com.example.campergas.ui.screens.weight.GasCylinderVisualizer
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,8 +56,6 @@ fun HomeScreen(
 ) {
     val connectionState by viewModel.connectionState.collectAsState()
     val fuelData by viewModel.fuelData.collectAsState()
-    val activeCylinder by gasCylinderViewModel.activeCylinder.collectAsState()
-    val gasCylinderUiState by gasCylinderViewModel.uiState.collectAsState()
     val vehicleConfig by viewModel.vehicleConfig.collectAsState()
     val lastDayConsumption by viewModel.lastDayConsumption.collectAsState()
     val lastWeekConsumption by viewModel.lastWeekConsumption.collectAsState()
@@ -142,14 +137,6 @@ fun HomeScreen(
                             text = "BLE: ${if (connectionState) "✅ Conectado" else "❌ Desconectado"}",
                             style = MaterialTheme.typography.bodyLarge
                         )
-
-                        fuelData?.let {
-                            Text(
-                                text = "Combustible: ${it.getFormattedFuelKilograms()} (${it.getFormattedPercentage()})",
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
                     }
                 }
             }
@@ -217,15 +204,6 @@ fun HomeScreen(
                         )
                     }
                 }
-            }
-
-            // Información de bombona activa
-            item {
-                GasCylinderInfoCard(
-                    activeCylinder = activeCylinder,
-                    currentFuelMeasurement = fuelData,
-                    errorMessage = gasCylinderUiState.errorMessage
-                )
             }
 
             // Título de funciones adicionales
