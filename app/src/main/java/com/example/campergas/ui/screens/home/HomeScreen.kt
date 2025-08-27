@@ -141,7 +141,7 @@ fun HomeScreen(
                     // Weight button (left)
                     NavigationButtonWithPreview(
                         title = "Monitoreo de Peso",
-                        description = "Ver peso actual y estadísticas",
+                        description = "Toca para acceder a la vista de peso actual",
                         onClick = { navController.navigate(Screen.Weight.route) },
                         modifier = Modifier.weight(1f),
                         isLargeButton = true
@@ -164,7 +164,7 @@ fun HomeScreen(
                     // History button (right)
                     NavigationButtonWithPreview(
                         title = "Historial de Consumo",
-                        description = "Ver consumo de gas histórico",
+                        description = "Toca para acceder a la vista de consumo de gas histórico",
                         onClick = { navController.navigate(Screen.Consumption.route) },
                         modifier = Modifier.weight(1f),
                         isLargeButton = true
@@ -180,7 +180,7 @@ fun HomeScreen(
                 // Bottom section: Inclination button with larger space for drawing
                 NavigationButtonWithPreview(
                     title = "Inclinación",
-                    description = "Verificar nivelación del vehículo",
+                    description = "Toca para acceder a la vista de nivelación del vehículo",
                     onClick = { navController.navigate(Screen.Inclination.route) },
                     isLargeButton = true
                 ) {
