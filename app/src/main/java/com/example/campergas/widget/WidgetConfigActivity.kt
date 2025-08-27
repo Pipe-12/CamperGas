@@ -1,14 +1,24 @@
 package com.example.campergas.widget
 
-import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -24,7 +34,7 @@ class WidgetConfigActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         // Configurar resultado como cancelado por defecto
-        setResult(Activity.RESULT_CANCELED)
+        setResult(RESULT_CANCELED)
         
         // Obtener el ID del widget desde el intent
         appWidgetId = intent?.extras?.getInt(
@@ -52,7 +62,7 @@ class WidgetConfigActivity : ComponentActivity() {
                         val resultValue = Intent().apply {
                             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                         }
-                        setResult(Activity.RESULT_OK, resultValue)
+                        setResult(RESULT_OK, resultValue)
                         finish()
                     },
                     onCancel = {
@@ -72,14 +82,14 @@ class WidgetConfigActivity : ComponentActivity() {
                 appWidgetManager,
                 intArrayOf(appWidgetId)
             )
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             try {
                 VehicleStabilityWidgetProvider().onUpdate(
                     this,
                     appWidgetManager,
                     intArrayOf(appWidgetId)
                 )
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Si ambos fallan, al menos intentar actualizar todos los widgets
                 GasCylinderWidgetProvider.updateAllWidgets(this)
                 VehicleStabilityWidgetProvider.updateAllWidgets(this)

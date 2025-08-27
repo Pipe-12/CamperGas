@@ -10,10 +10,5 @@ class CamperGasApplication : Application() {
     
     @Inject
     lateinit var widgetUpdateManager: WidgetUpdateManager
-    
-    override fun onCreate() {
-        super.onCreate()
-        // El widgetUpdateManager se inicializa automáticamente al inyectarse
-        // y comenzará a escuchar cambios en los datos
-    }
+
 }
