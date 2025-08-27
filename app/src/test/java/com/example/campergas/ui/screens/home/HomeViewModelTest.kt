@@ -2,9 +2,16 @@ package com.example.campergas.ui.screens.home
 
 import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.campergas.domain.model.Consumption
 import com.example.campergas.domain.model.FuelMeasurement
+import com.example.campergas.domain.model.Inclination
+import com.example.campergas.domain.model.VehicleConfig
+import com.example.campergas.domain.model.VehicleType
 import com.example.campergas.domain.usecase.ConnectBleDeviceUseCase
+import com.example.campergas.domain.usecase.GetConsumptionHistoryUseCase
 import com.example.campergas.domain.usecase.GetFuelDataUseCase
+import com.example.campergas.domain.usecase.GetInclinationUseCase
+import com.example.campergas.domain.usecase.GetVehicleConfigUseCase
 import com.example.campergas.domain.usecase.ReadSensorDataUseCase
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -41,6 +48,9 @@ class HomeViewModelTest {
     private val getFuelDataUseCase: GetFuelDataUseCase = mockk()
     private val connectBleDeviceUseCase: ConnectBleDeviceUseCase = mockk()
     private val readSensorDataUseCase: ReadSensorDataUseCase = mockk()
+    private val getVehicleConfigUseCase: GetVehicleConfigUseCase = mockk()
+    private val getConsumptionHistoryUseCase: GetConsumptionHistoryUseCase = mockk()
+    private val getInclinationUseCase: GetInclinationUseCase = mockk()
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -48,6 +58,10 @@ class HomeViewModelTest {
     private val fuelDataFlow = MutableStateFlow<FuelMeasurement?>(null)
     private val connectionStateFlow = MutableStateFlow(false)
     private val lastConnectedDeviceFlow = MutableStateFlow("")
+    private val vehicleConfigFlow = MutableStateFlow<VehicleConfig?>(null)
+    private val lastDayConsumptionFlow = MutableStateFlow<List<Consumption>>(emptyList())
+    private val lastWeekConsumptionFlow = MutableStateFlow<List<Consumption>>(emptyList())
+    private val inclinationFlow = MutableStateFlow<Inclination?>(null)
 
     @Before
     fun setUp() {
@@ -65,6 +79,11 @@ class HomeViewModelTest {
         every { getFuelDataUseCase() } returns fuelDataFlow
         every { readSensorDataUseCase.getConnectionState() } returns connectionStateFlow
         every { connectBleDeviceUseCase.getLastConnectedDevice() } returns lastConnectedDeviceFlow
+        every { getVehicleConfigUseCase() } returns vehicleConfigFlow
+        every { getConsumptionHistoryUseCase.getLastDayConsumption() } returns lastDayConsumptionFlow
+        every { getConsumptionHistoryUseCase.getLastWeekConsumption() } returns lastWeekConsumptionFlow
+        every { getConsumptionHistoryUseCase.calculateTotalConsumption(any()) } returns 0f
+        every { getInclinationUseCase() } returns inclinationFlow
         coEvery { connectBleDeviceUseCase.invoke(any()) } returns Unit
         coEvery { connectBleDeviceUseCase.disconnect() } returns Unit
         coEvery { readSensorDataUseCase.readAllSensorData() } returns Unit
@@ -72,7 +91,10 @@ class HomeViewModelTest {
         viewModel = HomeViewModel(
             getFuelDataUseCase,
             connectBleDeviceUseCase,
-            readSensorDataUseCase
+            readSensorDataUseCase,
+            getVehicleConfigUseCase,
+            getConsumptionHistoryUseCase,
+            getInclinationUseCase
         )
     }
 
@@ -132,7 +154,10 @@ class HomeViewModelTest {
         val newViewModel = HomeViewModel(
             getFuelDataUseCase,
             connectBleDeviceUseCase,
-            readSensorDataUseCase
+            readSensorDataUseCase,
+            getVehicleConfigUseCase,
+            getConsumptionHistoryUseCase,
+            getInclinationUseCase
         )
         advanceUntilIdle()
 
@@ -156,7 +181,10 @@ class HomeViewModelTest {
         val newViewModel = HomeViewModel(
             getFuelDataUseCase,
             connectUseCase,
-            readSensorDataUseCase
+            readSensorDataUseCase,
+            getVehicleConfigUseCase,
+            getConsumptionHistoryUseCase,
+            getInclinationUseCase
         )
 
         // Allow enough time for all flows to be processed
@@ -177,7 +205,10 @@ class HomeViewModelTest {
         val newViewModel = HomeViewModel(
             getFuelDataUseCase,
             connectBleDeviceUseCase,
-            readSensorDataUseCase
+            readSensorDataUseCase,
+            getVehicleConfigUseCase,
+            getConsumptionHistoryUseCase,
+            getInclinationUseCase
         )
         advanceUntilIdle()
 

@@ -1,19 +1,22 @@
 package com.example.campergas.ui.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,11 +40,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.campergas.domain.model.VehicleType
+import com.example.campergas.ui.components.VehicleInclinationView
 import com.example.campergas.ui.components.gas.AddGasCylinderDialog
 import com.example.campergas.ui.components.gas.GasCylinderFloatingActionButton
 import com.example.campergas.ui.components.gas.GasCylinderInfoCard
 import com.example.campergas.ui.components.gas.GasCylinderViewModel
 import com.example.campergas.ui.navigation.Screen
+import com.example.campergas.ui.screens.consumption.ConsumptionSummarySection
+import com.example.campergas.ui.screens.weight.GasCylinderVisualizer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +61,11 @@ fun HomeScreen(
     val fuelData by viewModel.fuelData.collectAsState()
     val activeCylinder by gasCylinderViewModel.activeCylinder.collectAsState()
     val gasCylinderUiState by gasCylinderViewModel.uiState.collectAsState()
+    val vehicleConfig by viewModel.vehicleConfig.collectAsState()
+    val lastDayConsumption by viewModel.lastDayConsumption.collectAsState()
+    val lastWeekConsumption by viewModel.lastWeekConsumption.collectAsState()
+    val inclinationPitch by viewModel.inclinationPitch.collectAsState()
+    val inclinationRoll by viewModel.inclinationRoll.collectAsState()
 
     var showAddCylinderDialog by remember { mutableStateOf(false) }
 
@@ -110,7 +122,7 @@ fun HomeScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Estado de conexión y peso
+            // Estado de conexión y información de la app
             item {
                 ElevatedCard(
                     modifier = Modifier.fillMaxWidth(),
@@ -121,13 +133,13 @@ fun HomeScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "Conexión BLE",
+                            text = "Estado de Conexión",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
 
                         Text(
-                            text = "Estado: ${if (connectionState) "✅ Conectado" else "❌ Desconectado"}",
+                            text = "BLE: ${if (connectionState) "✅ Conectado" else "❌ Desconectado"}",
                             style = MaterialTheme.typography.bodyLarge
                         )
 
@@ -142,6 +154,71 @@ fun HomeScreen(
                 }
             }
 
+            // Botón que lleva a la vista de peso con bombona visualizada
+            item {
+                NavigationButtonWithPreview(
+                    title = "Monitoreo de Peso",
+                    description = "Ver peso actual y estadísticas",
+                    onClick = { navController.navigate(Screen.Weight.route) }
+                ) {
+                    // Mostrar la bombona con el porcentaje actual
+                    fuelData?.let { fuel ->
+                        GasCylinderVisualizer(
+                            fuelPercentage = fuel.fuelPercentage,
+                            modifier = Modifier.size(80.dp, 120.dp)
+                        )
+                    } ?: run {
+                        // Bombona vacía si no hay datos
+                        GasCylinderVisualizer(
+                            fuelPercentage = 0f,
+                            modifier = Modifier.size(80.dp, 120.dp)
+                        )
+                    }
+                }
+            }
+
+            // Botón de historial con resumen de consumo
+            item {
+                NavigationButtonWithPreview(
+                    title = "Historial de Consumo",
+                    description = "Ver consumo de gas histórico",
+                    onClick = { navController.navigate(Screen.Consumption.route) }
+                ) {
+                    // Mostrar resumen compacto de consumo
+                    ConsumptionPreview(
+                        lastDayConsumption = lastDayConsumption,
+                        lastWeekConsumption = lastWeekConsumption
+                    )
+                }
+            }
+
+            // Botón de inclinación con vista del vehículo
+            item {
+                NavigationButtonWithPreview(
+                    title = "Inclinación",
+                    description = "Verificar nivelación del vehículo",
+                    onClick = { navController.navigate(Screen.Inclination.route) }
+                ) {
+                    // Mostrar vista compacta del vehículo con inclinación
+                    vehicleConfig?.let { config ->
+                        VehicleInclinationView(
+                            vehicleType = config.type,
+                            pitchAngle = inclinationPitch,
+                            rollAngle = inclinationRoll,
+                            modifier = Modifier.height(100.dp)
+                        )
+                    } ?: run {
+                        // Vista por defecto si no hay configuración
+                        VehicleInclinationView(
+                            vehicleType = VehicleType.CARAVAN,
+                            pitchAngle = inclinationPitch,
+                            rollAngle = inclinationRoll,
+                            modifier = Modifier.height(100.dp)
+                        )
+                    }
+                }
+            }
+
             // Información de bombona activa
             item {
                 GasCylinderInfoCard(
@@ -151,102 +228,76 @@ fun HomeScreen(
                 )
             }
 
-            // Título de navegación
+            // Título de funciones adicionales
             item {
                 Text(
-                    text = "Funciones Principales",
+                    text = "Configuración",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
 
-            // Botones de navegación
+            // Botones de configuración con iconos apropiados
             item {
-                NavigationButton(
-                    title = "Monitoreo de Peso",
-                    description = "Ver peso actual y estadísticas",
-                    icon = Icons.Default.Star,
-                    onClick = { navController.navigate(Screen.Weight.route) }
-                )
-            }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Botón de conexión BLE con símbolo Bluetooth
+                    ConfigurationButton(
+                        title = "Conectar BLE",
+                        text = "🔗", // Connection symbol for Bluetooth
+                        onClick = { navController.navigate(Screen.BleConnect.route) },
+                        modifier = Modifier.weight(1f)
+                    )
 
-            item {
-                NavigationButton(
-                    title = "Inclinación",
-                    description = "Verificar nivelación del vehículo",
-                    icon = Icons.Default.Info,
-                    onClick = { navController.navigate(Screen.Inclination.route) }
-                )
-            }
+                    // Botón de configuración con icono engranaje
+                    ConfigurationButton(
+                        title = "Configuración",
+                        icon = Icons.Default.Settings,
+                        onClick = { navController.navigate(Screen.Settings.route) },
+                        modifier = Modifier.weight(1f)
+                    )
 
-            item {
-                NavigationButton(
-                    title = "Historial de Consumo",
-                    description = "Ver consumo de gas histórico",
-                    icon = Icons.Default.Home,
-                    onClick = { navController.navigate(Screen.Consumption.route) }
-                )
-            }
-
-            item {
-                NavigationButton(
-                    title = "Conectar Dispositivo",
-                    description = "Gestionar conexiones Bluetooth",
-                    icon = Icons.Default.Settings,
-                    onClick = { navController.navigate(Screen.BleConnect.route) }
-                )
-            }
-
-            item {
-                NavigationButton(
-                    title = "Configurar Caravana",
-                    description = "Ajustar parámetros del vehículo",
-                    icon = Icons.Default.Build,
-                    onClick = { navController.navigate(Screen.CaravanConfig.route) }
-                )
-            }
-
-            item {
-                NavigationButton(
-                    title = "Ajustes",
-                    description = "Configuración de la aplicación",
-                    icon = Icons.Default.Settings,
-                    onClick = { navController.navigate(Screen.Settings.route) }
-                )
+                    // Botón de ajustes de vehículo con emoji apropiado
+                    val vehicleIcon = getVehicleIcon(vehicleConfig?.type)
+                    ConfigurationButton(
+                        title = "Ajustes del Vehículo",
+                        text = vehicleIcon,
+                        onClick = { navController.navigate(Screen.CaravanConfig.route) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun NavigationButton(
+private fun NavigationButtonWithPreview(
     title: String,
     description: String,
-    icon: ImageVector,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    content: @Composable () -> Unit
 ) {
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(140.dp),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
         onClick = onClick
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(8.dp)
-            )
-
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
                     text = title,
@@ -259,6 +310,96 @@ private fun NavigationButton(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            
+            // Contenido del preview (bombona, gráfico, etc.)
+            Box(
+                modifier = Modifier.width(120.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                content()
+            }
         }
+    }
+}
+
+@Composable
+private fun ConsumptionPreview(
+    lastDayConsumption: Float,
+    lastWeekConsumption: Float
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = "📊 Resumen",
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = "24h: ${String.format("%.1f", lastDayConsumption)} kg",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = "7d: ${String.format("%.1f", lastWeekConsumption)} kg",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.secondary
+        )
+    }
+}
+
+@Composable
+private fun ConfigurationButton(
+    title: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    text: String? = null
+) {
+    ElevatedCard(
+        modifier = modifier.height(80.dp),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
+        onClick = onClick
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+            } else if (text != null) {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
+
+@Composable
+private fun getVehicleIcon(vehicleType: VehicleType?): String {
+    return when (vehicleType) {
+        VehicleType.CARAVAN -> "🚐"
+        VehicleType.AUTOCARAVANA -> "🚌"
+        null -> "🚗"
     }
 }
