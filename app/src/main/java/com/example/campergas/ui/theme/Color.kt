@@ -2,15 +2,6 @@ package com.example.campergas.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Legacy Material colors (kept for compatibility but not used in theme)
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-
 // CamperGas Brand Colors - Improved for Accessibility
 // Primary Blue - Outdoor adventure theme with improved contrast ratios
 val CamperBlue = Color(0xFF0D47A1)        // WCAG AA compliant blue for light theme (7.8:1 contrast)
