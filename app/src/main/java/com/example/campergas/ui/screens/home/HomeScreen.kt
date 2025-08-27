@@ -226,7 +226,8 @@ fun HomeScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "Configuración",
