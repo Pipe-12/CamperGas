@@ -281,7 +281,7 @@ private fun NavigationButtonWithPreview(
     isLargeButton: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val buttonHeight = if (isLargeButton) 240.dp else 160.dp
+    val buttonHeight = if (isLargeButton) 280.dp else 160.dp
     
     ElevatedCard(
         modifier = modifier
