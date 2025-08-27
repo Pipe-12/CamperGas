@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Estabilidad Vehículo"
-            android:textColor="#000000"
+            android:textColor="@color/widget_text_primary"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="🔴 Desconectado"
-            android:textColor="#666666"
+            android:textColor="@color/widget_text_secondary"
             android:textSize="10sp" />
 
     </LinearLayout>
@@ -39,7 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="⚠️ SIN DATOS"
-        android:textColor="#FF9800"
+        android:textColor="@color/widget_text_warning"
         android:textSize="16sp"
         android:textStyle="bold"
         android:gravity="center"
@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="P: --°"
-            android:textColor="#666666"
+            android:textColor="@color/widget_text_secondary"
             android:textSize="12sp"
             android:gravity="center" />
 
@@ -80,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="R: --°"
-            android:textColor="#666666"
+            android:textColor="@color/widget_text_secondary"
             android:textSize="12sp"
             android:gravity="center" />
 
@@ -100,7 +100,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Sin datos disponibles"
-            android:textColor="#666666"
+            android:textColor="@color/widget_text_secondary"
             android:textSize="9sp"
             android:gravity="start" />
 
