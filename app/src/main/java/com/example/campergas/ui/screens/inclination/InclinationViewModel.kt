@@ -1,12 +1,12 @@
 package com.example.campergas.ui.screens.inclination
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.domain.model.VehicleType
 import com.example.campergas.domain.usecase.CheckBleConnectionUseCase
 import com.example.campergas.domain.usecase.GetInclinationUseCase
 import com.example.campergas.domain.usecase.GetVehicleConfigUseCase
 import com.example.campergas.domain.usecase.RequestInclinationDataUseCase
+import com.example.campergas.ui.base.BaseRequestViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,19 +20,12 @@ import kotlin.math.tan
 class InclinationViewModel @Inject constructor(
     private val getInclinationUseCase: GetInclinationUseCase,
     private val requestInclinationDataUseCase: RequestInclinationDataUseCase,
-    private val checkBleConnectionUseCase: CheckBleConnectionUseCase,
+    checkBleConnectionUseCase: CheckBleConnectionUseCase,
     private val getVehicleConfigUseCase: GetVehicleConfigUseCase
-) : ViewModel() {
+) : BaseRequestViewModel(checkBleConnectionUseCase) {
 
     private val _uiState = MutableStateFlow(InclinationUiState())
     val uiState: StateFlow<InclinationUiState> = _uiState.asStateFlow()
-
-    // Control de peticiones para evitar spam
-    private var lastRequestTime = 0L
-    private val requestCooldownMs = 2000L // 2 segundos entre peticiones
-
-    private val _isRequestingData = MutableStateFlow(false)
-    val isRequestingData: StateFlow<Boolean> = _isRequestingData
 
     init {
         // Cargar configuración del vehículo
@@ -133,49 +126,11 @@ class InclinationViewModel @Inject constructor(
      * Incluye protección contra múltiples peticiones seguidas
      */
     fun requestInclinationDataManually() {
-        val currentTime = System.currentTimeMillis()
-
-        // Verificar si ha pasado suficiente tiempo desde la última petición
-        if (currentTime - lastRequestTime < requestCooldownMs) {
-            android.util.Log.d("InclinationViewModel", "⏱️ Petición bloqueada - cooldown activo")
-            return
-        }
-
-        // Verificar si ya hay una petición en curso
-        if (_isRequestingData.value) {
-            android.util.Log.d(
-                "InclinationViewModel",
-                "⏱️ Petición bloqueada - ya hay una en curso"
-            )
-            return
-        }
-
-        android.util.Log.d("InclinationViewModel", "📊 Solicitando datos de inclinación manualmente")
-        _isRequestingData.value = true
-        lastRequestTime = currentTime
-
-        requestInclinationDataUseCase()
-
-        // Resetear el estado después de un tiempo razonable
-        viewModelScope.launch {
-            kotlinx.coroutines.delay(1500) // 1.5 segundos
-            _isRequestingData.value = false
-        }
-    }
-
-    /**
-     * Verifica si hay una conexión BLE activa
-     */
-    fun isConnected(): Boolean {
-        return checkBleConnectionUseCase.isConnected()
-    }
-
-    /**
-     * Verifica si se puede hacer una nueva petición (no está en cooldown)
-     */
-    fun canMakeRequest(): Boolean {
-        val currentTime = System.currentTimeMillis()
-        return (currentTime - lastRequestTime >= requestCooldownMs) && !_isRequestingData.value
+        executeManualRequest(
+            requestAction = { requestInclinationDataUseCase() },
+            logTag = "InclinationViewModel",
+            dataTypeDescription = "inclinación"
+        )
     }
 }
 

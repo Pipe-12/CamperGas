@@ -2,8 +2,9 @@ package com.example.campergas.ui.screens.bleconnect
 
 import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.campergas.data.repository.BleRepository
 import com.example.campergas.domain.model.BleDevice
+import com.example.campergas.domain.usecase.CheckBleConnectionUseCase
+import com.example.campergas.domain.usecase.ConnectBleDeviceUseCase
 import com.example.campergas.domain.usecase.ScanBleDevicesUseCase
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -38,7 +39,8 @@ class BleConnectViewModelTest {
 
     private lateinit var viewModel: BleConnectViewModel
     private val scanBleDevicesUseCase: ScanBleDevicesUseCase = mockk()
-    private val bleRepository: BleRepository = mockk()
+    private val connectBleDeviceUseCase: ConnectBleDeviceUseCase = mockk()
+    private val checkBleConnectionUseCase: CheckBleConnectionUseCase = mockk()
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -54,14 +56,13 @@ class BleConnectViewModelTest {
         every { Log.e(any<String>(), any<String>(), any()) } returns 0
 
         // Setup basic mock responses
-        every { bleRepository.connectionState } returns MutableStateFlow(false)
-        every { bleRepository.isBluetoothEnabled() } returns true
+        every { checkBleConnectionUseCase() } returns MutableStateFlow(false)
         every { scanBleDevicesUseCase.isBluetoothEnabled() } returns true
         every { scanBleDevicesUseCase.isCompatibleFilterEnabled() } returns false
         every { scanBleDevicesUseCase.stopScan() } returns Unit
         every { scanBleDevicesUseCase.toggleCompatibleDevicesFilter() } returns Unit
 
-        viewModel = BleConnectViewModel(scanBleDevicesUseCase, bleRepository)
+        viewModel = BleConnectViewModel(scanBleDevicesUseCase, connectBleDeviceUseCase, checkBleConnectionUseCase)
     }
 
     @After
@@ -102,7 +103,7 @@ class BleConnectViewModelTest {
     @Test
     fun `startScan with bluetooth disabled shows error`() = runTest {
         // Arrange
-        every { bleRepository.isBluetoothEnabled() } returns false
+        every { scanBleDevicesUseCase.isBluetoothEnabled() } returns false
 
         // Act
         viewModel.startScan()
@@ -155,8 +156,7 @@ class BleConnectViewModelTest {
     fun `connectToDevice sets connecting state`() = runTest {
         // Arrange
         val testDevice = BleDevice("Test Device", "00:11:22:33:44:55", -65)
-        coEvery { bleRepository.connectToSensor(any()) } returns Unit
-        coEvery { bleRepository.saveLastConnectedDevice(any()) } returns Unit
+        coEvery { connectBleDeviceUseCase(any()) } returns Unit
 
         // Act
         viewModel.connectToDevice(testDevice)
@@ -168,8 +168,7 @@ class BleConnectViewModelTest {
         assertNull(state.error)
 
         coVerify {
-            bleRepository.connectToSensor(testDevice.address)
-            bleRepository.saveLastConnectedDevice(testDevice.address)
+            connectBleDeviceUseCase(testDevice.address)
         }
     }
 
@@ -177,7 +176,7 @@ class BleConnectViewModelTest {
     fun `connectToDevice with bluetooth disabled shows error`() = runTest {
         // Arrange
         val testDevice = BleDevice("Test Device", "00:11:22:33:44:55", -65)
-        every { bleRepository.isBluetoothEnabled() } returns false
+        every { scanBleDevicesUseCase.isBluetoothEnabled() } returns false
 
         // Act
         viewModel.connectToDevice(testDevice)
@@ -193,9 +192,8 @@ class BleConnectViewModelTest {
     fun `disconnectDevice clears connected device`() = runTest {
         // Arrange - first connect a device
         val testDevice = BleDevice("Test Device", "00:11:22:33:44:55", -65)
-        coEvery { bleRepository.connectToSensor(any()) } returns Unit
-        coEvery { bleRepository.saveLastConnectedDevice(any()) } returns Unit
-        coEvery { bleRepository.disconnectSensor() } returns Unit
+        coEvery { connectBleDeviceUseCase(any()) } returns Unit
+        coEvery { connectBleDeviceUseCase.disconnect() } returns Unit
 
         viewModel.connectToDevice(testDevice)
         advanceUntilIdle()
@@ -211,13 +209,13 @@ class BleConnectViewModelTest {
         assertNull(state.error)
         assertEquals(emptyList<BleDevice>(), state.availableDevices)
 
-        coVerify { bleRepository.disconnectSensor() }
+        coVerify { connectBleDeviceUseCase.disconnect() }
     }
 
     @Test
     fun `clearError clears error state`() = runTest {
         // Arrange - set an error first
-        every { bleRepository.isBluetoothEnabled() } returns false
+        every { scanBleDevicesUseCase.isBluetoothEnabled() } returns false
         viewModel.startScan()
         advanceUntilIdle()
 
@@ -265,10 +263,10 @@ class BleConnectViewModelTest {
     fun `connection state flow updates ui state`() = runTest {
         // Arrange
         val connectionStateFlow = MutableStateFlow(false)
-        every { bleRepository.connectionState } returns connectionStateFlow
+        every { checkBleConnectionUseCase() } returns connectionStateFlow
 
         // Create new viewModel to trigger init block with the flow
-        val newViewModel = BleConnectViewModel(scanBleDevicesUseCase, bleRepository)
+        val newViewModel = BleConnectViewModel(scanBleDevicesUseCase, connectBleDeviceUseCase, checkBleConnectionUseCase)
 
         // Act - simulate connection state change
         connectionStateFlow.value = true
