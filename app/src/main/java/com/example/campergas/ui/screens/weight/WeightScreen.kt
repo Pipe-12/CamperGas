@@ -80,7 +80,7 @@ fun GasCylinderVisualizer(
         // Percentage text with theme-aware coloring
         Text(
             text = "${fuelPercentage.toInt()}%",
-            style = MaterialTheme.typography.displayMedium,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.align(Alignment.Center)
