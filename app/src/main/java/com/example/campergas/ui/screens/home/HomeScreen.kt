@@ -145,7 +145,8 @@ fun HomeScreen(
                         description = "Toca para acceder a la vista de peso actual",
                         onClick = { navController.navigate(Screen.Weight.route) },
                         modifier = Modifier.weight(1f),
-                        isLargeButton = true
+                        isLargeButton = true,
+                        verticalLayout = true
                     ) {
                         // Mostrar la bombona con el porcentaje actual
                         fuelData?.let { fuel ->
@@ -168,7 +169,8 @@ fun HomeScreen(
                         description = "Toca para acceder a la vista de consumo de gas histórico",
                         onClick = { navController.navigate(Screen.Consumption.route) },
                         modifier = Modifier.weight(1f),
-                        isLargeButton = true
+                        isLargeButton = true,
+                        verticalLayout = true
                     ) {
                         // Mostrar resumen compacto de consumo
                         ConsumptionPreview(
@@ -280,6 +282,7 @@ private fun NavigationButtonWithPreview(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isLargeButton: Boolean = false,
+    verticalLayout: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val buttonHeight = if (isLargeButton) 280.dp else 160.dp
@@ -291,40 +294,84 @@ private fun NavigationButtonWithPreview(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
         onClick = onClick
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        if (verticalLayout) {
+            // Vertical layout: text on top, content below
             Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 2,
-                    lineHeight = MaterialTheme.typography.titleMedium.lineHeight
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 3,
-                    lineHeight = MaterialTheme.typography.bodySmall.lineHeight
-                )
+                // Text section
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 2,
+                        lineHeight = MaterialTheme.typography.titleMedium.lineHeight,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        lineHeight = MaterialTheme.typography.bodySmall.lineHeight,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                }
+                
+                // Content section (bombona, gráfico, etc.)
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    content()
+                }
             }
-            
-            // Contenido del preview (bombona, gráfico, etc.)
-            Box(
-                modifier = Modifier.width(if (isLargeButton) 140.dp else 80.dp),
-                contentAlignment = Alignment.Center
+        } else {
+            // Horizontal layout: text on left, content on right (original layout)
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                content()
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 2,
+                        lineHeight = MaterialTheme.typography.titleMedium.lineHeight
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 3,
+                        lineHeight = MaterialTheme.typography.bodySmall.lineHeight
+                    )
+                }
+                
+                // Contenido del preview (bombona, gráfico, etc.)
+                Box(
+                    modifier = Modifier.width(if (isLargeButton) 140.dp else 80.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    content()
+                }
             }
         }
     }
