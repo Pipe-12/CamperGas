@@ -100,6 +100,14 @@ class FuelMeasurementRepository @Inject constructor(
         return fuelMeasurementDao.getLastTwoMeasurements(cylinderId).map { it.toDomainModel() }
     }
 
+    suspend fun getLastNMeasurements(cylinderId: Long, limit: Int): List<FuelMeasurement> {
+        return fuelMeasurementDao.getLastNMeasurements(cylinderId, limit).map { it.toDomainModel() }
+    }
+
+    suspend fun deleteMeasurementById(id: Long) {
+        fuelMeasurementDao.deleteMeasurementById(id)
+    }
+
     private fun FuelMeasurementEntity.toDomainModel(): FuelMeasurement {
         return FuelMeasurement(
             id = this.id,

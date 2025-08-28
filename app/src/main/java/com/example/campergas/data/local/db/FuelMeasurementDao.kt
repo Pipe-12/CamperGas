@@ -87,4 +87,14 @@ interface FuelMeasurementDao {
     """
     )
     suspend fun getLastTwoMeasurements(cylinderId: Long): List<FuelMeasurementEntity>
+
+    @Query(
+        """
+        SELECT * FROM fuel_measurements 
+        WHERE cylinderId = :cylinderId 
+        ORDER BY timestamp DESC 
+        LIMIT :limit
+    """
+    )
+    suspend fun getLastNMeasurements(cylinderId: Long, limit: Int): List<FuelMeasurementEntity>
 }

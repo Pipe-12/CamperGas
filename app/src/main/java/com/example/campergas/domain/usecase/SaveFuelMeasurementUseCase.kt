@@ -13,6 +13,8 @@ class SaveFuelMeasurementUseCase @Inject constructor(
 
     companion object {
         private const val MIN_TIME_BETWEEN_SAVES_MS = 2 * 60 * 1000L // 2 minutos en milisegundos
+        private const val OUTLIER_THRESHOLD_PERCENTAGE = 30.0f // 30% difference considered outlier
+        private const val MIN_MEASUREMENTS_FOR_OUTLIER_DETECTION = 3 // Need at least 3 measurements for pattern detection
     }
 
     // Variable para trackear la última vez que se guardó una medición en tiempo real
@@ -85,6 +87,9 @@ class SaveFuelMeasurementUseCase @Inject constructor(
             // Guardar la medición
             val id = fuelMeasurementRepository.insertMeasurement(measurement)
 
+            // Detectar y eliminar mediciones erróneas (outliers)
+            detectAndRemoveOutliers(activeCylinder.id)
+
             // Actualizar el timestamp de la última medición guardada
             lastSaveTimestamp = currentTime
 
@@ -154,6 +159,95 @@ class SaveFuelMeasurementUseCase @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    /**
+     * Detecta y elimina mediciones erróneas (outliers) basándose en patrones de peso.
+     * 
+     * Cuando una medición se desvía sustancialmente de la tendencia y luego vuelve a valores
+     * normales, la medición desviada se considera un error y se elimina.
+     * 
+     * Patrón de detección:
+     * - Anterior: peso normal
+     * - Outlier: peso sustancialmente diferente (>30% cambio)
+     * - Actual: peso similar al anterior (vuelve a la normalidad)
+     *
+     * @param cylinderId ID de la bombona para analizar
+     */
+    private suspend fun detectAndRemoveOutliers(cylinderId: Long) {
+        try {
+            // Obtener las últimas 3 mediciones para análisis de patrón
+            val recentMeasurements = fuelMeasurementRepository.getLastNMeasurements(cylinderId, MIN_MEASUREMENTS_FOR_OUTLIER_DETECTION)
+            
+            // Necesitamos al menos 3 mediciones para detectar el patrón: anterior -> outlier -> actual
+            if (recentMeasurements.size < MIN_MEASUREMENTS_FOR_OUTLIER_DETECTION) {
+                return
+            }
+
+            // Las mediciones vienen ordenadas por timestamp DESC, así que:
+            // current = recentMeasurements[0] (más reciente)
+            // outlier = recentMeasurements[1] (medio)
+            // previous = recentMeasurements[2] (anterior)
+            val current = recentMeasurements[0]
+            val outlier = recentMeasurements[1]
+            val previous = recentMeasurements[2]
+
+            // Verificar si la medición del medio es un outlier
+            if (isOutlierMeasurement(previous, outlier, current)) {
+                // Eliminar la medición outlier
+                fuelMeasurementRepository.deleteMeasurementById(outlier.id)
+            }
+        } catch (e: Exception) {
+            // Si ocurre algún error en la detección de outliers, no afectar el flujo principal
+            // Solo registrar silenciosamente el error
+        }
+    }
+
+    /**
+     * Determina si una medición es un outlier basándose en el patrón:
+     * previous -> outlier -> current
+     * 
+     * Una medición se considera outlier si:
+     * 1. Se desvía sustancialmente (>30%) del valor anterior
+     * 2. El valor actual regresa cerca del valor anterior (diferencia <30%)
+     * 3. La desviación del outlier es mayor que la desviación entre anterior y actual
+     *
+     * @param previous Medición anterior
+     * @param outlier Medición candidata a outlier  
+     * @param current Medición actual
+     * @return true si la medición del medio es un outlier
+     */
+    private fun isOutlierMeasurement(
+        previous: FuelMeasurement,
+        outlier: FuelMeasurement,
+        current: FuelMeasurement
+    ): Boolean {
+        // Usar el peso total para el análisis ya que es el valor más directo del sensor
+        val prevWeight = previous.totalWeight
+        val outlierWeight = outlier.totalWeight
+        val currentWeight = current.totalWeight
+
+        // Evitar división por cero
+        if (prevWeight <= 0f || outlierWeight <= 0f || currentWeight <= 0f) {
+            return false
+        }
+
+        // Calcular porcentajes de cambio
+        val outlierVsPrevious = kotlin.math.abs(outlierWeight - prevWeight) / prevWeight * 100f
+        val currentVsPrevious = kotlin.math.abs(currentWeight - prevWeight) / prevWeight * 100f
+        val currentVsOutlier = kotlin.math.abs(currentWeight - outlierWeight) / outlierWeight * 100f
+
+        // Condiciones para considerar outlier:
+        // 1. El outlier se desvía sustancialmente del anterior (>30%)
+        val isSignificantDeviation = outlierVsPrevious > OUTLIER_THRESHOLD_PERCENTAGE
+        
+        // 2. El valor actual está más cerca del anterior que del outlier
+        val returnsToNormal = currentVsPrevious < outlierVsPrevious
+        
+        // 3. El cambio del outlier al actual también es significativo (confirma que el outlier era anómalo)
+        val significantCorrectionFromOutlier = currentVsOutlier > OUTLIER_THRESHOLD_PERCENTAGE
+
+        return isSignificantDeviation && returnsToNormal && significantCorrectionFromOutlier
     }
 
     data class SaveMeasurementResult(
