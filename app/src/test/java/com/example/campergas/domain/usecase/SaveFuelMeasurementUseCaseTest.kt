@@ -259,4 +259,146 @@ class SaveFuelMeasurementUseCaseTest {
             )
         }
     }
+
+    @Test
+    fun `saveRealTimeMeasurement detects and removes weight drop outlier`() = runTest {
+        // Arrange
+        val cylinderId = 1L
+        val activeCylinder = testCylinder.copy(id = cylinderId)
+        
+        // Escenario: peso normal -> peso muy bajo (outlier) -> peso normal
+        val previousMeasurements = listOf(
+            FuelMeasurement(id = 3, cylinderId = cylinderId, cylinderName = "Test", timestamp = 3000L, 
+                           fuelKilograms = 7.0f, fuelPercentage = 70.0f, totalWeight = 12.0f),
+            FuelMeasurement(id = 2, cylinderId = cylinderId, cylinderName = "Test", timestamp = 2000L, 
+                           fuelKilograms = 1.0f, fuelPercentage = 10.0f, totalWeight = 6.0f), // Outlier: muy bajo
+            FuelMeasurement(id = 1, cylinderId = cylinderId, cylinderName = "Test", timestamp = 1000L, 
+                           fuelKilograms = 6.5f, fuelPercentage = 65.0f, totalWeight = 11.5f)
+        )
+
+        every { gasCylinderRepository.getActiveCylinder() } returns flowOf(activeCylinder)
+        coEvery { fuelMeasurementRepository.insertMeasurement(any()) } returns 4L
+        coEvery { fuelMeasurementRepository.getLastNMeasurements(cylinderId, 3) } returns previousMeasurements
+        coEvery { fuelMeasurementRepository.deleteMeasurementById(any()) } returns Unit
+
+        // Act - nueva medición que vuelve a peso normal (similar al anterior)
+        val result = useCase.saveRealTimeMeasurement(11.8f, 4000L)
+
+        // Assert
+        assertTrue(result.isSuccess)
+        
+        // Verificar que se detectó y eliminó el outlier (id = 2)
+        coVerify { fuelMeasurementRepository.deleteMeasurementById(2L) }
+    }
+
+    @Test
+    fun `saveRealTimeMeasurement detects and removes weight spike outlier`() = runTest {
+        // Arrange
+        val cylinderId = 1L
+        val activeCylinder = testCylinder.copy(id = cylinderId)
+        
+        // Escenario: peso normal -> peso muy alto (outlier) -> peso normal
+        val previousMeasurements = listOf(
+            FuelMeasurement(id = 3, cylinderId = cylinderId, cylinderName = "Test", timestamp = 3000L, 
+                           fuelKilograms = 6.5f, fuelPercentage = 65.0f, totalWeight = 11.5f),
+            FuelMeasurement(id = 2, cylinderId = cylinderId, cylinderName = "Test", timestamp = 2000L, 
+                           fuelKilograms = 20.0f, fuelPercentage = 100.0f, totalWeight = 25.0f), // Outlier: muy alto
+            FuelMeasurement(id = 1, cylinderId = cylinderId, cylinderName = "Test", timestamp = 1000L, 
+                           fuelKilograms = 7.0f, fuelPercentage = 70.0f, totalWeight = 12.0f)
+        )
+
+        every { gasCylinderRepository.getActiveCylinder() } returns flowOf(activeCylinder)
+        coEvery { fuelMeasurementRepository.insertMeasurement(any()) } returns 4L
+        coEvery { fuelMeasurementRepository.getLastNMeasurements(cylinderId, 3) } returns previousMeasurements
+        coEvery { fuelMeasurementRepository.deleteMeasurementById(any()) } returns Unit
+
+        // Act - nueva medición que vuelve a peso normal
+        val result = useCase.saveRealTimeMeasurement(12.2f, 4000L)
+
+        // Assert
+        assertTrue(result.isSuccess)
+        
+        // Verificar que se detectó y eliminó el outlier (id = 2)
+        coVerify { fuelMeasurementRepository.deleteMeasurementById(2L) }
+    }
+
+    @Test
+    fun `saveRealTimeMeasurement does not remove valid weight progression`() = runTest {
+        // Arrange
+        val cylinderId = 1L
+        val activeCylinder = testCylinder.copy(id = cylinderId)
+        
+        // Escenario: progresión normal de consumo (peso va disminuyendo gradualmente)
+        val previousMeasurements = listOf(
+            FuelMeasurement(id = 3, cylinderId = cylinderId, cylinderName = "Test", timestamp = 3000L, 
+                           fuelKilograms = 6.0f, fuelPercentage = 60.0f, totalWeight = 11.0f),
+            FuelMeasurement(id = 2, cylinderId = cylinderId, cylinderName = "Test", timestamp = 2000L, 
+                           fuelKilograms = 6.5f, fuelPercentage = 65.0f, totalWeight = 11.5f), // Consumo normal
+            FuelMeasurement(id = 1, cylinderId = cylinderId, cylinderName = "Test", timestamp = 1000L, 
+                           fuelKilograms = 7.0f, fuelPercentage = 70.0f, totalWeight = 12.0f)
+        )
+
+        every { gasCylinderRepository.getActiveCylinder() } returns flowOf(activeCylinder)
+        coEvery { fuelMeasurementRepository.insertMeasurement(any()) } returns 4L
+        coEvery { fuelMeasurementRepository.getLastNMeasurements(cylinderId, 3) } returns previousMeasurements
+        coEvery { fuelMeasurementRepository.deleteMeasurementById(any()) } returns Unit
+
+        // Act - nueva medición que continua la tendencia normal
+        val result = useCase.saveRealTimeMeasurement(10.5f, 4000L)
+
+        // Assert
+        assertTrue(result.isSuccess)
+        
+        // Verificar que NO se eliminó ninguna medición
+        coVerify(exactly = 0) { fuelMeasurementRepository.deleteMeasurementById(any()) }
+    }
+
+    @Test
+    fun `saveRealTimeMeasurement handles insufficient measurements for outlier detection`() = runTest {
+        // Arrange
+        val cylinderId = 1L
+        val activeCylinder = testCylinder.copy(id = cylinderId)
+        
+        // Solo 2 mediciones previas - insuficientes para detección de outliers
+        val previousMeasurements = listOf(
+            FuelMeasurement(id = 2, cylinderId = cylinderId, cylinderName = "Test", timestamp = 2000L, 
+                           fuelKilograms = 7.0f, fuelPercentage = 70.0f, totalWeight = 12.0f),
+            FuelMeasurement(id = 1, cylinderId = cylinderId, cylinderName = "Test", timestamp = 1000L, 
+                           fuelKilograms = 6.0f, fuelPercentage = 60.0f, totalWeight = 11.0f)
+        )
+
+        every { gasCylinderRepository.getActiveCylinder() } returns flowOf(activeCylinder)
+        coEvery { fuelMeasurementRepository.insertMeasurement(any()) } returns 3L
+        coEvery { fuelMeasurementRepository.getLastNMeasurements(cylinderId, 3) } returns previousMeasurements
+        coEvery { fuelMeasurementRepository.deleteMeasurementById(any()) } returns Unit
+
+        // Act
+        val result = useCase.saveRealTimeMeasurement(12.0f, 3000L)
+
+        // Assert
+        assertTrue(result.isSuccess)
+        
+        // Verificar que NO se intentó eliminar mediciones
+        coVerify(exactly = 0) { fuelMeasurementRepository.deleteMeasurementById(any()) }
+    }
+
+    @Test  
+    fun `saveRealTimeMeasurement handles outlier detection errors gracefully`() = runTest {
+        // Arrange
+        val cylinderId = 1L
+        val activeCylinder = testCylinder.copy(id = cylinderId)
+
+        every { gasCylinderRepository.getActiveCylinder() } returns flowOf(activeCylinder)
+        coEvery { fuelMeasurementRepository.insertMeasurement(any()) } returns 4L
+        // Simular error en getLastNMeasurements
+        coEvery { fuelMeasurementRepository.getLastNMeasurements(cylinderId, 3) } throws RuntimeException("Database error")
+
+        // Act
+        val result = useCase.saveRealTimeMeasurement(12.0f, 4000L)
+
+        // Assert - el error en outlier detection no debería afectar el guardado principal
+        assertTrue(result.isSuccess)
+        val saveResult = result.getOrNull()!!
+        assertTrue(saveResult.processed)
+    }
 }
