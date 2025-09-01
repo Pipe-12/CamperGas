@@ -15,7 +15,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
+import com.example.campergas.R
 import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.domain.model.Language
 import com.example.campergas.domain.model.ThemeMode
@@ -75,22 +77,19 @@ class MainActivity : ComponentActivity() {
 
                     // Estado para controlar si mostrar el diálogo de permisos
                     var showPermissionDialog by remember { mutableStateOf(false) }
-                    var permissionMessage by remember { mutableStateOf("") }
 
                     // Verificar permisos al iniciar
                     LaunchedEffect(Unit) {
                         if (!bluetoothPermissionManager.hasAllPermissions()) {
                             showPermissionDialog = true
-                            permissionMessage =
-                                "CamperGas necesita permisos de Bluetooth y ubicación para funcionar correctamente."
                         }
                     }
 
                     // Mostrar diálogo de permisos si es necesario
                     if (showPermissionDialog) {
                         PermissionDialog(
-                            title = "Permisos necesarios",
-                            message = permissionMessage,
+                            title = stringResource(R.string.permissions_needed_title),
+                            message = stringResource(R.string.permissions_needed_message),
                             onAccept = {
                                 showPermissionDialog = false
                                 bluetoothPermissionManager.checkAndRequestAllPermissions()

@@ -44,4 +44,26 @@
     <string name="save">Guardar</string>
     <string name="save_threshold">Guardar umbral</string>
     <string name="percentage_minimum_gas">Porcentaje de gas mínimo</string>
+    <string name="configuration">Configuración</string>
+    
+    <!-- Home Screen -->
+    <string name="home_summary">📊 Resumen</string>
+    <string name="home_consumption_24h">24h: %.1f kg</string>
+    <string name="home_consumption_7d">7d: %.1f kg</string>
+    
+    <!-- Permission dialogs -->
+    <string name="dialog_accept">Aceptar</string>
+    <string name="dialog_cancel">Cancelar</string>
+    <string name="permissions_needed_title">Permisos necesarios</string>
+    <string name="permissions_needed_message">CamperGas necesita permisos de Bluetooth y ubicación para funcionar correctamente.</string>
+    <string name="bluetooth_permission_title">Permisos de Bluetooth</string>
+    <string name="bluetooth_permission_message">CamperGas necesita acceso a Bluetooth y ubicación para conectarse con los dispositivos de la caravana y obtener datos de peso, inclinación y consumo de gas.</string>
+    <string name="bluetooth_permission_grant">Conceder permisos</string>
+    <string name="bluetooth_permission_later">Ahora no</string>
+    <string name="bluetooth_disabled_title">Bluetooth Desactivado</string>
+    <string name="bluetooth_disabled_message">Para usar CamperGas necesitas activar el Bluetooth. ¿Quieres activarlo ahora?</string>
+    <string name="bluetooth_disabled_enable">Activar Bluetooth</string>
+    <string name="location_disabled_title">Ubicación Desactivada</string>
+    <string name="location_disabled_message">Para escanear dispositivos Bluetooth necesitas tener la ubicación activada. ¿Quieres activarla ahora?</string>
+    <string name="location_disabled_enable">Activar ubicación</string>
 </resources>

@@ -37,10 +37,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.campergas.R
 import com.example.campergas.domain.model.VehicleType
 import com.example.campergas.ui.components.VehicleInclinationView
 import com.example.campergas.ui.components.gas.AddGasCylinderDialog
@@ -234,7 +236,7 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Configuración",
+                    text = stringResource(R.string.configuration),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -386,17 +388,17 @@ private fun ConsumptionPreview(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
-            text = "📊 Resumen",
+            text = stringResource(R.string.home_summary),
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "24h: ${String.format("%.1f", lastDayConsumption)} kg",
+            text = stringResource(R.string.home_consumption_24h, lastDayConsumption),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.primary
         )
         Text(
-            text = "7d: ${String.format("%.1f", lastWeekConsumption)} kg",
+            text = stringResource(R.string.home_consumption_7d, lastWeekConsumption),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary
         )
