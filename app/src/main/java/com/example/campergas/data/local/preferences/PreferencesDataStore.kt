@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.campergas.domain.model.Language
 import com.example.campergas.domain.model.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +23,7 @@ class PreferencesDataStore @Inject constructor(
 ) {
     private val lastConnectedDeviceKey = stringPreferencesKey("last_connected_device")
     private val themeModeKey = stringPreferencesKey("theme_mode")
+    private val languageKey = stringPreferencesKey("language")
     private val notificationsEnabledKey = booleanPreferencesKey("notifications_enabled")
     private val gasLevelThresholdKey = floatPreferencesKey("gas_level_threshold")
     private val weightReadIntervalKey = longPreferencesKey("weight_read_interval")
@@ -40,6 +42,12 @@ class PreferencesDataStore @Inject constructor(
             } catch (_: IllegalArgumentException) {
                 ThemeMode.SYSTEM
             }
+        }
+
+    val language: Flow<Language> = context.dataStore.data
+        .map { preferences ->
+            val languageCode = preferences[languageKey] ?: Language.SYSTEM.code
+            Language.entries.find { it.code == languageCode } ?: Language.SYSTEM
         }
 
     val areNotificationsEnabled: Flow<Boolean> = context.dataStore.data
@@ -71,6 +79,12 @@ class PreferencesDataStore @Inject constructor(
     suspend fun setThemeMode(themeMode: ThemeMode) {
         context.dataStore.edit { preferences ->
             preferences[themeModeKey] = themeMode.name
+        }
+    }
+
+    suspend fun setLanguage(language: Language) {
+        context.dataStore.edit { preferences ->
+            preferences[languageKey] = language.code
         }
     }
 

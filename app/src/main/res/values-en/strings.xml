@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">CamperGas</string>
+    
+    <!-- Widget descriptions -->
+    <string name="gas_cylinder_widget_description">Monitor your gas cylinder level from the home screen</string>
+    <string name="vehicle_stability_widget_description">Check your vehicle stability in real time</string>
+    
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_status">Status</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_dark_mode">Dark mode</string>
+    <string name="settings_use_system_config">Use system configuration</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_description">Select application language</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_enable_notifications">Enable notifications</string>
+    <string name="settings_gas_threshold">Gas alert threshold</string>
+    <string name="settings_gas_threshold_description">A notification will be sent when gas drops below %d%%</string>
+    <string name="settings_weight_reading">Weight Reading</string>
+    <string name="settings_weight_interval_description">Interval between weight sensor readings</string>
+    <string name="settings_weight_range">Valid range: 1-60 minutes</string>
+    <string name="settings_inclination_reading">Inclination Reading</string>
+    <string name="settings_inclination_interval_description">Interval between inclination sensor readings</string>
+    <string name="settings_inclination_range">Valid range: 1-300 seconds</string>
+    <string name="settings_information">Information</string>
+    <string name="settings_info_short_intervals">• Shorter intervals provide more frequent data but may consume more battery</string>
+    <string name="settings_info_long_intervals">• Longer intervals save battery but provide less frequent data</string>
+    <string name="settings_info_defaults">• Weight: 1 minute default, Inclination: 5 seconds default</string>
+    <string name="settings_info_auto_save">• Changes are saved automatically</string>
+    
+    <!-- Theme modes -->
+    <string name="theme_system">Following system configuration</string>
+    <string name="theme_light">Light mode activated</string>
+    <string name="theme_dark">Dark mode activated</string>
+    
+    <!-- Languages -->
+    <string name="language_spanish">Español</string>
+    <string name="language_english">English</string>
+    <string name="language_catalan">Català</string>
+    <string name="language_system">System</string>
+    
+    <!-- Common -->
+    <string name="save">Save</string>
+    <string name="save_threshold">Save threshold</string>
+    <string name="percentage_minimum_gas">Minimum gas percentage</string>
+</resources>

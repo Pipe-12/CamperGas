@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">CamperGas</string>
+    
+    <!-- Widget descriptions -->
+    <string name="gas_cylinder_widget_description">Monitora el nivell de gas de la teva bombona des de la pantalla d\'inici</string>
+    <string name="vehicle_stability_widget_description">Verifica l\'estabilitat del teu vehicle en temps real</string>
+    
+    <!-- Settings Screen -->
+    <string name="settings_title">Configuració</string>
+    <string name="settings_status">Estat</string>
+    <string name="settings_appearance">Aparença</string>
+    <string name="settings_dark_mode">Mode fosc</string>
+    <string name="settings_use_system_config">Usar configuració del sistema</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_description">Selecciona l\'idioma de l\'aplicació</string>
+    <string name="settings_notifications">Notificacions</string>
+    <string name="settings_enable_notifications">Activar notificacions</string>
+    <string name="settings_gas_threshold">Llindar d\'alerta de gas</string>
+    <string name="settings_gas_threshold_description">S\'enviarà una notificació quan el gas baixi del %d%%</string>
+    <string name="settings_weight_reading">Lectura de Pes</string>
+    <string name="settings_weight_interval_description">Interval entre lectures de pes del sensor</string>
+    <string name="settings_weight_range">Rang vàlid: 1-60 minuts</string>
+    <string name="settings_inclination_reading">Lectura d\'Inclinació</string>
+    <string name="settings_inclination_interval_description">Interval entre lectures d\'inclinació del sensor</string>
+    <string name="settings_inclination_range">Rang vàlid: 1-300 segons</string>
+    <string name="settings_information">Informació</string>
+    <string name="settings_info_short_intervals">• Intervals més curts proporcionen dades més freqüents però poden consumir més bateria</string>
+    <string name="settings_info_long_intervals">• Intervals més llargs estalvien bateria però proporcionen dades menys freqüents</string>
+    <string name="settings_info_defaults">• Pes: 1 minut per defecte, Inclinació: 5 segons per defecte</string>
+    <string name="settings_info_auto_save">• Els canvis es guarden automàticament</string>
+    
+    <!-- Theme modes -->
+    <string name="theme_system">Seguint configuració del sistema</string>
+    <string name="theme_light">Mode clar activat</string>
+    <string name="theme_dark">Mode fosc activat</string>
+    
+    <!-- Languages -->
+    <string name="language_spanish">Español</string>
+    <string name="language_english">English</string>
+    <string name="language_catalan">Català</string>
+    <string name="language_system">Sistema</string>
+    
+    <!-- Common -->
+    <string name="save">Guardar</string>
+    <string name="save_threshold">Guardar llindar</string>
+    <string name="percentage_minimum_gas">Percentatge de gas mínim</string>
+</resources>

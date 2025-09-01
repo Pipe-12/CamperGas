@@ -2,6 +2,7 @@ package com.example.campergas.ui.screens.settings
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,9 +16,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,11 +39,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.campergas.R
+import com.example.campergas.domain.model.Language
 import com.example.campergas.domain.model.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,7 +107,7 @@ fun SettingsScreen(
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
             }
             Text(
-                text = "Configuración",
+                text = stringResource(R.string.settings_title),
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(start = 8.dp)
             )
@@ -118,7 +125,7 @@ fun SettingsScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "Estado",
+                        text = stringResource(R.string.settings_status),
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -138,7 +145,7 @@ fun SettingsScreen(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Apariencia",
+                    text = stringResource(R.string.settings_appearance),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -148,7 +155,7 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Modo oscuro",
+                        text = stringResource(R.string.settings_dark_mode),
                         modifier = Modifier.weight(1f)
                     )
                     Switch(
@@ -167,7 +174,7 @@ fun SettingsScreen(
                         modifier = Modifier.padding(top = 8.dp)
                     ) {
                         Text(
-                            text = "Usar configuración del sistema",
+                            text = stringResource(R.string.settings_use_system_config),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -176,14 +183,75 @@ fun SettingsScreen(
                 // Texto explicativo del estado actual
                 Text(
                     text = when (uiState.themeMode) {
-                        ThemeMode.SYSTEM -> "Siguiendo configuración del sistema"
-                        ThemeMode.LIGHT -> "Modo claro activado"
-                        ThemeMode.DARK -> "Modo oscuro activado"
+                        ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
+                        ThemeMode.LIGHT -> stringResource(R.string.theme_light)
+                        ThemeMode.DARK -> stringResource(R.string.theme_dark)
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp)
                 )
+            }
+        }
+
+        // Configuración de idioma
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.settings_language),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                var expanded by remember { mutableStateOf(false) }
+
+                Box {
+                    OutlinedTextField(
+                        value = when (uiState.language) {
+                            Language.SPANISH -> stringResource(R.string.language_spanish)
+                            Language.ENGLISH -> stringResource(R.string.language_english)
+                            Language.CATALAN -> stringResource(R.string.language_catalan)
+                            Language.SYSTEM -> stringResource(R.string.language_system)
+                        },
+                        onValueChange = { },
+                        readOnly = true,
+                        label = { Text(stringResource(R.string.settings_language_description)) },
+                        trailingIcon = {
+                            IconButton(onClick = { expanded = !expanded }) {
+                                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        Language.entries.forEach { language ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        when (language) {
+                                            Language.SPANISH -> stringResource(R.string.language_spanish)
+                                            Language.ENGLISH -> stringResource(R.string.language_english)
+                                            Language.CATALAN -> stringResource(R.string.language_catalan)
+                                            Language.SYSTEM -> stringResource(R.string.language_system)
+                                        }
+                                    )
+                                },
+                                onClick = {
+                                    viewModel.setLanguage(language)
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
 
@@ -195,7 +263,7 @@ fun SettingsScreen(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Notificaciones",
+                    text = stringResource(R.string.settings_notifications),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -205,7 +273,7 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Activar notificaciones",
+                        text = stringResource(R.string.settings_enable_notifications),
                         modifier = Modifier.weight(1f)
                     )
                     Switch(
@@ -218,7 +286,7 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     
                     Text(
-                        text = "Umbral de alerta de gas",
+                        text = stringResource(R.string.settings_gas_threshold),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -229,7 +297,7 @@ fun SettingsScreen(
                         onValueChange = { newValue ->
                             gasThresholdText = newValue
                         },
-                        label = { Text("Porcentaje de gas mínimo") },
+                        label = { Text(stringResource(R.string.percentage_minimum_gas)) },
                         suffix = { Text("%") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         modifier = Modifier.fillMaxWidth(),
@@ -247,11 +315,11 @@ fun SettingsScreen(
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Guardar umbral")
+                        Text(stringResource(R.string.save_threshold))
                     }
 
                     Text(
-                        text = "Se enviará una notificación cuando el gas baje del ${uiState.gasLevelThreshold.toInt()}%",
+                        text = stringResource(R.string.settings_gas_threshold_description, uiState.gasLevelThreshold.toInt()),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 4.dp)
@@ -267,12 +335,12 @@ fun SettingsScreen(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Lectura de Peso",
+                    text = stringResource(R.string.settings_weight_reading),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
-                    text = "Intervalo entre lecturas de peso del sensor",
+                    text = stringResource(R.string.settings_weight_interval_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 12.dp)
@@ -306,7 +374,7 @@ fun SettingsScreen(
                 }
 
                 Text(
-                    text = "Rango válido: 1-60 minutos",
+                    text = stringResource(R.string.settings_weight_range),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -325,12 +393,12 @@ fun SettingsScreen(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Lectura de Inclinación",
+                    text = stringResource(R.string.settings_inclination_reading),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
-                    text = "Intervalo entre lecturas de inclinación del sensor",
+                    text = stringResource(R.string.settings_inclination_interval_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 12.dp)
@@ -364,7 +432,7 @@ fun SettingsScreen(
                 }
 
                 Text(
-                    text = "Rango válido: 1-300 segundos",
+                    text = stringResource(R.string.settings_inclination_range),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -383,28 +451,28 @@ fun SettingsScreen(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Información",
+                    text = stringResource(R.string.settings_information),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
                 Text(
-                    text = "• Intervalos más cortos proporcionan datos más frecuentes pero pueden consumir más batería",
+                    text = stringResource(R.string.settings_info_short_intervals),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Text(
-                    text = "• Intervalos más largos ahorran batería pero proporcionan datos menos frecuentes",
+                    text = stringResource(R.string.settings_info_long_intervals),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Text(
-                    text = "• Peso: 1 minuto por defecto, Inclinación: 5 segundos por defecto",
+                    text = stringResource(R.string.settings_info_defaults),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Text(
-                    text = "• Los cambios se guardan automáticamente",
+                    text = stringResource(R.string.settings_info_auto_save),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
