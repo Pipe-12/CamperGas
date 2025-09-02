@@ -106,8 +106,8 @@ fun CaravanConfigScreen(
                         )
                         Text(
                             text = when (vehicleType) {
-                                VehicleType.CARAVAN -> "Caravana"
-                                VehicleType.AUTOCARAVANA -> "Autocaravana"
+                                VehicleType.CARAVAN -> stringResource(R.string.vehicle_type_caravan)
+                                VehicleType.AUTOCARAVANA -> stringResource(R.string.vehicle_type_motorhome)
                             },
                             modifier = Modifier.padding(start = 8.dp)
                         )
@@ -137,7 +137,7 @@ fun CaravanConfigScreen(
                     onValueChange = { value ->
                         value.toFloatOrNull()?.let { viewModel.updateDistanceBetweenWheels(it) }
                     },
-                    label = { Text("Distancia entre ruedas traseras") },
+                    label = { Text(stringResource(R.string.caravan_config_distance_between_rear_wheels_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -153,7 +153,7 @@ fun CaravanConfigScreen(
                                 value.toFloatOrNull()
                                     ?.let { viewModel.updateDistanceToFrontSupport(it) }
                             },
-                            label = { Text("Distancia al apoyo delantero") },
+                            label = { Text(stringResource(R.string.caravan_config_distance_to_front_support_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -166,7 +166,7 @@ fun CaravanConfigScreen(
                                 value.toFloatOrNull()
                                     ?.let { viewModel.updateDistanceBetweenFrontWheels(it) }
                             },
-                            label = { Text("Distancia entre ruedas delanteras") },
+                            label = { Text(stringResource(R.string.caravan_config_distance_between_front_wheels_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )

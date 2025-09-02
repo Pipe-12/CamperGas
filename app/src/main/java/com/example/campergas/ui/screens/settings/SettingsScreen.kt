@@ -104,7 +104,7 @@ fun SettingsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.nav_back))
             }
             Text(
                 text = stringResource(R.string.settings_title),
@@ -352,7 +352,7 @@ fun SettingsScreen(
                         weightIntervalText = newValue
                     },
                     label = { Text("Intervalo (minutos)") },
-                    suffix = { Text("min") },
+                    suffix = { Text(stringResource(R.string.unit_minutes)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
@@ -410,7 +410,7 @@ fun SettingsScreen(
                         inclinationIntervalText = newValue
                     },
                     label = { Text("Intervalo (segundos)") },
-                    suffix = { Text("seg") },
+                    suffix = { Text(stringResource(R.string.unit_seconds)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true

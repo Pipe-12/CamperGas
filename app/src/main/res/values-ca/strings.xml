@@ -186,4 +186,45 @@
     <string name="widget_config_title">Configuració del Widget</string>
     <string name="widget_config_ready_message">El teu widget de CamperGas està llest per usar.</string>
     <string name="widget_config_usage_info">• Toca el widget per obrir l\'aplicació\n• Toca el botó d\'actualitzar per sol·licitar noves dades\n• El widget s\'actualitza automàticament quan hi ha canvis</string>
+    
+    <!-- Bluetooth Permission Error Messages -->
+    <string name="error_bluetooth_not_enabled">Bluetooth no activat</string>
+    <string name="error_location_not_enabled">Ubicació no activada</string>
+    <string name="error_bluetooth_not_supported">El dispositiu no suporta Bluetooth</string>
+    
+    <!-- Vehicle Types -->
+    <string name="vehicle_type_caravan">Caravana</string>
+    <string name="vehicle_type_motorhome">Autocaravana</string>
+    
+    <!-- Caravan Config Labels -->
+    <string name="caravan_config_distance_between_rear_wheels_label">Distància entre rodes posteriors</string>
+    <string name="caravan_config_distance_to_front_support_label">Distància al suport davanter</string>
+    <string name="caravan_config_distance_between_front_wheels_label">Distància entre rodes davanteres</string>
+    
+    <!-- Connection Status -->
+    <string name="connection_status_connected">✅ Connectat</string>
+    <string name="connection_status_disconnected">❌ Desconnectat</string>
+    
+    <!-- Navigation -->
+    <string name="nav_back">Tornar</string>
+    
+    <!-- Units -->
+    <string name="unit_minutes">min</string>
+    <string name="unit_seconds">seg</string>
+    
+    <!-- Home Screen Cards -->
+    <string name="home_weight_monitoring_title">Monitoratge de Pes</string>
+    <string name="home_weight_monitoring_description">Toca per accedir a la vista de pes actual</string>
+    <string name="home_consumption_history_title">Historial de Consum</string>
+    <string name="home_consumption_history_description">Toca per accedir a la vista de consum de gas històric</string>
+    <string name="home_inclination_title">Inclinació</string>
+    <string name="home_inclination_description">Toca per accedir a la vista de nivell del vehicle</string>
+    <string name="home_add_cylinder">Afegir Bombona</string>
+    <string name="home_connect_ble_title">Connectar BLE</string>
+    <string name="home_configuration_title">Configuració</string>
+    <string name="home_vehicle_settings_title">Configuració del Vehicle</string>
+    
+    <!-- Content Descriptions -->
+    <string name="clear_filters_description">Esborrar filtres</string>
+    <string name="start_date_label">Data d\'inici</string>
 </resources>

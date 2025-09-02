@@ -186,4 +186,45 @@
     <string name="widget_config_title">Widget Configuration</string>
     <string name="widget_config_ready_message">Your CamperGas widget is ready to use.</string>
     <string name="widget_config_usage_info">• Tap the widget to open the app\n• Tap the refresh button to request new data\n• The widget updates automatically when there are changes</string>
+    
+    <!-- Bluetooth Permission Error Messages -->
+    <string name="error_bluetooth_not_enabled">Bluetooth not enabled</string>
+    <string name="error_location_not_enabled">Location not enabled</string>
+    <string name="error_bluetooth_not_supported">Device does not support Bluetooth</string>
+    
+    <!-- Vehicle Types -->
+    <string name="vehicle_type_caravan">Caravan</string>
+    <string name="vehicle_type_motorhome">Motorhome</string>
+    
+    <!-- Caravan Config Labels -->
+    <string name="caravan_config_distance_between_rear_wheels_label">Distance between rear wheels</string>
+    <string name="caravan_config_distance_to_front_support_label">Distance to front support</string>
+    <string name="caravan_config_distance_between_front_wheels_label">Distance between front wheels</string>
+    
+    <!-- Connection Status -->
+    <string name="connection_status_connected">✅ Connected</string>
+    <string name="connection_status_disconnected">❌ Disconnected</string>
+    
+    <!-- Navigation -->
+    <string name="nav_back">Back</string>
+    
+    <!-- Units -->
+    <string name="unit_minutes">min</string>
+    <string name="unit_seconds">sec</string>
+    
+    <!-- Home Screen Cards -->
+    <string name="home_weight_monitoring_title">Weight Monitoring</string>
+    <string name="home_weight_monitoring_description">Tap to access current weight view</string>
+    <string name="home_consumption_history_title">Consumption History</string>
+    <string name="home_consumption_history_description">Tap to access historical gas consumption view</string>
+    <string name="home_inclination_title">Inclination</string>
+    <string name="home_inclination_description">Tap to access vehicle leveling view</string>
+    <string name="home_add_cylinder">Add Cylinder</string>
+    <string name="home_connect_ble_title">Connect BLE</string>
+    <string name="home_configuration_title">Configuration</string>
+    <string name="home_vehicle_settings_title">Vehicle Settings</string>
+    
+    <!-- Content Descriptions -->
+    <string name="clear_filters_description">Clear filters</string>
+    <string name="start_date_label">Start date</string>
 </resources>

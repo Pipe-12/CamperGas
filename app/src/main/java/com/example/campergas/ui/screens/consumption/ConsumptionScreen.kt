@@ -234,7 +234,7 @@ fun DateFiltersSection(
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Clear,
-                                contentDescription = "Limpiar filtros",
+                                contentDescription = stringResource(R.string.clear_filters_description),
                                 modifier = Modifier.size(16.dp)
                             )
                         }
@@ -310,7 +310,7 @@ fun DateFiltersSection(
                         text = if (startDate != null) {
                             "Desde: ${formatDateOnly(startDate)}"
                         } else {
-                            "Fecha inicio"
+                            "                            stringResource(R.string.start_date_label)"
                         }
                     )
                 }
