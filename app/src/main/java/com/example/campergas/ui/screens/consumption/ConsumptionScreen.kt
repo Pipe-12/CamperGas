@@ -252,7 +252,7 @@ fun DateFiltersSection(
                 FilterChip(
                     selected = false,
                     onClick = onLastDayClick,
-                    label = { Text("24h") },
+                    label = { Text(stringResource(R.string.consumption_filter_24h)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.DateRange,
@@ -265,7 +265,7 @@ fun DateFiltersSection(
                 FilterChip(
                     selected = false,
                     onClick = onLastWeekClick,
-                    label = { Text("7 días") },
+                    label = { Text(stringResource(R.string.consumption_filter_7d)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.DateRange,
@@ -278,7 +278,7 @@ fun DateFiltersSection(
                 FilterChip(
                     selected = false,
                     onClick = onLastMonthClick,
-                    label = { Text("30 días") },
+                    label = { Text(stringResource(R.string.consumption_filter_30d)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.DateRange,
@@ -308,9 +308,9 @@ fun DateFiltersSection(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = if (startDate != null) {
-                            "Desde: ${formatDateOnly(startDate)}"
+                            stringResource(R.string.consumption_from_date, formatDateOnly(startDate))
                         } else {
-                            "                            stringResource(R.string.start_date_label)"
+                            stringResource(R.string.consumption_start_date)
                         }
                     )
                 }
@@ -327,9 +327,9 @@ fun DateFiltersSection(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = if (endDate != null) {
-                            "Hasta: ${formatDateOnly(endDate)}"
+                            stringResource(R.string.consumption_to_date, formatDateOnly(endDate))
                         } else {
-                            "Fecha fin"
+                            stringResource(R.string.consumption_end_date)
                         }
                     )
                 }
@@ -506,7 +506,7 @@ fun ConsumptionChart(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Se necesitan al menos 2 días de datos para mostrar el gráfico",
+                        text = stringResource(R.string.consumption_chart_minimum_data),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )

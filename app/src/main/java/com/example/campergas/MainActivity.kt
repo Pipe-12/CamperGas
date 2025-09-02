@@ -39,7 +39,8 @@ class MainActivity : ComponentActivity() {
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(newBase)
-        // Note: The locale will be set dynamically in the setContent based on user preference
+        // The locale will be applied when the app starts through the LaunchedEffect
+        // which will recreate the activity to apply language changes
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,11 +62,18 @@ class MainActivity : ComponentActivity() {
             val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
             val language by preferencesDataStore.language.collectAsState(initial = Language.SYSTEM)
 
-            // Apply language configuration
+            // Apply language configuration and recreate activity when language changes
+            var previousLanguage by remember { mutableStateOf<Language?>(null) }
+            
             LaunchedEffect(language) {
-                if (language != Language.SYSTEM) {
-                    LocaleUtils.setLocale(this@MainActivity, language)
+                // Apply the new locale
+                LocaleUtils.setLocale(this@MainActivity, language)
+                
+                // Only recreate if this is not the first time and language actually changed
+                if (previousLanguage != null && previousLanguage != language) {
+                    recreate()
                 }
+                previousLanguage = language
             }
 
             CamperGasTheme(themeMode = themeMode) {
