@@ -35,6 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.compose.ui.res.stringResource
+import com.example.campergas.R
 import com.example.campergas.domain.model.VehicleType
 import com.example.campergas.ui.components.VehicleInclinationView
 import com.example.campergas.ui.components.WheelElevationsDisplay
@@ -54,10 +56,10 @@ fun InclinationScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Inclinación del Vehículo") },
+                title = { Text(stringResource(R.string.inclination_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ble_back_button))
                     }
                 }
             )

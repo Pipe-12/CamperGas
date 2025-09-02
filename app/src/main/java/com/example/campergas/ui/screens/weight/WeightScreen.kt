@@ -40,6 +40,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.compose.ui.res.stringResource
+import com.example.campergas.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -183,7 +185,7 @@ fun WeightScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Monitoreo de Combustible") },
+                title = { Text(stringResource(R.string.weight_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -218,7 +220,7 @@ fun WeightScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Monitor de Combustible",
+                                text = stringResource(R.string.weight_fuel_monitor),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold
                             )
@@ -284,7 +286,7 @@ fun WeightScreen(
                                         )
                                     }
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(if (isRequestingData) "Solicitando..." else "Actualizar Peso")
+                                    Text(if (isRequestingData) stringResource(R.string.weight_requesting) else stringResource(R.string.weight_update_weight))
                                 }
                             }
 
@@ -390,7 +392,7 @@ fun WeightScreen(
                                 )
                             }
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(if (isRequestingData) "Solicitando..." else "Solicitar Datos")
+                            Text(if (isRequestingData) stringResource(R.string.weight_requesting) else stringResource(R.string.weight_request_data))
                         }
 
                         if (!viewModel.isConnected()) {

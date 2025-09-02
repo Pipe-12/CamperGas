@@ -52,6 +52,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.compose.ui.res.stringResource
+import com.example.campergas.R
 import com.example.campergas.domain.usecase.ChartDataPoint
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -81,10 +83,10 @@ fun ConsumptionScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ble_back_button))
             }
             Text(
-                text = "Historial de Consumo",
+                text = stringResource(R.string.consumption_title),
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(start = 8.dp)
             )
@@ -137,14 +139,14 @@ fun ConsumptionScreen(
                 TextButton(
                     onClick = { showStartDatePicker = false }
                 ) {
-                    Text("Aceptar")
+                    Text(stringResource(R.string.consumption_accept))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { showStartDatePicker = false }
                 ) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.consumption_cancel))
                 }
             }
         ) {
@@ -168,14 +170,14 @@ fun ConsumptionScreen(
                 TextButton(
                     onClick = { showEndDatePicker = false }
                 ) {
-                    Text("Aceptar")
+                    Text(stringResource(R.string.consumption_accept))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { showEndDatePicker = false }
                 ) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.consumption_cancel))
                 }
             }
         ) {
@@ -219,7 +221,7 @@ fun DateFiltersSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Filtros de Fecha",
+                    text = stringResource(R.string.consumption_date_filters),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -228,7 +230,7 @@ fun DateFiltersSection(
                     FilterChip(
                         selected = true,
                         onClick = onClearFilter,
-                        label = { Text("Limpiar") },
+                        label = { Text(stringResource(R.string.consumption_clear_filter)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Clear,
