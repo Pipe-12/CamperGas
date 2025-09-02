@@ -51,6 +51,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.compose.ui.res.stringResource
+import com.example.campergas.R
 import com.example.campergas.domain.model.BleDevice
 import com.example.campergas.ui.components.BluetoothDisabledDialog
 import com.example.campergas.ui.components.BluetoothPermissionDialog
@@ -112,10 +114,10 @@ fun BleConnectScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ble_back_button))
             }
             Text(
-                text = "Conexión Bluetooth",
+                text = stringResource(R.string.ble_connection_title),
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(start = 8.dp)
             )
@@ -148,7 +150,7 @@ fun BleConnectScreen(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Buscar")
+                Text(stringResource(R.string.ble_search_button))
             }
 
             OutlinedButton(
@@ -156,7 +158,7 @@ fun BleConnectScreen(
                 modifier = Modifier.weight(1f),
                 enabled = uiState.isScanning
             ) {
-                Text("Detener")
+                Text(stringResource(R.string.ble_stop_button))
             }
         }
 
@@ -169,7 +171,7 @@ fun BleConnectScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Solo dispositivos CamperGas",
+                text = stringResource(R.string.ble_only_compatible_devices),
                 style = MaterialTheme.typography.bodyMedium
             )
             Switch(
@@ -198,7 +200,7 @@ fun BleConnectScreen(
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
-                        text = "Buscando dispositivos BLE...",
+                        text = stringResource(R.string.ble_searching_devices),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -218,7 +220,7 @@ fun BleConnectScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "Error",
+                        text = stringResource(R.string.ble_error_title),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onErrorContainer
@@ -232,7 +234,7 @@ fun BleConnectScreen(
                     TextButton(
                         onClick = { viewModel.clearError() }
                     ) {
-                        Text("Cerrar")
+                        Text(stringResource(R.string.ble_close_button))
                     }
                 }
             }
@@ -242,7 +244,7 @@ fun BleConnectScreen(
         // Available devices section (solo si no está conectado)
         if (!connectionState) {
             Text(
-                text = "Dispositivos Disponibles (${uiState.availableDevices.size})",
+                text = stringResource(R.string.ble_available_devices, uiState.availableDevices.size),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -269,12 +271,12 @@ fun BleConnectScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "No se encontraron dispositivos",
+                            text = stringResource(R.string.ble_no_devices_found),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "Presiona 'Buscar' para escanear",
+                            text = stringResource(R.string.ble_press_search_to_scan),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -341,7 +343,7 @@ private fun AvailableDeviceCard(
                         modifier = Modifier.padding(bottom = 4.dp)
                     ) {
                         Text(
-                            text = "✓ Compatible",
+                            text = stringResource(R.string.ble_compatible_badge),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)

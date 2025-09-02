@@ -22,6 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.example.campergas.R
 import com.example.campergas.ui.theme.CamperGasTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -118,14 +120,14 @@ fun WidgetConfigScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Configuración del Widget",
+                    text = stringResource(R.string.widget_config_title),
                     style = MaterialTheme.typography.headlineSmall
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 Text(
-                    text = "Tu widget de CamperGas está listo para usar.",
+                    text = stringResource(R.string.widget_config_ready_message),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 

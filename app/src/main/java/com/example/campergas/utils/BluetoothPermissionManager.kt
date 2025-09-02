@@ -15,6 +15,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import com.example.campergas.R
 
 class BluetoothPermissionManager(
     private val activity: ComponentActivity,
@@ -39,7 +40,7 @@ class BluetoothPermissionManager(
                 // Bluetooth activado, ahora verificar permisos
                 checkAndRequestPermissions()
             } else {
-                onPermissionsDenied(listOf("Bluetooth no activado"))
+                onPermissionsDenied(listOf(activity.getString(R.string.error_bluetooth_not_enabled)))
             }
         }
 
@@ -51,7 +52,7 @@ class BluetoothPermissionManager(
             if (isLocationEnabled()) {
                 checkAndRequestPermissions()
             } else {
-                onPermissionsDenied(listOf("Ubicación no activada"))
+                onPermissionsDenied(listOf(activity.getString(R.string.error_location_not_enabled)))
             }
         }
 
@@ -91,7 +92,7 @@ class BluetoothPermissionManager(
     fun checkAndRequestAllPermissions() {
         when {
             !isBluetoothSupported() -> {
-                onPermissionsDenied(listOf("Dispositivo no soporta Bluetooth"))
+                onPermissionsDenied(listOf(activity.getString(R.string.error_bluetooth_not_supported)))
             }
 
             !isBluetoothEnabled() -> {

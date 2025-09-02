@@ -37,6 +37,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.compose.ui.res.stringResource
+import com.example.campergas.R
 import com.example.campergas.domain.model.VehicleType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,10 +61,10 @@ fun CaravanConfigScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ble_back_button))
             }
             Text(
-                text = "Configuración del Vehículo",
+                text = stringResource(R.string.caravan_config_title),
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(start = 8.dp)
             )
@@ -82,7 +84,7 @@ fun CaravanConfigScreen(
                     .selectableGroup()
             ) {
                 Text(
-                    text = "Tipo de Vehículo",
+                    text = stringResource(R.string.caravan_config_vehicle_type),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -104,8 +106,8 @@ fun CaravanConfigScreen(
                         )
                         Text(
                             text = when (vehicleType) {
-                                VehicleType.CARAVAN -> "Caravana"
-                                VehicleType.AUTOCARAVANA -> "Autocaravana"
+                                VehicleType.CARAVAN -> stringResource(R.string.vehicle_type_caravan)
+                                VehicleType.AUTOCARAVANA -> stringResource(R.string.vehicle_type_motorhome)
                             },
                             modifier = Modifier.padding(start = 8.dp)
                         )
@@ -124,7 +126,7 @@ fun CaravanConfigScreen(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Dimensiones (cm)",
+                    text = stringResource(R.string.caravan_config_dimensions),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -135,7 +137,7 @@ fun CaravanConfigScreen(
                     onValueChange = { value ->
                         value.toFloatOrNull()?.let { viewModel.updateDistanceBetweenWheels(it) }
                     },
-                    label = { Text("Distancia entre ruedas traseras") },
+                    label = { Text(stringResource(R.string.caravan_config_distance_between_rear_wheels_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -151,7 +153,7 @@ fun CaravanConfigScreen(
                                 value.toFloatOrNull()
                                     ?.let { viewModel.updateDistanceToFrontSupport(it) }
                             },
-                            label = { Text("Distancia al apoyo delantero") },
+                            label = { Text(stringResource(R.string.caravan_config_distance_to_front_support_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -164,7 +166,7 @@ fun CaravanConfigScreen(
                                 value.toFloatOrNull()
                                     ?.let { viewModel.updateDistanceBetweenFrontWheels(it) }
                             },
-                            label = { Text("Distancia entre ruedas delanteras") },
+                            label = { Text(stringResource(R.string.caravan_config_distance_between_front_wheels_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -213,7 +215,7 @@ fun CaravanConfigScreen(
                 modifier = Modifier.weight(1f),
                 enabled = !uiState.isSaving
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.caravan_config_cancel))
             }
 
             Button(
@@ -227,7 +229,7 @@ fun CaravanConfigScreen(
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Text("Guardar")
+                    Text(stringResource(R.string.caravan_config_save))
                 }
             }
         }

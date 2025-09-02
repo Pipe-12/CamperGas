@@ -37,10 +37,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.campergas.R
 import com.example.campergas.domain.model.VehicleType
 import com.example.campergas.ui.components.VehicleInclinationView
 import com.example.campergas.ui.components.gas.AddGasCylinderDialog
@@ -106,7 +108,7 @@ fun HomeScreen(
                         
                         // Connection status in topbar
                         Text(
-                            text = if (connectionState) "✅ Conectado" else "❌ Desconectado",
+                            text = if (connectionState) stringResource(R.string.connection_status_connected) else stringResource(R.string.connection_status_disconnected),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.padding(end = 8.dp)
@@ -140,8 +142,8 @@ fun HomeScreen(
                 ) {
                     // Weight button (left)
                     NavigationButtonWithPreview(
-                        title = "Monitoreo de Peso",
-                        description = "Toca para acceder a la vista de peso actual",
+                        title = stringResource(R.string.home_weight_monitoring_title),
+                        description = stringResource(R.string.home_weight_monitoring_description),
                         onClick = { navController.navigate(Screen.Weight.route) },
                         modifier = Modifier.weight(1f),
                         isLargeButton = true,
@@ -164,8 +166,8 @@ fun HomeScreen(
 
                     // History button (right)
                     NavigationButtonWithPreview(
-                        title = "Historial de Consumo",
-                        description = "Toca para acceder a la vista de consumo de gas histórico",
+                        title = stringResource(R.string.home_consumption_history_title),
+                        description = stringResource(R.string.home_consumption_history_description),
                         onClick = { navController.navigate(Screen.Consumption.route) },
                         modifier = Modifier.weight(1f),
                         isLargeButton = true,
@@ -181,8 +183,8 @@ fun HomeScreen(
 
                 // Bottom section: Inclination button with larger space for drawing
                 NavigationButtonWithPreview(
-                    title = "Inclinación",
-                    description = "Toca para acceder a la vista de nivelación del vehículo",
+                    title = stringResource(R.string.home_inclination_title),
+                    description = stringResource(R.string.home_inclination_description),
                     onClick = { navController.navigate(Screen.Inclination.route) },
                     isLargeButton = true
                 ) {
@@ -222,7 +224,7 @@ fun HomeScreen(
                         contentDescription = null,
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    Text("Añadir Bombona")
+                    Text(stringResource(R.string.home_add_cylinder))
                 }
             }
 
@@ -234,7 +236,7 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Configuración",
+                    text = stringResource(R.string.configuration),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -246,7 +248,7 @@ fun HomeScreen(
                 ) {
                     // Botón de conexión BLE
                     ConfigurationButton(
-                        title = "Conectar BLE",
+                        title = stringResource(R.string.home_connect_ble_title),
                         text = "🔗",
                         onClick = { navController.navigate(Screen.BleConnect.route) },
                         modifier = Modifier.weight(1f)
@@ -254,7 +256,7 @@ fun HomeScreen(
 
                     // Botón de configuración
                     ConfigurationButton(
-                        title = "Configuración",
+                        title = stringResource(R.string.home_configuration_title),
                         icon = Icons.Default.Settings,
                         onClick = { navController.navigate(Screen.Settings.route) },
                         modifier = Modifier.weight(1f)
@@ -263,7 +265,7 @@ fun HomeScreen(
                     // Botón de ajustes de vehículo
                     val vehicleIcon = getVehicleIcon(vehicleConfig?.type)
                     ConfigurationButton(
-                        title = "Ajustes del Vehículo",
+                        title = stringResource(R.string.home_vehicle_settings_title),
                         text = vehicleIcon,
                         onClick = { navController.navigate(Screen.CaravanConfig.route) },
                         modifier = Modifier.weight(1f)
@@ -386,17 +388,17 @@ private fun ConsumptionPreview(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
-            text = "📊 Resumen",
+            text = stringResource(R.string.home_summary),
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "24h: ${String.format("%.1f", lastDayConsumption)} kg",
+            text = stringResource(R.string.home_consumption_24h, lastDayConsumption),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.primary
         )
         Text(
-            text = "7d: ${String.format("%.1f", lastWeekConsumption)} kg",
+            text = stringResource(R.string.home_consumption_7d, lastWeekConsumption),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary
         )

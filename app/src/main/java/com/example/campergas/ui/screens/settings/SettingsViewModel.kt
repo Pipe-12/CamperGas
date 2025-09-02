@@ -3,6 +3,7 @@ package com.example.campergas.ui.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.data.local.preferences.PreferencesDataStore
+import com.example.campergas.domain.model.Language
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,11 +56,13 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 preferencesDataStore.themeMode,
+                preferencesDataStore.language,
                 preferencesDataStore.areNotificationsEnabled,
                 preferencesDataStore.gasLevelThreshold
-            ) { themeMode, notificationsEnabled, gasLevelThreshold ->
+            ) { themeMode, language, notificationsEnabled, gasLevelThreshold ->
                 SettingsUiState(
                     themeMode = themeMode,
+                    language = language,
                     notificationsEnabled = notificationsEnabled,
                     gasLevelThreshold = gasLevelThreshold
                 )
@@ -72,6 +75,12 @@ class SettingsViewModel @Inject constructor(
     fun setThemeMode(themeMode: ThemeMode) {
         viewModelScope.launch {
             preferencesDataStore.setThemeMode(themeMode)
+        }
+    }
+
+    fun setLanguage(language: Language) {
+        viewModelScope.launch {
+            preferencesDataStore.setLanguage(language)
         }
     }
 
@@ -130,6 +139,7 @@ class SettingsViewModel @Inject constructor(
 
 data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val language: Language = Language.SYSTEM,
     val notificationsEnabled: Boolean = true,
     val gasLevelThreshold: Float = 15.0f,
     val isLoading: Boolean = false,

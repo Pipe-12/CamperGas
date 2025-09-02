@@ -9,8 +9,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.window.DialogProperties
+import com.example.campergas.R
 
 @Composable
 fun PermissionDialog(
@@ -19,8 +21,8 @@ fun PermissionDialog(
     icon: ImageVector = Icons.Default.Warning,
     onAccept: () -> Unit,
     onDismiss: () -> Unit,
-    acceptText: String = "Aceptar",
-    dismissText: String = "Cancelar",
+    acceptText: String = stringResource(R.string.dialog_accept),
+    dismissText: String = stringResource(R.string.dialog_cancel),
     dismissible: Boolean = true
 ) {
     AlertDialog(
@@ -76,12 +78,12 @@ fun BluetoothPermissionDialog(
     onDismiss: () -> Unit
 ) {
     PermissionDialog(
-        title = "Permisos de Bluetooth",
-        message = "CamperGas necesita acceso a Bluetooth y ubicación para conectarse con los dispositivos de la caravana y obtener datos de peso, inclinación y consumo de gas.",
+        title = stringResource(R.string.bluetooth_permission_title),
+        message = stringResource(R.string.bluetooth_permission_message),
         onAccept = onAccept,
         onDismiss = onDismiss,
-        acceptText = "Conceder permisos",
-        dismissText = "Ahora no"
+        acceptText = stringResource(R.string.bluetooth_permission_grant),
+        dismissText = stringResource(R.string.bluetooth_permission_later)
     )
 }
 
@@ -91,12 +93,12 @@ fun BluetoothDisabledDialog(
     onDismiss: () -> Unit
 ) {
     PermissionDialog(
-        title = "Bluetooth Desactivado",
-        message = "Para usar CamperGas necesitas activar el Bluetooth. ¿Quieres activarlo ahora?",
+        title = stringResource(R.string.bluetooth_disabled_title),
+        message = stringResource(R.string.bluetooth_disabled_message),
         onAccept = onAccept,
         onDismiss = onDismiss,
-        acceptText = "Activar Bluetooth",
-        dismissText = "Cancelar"
+        acceptText = stringResource(R.string.bluetooth_disabled_enable),
+        dismissText = stringResource(R.string.dialog_cancel)
     )
 }
 
@@ -106,11 +108,11 @@ fun LocationDisabledDialog(
     onDismiss: () -> Unit
 ) {
     PermissionDialog(
-        title = "Ubicación Desactivada",
-        message = "Para escanear dispositivos Bluetooth necesitas tener la ubicación activada. ¿Quieres activarla ahora?",
+        title = stringResource(R.string.location_disabled_title),
+        message = stringResource(R.string.location_disabled_message),
         onAccept = onAccept,
         onDismiss = onDismiss,
-        acceptText = "Activar ubicación",
-        dismissText = "Cancelar"
+        acceptText = stringResource(R.string.location_disabled_enable),
+        dismissText = stringResource(R.string.dialog_cancel)
     )
 }
