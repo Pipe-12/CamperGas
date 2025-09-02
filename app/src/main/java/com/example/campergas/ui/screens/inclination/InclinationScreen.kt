@@ -111,14 +111,14 @@ fun InclinationScreen(
                         if (!viewModel.isConnected()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "⚠️ Conecta el sensor primero",
+                                text = stringResource(R.string.inclination_connect_sensor_first),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.error
                             )
                         } else if (!viewModel.canMakeRequest()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "⏱️ Espera 2 segundos entre peticiones",
+                                text = stringResource(R.string.inclination_wait_between_requests),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -305,7 +305,7 @@ fun InclinationScreen(
                     } else if (!viewModel.canMakeRequest()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "⏱️ Espera 2 segundos entre peticiones",
+                            text = stringResource(R.string.inclination_wait_between_requests),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.fillMaxWidth()

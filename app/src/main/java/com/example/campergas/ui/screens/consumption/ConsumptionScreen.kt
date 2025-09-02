@@ -506,7 +506,7 @@ fun ConsumptionChart(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Se necesitan al menos 2 días de datos para mostrar el gráfico",
+                        text = stringResource(R.string.consumption_chart_minimum_data),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
