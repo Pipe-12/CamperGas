@@ -140,6 +140,42 @@ class GetConsumptionHistoryUseCaseTest {
         }
     }
 
+    @Test
+    fun `integration test - realistic consumption scenario over time`() {
+        // Arrange - Realistic scenario with mixed consumption and refill patterns
+        val consumptions = listOf(
+            // Week 1: Start with full cylinder
+            createTestConsumption(id = 1, fuelKilograms = 15f, date = 0L),
+            createTestConsumption(id = 2, fuelKilograms = 12f, date = 86400000L), // Day 1: 3kg consumed
+            createTestConsumption(id = 3, fuelKilograms = 9f, date = 172800000L),  // Day 2: 3kg consumed
+            createTestConsumption(id = 4, fuelKilograms = 6f, date = 259200000L),  // Day 3: 3kg consumed
+            createTestConsumption(id = 5, fuelKilograms = 3f, date = 345600000L),  // Day 4: 3kg consumed
+            
+            // Week 2: Refill the cylinder
+            createTestConsumption(id = 6, fuelKilograms = 15f, date = 432000000L), // Day 5: REFILL (should not count as negative)
+            createTestConsumption(id = 7, fuelKilograms = 13f, date = 518400000L), // Day 6: 2kg consumed
+            createTestConsumption(id = 8, fuelKilograms = 11f, date = 604800000L), // Day 7: 2kg consumed
+        )
+
+        // Act
+        val totalConsumption = useCase.calculateTotalConsumption(consumptions)
+        val chartData = useCase.prepareChartData(consumptions)
+
+        // Assert
+        // Total consumption calculated as oldest (15kg) - newest (11kg) = 4kg
+        // This shows net consumption over the entire period, ignoring the refill
+        assertEquals(4f, totalConsumption, 0.01f)
+        
+        // Chart data should have no negative values
+        chartData.forEach { dataPoint ->
+            assertTrue("Chart data should not contain negative values: ${dataPoint.kilograms}", 
+                      dataPoint.kilograms >= 0f)
+        }
+        
+        // Should have appropriate number of chart points (days with data)
+        assertTrue("Should have chart data for multiple days", chartData.size >= 5)
+    }
+
     private fun createTestConsumption(
         id: Long = 1,
         cylinderId: Long = 1,
