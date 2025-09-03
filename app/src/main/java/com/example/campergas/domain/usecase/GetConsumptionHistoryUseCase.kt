@@ -80,8 +80,11 @@ class GetConsumptionHistoryUseCase @Inject constructor(
                 val lastMeasurement = sortedConsumptions.last()    // Más antigua
                 
                 // El consumo es la diferencia: medición inicial - medición final
-                // Como se crea un nuevo cilindro al rellenar, no debería haber valores negativos
-                lastMeasurement.fuelKilograms - firstMeasurement.fuelKilograms
+                val calculatedConsumption = lastMeasurement.fuelKilograms - firstMeasurement.fuelKilograms
+                
+                // Evitar valores negativos (puede ocurrir durante recargas de bombonas)
+                // En caso de recarga, el consumo se considera 0 para ese período
+                kotlin.math.max(0f, calculatedConsumption)
             }
             .sum()
     }
