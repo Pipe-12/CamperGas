@@ -15,8 +15,8 @@ object LocaleUtils {
             Language.SYSTEM -> Locale.getDefault()
         }
         
-        Locale.setDefault(locale)
-        
+        // Don't modify global default locale to avoid interfering with language flow observation
+        // Only set locale for specific context
         val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
         
