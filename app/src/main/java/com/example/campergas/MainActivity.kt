@@ -39,8 +39,6 @@ class MainActivity : ComponentActivity() {
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(newBase)
-        // The locale will be applied when the app starts through the LaunchedEffect
-        // which will recreate the activity to apply language changes
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,13 +62,17 @@ class MainActivity : ComponentActivity() {
 
             // Apply language configuration and recreate activity when language changes
             var previousLanguage by remember { mutableStateOf<Language?>(null) }
+            var recreationPending by remember { mutableStateOf(false) }
             
             LaunchedEffect(language) {
-                // Apply the new locale
                 LocaleUtils.setLocale(this@MainActivity, language)
                 
-                // Only recreate if this is not the first time and language actually changed
-                if (previousLanguage != null && previousLanguage != language) {
+                if (previousLanguage != null && 
+                    previousLanguage != language && 
+                    !recreationPending) {
+                    
+                    recreationPending = true
+                    kotlinx.coroutines.delay(100)
                     recreate()
                 }
                 previousLanguage = language
