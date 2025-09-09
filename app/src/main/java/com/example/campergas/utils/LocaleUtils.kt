@@ -10,9 +10,9 @@ object LocaleUtils {
     
     fun setLocale(context: Context, language: Language): Context {
         val locale = when (language) {
-            Language.SPANISH -> Locale("es")
-            Language.ENGLISH -> Locale("en")
-            Language.CATALAN -> Locale("ca")
+            Language.SPANISH -> Locale.forLanguageTag("es")
+            Language.ENGLISH -> Locale.forLanguageTag("en")
+            Language.CATALAN -> Locale.forLanguageTag("ca")
             Language.SYSTEM -> Locale.getDefault()
         }
         
@@ -30,9 +30,9 @@ object LocaleUtils {
      */
     fun applyLocaleToActivity(activity: Activity, language: Language) {
         val locale = when (language) {
-            Language.SPANISH -> Locale("es")
-            Language.ENGLISH -> Locale("en") 
-            Language.CATALAN -> Locale("ca")
+            Language.SPANISH -> Locale.forLanguageTag("es")
+            Language.ENGLISH -> Locale.forLanguageTag("en") 
+            Language.CATALAN -> Locale.forLanguageTag("ca")
             Language.SYSTEM -> Locale.getDefault()
         }
         
