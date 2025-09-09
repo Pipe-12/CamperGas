@@ -1,5 +1,6 @@
 package com.example.campergas.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import com.example.campergas.domain.model.Language
@@ -15,10 +16,32 @@ object LocaleUtils {
             Language.SYSTEM -> Locale.getDefault()
         }
         
+        // Set the default locale globally
+        Locale.setDefault(locale)
+        
         val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
         
         return context.createConfigurationContext(config)
+    }
+    
+    /**
+     * Apply locale directly to an activity
+     */
+    fun applyLocaleToActivity(activity: Activity, language: Language) {
+        val locale = when (language) {
+            Language.SPANISH -> Locale("es")
+            Language.ENGLISH -> Locale("en") 
+            Language.CATALAN -> Locale("ca")
+            Language.SYSTEM -> Locale.getDefault()
+        }
+        
+        // Set the default locale globally
+        Locale.setDefault(locale)
+        
+        val config = Configuration(activity.resources.configuration)
+        config.setLocale(locale)
+        activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
     }
     
     fun getCurrentLanguageFromLocale(): Language {

@@ -62,17 +62,21 @@ class MainActivity : ComponentActivity() {
 
             // Apply language configuration and recreate activity when language changes
             var previousLanguage by remember { mutableStateOf<Language?>(null) }
-            var recreationPending by remember { mutableStateOf(false) }
+            var isRecreating by remember { mutableStateOf(false) }
             
             LaunchedEffect(language) {
-                LocaleUtils.setLocale(this@MainActivity, language)
+                // Apply locale immediately when language changes
+                LocaleUtils.applyLocaleToActivity(this@MainActivity, language)
                 
+                // Only recreate if language actually changed, we have a previous language,
+                // and we're not already in the process of recreating
                 if (previousLanguage != null && 
                     previousLanguage != language && 
-                    !recreationPending) {
+                    !isRecreating) {
                     
-                    recreationPending = true
-                    kotlinx.coroutines.delay(100)
+                    isRecreating = true
+                    // Small delay to ensure all state updates are complete
+                    kotlinx.coroutines.delay(150)
                     recreate()
                 }
                 previousLanguage = language
