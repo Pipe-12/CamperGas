@@ -9,9 +9,9 @@ object LocaleUtils {
     
     fun setLocale(context: Context, language: Language): Context {
         val locale = when (language) {
-            Language.SPANISH -> Locale("es")
-            Language.ENGLISH -> Locale("en")
-            Language.CATALAN -> Locale("ca")
+            Language.SPANISH -> Locale.forLanguageTag("es")
+            Language.ENGLISH -> Locale.forLanguageTag("en")
+            Language.CATALAN -> Locale.forLanguageTag("ca")
             Language.SYSTEM -> Locale.getDefault()
         }
         
@@ -19,15 +19,5 @@ object LocaleUtils {
         config.setLocale(locale)
         
         return context.createConfigurationContext(config)
-    }
-    
-    fun getCurrentLanguageFromLocale(): Language {
-        val currentLocale = Locale.getDefault()
-        return when (currentLocale.language) {
-            "es" -> Language.SPANISH
-            "en" -> Language.ENGLISH
-            "ca" -> Language.CATALAN
-            else -> Language.SYSTEM
-        }
     }
 }
