@@ -74,7 +74,7 @@ class CaravanConfigViewModelTest {
         // Assert
         val state = viewModel.uiState.value
         assertEquals(VehicleType.CARAVAN, state.selectedVehicleType)
-        assertEquals(0f, state.distanceBetweenWheels)
+        assertEquals(250f, state.distanceBetweenWheels) // 2.5 metros en cm
         assertEquals(0f, state.distanceToFrontSupport)
         assertEquals(0f, state.distanceBetweenFrontWheels)
         assertFalse(state.isLoading)
