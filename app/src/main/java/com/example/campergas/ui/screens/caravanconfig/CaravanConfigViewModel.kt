@@ -95,7 +95,7 @@ class CaravanConfigViewModel @Inject constructor(
 
 data class CaravanConfigUiState(
     val selectedVehicleType: VehicleType = VehicleType.CARAVAN,
-    val distanceBetweenWheels: Float = 0f,
+    val distanceBetweenWheels: Float = 250f, // 2.5 metros en cm
     val distanceToFrontSupport: Float = 0f,
     val distanceBetweenFrontWheels: Float = 0f,
     val isLoading: Boolean = false,

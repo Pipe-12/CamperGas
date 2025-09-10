@@ -142,7 +142,7 @@ data class InclinationUiState(
     val error: String? = null,
     val timestamp: Long = 0L,
     val vehicleType: VehicleType = VehicleType.CARAVAN,
-    val distanceBetweenRearWheels: Float = 0f,
+    val distanceBetweenRearWheels: Float = 250f, // 2.5 metros en cm
     val distanceToFrontSupport: Float = 0f,
     val distanceBetweenFrontWheels: Float = 0f,
     val wheelElevations: WheelElevations = WheelElevations()
