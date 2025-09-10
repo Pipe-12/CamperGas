@@ -38,6 +38,9 @@ class LocaleUtilsTest {
         
         every { activity.resources } returns resources
         every { resources.displayMetrics } returns displayMetrics
+        
+        // Reset LocaleUtils state before each test
+        LocaleUtils.resetLastAppliedLanguage()
     }
     
     private fun getLocaleFromConfig(config: Configuration): Locale {
@@ -127,6 +130,20 @@ class LocaleUtilsTest {
         verify { activity.recreate() }
         // Verify that the default locale was set to Spanish
         assertEquals("es", Locale.getDefault().language)
+    }
+    
+    @Test
+    fun `applyLocaleToActivity prevents infinite loop by tracking last applied language`() {
+        // Given
+        val language = Language.SPANISH
+        LocaleUtils.resetLastAppliedLanguage() // Reset state for test
+        
+        // When - Apply the same language twice
+        LocaleUtils.applyLocaleToActivity(activity, language)
+        LocaleUtils.applyLocaleToActivity(activity, language) // Second call should be ignored
+        
+        // Then - Activity should only be recreated once
+        verify(exactly = 1) { activity.recreate() }
     }
     
     @Test
