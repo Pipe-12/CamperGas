@@ -24,33 +24,4 @@ object LocaleUtils {
         
         return context.createConfigurationContext(config)
     }
-    
-    /**
-     * Apply locale directly to an activity
-     */
-    fun applyLocaleToActivity(activity: Activity, language: Language) {
-        val locale = when (language) {
-            Language.SPANISH -> Locale.forLanguageTag("es")
-            Language.ENGLISH -> Locale.forLanguageTag("en") 
-            Language.CATALAN -> Locale.forLanguageTag("ca")
-            Language.SYSTEM -> Locale.getDefault()
-        }
-        
-        // Set the default locale globally
-        Locale.setDefault(locale)
-        
-        val config = Configuration(activity.resources.configuration)
-        config.setLocale(locale)
-        activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
-    }
-    
-    fun getCurrentLanguageFromLocale(): Language {
-        val currentLocale = Locale.getDefault()
-        return when (currentLocale.language) {
-            "es" -> Language.SPANISH
-            "en" -> Language.ENGLISH
-            "ca" -> Language.CATALAN
-            else -> Language.SYSTEM
-        }
-    }
 }
