@@ -26,7 +26,8 @@ object LocaleUtils {
     }
 
     /**
-     * Apply locale directly to an activity
+     * Apply locale configuration using modern Android approach
+     * This replaces the deprecated updateConfiguration method
      */
     fun applyLocaleToActivity(activity: Activity, language: Language) {
         val locale = when (language) {
@@ -38,13 +39,10 @@ object LocaleUtils {
 
         // Set the default locale globally
         Locale.setDefault(locale)
-
-        val config = Configuration(activity.resources.configuration)
-        config.setLocale(locale)
-        activity.apply {
-            applicationContext.createConfigurationContext(config)
-            recreate()
-        }
+        
+        // For immediate locale changes, we need to recreate the activity
+        // This is the modern recommended approach for runtime locale changes
+        activity.recreate()
     }
 
     fun getCurrentLanguageFromLocale(): Language {

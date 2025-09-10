@@ -116,19 +116,17 @@ class LocaleUtilsTest {
     }
     
     @Test
-    fun `applyLocaleToActivity updates resources configuration for Spanish`() {
+    fun `applyLocaleToActivity recreates activity for Spanish`() {
         // Given
         val language = Language.SPANISH
-        val configSlot = slot<Configuration>()
-        every { resources.updateConfiguration(capture(configSlot), displayMetrics) } returns Unit
         
         // When
         LocaleUtils.applyLocaleToActivity(activity, language)
         
         // Then
-        verify { resources.updateConfiguration(any(), displayMetrics) }
-        val capturedLocale = getLocaleFromConfig(configSlot.captured)
-        assertEquals("es", capturedLocale.language)
+        verify { activity.recreate() }
+        // Verify that the default locale was set to Spanish
+        assertEquals("es", Locale.getDefault().language)
     }
     
     @Test
