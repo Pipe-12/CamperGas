@@ -1,6 +1,7 @@
 package com.example.campergas
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -60,26 +61,9 @@ class MainActivity : ComponentActivity() {
             val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
             val language by preferencesDataStore.language.collectAsState(initial = Language.SYSTEM)
 
-            // Apply language configuration and recreate activity when language changes
-            var previousLanguage by remember { mutableStateOf<Language?>(null) }
-            var isRecreating by remember { mutableStateOf(false) }
-            
+            // Simply apply locale changes without recreation to avoid infinite loops
             LaunchedEffect(language) {
-                // Apply locale immediately when language changes
                 LocaleUtils.applyLocaleToActivity(this@MainActivity, language)
-                
-                // Only recreate if language actually changed, we have a previous language,
-                // and we're not already in the process of recreating
-                if (previousLanguage != null && 
-                    previousLanguage != language && 
-                    !isRecreating) {
-                    
-                    isRecreating = true
-                    // Small delay to ensure all state updates are complete
-                    kotlinx.coroutines.delay(150)
-                    recreate()
-                }
-                previousLanguage = language
             }
 
             CamperGasTheme(themeMode = themeMode) {
