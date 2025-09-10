@@ -120,13 +120,13 @@ class LocaleUtilsTest {
         // Given
         val language = Language.SPANISH
         val configSlot = slot<Configuration>()
-        every { resources.updateConfiguration(capture(configSlot), displayMetrics) } returns Unit
+        every { activity.resources.updateConfiguration(capture(configSlot), any()) } returns Unit
         
         // When
         LocaleUtils.applyLocaleToActivity(activity, language)
         
         // Then
-        verify { resources.updateConfiguration(any(), displayMetrics) }
+        verify { activity.resources.updateConfiguration(any(), any()) }
         val capturedLocale = getLocaleFromConfig(configSlot.captured)
         assertEquals("es", capturedLocale.language)
     }

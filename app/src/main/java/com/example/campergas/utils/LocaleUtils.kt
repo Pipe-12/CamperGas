@@ -41,10 +41,9 @@ object LocaleUtils {
 
         val config = Configuration(activity.resources.configuration)
         config.setLocale(locale)
-        activity.apply {
-            applicationContext.createConfigurationContext(config)
-            recreate()
-        }
+        
+        // Update the activity's resources configuration
+        activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
     }
 
     fun getCurrentLanguageFromLocale(): Language {
