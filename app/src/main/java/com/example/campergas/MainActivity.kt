@@ -58,6 +58,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Configure initial edge-to-edge styling to prevent white flash
+        // Use system configuration to determine initial theme
+        val isSystemDarkTheme = (resources.configuration.uiMode and 
+            Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        configureSystemBars(isSystemDarkTheme)
+
         // Configurar el gestor de permisos
         bluetoothPermissionManager = BluetoothPermissionManager(
             activity = this,
@@ -83,24 +89,7 @@ class MainActivity : ComponentActivity() {
 
             // Configure edge-to-edge with proper system bar styling based on theme
             LaunchedEffect(isDarkTheme) {
-                enableEdgeToEdge(
-                    statusBarStyle = if (isDarkTheme) {
-                        SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
-                    } else {
-                        SystemBarStyle.light(
-                            android.graphics.Color.TRANSPARENT,
-                            android.graphics.Color.TRANSPARENT
-                        )
-                    },
-                    navigationBarStyle = if (isDarkTheme) {
-                        SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
-                    } else {
-                        SystemBarStyle.light(
-                            android.graphics.Color.TRANSPARENT,
-                            android.graphics.Color.TRANSPARENT
-                        )
-                    }
-                )
+                configureSystemBars(isDarkTheme)
             }
 
             // Apply locale changes when language preference changes
@@ -149,5 +138,30 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * Configure system bars (status bar and navigation bar) styling based on theme
+     * This method ensures consistent styling and prevents white flash during activity recreation
+     */
+    private fun configureSystemBars(isDarkTheme: Boolean) {
+        enableEdgeToEdge(
+            statusBarStyle = if (isDarkTheme) {
+                SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+            } else {
+                SystemBarStyle.light(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT
+                )
+            },
+            navigationBarStyle = if (isDarkTheme) {
+                SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+            } else {
+                SystemBarStyle.light(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT
+                )
+            }
+        )
     }
 }
