@@ -41,10 +41,9 @@ class MainActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: Context?) {
         val context = newBase ?: return super.attachBaseContext(newBase)
         
-        // Apply the current locale setting from preferences
-        // This will be called when the activity is created/recreated
+        // Apply the current locale setting
+        // For initial load, we use system default, language changes are handled in onCreate
         try {
-            // Get current language from system locale as fallback
             val currentLanguage = LocaleUtils.getCurrentLanguageFromLocale()
             val wrappedContext = LocaleUtils.setLocale(context, currentLanguage)
             super.attachBaseContext(wrappedContext)
@@ -73,12 +72,12 @@ class MainActivity : ComponentActivity() {
             val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
             val language by preferencesDataStore.language.collectAsState(initial = Language.SYSTEM)
 
-            // Apply locale changes with proper state tracking to prevent infinite loops
+            // Apply locale changes when language preference changes
             LaunchedEffect(language) {
-                // Only recreate if the language actually changed from a previous state
-                // This prevents infinite loops during activity recreation
-                val currentLocaleLanguage = LocaleUtils.getCurrentLanguageFromLocale()
-                if (language != currentLocaleLanguage) {
+                // Only apply locale if it's different from current system locale
+                // This prevents recreation on initial load when no change is needed
+                val currentLanguage = LocaleUtils.getCurrentLanguageFromLocale()
+                if (language != Language.SYSTEM && language != currentLanguage) {
                     LocaleUtils.applyLocaleToActivity(this@MainActivity, language)
                 }
             }
