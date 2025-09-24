@@ -44,7 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.campergas.R
 import com.example.campergas.domain.model.VehicleType
-import com.example.campergas.ui.components.VehicleInclinationCompactView
+import com.example.campergas.ui.components.VehicleInclinationView
 import com.example.campergas.ui.components.gas.AddGasCylinderDialog
 import com.example.campergas.ui.components.gas.GasCylinderViewModel
 import com.example.campergas.ui.navigation.Screen
@@ -188,19 +188,23 @@ fun HomeScreen(
                     onClick = { navController.navigate(Screen.Inclination.route) },
                     isLargeButton = true
                 ) {
-                    // Mostrar vista más compacta del vehículo con inclinación para la home screen
+                    // Mostrar vista compacta del vehículo con inclinación para la home screen
                     vehicleConfig?.let { config ->
-                        VehicleInclinationCompactView(
+                        VehicleInclinationView(
                             vehicleType = config.type,
                             pitchAngle = inclinationPitch,
-                            modifier = Modifier.height(160.dp)
+                            rollAngle = inclinationRoll,
+                            modifier = Modifier.height(160.dp),
+                            compact = true
                         )
                     } ?: run {
                         // Vista por defecto si no hay configuración
-                        VehicleInclinationCompactView(
+                        VehicleInclinationView(
                             vehicleType = VehicleType.CARAVAN,
                             pitchAngle = inclinationPitch,
-                            modifier = Modifier.height(160.dp)
+                            rollAngle = inclinationRoll,
+                            modifier = Modifier.height(160.dp),
+                            compact = true
                         )
                     }
                 }
