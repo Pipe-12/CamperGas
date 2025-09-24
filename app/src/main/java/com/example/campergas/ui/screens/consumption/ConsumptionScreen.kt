@@ -537,7 +537,7 @@ fun SimpleLineChart(
         
         val chartWidth = size.width
         val chartHeight = size.height
-        val leftPadding = 100f // Further increased left padding for Y-axis labels to prevent overlap
+        val leftPadding = 110f // Increased from 100f to provide more space for Y-axis labels
         val topPadding = 20f
         val rightPadding = 20f
         val bottomPadding = 50f // Space for X-axis labels
@@ -574,7 +574,7 @@ fun SimpleLineChart(
                 }
                 canvas.nativeCanvas.drawText(
                     String.format(Locale.getDefault(), "%.1f kg", kgValue),
-                    leftPadding - 10f,
+                    leftPadding - 20f, // Increased spacing from 10f to 20f to prevent collision
                     y + 5f,
                     paint
                 )
