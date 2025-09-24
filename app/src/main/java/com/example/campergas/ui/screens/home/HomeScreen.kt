@@ -188,13 +188,14 @@ fun HomeScreen(
                     onClick = { navController.navigate(Screen.Inclination.route) },
                     isLargeButton = true
                 ) {
-                    // Mostrar vista más grande del vehículo con inclinación
+                    // Mostrar vista compacta del vehículo con inclinación para la home screen
                     vehicleConfig?.let { config ->
                         VehicleInclinationView(
                             vehicleType = config.type,
                             pitchAngle = inclinationPitch,
                             rollAngle = inclinationRoll,
-                            modifier = Modifier.height(160.dp)
+                            modifier = Modifier.height(160.dp),
+                            compact = true
                         )
                     } ?: run {
                         // Vista por defecto si no hay configuración
@@ -202,7 +203,8 @@ fun HomeScreen(
                             vehicleType = VehicleType.CARAVAN,
                             pitchAngle = inclinationPitch,
                             rollAngle = inclinationRoll,
-                            modifier = Modifier.height(160.dp)
+                            modifier = Modifier.height(160.dp),
+                            compact = true
                         )
                     }
                 }

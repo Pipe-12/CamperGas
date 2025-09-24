@@ -35,27 +35,39 @@ fun VehicleInclinationView(
     vehicleType: VehicleType,
     pitchAngle: Float,
     rollAngle: Float,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    compact: Boolean = false
 ) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Vista lateral - Nivelado Vertical (Pitch)
+    if (compact) {
+        // Compact mode: only show pitch (side view) for space-constrained displays
         VehicleInclinationSideView(
             vehicleType = vehicleType,
             pitchAngle = pitchAngle,
-            modifier = Modifier.fillMaxWidth()
+            modifier = modifier,
+            compact = true
         )
+    } else {
+        // Full mode: show both pitch and roll views
+        Column(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Vista lateral - Nivelado Vertical (Pitch)
+            VehicleInclinationSideView(
+                vehicleType = vehicleType,
+                pitchAngle = pitchAngle,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Vista trasera - Nivelado Horizontal (Roll)
-        VehicleInclinationRearView(
-            vehicleType = vehicleType,
-            rollAngle = rollAngle,
-            modifier = Modifier.fillMaxWidth()
-        )
+            // Vista trasera - Nivelado Horizontal (Roll)
+            VehicleInclinationRearView(
+                vehicleType = vehicleType,
+                rollAngle = rollAngle,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 
@@ -63,7 +75,8 @@ fun VehicleInclinationView(
 fun VehicleInclinationSideView(
     vehicleType: VehicleType,
     pitchAngle: Float,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    compact: Boolean = false
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
     val secondaryColor = MaterialTheme.colorScheme.secondary
@@ -79,10 +92,10 @@ fun VehicleInclinationSideView(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Vista Lateral - Nivelado Vertical (Pitch)",
+                text = if (compact) "Inclinación" else "Vista Lateral - Nivelado Vertical (Pitch)",
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = if (compact) 4.dp else 8.dp)
             )
 
             Text(
@@ -92,33 +105,38 @@ fun VehicleInclinationSideView(
                 color = if (kotlin.math.abs(pitchAngle) <= 2f)
                     MaterialTheme.colorScheme.primary
                 else
-                    MaterialTheme.colorScheme.error
+                    MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(bottom = if (compact) 16.dp else 0.dp) // Extra spacing in compact mode
             )
 
             Canvas(
                 modifier = Modifier
-                    .size(320.dp, 140.dp)
+                    .size(
+                        width = if (compact) 280.dp else 320.dp,
+                        height = if (compact) 100.dp else 140.dp
+                    )
                     .padding(8.dp)
             ) {
                 val centerX = size.width / 2
                 val centerY = size.height / 2
-                val groundLevel = centerY + 25f // Nivel del suelo más abajo para que las ruedas estén en la línea
+                val groundLevel = centerY + if (compact) 20f else 25f // Adjusted for compact mode
 
                 // Dibujar línea de referencia horizontal (nivel del suelo) con graduación
                 drawLine(
                     color = Color.Gray.copy(alpha = 0.7f),
-                    start = Offset(20f, groundLevel),
-                    end = Offset(size.width - 20f, groundLevel),
+                    start = Offset(if (compact) 15f else 20f, groundLevel),
+                    end = Offset(size.width - if (compact) 15f else 20f, groundLevel),
                     strokeWidth = 2.dp.toPx()
                 )
                 // Aplicar solo rotación de pitch, centrado en el nivel del suelo
                 translate(centerX, groundLevel) {
                     rotate(pitchAngle, pivot = Offset.Zero) {
                         when (vehicleType) {
-                            VehicleType.CARAVAN -> drawCaravanSideView(primaryColor, secondaryColor)
+                            VehicleType.CARAVAN -> drawCaravanSideView(primaryColor, secondaryColor, compact)
                             VehicleType.AUTOCARAVANA -> drawMotorHomeSideView(
                                 primaryColor,
-                                secondaryColor
+                                secondaryColor,
+                                compact
                             )
                         }
                     }
@@ -197,19 +215,19 @@ fun VehicleInclinationRearView(
     }
 }
 
-private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: Color) {
-    val width = 240f // Aumentado significativamente
-    val height = 100f // Aumentado
-    val wheelRadius = 16f // Aumentado
-    val strokeWidth = 2.dp.toPx()
-    val bodyOffsetY = -height  - wheelRadius + 8f // Ajustado para mejor posición
+private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: Color, compact: Boolean = false) {
+    val width = if (compact) 180f else 240f
+    val height = if (compact) 75f else 100f
+    val wheelRadius = if (compact) 12f else 16f
+    val strokeWidth = if (compact) 1.5.dp.toPx() else 2.dp.toPx()
+    val bodyOffsetY = -height - wheelRadius + if (compact) 6f else 8f
 
     // Sombra del vehículo
     drawRoundRect(
-        color = Color.Black.copy(alpha = 0.2f),
-        topLeft = Offset(-width / 2 + 3, bodyOffsetY + 3),
+        color = Color.Black.copy(alpha = if (compact) 0.15f else 0.2f),
+        topLeft = Offset(-width / 2 + if (compact) 2 else 3, bodyOffsetY + if (compact) 2 else 3),
         size = Size(width, height),
-        cornerRadius = CornerRadius(12f, 12f)
+        cornerRadius = CornerRadius(if (compact) 8f else 12f, if (compact) 8f else 12f)
     )
 
     // Cuerpo principal de la caravana con esquinas redondeadas
@@ -217,7 +235,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         color = primaryColor,
         topLeft = Offset(-width / 2, bodyOffsetY),
         size = Size(width, height),
-        cornerRadius = CornerRadius(12f, 12f)
+        cornerRadius = CornerRadius(if (compact) 8f else 12f, if (compact) 8f else 12f)
     )
     
     // Contorno del cuerpo
@@ -225,7 +243,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         color = Color.Black.copy(alpha = 0.8f),
         topLeft = Offset(-width / 2, bodyOffsetY),
         size = Size(width, height),
-        cornerRadius = CornerRadius(12f, 12f),
+        cornerRadius = CornerRadius(if (compact) 8f else 12f, if (compact) 8f else 12f),
         style = Stroke(width = strokeWidth)
     )
 
@@ -410,12 +428,12 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
     )
 }
 
-private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor: Color) {
-    val width = 260f // Aumentado significativamente
-    val height = 110f // Aumentado
-    val wheelRadius = 16f // Aumentado
-    val strokeWidth = 2.dp.toPx()
-    val bodyOffsetY = -height  - wheelRadius + 8f // Ajustado para mejor posición
+private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor: Color, compact: Boolean = false) {
+    val width = if (compact) 200f else 260f
+    val height = if (compact) 80f else 110f
+    val wheelRadius = if (compact) 12f else 16f
+    val strokeWidth = if (compact) 1.5.dp.toPx() else 2.dp.toPx()
+    val bodyOffsetY = -height - wheelRadius + if (compact) 6f else 8f
 
     // Sombra del vehículo
     drawRoundRect(
