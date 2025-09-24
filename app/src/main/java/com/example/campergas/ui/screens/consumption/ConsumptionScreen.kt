@@ -537,7 +537,10 @@ fun SimpleLineChart(
         
         val chartWidth = size.width
         val chartHeight = size.height
-        val padding = 60f // Increased padding for labels
+        val leftPadding = 80f // Increased left padding for Y-axis labels
+        val topPadding = 20f
+        val rightPadding = 20f
+        val bottomPadding = 50f // Space for X-axis labels
         
         // Calculate bounds
         val minValue = data.minOf { it.kilograms }
@@ -551,13 +554,13 @@ fun SimpleLineChart(
         // Draw grid lines (horizontal) and Y-axis labels
         val gridLines = 4
         for (i in 0..gridLines) {
-            val y = padding + (i * (chartHeight - 2 * padding) / gridLines)
+            val y = topPadding + (i * (chartHeight - topPadding - bottomPadding) / gridLines)
             
             // Draw horizontal grid line
             drawLine(
                 color = Color.Gray.copy(alpha = 0.3f),
-                start = Offset(padding, y),
-                end = Offset(chartWidth - padding, y),
+                start = Offset(leftPadding, y),
+                end = Offset(chartWidth - rightPadding, y),
                 strokeWidth = 1f
             )
             
@@ -571,7 +574,7 @@ fun SimpleLineChart(
                 }
                 canvas.nativeCanvas.drawText(
                     String.format(Locale.getDefault(), "%.1f kg", kgValue),
-                    padding - 10f,
+                    leftPadding - 10f,
                     y + 5f,
                     paint
                 )
@@ -581,13 +584,13 @@ fun SimpleLineChart(
         // Draw vertical grid lines and X-axis labels (dates)
         val xAxisLabels = 4 // Show 4 date labels
         for (i in 0..xAxisLabels) {
-            val x = padding + (i * (chartWidth - 2 * padding) / xAxisLabels)
+            val x = leftPadding + (i * (chartWidth - leftPadding - rightPadding) / xAxisLabels)
             
             // Draw vertical grid line
             drawLine(
                 color = Color.Gray.copy(alpha = 0.3f),
-                start = Offset(x, padding),
-                end = Offset(x, chartHeight - padding),
+                start = Offset(x, topPadding),
+                end = Offset(x, chartHeight - bottomPadding),
                 strokeWidth = 1f
             )
             
@@ -615,7 +618,7 @@ fun SimpleLineChart(
                         canvas.nativeCanvas.drawText(
                             dateLabel,
                             x,
-                            chartHeight - padding + 25f,
+                            chartHeight - bottomPadding + 25f,
                             paint
                         )
                     }
@@ -625,8 +628,8 @@ fun SimpleLineChart(
         
         // Calculate points
         val points = data.map { point ->
-            val x = padding + ((point.date - minDate).toFloat() / dateRange) * (chartWidth - 2 * padding)
-            val y = chartHeight - padding - ((point.kilograms - minValue) / valueRange) * (chartHeight - 2 * padding)
+            val x = leftPadding + ((point.date - minDate).toFloat() / dateRange) * (chartWidth - leftPadding - rightPadding)
+            val y = chartHeight - bottomPadding - ((point.kilograms - minValue) / valueRange) * (chartHeight - topPadding - bottomPadding)
             Offset(x, y)
         }
         
