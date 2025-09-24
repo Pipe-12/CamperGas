@@ -17,6 +17,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
@@ -58,11 +60,25 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Configure initial edge-to-edge styling to prevent white flash
-        // Use system configuration to determine initial theme
+        // Configure initial edge-to-edge styling with user's saved theme preference
+        // This prevents white system bars during activity recreation (e.g., when language changes)
         val isSystemDarkTheme = (resources.configuration.uiMode and 
             Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-        configureSystemBars(isSystemDarkTheme)
+        
+        // Load saved theme preference to determine correct system bar styling
+        val savedThemeMode = try {
+            runBlocking { preferencesDataStore.themeMode.first() }
+        } catch (e: Exception) {
+            ThemeMode.SYSTEM // Fallback to system if loading fails
+        }
+        
+        val isDarkThemeForSystemBars = when (savedThemeMode) {
+            ThemeMode.SYSTEM -> isSystemDarkTheme
+            ThemeMode.LIGHT -> false
+            ThemeMode.DARK -> true
+        }
+        
+        configureSystemBars(isDarkThemeForSystemBars)
 
         // Configurar el gestor de permisos
         bluetoothPermissionManager = BluetoothPermissionManager(

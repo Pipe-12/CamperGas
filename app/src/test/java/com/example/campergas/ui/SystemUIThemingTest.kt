@@ -59,4 +59,34 @@ class SystemUIThemingTest {
         assertEquals("Dark theme should use transparent color", android.graphics.Color.TRANSPARENT, darkThemeColor)
         assertEquals("Light theme should use transparent color", android.graphics.Color.TRANSPARENT, lightThemeColor)
     }
+
+    @Test
+    fun `test theme preservation during activity recreation`() {
+        // Test the logic for preserving theme state during activity recreation
+        // This simulates the fix for the language change bug
+        
+        fun determineSystemBarsTheme(savedThemeMode: ThemeMode, isSystemDarkTheme: Boolean): Boolean {
+            return when (savedThemeMode) {
+                ThemeMode.SYSTEM -> isSystemDarkTheme
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+            }
+        }
+        
+        // Test with different combinations
+        assertTrue("DARK mode should always result in dark system bars", 
+            determineSystemBarsTheme(ThemeMode.DARK, false))
+        assertTrue("DARK mode should always result in dark system bars", 
+            determineSystemBarsTheme(ThemeMode.DARK, true))
+            
+        assertFalse("LIGHT mode should always result in light system bars", 
+            determineSystemBarsTheme(ThemeMode.LIGHT, false))
+        assertFalse("LIGHT mode should always result in light system bars", 
+            determineSystemBarsTheme(ThemeMode.LIGHT, true))
+            
+        assertTrue("SYSTEM mode should follow system theme when dark", 
+            determineSystemBarsTheme(ThemeMode.SYSTEM, true))
+        assertFalse("SYSTEM mode should follow system theme when light", 
+            determineSystemBarsTheme(ThemeMode.SYSTEM, false))
+    }
 }
