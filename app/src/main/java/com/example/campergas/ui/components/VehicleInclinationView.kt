@@ -60,6 +60,76 @@ fun VehicleInclinationView(
 }
 
 @Composable
+fun VehicleInclinationCompactView(
+    vehicleType: VehicleType,
+    pitchAngle: Float,
+    modifier: Modifier = Modifier
+) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val secondaryColor = MaterialTheme.colorScheme.secondary
+
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Inclinación",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
+            Text(
+                text = "${String.format(java.util.Locale.US, "%.1f", pitchAngle)}°",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = if (kotlin.math.abs(pitchAngle) <= 2f)
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(bottom = 12.dp) // Add extra padding to separate from Canvas
+            )
+
+            Canvas(
+                modifier = Modifier
+                    .size(280.dp, 100.dp) // Reduced size to fit better in compact view
+                    .padding(horizontal = 4.dp)
+            ) {
+                val centerX = size.width / 2
+                val centerY = size.height / 2
+                val groundLevel = centerY + 20f // Adjusted for smaller canvas
+
+                // Dibujar línea de referencia horizontal (nivel del suelo) con graduación
+                drawLine(
+                    color = Color.Gray.copy(alpha = 0.7f),
+                    start = Offset(15f, groundLevel),
+                    end = Offset(size.width - 15f, groundLevel),
+                    strokeWidth = 2.dp.toPx()
+                )
+                // Aplicar solo rotación de pitch, centrado en el nivel del suelo
+                translate(centerX, groundLevel) {
+                    rotate(pitchAngle, pivot = Offset.Zero) {
+                        when (vehicleType) {
+                            VehicleType.CARAVAN -> drawCaravanSideViewCompact(primaryColor, secondaryColor)
+                            VehicleType.AUTOCARAVANA -> drawMotorHomeSideViewCompact(
+                                primaryColor,
+                                secondaryColor
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun VehicleInclinationSideView(
     vehicleType: VehicleType,
     pitchAngle: Float,
@@ -1076,5 +1146,256 @@ private fun DrawScope.drawRearViewWheel(center: Offset, width: Float = 20f, heig
         topLeft = Offset(center.x - width / 2, center.y - height / 2),
         size = Size(width, height),
         style = Stroke(width = 1.5.dp.toPx())
+    )
+}
+
+// Compact versions for home screen
+private fun DrawScope.drawCaravanSideViewCompact(primaryColor: Color, secondaryColor: Color) {
+    val width = 180f // Reduced size for compact view
+    val height = 75f // Reduced height
+    val wheelRadius = 12f // Smaller wheel
+    val strokeWidth = 1.5.dp.toPx() // Thinner strokes
+    val bodyOffsetY = -height - wheelRadius + 6f
+
+    // Sombra del vehículo (more subtle)
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.15f),
+        topLeft = Offset(-width / 2 + 2, bodyOffsetY + 2),
+        size = Size(width, height),
+        cornerRadius = CornerRadius(8f, 8f)
+    )
+
+    // Cuerpo principal de la caravana
+    drawRoundRect(
+        color = primaryColor,
+        topLeft = Offset(-width / 2, bodyOffsetY),
+        size = Size(width, height),
+        cornerRadius = CornerRadius(8f, 8f)
+    )
+    
+    // Contorno del cuerpo
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.8f),
+        topLeft = Offset(-width / 2, bodyOffsetY),
+        size = Size(width, height),
+        cornerRadius = CornerRadius(8f, 8f),
+        style = Stroke(width = strokeWidth)
+    )
+
+    // Ventanas (reduced number and size)
+    val windowHeight = 25f
+    val windowWidth = 35f
+    
+    // Ventana delantera
+    drawRoundRect(
+        color = Color.White,
+        topLeft = Offset(-width / 2 + 20, bodyOffsetY + 12),
+        size = Size(windowWidth, windowHeight),
+        cornerRadius = CornerRadius(4f, 4f)
+    )
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.5f),
+        topLeft = Offset(-width / 2 + 20, bodyOffsetY + 12),
+        size = Size(windowWidth, windowHeight),
+        cornerRadius = CornerRadius(4f, 4f),
+        style = Stroke(width = 1.dp.toPx())
+    )
+    
+    // Ventana trasera
+    drawRoundRect(
+        color = Color.White,
+        topLeft = Offset(width / 2 - 55, bodyOffsetY + 12),
+        size = Size(windowWidth, windowHeight),
+        cornerRadius = CornerRadius(4f, 4f)
+    )
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.5f),
+        topLeft = Offset(width / 2 - 55, bodyOffsetY + 12),
+        size = Size(windowWidth, windowHeight),
+        cornerRadius = CornerRadius(4f, 4f),
+        style = Stroke(width = 1.dp.toPx())
+    )
+
+    // Rueda (simplified)
+    val wheelCenter = Offset(0f, 0f)
+    
+    // Llanta
+    drawCircle(
+        color = Color.Gray,
+        radius = wheelRadius,
+        center = wheelCenter
+    )
+    
+    // Neumático
+    drawCircle(
+        color = Color.Black,
+        radius = wheelRadius - 2f,
+        center = wheelCenter
+    )
+    
+    // Centro de la llanta
+    drawCircle(
+        color = Color.LightGray,
+        radius = wheelRadius - 6f,
+        center = wheelCenter
+    )
+
+    // Timón (simplified)
+    val hitchWidth = 30f
+    val hitchHeight = 12f
+
+    drawRoundRect(
+        color = secondaryColor,
+        topLeft = Offset(-width / 2 - hitchWidth, -hitchHeight * 1.5f),
+        size = Size(hitchWidth, hitchHeight),
+        cornerRadius = CornerRadius(3f, 3f)
+    )
+    
+    // Conexión del timón
+    drawCircle(
+        color = Color.Gray,
+        radius = 6f,
+        center = Offset(-width / 2 - hitchWidth + 4f, 0f)
+    )
+
+    // Franja decorativa
+    drawLine(
+        color = secondaryColor.copy(alpha = 0.6f),
+        start = Offset(-width / 2 + 15, bodyOffsetY + height / 2),
+        end = Offset(width / 2 - 15, bodyOffsetY + height / 2),
+        strokeWidth = 2.dp.toPx()
+    )
+}
+
+private fun DrawScope.drawMotorHomeSideViewCompact(primaryColor: Color, secondaryColor: Color) {
+    val width = 200f // Slightly larger for motorhome
+    val height = 80f
+    val wheelRadius = 12f
+    val strokeWidth = 1.5.dp.toPx()
+    val bodyOffsetY = -height - wheelRadius + 6f
+
+    // Sombra del vehículo
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.15f),
+        topLeft = Offset(-width / 2 + 2, bodyOffsetY + 2),
+        size = Size(width, height),
+        cornerRadius = CornerRadius(8f, 8f)
+    )
+
+    // Cuerpo principal (habitáculo)
+    drawRoundRect(
+        color = primaryColor,
+        topLeft = Offset(-width / 2, bodyOffsetY),
+        size = Size(width - 50f, height),
+        cornerRadius = CornerRadius(8f, 8f)
+    )
+    
+    // Contorno del cuerpo principal
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.8f),
+        topLeft = Offset(-width / 2, bodyOffsetY),
+        size = Size(width - 50f, height),
+        cornerRadius = CornerRadius(8f, 8f),
+        style = Stroke(width = strokeWidth)
+    )
+
+    // Cabina del conductor (simplified)
+    val cabinPath = Path().apply {
+        moveTo(width / 2 - 50f, bodyOffsetY)
+        lineTo(width / 2, bodyOffsetY + 15f)
+        lineTo(width / 2, bodyOffsetY + height)
+        lineTo(width / 2 - 50f, bodyOffsetY + height)
+        close()
+    }
+    
+    drawPath(
+        path = cabinPath,
+        color = secondaryColor
+    )
+    
+    drawPath(
+        path = cabinPath,
+        color = Color.Black.copy(alpha = 0.8f),
+        style = Stroke(width = strokeWidth)
+    )
+
+    // Ventana principal (simplified)
+    val windowHeight = 30f
+    val windowWidth = 40f
+    
+    drawRoundRect(
+        color = Color.White,
+        topLeft = Offset(-width / 2 + 20, bodyOffsetY + 15),
+        size = Size(windowWidth, windowHeight),
+        cornerRadius = CornerRadius(6f, 6f)
+    )
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.5f),
+        topLeft = Offset(-width / 2 + 20, bodyOffsetY + 15),
+        size = Size(windowWidth, windowHeight),
+        cornerRadius = CornerRadius(6f, 6f),
+        style = Stroke(width = 1.dp.toPx())
+    )
+
+    // Parabrisas (simplified)
+    val windshieldPath = Path().apply {
+        moveTo(width / 2 - 45f, bodyOffsetY + 15f)
+        lineTo(width / 2 - 10f, bodyOffsetY + 20f)
+        lineTo(width / 2 - 10f, bodyOffsetY + height - 25f)
+        lineTo(width / 2 - 45f, bodyOffsetY + height - 20f)
+        close()
+    }
+    
+    drawPath(
+        path = windshieldPath,
+        color = Color.White.copy(alpha = 0.9f)
+    )
+    
+    drawPath(
+        path = windshieldPath,
+        color = Color.Black.copy(alpha = 0.5f),
+        style = Stroke(width = 1.dp.toPx())
+    )
+
+    // Ruedas (simplified)
+    val rearWheelCenter = Offset(-width / 2 + 40f, 0f)
+    val frontWheelCenter = Offset(width / 2 - 35f, 0f)
+    
+    for (wheelCenter in listOf(rearWheelCenter, frontWheelCenter)) {
+        // Llanta
+        drawCircle(
+            color = Color.Gray,
+            radius = wheelRadius,
+            center = wheelCenter
+        )
+        
+        // Neumático
+        drawCircle(
+            color = Color.Black,
+            radius = wheelRadius - 2f,
+            center = wheelCenter
+        )
+        
+        // Centro de la llanta
+        drawCircle(
+            color = Color.LightGray,
+            radius = wheelRadius - 6f,
+            center = wheelCenter
+        )
+    }
+
+    // Franja decorativa
+    drawLine(
+        color = secondaryColor.copy(alpha = 0.7f),
+        start = Offset(-width / 2 + 15, bodyOffsetY + height / 2),
+        end = Offset(width / 2 - 55f, bodyOffsetY + height / 2),
+        strokeWidth = 3.dp.toPx()
+    )
+    
+    // Faros delanteros (simplified)
+    drawCircle(
+        color = Color.Yellow.copy(alpha = 0.8f),
+        radius = 6f,
+        center = Offset(width / 2 - 6f, bodyOffsetY + height - 15f)
     )
 }
