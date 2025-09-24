@@ -193,4 +193,24 @@ class LocaleUtilsTest {
         // Then
         assertEquals(Language.SYSTEM, result)
     }
+    
+    @Test
+    fun `language persistence works correctly after activity recreation`() {
+        // Given - A specific language is set
+        val targetLanguage = Language.ENGLISH
+        LocaleUtils.resetLastAppliedLanguage()
+        
+        // When - Apply locale to activity
+        LocaleUtils.applyLocaleToActivity(activity, targetLanguage)
+        
+        // Then - Verify activity is recreated and locale is set correctly
+        verify(exactly = 1) { activity.recreate() }
+        assertEquals("en", Locale.getDefault().language)
+        
+        // When - Try to apply the same language again (simulating activity recreation)
+        LocaleUtils.applyLocaleToActivity(activity, targetLanguage)
+        
+        // Then - Activity should not be recreated again (prevents infinite loop)
+        verify(exactly = 1) { activity.recreate() } 
+    }
 }

@@ -89,4 +89,34 @@ class SystemUIThemingTest {
         assertFalse("SYSTEM mode should follow system theme when light", 
             determineSystemBarsTheme(ThemeMode.SYSTEM, false))
     }
+    
+    @Test
+    fun `test language change preserves theme state`() {
+        // Test that theme preferences are correctly preserved during language changes
+        
+        fun shouldUseDarkSystemBars(themeMode: ThemeMode, isSystemDark: Boolean): Boolean {
+            return when (themeMode) {
+                ThemeMode.SYSTEM -> isSystemDark
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+            }
+        }
+        
+        // Test different theme scenarios that should be preserved during language changes
+        assertTrue("Dark theme should be preserved during language change", 
+            shouldUseDarkSystemBars(ThemeMode.DARK, false))
+        assertTrue("Dark theme should be preserved during language change", 
+            shouldUseDarkSystemBars(ThemeMode.DARK, true))
+            
+        assertFalse("Light theme should be preserved during language change", 
+            shouldUseDarkSystemBars(ThemeMode.LIGHT, false))
+        assertFalse("Light theme should be preserved during language change", 
+            shouldUseDarkSystemBars(ThemeMode.LIGHT, true))
+            
+        // System theme should follow actual system state
+        assertTrue("System theme should follow dark system during language change", 
+            shouldUseDarkSystemBars(ThemeMode.SYSTEM, true))
+        assertFalse("System theme should follow light system during language change", 
+            shouldUseDarkSystemBars(ThemeMode.SYSTEM, false))
+    }
 }

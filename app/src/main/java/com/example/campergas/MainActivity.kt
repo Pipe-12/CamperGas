@@ -45,11 +45,18 @@ class MainActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: Context?) {
         val context = newBase ?: return super.attachBaseContext(newBase)
         
-        // Apply the current locale setting
-        // For initial load, we use system default, language changes are handled in onCreate
+        // Apply the saved locale setting to preserve user's language choice
+        // This ensures language persists across activity recreation (e.g., language changes)
         try {
-            val currentLanguage = LocaleUtils.getCurrentLanguageFromLocale()
-            val wrappedContext = LocaleUtils.setLocale(context, currentLanguage)
+            // Create temporary preferences data store to get saved language
+            val tempPreferences = PreferencesDataStore(context)
+            val savedLanguage = try {
+                runBlocking { tempPreferences.language.first() }
+            } catch (e: Exception) {
+                Language.SYSTEM // Fallback to system if loading fails
+            }
+            
+            val wrappedContext = LocaleUtils.setLocale(context, savedLanguage)
             super.attachBaseContext(wrappedContext)
         } catch (e: Exception) {
             // Fallback to original context if locale setting fails
@@ -78,6 +85,7 @@ class MainActivity : ComponentActivity() {
             ThemeMode.DARK -> true
         }
         
+        // Apply system bars configuration immediately to prevent white flash
         configureSystemBars(isDarkThemeForSystemBars)
 
         // Configurar el gestor de permisos
