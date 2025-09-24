@@ -537,7 +537,7 @@ fun SimpleLineChart(
         
         val chartWidth = size.width
         val chartHeight = size.height
-        val leftPadding = 80f // Increased left padding for Y-axis labels
+        val leftPadding = 100f // Further increased left padding for Y-axis labels to prevent overlap
         val topPadding = 20f
         val rightPadding = 20f
         val bottomPadding = 50f // Space for X-axis labels
