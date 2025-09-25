@@ -253,6 +253,16 @@ fun WeightScreen(
                                 }
                             )
 
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Peso medido por el sensor
+                            Text(
+                                text = "Peso medido: ${fuelMeasurement.getFormattedTotalWeight()}",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+
                             Spacer(modifier = Modifier.height(20.dp))
 
                             // Tiempo de medición centrado
