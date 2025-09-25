@@ -17,9 +17,14 @@ data class FuelMeasurement(
     fun getFormattedFuelKilograms(): String = "%.2f kg".format(fuelKilograms)
 
     /**
-     * Formatea el porcentaje para mostrar en la UI
+     * Formatea el porcentage para mostrar en la UI
      */
     fun getFormattedPercentage(): String = "%.1f%%".format(fuelPercentage)
+
+    /**
+     * Formatea el peso total medido para mostrar en la UI
+     */
+    fun getFormattedTotalWeight(): String = "%.2f kg".format(totalWeight)
 
     /**
      * Obtiene la fecha formateada de la medición
