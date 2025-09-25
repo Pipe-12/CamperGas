@@ -532,15 +532,25 @@ fun SimpleLineChart(
     val surface = MaterialTheme.colorScheme.surface
     val onSurface = MaterialTheme.colorScheme.onSurface
     
-    Canvas(modifier = modifier.background(surface)) {
+    Canvas(modifier = modifier) {
         if (data.size < 2) return@Canvas
         
         val chartWidth = size.width
         val chartHeight = size.height
-        val leftPadding = 100f // Further increased left padding for Y-axis labels to prevent overlap
+        val leftPadding = 100f // Space for Y-axis labels (outside chart background)
         val topPadding = 20f
         val rightPadding = 20f
-        val bottomPadding = 50f // Space for X-axis labels
+        val bottomPadding = 50f // Space for X-axis labels (outside chart background)
+        
+        // Draw chart background rectangle (the darker rectangle)
+        drawRect(
+            color = surface,
+            topLeft = Offset(leftPadding, topPadding),
+            size = androidx.compose.ui.geometry.Size(
+                chartWidth - leftPadding - rightPadding,
+                chartHeight - topPadding - bottomPadding
+            )
+        )
         
         // Calculate bounds
         val minValue = data.minOf { it.kilograms }
@@ -574,7 +584,7 @@ fun SimpleLineChart(
                 }
                 canvas.nativeCanvas.drawText(
                     String.format(Locale.getDefault(), "%.1f kg", kgValue),
-                    leftPadding - 10f,
+                    leftPadding - 10f, // Position labels outside the chart background rectangle
                     y + 5f,
                     paint
                 )
