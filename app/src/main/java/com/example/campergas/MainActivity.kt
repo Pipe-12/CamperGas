@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
@@ -124,6 +125,14 @@ class MainActivity : ComponentActivity() {
                 if (language != Language.SYSTEM && language != currentLanguage) {
                     LocaleUtils.applyLocaleToActivity(this@MainActivity, language)
                 }
+            }
+
+            // Additional system bar reconfiguration after language changes
+            // This ensures system bars maintain correct theming after activity recreation
+            LaunchedEffect(language, isDarkTheme) {
+                // Delay slightly to ensure the activity recreation is complete
+                kotlinx.coroutines.delay(50)
+                configureSystemBars(isDarkTheme)
             }
 
             CamperGasTheme(themeMode = themeMode) {

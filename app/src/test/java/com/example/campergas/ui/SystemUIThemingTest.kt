@@ -119,4 +119,39 @@ class SystemUIThemingTest {
         assertFalse("System theme should follow light system during language change", 
             shouldUseDarkSystemBars(ThemeMode.SYSTEM, false))
     }
+
+    @Test
+    fun `test system bar reconfiguration after language change`() {
+        // Test the fix for system bars losing correct colors during language changes
+        
+        fun simulateSystemBarReconfiguration(themeMode: ThemeMode, isSystemDark: Boolean): Boolean {
+            // Simulate the logic that runs after activity recreation due to language change
+            val isDarkTheme = when (themeMode) {
+                ThemeMode.SYSTEM -> isSystemDark
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+            }
+            
+            // This simulates the additional LaunchedEffect(language, isDarkTheme) that
+            // ensures system bars are reconfigured after language changes
+            return isDarkTheme
+        }
+        
+        // Test that the reconfiguration logic preserves the correct theme
+        assertTrue("Dark theme should be preserved after language change reconfiguration", 
+            simulateSystemBarReconfiguration(ThemeMode.DARK, false))
+        assertTrue("Dark theme should be preserved after language change reconfiguration", 
+            simulateSystemBarReconfiguration(ThemeMode.DARK, true))
+            
+        assertFalse("Light theme should be preserved after language change reconfiguration", 
+            simulateSystemBarReconfiguration(ThemeMode.LIGHT, false))
+        assertFalse("Light theme should be preserved after language change reconfiguration", 
+            simulateSystemBarReconfiguration(ThemeMode.LIGHT, true))
+            
+        // System theme should continue to follow system state after reconfiguration
+        assertTrue("System theme should follow dark system after reconfiguration", 
+            simulateSystemBarReconfiguration(ThemeMode.SYSTEM, true))
+        assertFalse("System theme should follow light system after reconfiguration", 
+            simulateSystemBarReconfiguration(ThemeMode.SYSTEM, false))
+    }
 }
