@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
         val savedThemeMode = try {
             runBlocking { preferencesDataStore.themeMode.first() }
         } catch (e: Exception) {
-            ThemeMode.LIGHT // Fallback to light theme if loading fails
+            ThemeMode.DARK // Fallback to dark theme if loading fails
         }
         
         val isDarkThemeForSystemBars = when (savedThemeMode) {
@@ -95,7 +95,7 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.LIGHT)
+            val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.DARK)
             val language by preferencesDataStore.language.collectAsState(initial = Language.SYSTEM)
 
             // Determine if dark theme should be used

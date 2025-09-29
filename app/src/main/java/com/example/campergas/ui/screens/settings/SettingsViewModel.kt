@@ -138,7 +138,7 @@ class SettingsViewModel @Inject constructor(
 }
 
 data class SettingsUiState(
-    val themeMode: ThemeMode = ThemeMode.LIGHT,
+    val themeMode: ThemeMode = ThemeMode.DARK,
     val language: Language = Language.SYSTEM,
     val notificationsEnabled: Boolean = true,
     val gasLevelThreshold: Float = 15.0f,
