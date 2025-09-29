@@ -51,6 +51,27 @@ class FuelMeasurementTest {
     }
 
     @Test
+    fun `getFormattedTotalWeight returns correctly formatted string`() {
+        // Arrange
+        val measurement = FuelMeasurement(
+            id = 1L,
+            cylinderId = 1L,
+            cylinderName = "Test Cylinder",
+            timestamp = 12345L,
+            fuelKilograms = 7.456f,
+            fuelPercentage = 74.56f,
+            totalWeight = 12.456f,
+            isCalibrated = true
+        )
+
+        // Act
+        val formatted = measurement.getFormattedTotalWeight()
+
+        // Assert
+        assertEquals("12.46 kg", formatted)
+    }
+
+    @Test
     fun `getFormattedTimestamp returns time in HH_mm_ss format`() {
         // Arrange
         val calendar = Calendar.getInstance()
