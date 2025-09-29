@@ -1,13 +1,11 @@
 package com.example.campergas
 
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -69,18 +67,15 @@ class MainActivity : ComponentActivity() {
 
         // Configure initial edge-to-edge styling with user's saved theme preference
         // This prevents white system bars during activity recreation (e.g., when language changes)
-        val isSystemDarkTheme = (resources.configuration.uiMode and 
-            Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
         
         // Load saved theme preference to determine correct system bar styling
         val savedThemeMode = try {
             runBlocking { preferencesDataStore.themeMode.first() }
         } catch (e: Exception) {
-            ThemeMode.SYSTEM // Fallback to system if loading fails
+            ThemeMode.LIGHT // Fallback to light theme if loading fails
         }
         
         val isDarkThemeForSystemBars = when (savedThemeMode) {
-            ThemeMode.SYSTEM -> isSystemDarkTheme
             ThemeMode.LIGHT -> false
             ThemeMode.DARK -> true
         }
@@ -100,13 +95,11 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+            val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.LIGHT)
             val language by preferencesDataStore.language.collectAsState(initial = Language.SYSTEM)
-            val isSystemInDarkTheme = isSystemInDarkTheme()
 
             // Determine if dark theme should be used
             val isDarkTheme = when (themeMode) {
-                ThemeMode.SYSTEM -> isSystemInDarkTheme
                 ThemeMode.LIGHT -> false
                 ThemeMode.DARK -> true
             }

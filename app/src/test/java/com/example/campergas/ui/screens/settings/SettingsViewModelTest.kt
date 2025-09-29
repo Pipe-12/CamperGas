@@ -45,7 +45,7 @@ class SettingsViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
 
     // Flujos para simular preferencias
-    private val themeModeFlow = MutableStateFlow(ThemeMode.SYSTEM)
+    private val themeModeFlow = MutableStateFlow(ThemeMode.LIGHT)
     private val languageFlow = MutableStateFlow(Language.SYSTEM)
     private val notificationsEnabledFlow = MutableStateFlow(true)
     private val gasLevelThresholdFlow = MutableStateFlow(15.0f)
@@ -104,7 +104,7 @@ class SettingsViewModelTest {
     fun `initial state has default values from preferences`() = runTest {
         // Assert
         val state = viewModel.uiState.value
-        assertEquals(ThemeMode.SYSTEM, state.themeMode)
+        assertEquals(ThemeMode.LIGHT, state.themeMode)
         assertEquals(Language.SYSTEM, state.language)
         assertTrue(state.notificationsEnabled)
         assertEquals(15.0f, state.gasLevelThreshold, 0.01f)

@@ -36,11 +36,11 @@ class PreferencesDataStore @Inject constructor(
 
     val themeMode: Flow<ThemeMode> = context.dataStore.data
         .map { preferences ->
-            val modeString = preferences[themeModeKey] ?: ThemeMode.SYSTEM.name
+            val modeString = preferences[themeModeKey] ?: ThemeMode.LIGHT.name
             try {
                 ThemeMode.valueOf(modeString)
             } catch (_: IllegalArgumentException) {
-                ThemeMode.SYSTEM
+                ThemeMode.LIGHT
             }
         }
 
