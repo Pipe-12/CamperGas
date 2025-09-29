@@ -1,6 +1,5 @@
 package com.example.campergas.ui.screens.settings
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -57,7 +55,6 @@ fun SettingsScreen(
 ) {
     val scrollState = rememberScrollState()
     val uiState by viewModel.uiState.collectAsState()
-    val isSystemInDarkTheme = isSystemInDarkTheme()
 
     // Estados para intervalos BLE
     val weightInterval by viewModel.weightInterval.collectAsState()
@@ -85,7 +82,6 @@ fun SettingsScreen(
 
     // Determinar si el switch debe estar activado
     val isDarkModeEnabled = when (uiState.themeMode) {
-        ThemeMode.SYSTEM -> isSystemInDarkTheme
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
     }
@@ -167,23 +163,9 @@ fun SettingsScreen(
                     )
                 }
 
-                // Botón para volver al modo sistema
-                if (uiState.themeMode != ThemeMode.SYSTEM) {
-                    TextButton(
-                        onClick = { viewModel.setThemeMode(ThemeMode.SYSTEM) },
-                        modifier = Modifier.padding(top = 8.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.settings_use_system_config),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-
                 // Texto explicativo del estado actual
                 Text(
                     text = when (uiState.themeMode) {
-                        ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
                         ThemeMode.LIGHT -> stringResource(R.string.theme_light)
                         ThemeMode.DARK -> stringResource(R.string.theme_dark)
                     },
