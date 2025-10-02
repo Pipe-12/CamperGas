@@ -72,9 +72,6 @@ interface FuelMeasurementDao {
     @Query("SELECT * FROM fuel_measurements ORDER BY timestamp DESC LIMIT :limit")
     fun getRecentMeasurements(limit: Int): Flow<List<FuelMeasurementEntity>>
 
-    @Query("SELECT COUNT(*) FROM fuel_measurements WHERE timestamp = :timestamp")
-    suspend fun doesTimestampExist(timestamp: Long): Int
-
     @Query("SELECT AVG(fuelKilograms) FROM fuel_measurements WHERE cylinderId = :cylinderId AND timestamp BETWEEN :startTime AND :endTime")
     suspend fun getAverageFuelConsumption(cylinderId: Long, startTime: Long, endTime: Long): Float?
 
