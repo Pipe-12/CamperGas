@@ -35,11 +35,4 @@ class SaveVehicleConfigUseCase @Inject constructor(
     suspend fun saveVehicleConfig(config: VehicleConfig) {
         vehicleRepository.saveVehicleConfig(config)
     }
-
-    /**
-     * Elimina la configuración del vehículo si existe.
-     */
-    suspend fun deleteVehicleConfig() {
-        vehicleRepository.deleteVehicleConfig()
-    }
 }

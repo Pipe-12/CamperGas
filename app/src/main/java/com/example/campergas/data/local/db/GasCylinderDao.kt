@@ -43,10 +43,4 @@ interface GasCylinderDao {
 
     @Query("UPDATE gas_cylinders SET isActive = :isActive WHERE id = :id")
     suspend fun updateCylinderActiveStatus(id: Long, isActive: Boolean)
-
-    @Query("SELECT COUNT(*) FROM gas_cylinders")
-    suspend fun getCylinderCount(): Int
-
-    @Query("SELECT * FROM gas_cylinders WHERE name LIKE '%' || :searchTerm || '%' ORDER BY createdAt DESC")
-    fun searchCylinders(searchTerm: String): Flow<List<GasCylinder>>
 }

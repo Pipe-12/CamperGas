@@ -20,7 +20,4 @@ interface VehicleDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM vehicle_config WHERE id = :id)")
     suspend fun configExists(id: String = "default_config"): Boolean
-
-    @Query("DELETE FROM vehicle_config")
-    suspend fun deleteVehicleConfig()
 }
