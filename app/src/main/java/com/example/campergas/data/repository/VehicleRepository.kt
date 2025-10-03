@@ -29,10 +29,6 @@ class VehicleRepository @Inject constructor(
         }
     }
 
-    suspend fun deleteVehicleConfig() {
-        vehicleDao.deleteVehicleConfig()
-    }
-
     private fun VehicleConfigEntity.toDomainModel(): VehicleConfig {
         return VehicleConfig(
             type = this.type,

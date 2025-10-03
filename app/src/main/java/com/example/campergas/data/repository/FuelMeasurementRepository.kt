@@ -83,19 +83,6 @@ class FuelMeasurementRepository @Inject constructor(
         fuelMeasurementDao.deleteAllMeasurements()
     }
 
-    suspend fun getMeasurementCountByCylinder(cylinderId: Long): Int {
-        return fuelMeasurementDao.getMeasurementCountByCylinder(cylinderId)
-    }
-
-
-    suspend fun getAverageFuelConsumption(
-        cylinderId: Long,
-        startTime: Long,
-        endTime: Long
-    ): Float? {
-        return fuelMeasurementDao.getAverageFuelConsumption(cylinderId, startTime, endTime)
-    }
-
     suspend fun getLastTwoMeasurements(cylinderId: Long): List<FuelMeasurement> {
         return fuelMeasurementDao.getLastTwoMeasurements(cylinderId).map { it.toDomainModel() }
     }

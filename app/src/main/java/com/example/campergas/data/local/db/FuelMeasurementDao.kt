@@ -66,17 +66,8 @@ interface FuelMeasurementDao {
     @Query("DELETE FROM fuel_measurements")
     suspend fun deleteAllMeasurements()
 
-    @Query("SELECT COUNT(*) FROM fuel_measurements WHERE cylinderId = :cylinderId")
-    suspend fun getMeasurementCountByCylinder(cylinderId: Long): Int
-
     @Query("SELECT * FROM fuel_measurements ORDER BY timestamp DESC LIMIT :limit")
     fun getRecentMeasurements(limit: Int): Flow<List<FuelMeasurementEntity>>
-
-    @Query("SELECT COUNT(*) FROM fuel_measurements WHERE timestamp = :timestamp")
-    suspend fun doesTimestampExist(timestamp: Long): Int
-
-    @Query("SELECT AVG(fuelKilograms) FROM fuel_measurements WHERE cylinderId = :cylinderId AND timestamp BETWEEN :startTime AND :endTime")
-    suspend fun getAverageFuelConsumption(cylinderId: Long, startTime: Long, endTime: Long): Float?
 
     @Query(
         """
