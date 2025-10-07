@@ -53,7 +53,7 @@ class SaveFuelMeasurementUseCaseTest {
         val saveResult = result.getOrNull()!!
         assertEquals(expectedId, saveResult.measurementId)
         assertTrue(saveResult.processed)
-        assertEquals("Medición guardada correctamente", saveResult.reason)
+        assertEquals("Measurement saved successfully", saveResult.reason)
 
         coVerify {
             fuelMeasurementRepository.insertMeasurement(

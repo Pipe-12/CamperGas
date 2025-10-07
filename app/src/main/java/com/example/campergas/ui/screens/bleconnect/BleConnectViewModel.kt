@@ -47,10 +47,10 @@ class BleConnectViewModel @Inject constructor(
     }
 
     fun startScan() {
-        // Verificar que tenemos permisos antes de escanear
+        // Verify we have permissions before scanning
         if (!scanBleDevicesUseCase.isBluetoothEnabled()) {
             _uiState.value = _uiState.value.copy(
-                error = "Bluetooth no está habilitado"
+                error = "Bluetooth is not enabled"
             )
             return
         }
@@ -101,7 +101,7 @@ class BleConnectViewModel @Inject constructor(
     fun connectToDevice(device: BleDevice) {
         if (!scanBleDevicesUseCase.isBluetoothEnabled()) {
             _uiState.value = _uiState.value.copy(
-                error = "Bluetooth no está habilitado"
+                error = "Bluetooth is not enabled"
             )
             return
         }

@@ -35,10 +35,10 @@ class GasCylinderViewModel @Inject constructor(
         viewModelScope.launch {
             getActiveCylinderUseCase().collectLatest { cylinder ->
                 _activeCylinder.value = cylinder
-                // Actualizar mensaje si no hay bombona activa
+                // Update message if no active cylinder
                 if (cylinder == null) {
                     _uiState.value = _uiState.value.copy(
-                        errorMessage = "Sin bombona activa - Las mediciones no se guardarán"
+                        errorMessage = "No active cylinder - Measurements will not be saved"
                     )
                 } else {
                     _uiState.value = _uiState.value.copy(errorMessage = null)
@@ -57,16 +57,16 @@ class GasCylinderViewModel @Inject constructor(
                 if (result.isSuccess) {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        successMessage = "Bombona añadida correctamente"
+                        successMessage = "Cylinder added successfully"
                     )
-                    // Limpiar mensaje después de unos segundos
+                    // Clear message after a few seconds
                     kotlinx.coroutines.delay(3000)
                     _uiState.value = _uiState.value.copy(successMessage = null)
                 } else {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         errorMessage = result.exceptionOrNull()?.message
-                            ?: "Error al añadir bombona"
+                            ?: "Error adding cylinder"
                     )
                 }
             } catch (e: Exception) {

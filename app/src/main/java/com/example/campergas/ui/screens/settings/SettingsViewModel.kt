@@ -96,21 +96,21 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    // Métodos para configurar intervalos de lectura BLE
+    // Methods to configure BLE reading intervals
     fun setWeightInterval(intervalMinutes: Int) {
         viewModelScope.launch {
             try {
-                _operationStatus.value = "Configurando intervalo de peso..."
-                val intervalSeconds = intervalMinutes * 60 // Convertir minutos a segundos
+                _operationStatus.value = "Configuring weight interval..."
+                val intervalSeconds = intervalMinutes * 60 // Convert minutes to seconds
                 configureReadingIntervalsUseCase.setWeightReadInterval(intervalSeconds)
-                _operationStatus.value = "Intervalo de peso configurado: $intervalMinutes min"
+                _operationStatus.value = "Weight interval configured: $intervalMinutes min"
 
-                // Limpiar el mensaje después de un tiempo
+                // Clear message after a while
                 kotlinx.coroutines.delay(2000)
                 _operationStatus.value = null
             } catch (exception: Exception) {
                 _operationStatus.value =
-                    "Error al configurar intervalo de peso: ${exception.message}"
+                    "Error configuring weight interval: ${exception.message}"
                 kotlinx.coroutines.delay(2000)
                 _operationStatus.value = null
             }
@@ -120,16 +120,16 @@ class SettingsViewModel @Inject constructor(
     fun setInclinationInterval(intervalSeconds: Int) {
         viewModelScope.launch {
             try {
-                _operationStatus.value = "Configurando intervalo de inclinación..."
+                _operationStatus.value = "Configuring inclination interval..."
                 configureReadingIntervalsUseCase.setInclinationReadInterval(intervalSeconds)
-                _operationStatus.value = "Intervalo de inclinación configurado: ${intervalSeconds}s"
+                _operationStatus.value = "Inclination interval configured: ${intervalSeconds}s"
 
-                // Limpiar el mensaje después de un tiempo
+                // Clear message after a while
                 kotlinx.coroutines.delay(2000)
                 _operationStatus.value = null
             } catch (exception: Exception) {
                 _operationStatus.value =
-                    "Error al configurar intervalo de inclinación: ${exception.message}"
+                    "Error configuring inclination interval: ${exception.message}"
                 kotlinx.coroutines.delay(2000)
                 _operationStatus.value = null
             }

@@ -97,7 +97,7 @@ class SaveFuelMeasurementUseCase @Inject constructor(
                 SaveMeasurementResult(
                     measurementId = id,
                     processed = true,
-                    reason = "Medición guardada correctamente"
+                    reason = "Measurement saved successfully"
                 )
             )
         } catch (e: Exception) {
