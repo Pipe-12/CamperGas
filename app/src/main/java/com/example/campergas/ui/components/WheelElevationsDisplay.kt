@@ -40,7 +40,7 @@ fun WheelElevationsDisplay(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "🔧 Elevación de Ruedas",
+                text = "🔧 Wheel Elevation",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 12.dp)
@@ -54,7 +54,7 @@ fun WheelElevationsDisplay(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "💡 Valores positivos = elevar, negativos = bajar",
+                text = "💡 Positive values = raise, negative = lower",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -67,29 +67,29 @@ fun WheelElevationsDisplay(
 @Composable
 private fun CaravanWheelElevations(wheelElevations: WheelElevations) {
     Column {
-        // Ruedín delantero
+        // Front support wheel
         WheelElevationItem(
-            wheelName = "🛞 Ruedín Delantero",
+            wheelName = "🛞 Front Support",
             elevation = wheelElevations.frontSupport,
             icon = "⬆️"
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Ruedas traseras
+        // Rear wheels
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             WheelElevationItem(
-                wheelName = "🛞 Trasera Izq.",
+                wheelName = "🛞 Rear Left",
                 elevation = wheelElevations.rearLeft,
                 icon = "⬅️",
                 modifier = Modifier.weight(1f)
             )
 
             WheelElevationItem(
-                wheelName = "🛞 Trasera Der.",
+                wheelName = "🛞 Rear Right",
                 elevation = wheelElevations.rearRight,
                 icon = "➡️",
                 modifier = Modifier.weight(1f)
@@ -101,9 +101,9 @@ private fun CaravanWheelElevations(wheelElevations: WheelElevations) {
 @Composable
 private fun MotorHomeWheelElevations(wheelElevations: WheelElevations) {
     Column {
-        // Ruedas delanteras
+        // Front wheels
         Text(
-            text = "Ruedas Delanteras",
+            text = "Front Wheels",
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(bottom = 4.dp)
@@ -114,14 +114,14 @@ private fun MotorHomeWheelElevations(wheelElevations: WheelElevations) {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             WheelElevationItem(
-                wheelName = "🛞 Delant. Izq.",
+                wheelName = "🛞 Front Left",
                 elevation = wheelElevations.frontLeft,
                 icon = "⬅️",
                 modifier = Modifier.weight(1f)
             )
 
             WheelElevationItem(
-                wheelName = "🛞 Delant. Der.",
+                wheelName = "🛞 Front Right",
                 elevation = wheelElevations.frontRight,
                 icon = "➡️",
                 modifier = Modifier.weight(1f)
@@ -130,9 +130,9 @@ private fun MotorHomeWheelElevations(wheelElevations: WheelElevations) {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Ruedas traseras
+        // Rear wheels
         Text(
-            text = "Ruedas Traseras",
+            text = "Rear Wheels",
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(bottom = 4.dp)
@@ -143,14 +143,14 @@ private fun MotorHomeWheelElevations(wheelElevations: WheelElevations) {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             WheelElevationItem(
-                wheelName = "🛞 Trasera Izq.",
+                wheelName = "🛞 Rear Left",
                 elevation = wheelElevations.rearLeft,
                 icon = "⬅️",
                 modifier = Modifier.weight(1f)
             )
 
             WheelElevationItem(
-                wheelName = "🛞 Trasera Der.",
+                wheelName = "🛞 Rear Right",
                 elevation = wheelElevations.rearRight,
                 icon = "➡️",
                 modifier = Modifier.weight(1f)
@@ -207,8 +207,8 @@ private fun WheelElevationItem(
             Text(
                 text = when {
                     abs(elevation) < 0.5f -> "OK"
-                    elevation > 0 -> "Elevar"
-                    else -> "Bajar"
+                    elevation > 0 -> "Raise"
+                    else -> "Lower"
                 },
                 style = MaterialTheme.typography.labelSmall,
                 color = when {

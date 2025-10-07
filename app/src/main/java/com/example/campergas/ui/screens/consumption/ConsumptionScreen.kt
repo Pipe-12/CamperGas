@@ -490,7 +490,7 @@ fun ConsumptionChart(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "📈 Gráfico de Consumo Diario",
+                text = "📈 Daily Consumption Chart",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
