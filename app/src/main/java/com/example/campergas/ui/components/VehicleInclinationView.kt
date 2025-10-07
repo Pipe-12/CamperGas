@@ -92,7 +92,7 @@ fun VehicleInclinationSideView(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (compact) "Inclinación" else "Vista Lateral - Nivelado Vertical (Pitch)",
+                text = if (compact) "Inclination" else "Side View - Vertical Level (Pitch)",
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = if (compact) 4.dp else 8.dp)
@@ -121,14 +121,14 @@ fun VehicleInclinationSideView(
                 val centerY = size.height / 2
                 val groundLevel = centerY + if (compact) 20f else 25f // Adjusted for compact mode
 
-                // Dibujar línea de referencia horizontal (nivel del suelo) con graduación
+                // Draw horizontal reference line (ground level) with graduation
                 drawLine(
                     color = Color.Gray.copy(alpha = 0.7f),
                     start = Offset(if (compact) 15f else 20f, groundLevel),
                     end = Offset(size.width - if (compact) 15f else 20f, groundLevel),
                     strokeWidth = 2.dp.toPx()
                 )
-                // Aplicar solo rotación de pitch, centrado en el nivel del suelo
+                // Apply pitch rotation only, centered on ground level
                 translate(centerX, groundLevel) {
                     rotate(pitchAngle, pivot = Offset.Zero) {
                         when (vehicleType) {
@@ -166,7 +166,7 @@ fun VehicleInclinationRearView(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Vista Trasera - Nivelado Horizontal (Roll)",
+                text = "Rear View - Horizontal Level (Roll)",
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -189,16 +189,16 @@ fun VehicleInclinationRearView(
             ) {
                 val centerX = size.width / 2
                 val centerY = size.height / 2
-                val groundLevel = centerY + 25f // Nivel del suelo más abajo para que las ruedas estén en la línea
+                val groundLevel = centerY + 25f // Ground level lower so wheels are on the line
 
-                // Dibujar línea de referencia horizontal (nivel del suelo) con graduación
+                // Draw horizontal reference line (ground level) with graduation
                 drawLine(
                     color = Color.Gray.copy(alpha = 0.7f),
                     start = Offset(20f, groundLevel),
                     end = Offset(size.width - 20f, groundLevel),
                     strokeWidth = 2.dp.toPx()
                 )
-                // Aplicar solo rotación de roll, centrado en el nivel del suelo
+                // Apply roll rotation only, centered on ground level
                 translate(centerX, groundLevel) {
                     rotate(rollAngle, pivot = Offset.Zero) {
                         when (vehicleType) {
@@ -230,7 +230,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         cornerRadius = CornerRadius(if (compact) 8f else 12f, if (compact) 8f else 12f)
     )
 
-    // Cuerpo principal de la caravana con esquinas redondeadas
+    // Main caravan body with rounded corners
     drawRoundRect(
         color = primaryColor,
         topLeft = Offset(-width / 2, bodyOffsetY),
@@ -247,11 +247,11 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         style = Stroke(width = strokeWidth)
     )
 
-    // Ventanas laterales con marcos (más grandes)
+    // Side windows with frames (larger)
     val windowHeight = 35f
     val windowWidth = 50f
     
-    // Ventana delantera
+    // Front window
     drawRoundRect(
         color = Color.White,
         topLeft = Offset(-width / 2 + 25, bodyOffsetY + 15),
@@ -296,7 +296,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         style = Stroke(width = 1.5.dp.toPx())
     )
 
-    // Puerta lateral (más grande)
+    // Side door (larger)
     drawRoundRect(
         color = primaryColor.copy(alpha = 0.8f),
         topLeft = Offset(30f, bodyOffsetY + 10),
@@ -312,8 +312,8 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         center = Offset(70f, bodyOffsetY + height / 2)
     )
 
-    // Ruedas con llantas detalladas - Posicionadas para tocar la línea de referencia
-    val wheelCenter = Offset(0f, 0f) // Altura 0 para estar en la línea de referencia
+    // Detailed wheels with rims - Positioned to touch reference line
+    val wheelCenter = Offset(0f, 0f) // Height 0 to be on reference line
     
     // Sombra de la rueda
     drawCircle(
@@ -390,7 +390,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         strokeWidth = 4.dp.toPx()
     )
     
-    // Ruedín
+    // Support wheel
     drawCircle(
         color = Color.Black,
         radius = 10f,
@@ -403,7 +403,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
     )
 
     // Detalles adicionales
-    // Línea de separación en el techo
+    // Roof separation line
     drawLine(
         color = Color.Black.copy(alpha = 0.3f),
         start = Offset(-width / 2 + 15, bodyOffsetY),
