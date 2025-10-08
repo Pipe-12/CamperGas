@@ -59,7 +59,7 @@ class WeightViewModel @Inject constructor(
     }
 
     /**
-     * Solicita una lectura manual de datos de peso del sensor BLE
+     * Solicita una lectura manual de datos de peso from sensor BLE
      * Incluye protección contra múltiples peticiones seguidas
      */
     fun requestWeightDataManually() {

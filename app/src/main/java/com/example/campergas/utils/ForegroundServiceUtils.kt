@@ -13,7 +13,7 @@ object ForegroundServiceUtils {
     private const val TAG = "ForegroundServiceUtils"
     
     /**
-     * Verifica si la aplicación puede iniciar un servicio en primer plano desde el contexto actual
+     * Verifica si la aplicación puede iniciar un servicio en primer plano from the contexto actual
      * 
      * A partir de Android 12 (API 31), existen limitaciones estrictas sobre cuándo
      * las aplicaciones en segundo plano pueden iniciar servicios en primer plano. Este método
@@ -21,10 +21,10 @@ object ForegroundServiceUtils {
      */
     fun canStartForegroundService(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            // Para Android 12+, verificar si la aplicación está en primer plano
+            // For Android 12+, verify if application is in foreground
             isAppInForeground(context)
         } else {
-            // Para Android 11 y anteriores, los servicios en primer plano se pueden iniciar más libremente
+            // For Android 11 and earlier, foreground services can be started more freely
             true
         }
     }
@@ -49,7 +49,7 @@ object ForegroundServiceUtils {
             }
             
             val isInForeground = foregroundProcess != null
-            Log.d(TAG, "Estado de primer plano de la aplicación: $isInForeground")
+            Log.d(TAG, "Estado de primer plano of the aplicación: $isInForeground")
             return isInForeground
             
         } catch (e: Exception) {
@@ -66,7 +66,7 @@ object ForegroundServiceUtils {
         return try {
             val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             
-            // Para Android 7.0+ (API 24), usar getRunningServices con límite menor por rendimiento
+            // For Android 7.0+ (API 24), use getRunningServices with lower limit for performance
             val maxServices = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) 100 else Integer.MAX_VALUE
             @Suppress("DEPRECATION") // Necesario para compatibilidad con widgets
             val runningServices = activityManager.getRunningServices(maxServices)
@@ -81,7 +81,7 @@ object ForegroundServiceUtils {
             
         } catch (e: Exception) {
             Log.e(TAG, "Error al verificar si el servicio está ejecutándose", e)
-            // En caso de error, asumimos que no está ejecutándose para permitir reintentos
+            // In case of error, we assume it is not running to allow retries
             false
         }
     }
@@ -110,7 +110,7 @@ object ForegroundServiceUtils {
                 }
                 true
             } else {
-                // Respaldo: iniciar como servicio regular (los widgets seguirán recibiendo actualizaciones cuando se abra la aplicación)
+                // Fallback: start as regular service (widgets will continue receiving updates when app opens)
                 Log.d(TAG, "No se puede iniciar servicio en primer plano, iniciando servicio regular para ${serviceClass.simpleName}")
                 context.startService(intent)
                 true
@@ -127,11 +127,11 @@ object ForegroundServiceUtils {
                     context.startService(intent)
                     true
                 } catch (regularServiceException: Exception) {
-                    Log.e(TAG, "Error al iniciar servicio regular como respaldo", regularServiceException)
+                    Log.e(TAG, "Error on start servicio regular como respaldo", regularServiceException)
                     false
                 }
             } else {
-                Log.e(TAG, "Error al iniciar servicio", e)
+                Log.e(TAG, "Error on start servicio", e)
                 false
             }
         }

@@ -55,7 +55,7 @@ fun CaravanConfigScreen(
             .statusBarsPadding()
             .padding(16.dp)
     ) {
-        // Botón de volver atrás y título
+        // Back button y título
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically

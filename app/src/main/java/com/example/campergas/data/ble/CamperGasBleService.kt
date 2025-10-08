@@ -32,7 +32,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Servicio BLE unificado para manejar todas las características del sensor CamperGas
+ * Servicio BLE unificado para manejar todas las características from sensor CamperGas
  * El sensor tiene un solo servicio con tres características READ-only:
  * - FuelMeasurement: datos de medición de combustible (lectura bajo demanda)
  * - Inclination: datos de inclinación (lectura bajo demanda)
@@ -56,7 +56,7 @@ class CamperGasBleService @Inject constructor(
     // Scope para operaciones en segundo plano
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    // Estados de conexión
+    // Connection states
     private val _connectionState = MutableStateFlow(false)
     val connectionState: StateFlow<Boolean> = _connectionState
 
@@ -68,15 +68,15 @@ class CamperGasBleService @Inject constructor(
     private val _fuelData = MutableStateFlow<FuelMeasurement?>(null)
     val fuelData: StateFlow<FuelMeasurement?> = _fuelData
 
-    // Datos de inclinación en tiempo real
+    // Real-time inclination data
     private val _inclinationData = MutableStateFlow<Inclination?>(null)
     val inclinationData: StateFlow<Inclination?> = _inclinationData
 
-    // Datos históricos
+    // Historical data
     private val _historyData = MutableStateFlow<List<FuelMeasurement>>(emptyList())
     val historyData: StateFlow<List<FuelMeasurement>> = _historyData
 
-    // Estado de carga de datos históricos
+    // Historical data loading state
     private val _isLoadingHistory = MutableStateFlow(false)
     val isLoadingHistory: StateFlow<Boolean> = _isLoadingHistory
 
@@ -115,9 +115,9 @@ class CamperGasBleService @Inject constructor(
                 }
 
                 BluetoothProfile.STATE_DISCONNECTED -> {
-                    Log.d(TAG, "❌ Callback: Desconectado del sensor CamperGas (status: $status)")
+                    Log.d(TAG, "❌ Callback: Desconectado from sensor CamperGas (status: $status)")
 
-                    // Solo actualizar si no hemos forzado ya la desconexión
+                    // Only update if we have not forced disconnection yet
                     if (_connectionState.value) {
                         Log.d(TAG, "❌ Actualizando estado de conexión desde callback")
                         _connectionState.value = false
@@ -126,11 +126,11 @@ class CamperGasBleService @Inject constructor(
                     }
 
                     _isLoadingHistory.value = false
-                    // Detener lectura periódica al desconectar
+                    // Stop periodic reading on disconnect
                     stopPeriodicDataReading()
                     cleanup()
 
-                    // Si la desconexión fue inesperada (status != 0), loguear
+                    // If disconnection was unexpected (status != 0), log it
                     if (status != BluetoothGatt.GATT_SUCCESS) {
                         Log.w(TAG, "⚠️ Desconexión inesperada - status: $status")
                     }
@@ -141,8 +141,8 @@ class CamperGasBleService @Inject constructor(
                 }
 
                 BluetoothProfile.STATE_DISCONNECTING -> {
-                    Log.d(TAG, "🔄 Desconectando del sensor CamperGas...")
-                    // Detener lectura periódica al iniciar desconexión
+                    Log.d(TAG, "🔄 Desconectando from sensor CamperGas...")
+                    // Stop periodic reading when starting disconnection
                     stopPeriodicDataReading()
                 }
             }
@@ -152,14 +152,14 @@ class CamperGasBleService @Inject constructor(
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d(TAG, "Servicios descubiertos")
 
-                // Buscar el servicio del sensor CamperGas
+                // Buscar el servicio from sensor CamperGas
                 val sensorService =
                     gatt?.getService(UUID.fromString(CamperGasUuids.SENSOR_SERVICE_UUID))
 
                 if (sensorService != null) {
                     Log.d(TAG, "Servicio CamperGas encontrado")
 
-                    // Obtener todas las características
+                    // Get all characteristics
                     setupCharacteristics(sensorService)
                 } else {
                     Log.e(TAG, "Servicio CamperGas no encontrado")
@@ -211,13 +211,13 @@ class CamperGasBleService @Inject constructor(
     }
 
     private fun setupCharacteristics(service: BluetoothGattService) {
-        // Verificar permisos antes de configurar características
+        // Verify permissions before setting up characteristics
         if (!bleManager.hasBluetoothConnectPermission()) {
             Log.e(TAG, "No hay permisos para configurar características")
             return
         }
 
-        // Configurar característica de medición de combustible (READ-only)
+        // Configure fuel measurement characteristic (READ-only)
         fuelMeasurementCharacteristic = service.getCharacteristic(
             UUID.fromString(CamperGasUuids.WEIGHT_CHARACTERISTIC_UUID)
         )
@@ -227,7 +227,7 @@ class CamperGasBleService @Inject constructor(
             Log.w(TAG, "Característica de medición de combustible no encontrada")
         }
 
-        // Configurar característica de inclinación (READ-only)
+        // Configure inclination characteristic (READ-only)
         inclinationCharacteristic = service.getCharacteristic(
             UUID.fromString(CamperGasUuids.INCLINATION_CHARACTERISTIC_UUID)
         )
@@ -240,20 +240,20 @@ class CamperGasBleService @Inject constructor(
             Log.w(TAG, "UUID buscado: ${CamperGasUuids.INCLINATION_CHARACTERISTIC_UUID}")
         }
 
-        // Configurar característica offline (READ-only)
+        // Configure offline characteristic (READ-only)
         offlineCharacteristic = service.getCharacteristic(
             UUID.fromString(CamperGasUuids.OFFLINE_CHARACTERISTIC_UUID)
         )
         if (offlineCharacteristic != null) {
             Log.d(TAG, "Característica offline encontrada (READ-only)")
-            // Iniciar lectura automática de datos offline al conectar
+            // Start automatic offline data reading on connect
             Log.d(TAG, "Iniciando lectura automática de datos offline...")
             startAutomaticOfflineDataReading()
         } else {
             Log.w(TAG, "Característica offline no encontrada")
         }
 
-        // Iniciar lectura periódica de datos en tiempo real
+        // Start periodic real-time data reading
         loadConfigurationAndStartReading()
     }
 
@@ -263,14 +263,14 @@ class CamperGasBleService @Inject constructor(
     private fun loadConfigurationAndStartReading() {
         serviceScope.launch {
             try {
-                // Cargar configuración desde preferencias
+                // Load configuration from preferences
                 val weightInterval = preferencesDataStore.weightReadInterval.first()
                 val inclinationInterval = preferencesDataStore.inclinationReadInterval.first()
 
-                // Aplicar configuración
+                // Apply configuration
                 configureReadingIntervals(weightInterval, inclinationInterval)
 
-                // Iniciar lectura periódica
+                // Start periodic reading
                 startPeriodicDataReading()
             } catch (e: Exception) {
                 Log.e(TAG, "Error al cargar configuración: ${e.message}")
@@ -325,7 +325,7 @@ class CamperGasBleService @Inject constructor(
             Log.d(TAG, "Deteniendo lectura periódica actual...")
             stopPeriodicDataReading()
 
-            // Pequeña pausa antes de reiniciar
+            // Short pause before restarting
             serviceScope.launch {
                 delay(500)
                 if (isConnected()) {
@@ -347,7 +347,7 @@ class CamperGasBleService @Inject constructor(
     fun getInclinationReadInterval(): Long = inclinationReadInterval
 
     /**
-     * Reinicia la lectura periódica (útil cuando se cambian los intervalos)
+     * Reinicia la lectura periódica (útil when cambian los intervalos)
      */
     fun restartPeriodicDataReading() {
         if (isConnected()) {
@@ -379,26 +379,26 @@ class CamperGasBleService @Inject constructor(
                 try {
                     val currentTime = System.currentTimeMillis()
 
-                    // Leer peso si han pasado más del intervalo configurado desde la última lectura
+                    // Read weight if more than configured interval has passed since last reading
                     if (currentTime - lastWeightReadTime > weightReadInterval) {
                         readWeightData()
                         lastWeightReadTime = currentTime
                     }
 
-                    // Esperar un poco más antes de leer inclinación para evitar conflictos BLE
+                    // Wait a bit more before reading inclination to avoid BLE conflicts
                     delay(500)
 
-                    // Leer inclinación si han pasado más del intervalo configurado desde la última lectura
+                    // Read inclination if more than configured interval has passed since last reading
                     if (currentTime - lastInclinationReadTime > inclinationReadInterval) {
                         readInclinationData()
                         lastInclinationReadTime = currentTime
                     }
 
-                    // Pausa entre ciclos de verificación (1000ms)
+                    // Pause between verification cycles (1000ms)
                     delay(1000)
                 } catch (e: Exception) {
                     Log.e(TAG, "Error en lectura periódica: ${e.message}")
-                    delay(2000) // Pausa más larga en caso de error
+                    delay(2000) // Longer pause in case of error
                 }
             }
 
@@ -417,7 +417,7 @@ class CamperGasBleService @Inject constructor(
     }
 
     /**
-     * Lee datos de peso desde la característica
+     * Lee datos de peso desof the característica
      */
     private fun readWeightData() {
         queueBleRead {
@@ -446,7 +446,7 @@ class CamperGasBleService @Inject constructor(
     }
 
     /**
-     * Lee datos de inclinación desde la característica
+     * Lee datos de inclinación desof the característica
      */
     private fun readInclinationData() {
         queueBleRead {
@@ -523,7 +523,7 @@ class CamperGasBleService @Inject constructor(
                 isReadingInProgress = true
                 val nextRead = readingQueue.removeAt(0)
 
-                // Configurar timeout para la operación de lectura
+                // Configure timeout for read operation
                 readingTimeoutJob = serviceScope.launch {
                     delay(5000) // Timeout de 5 segundos
                     if (isReadingInProgress) {
@@ -554,8 +554,8 @@ class CamperGasBleService @Inject constructor(
     }
 
     /**
-     * Procesa datos de medición EN TIEMPO REAL del sensor
-     * Estos datos provienen de la característica WEIGHT_CHARACTERISTIC_UUID
+     * Procesa datos de medición EN TIEMPO REAL from sensor
+     * This data comes from the WEIGHT_CHARACTERISTIC_UUID characteristic
      * y se marcan automáticamente como isHistorical = false
      */
     private fun processFuelMeasurementData(data: ByteArray) {
@@ -667,8 +667,8 @@ class CamperGasBleService @Inject constructor(
     }
 
     /**
-     * Procesa datos OFFLINE/HISTÓRICOS del sensor
-     * Estos datos provienen de la característica OFFLINE_CHARACTERISTIC_UUID
+     * Procesa datos OFFLINE/HISTÓRICOS from sensor
+     * Estos datos provienen of the característica OFFLINE_CHARACTERISTIC_UUID
      * y se marcan automáticamente como isHistorical = true
      */
     private fun processOfflineData(data: ByteArray) {
@@ -683,7 +683,7 @@ class CamperGasBleService @Inject constructor(
              * Ejemplo: Si "t":300000, significa que la medición se tomó hace 5 minutos (300000 ms)
              */
 
-            // Verificar si los datos están vacíos, son "0", o indican fin de datos
+            // Verify if data is empty, is "0", or indicates end of data
             if (jsonString.isBlank() ||
                 jsonString == "[]" ||
                 jsonString == "{}" ||
@@ -698,7 +698,7 @@ class CamperGasBleService @Inject constructor(
             // Parsear JSON array: [{"w":25.1,"t":1234567890},{"w":25.3,"t":1234567900}]
             val jsonArray = JSONArray(jsonString)
 
-            // Si el array está vacío, hemos terminado
+            // If array is empty, we are done
             if (jsonArray.length() == 0) {
                 Log.d(TAG, "Array vacío recibido - fin de datos offline")
                 finishOfflineDataReading()
@@ -718,7 +718,7 @@ class CamperGasBleService @Inject constructor(
                         val weightValue = jsonObject.getDouble("w").toFloat()
                         val millisecondsAgo = jsonObject.getLong("t")
 
-                        // Crear una clave única para este dato (peso + tiempo relativo en milisegundos)
+                        // Create unique key for this data (weight + relative time in milliseconds)
                         val dataKey = "${weightValue}_${millisecondsAgo}"
 
                         if (!processedOfflineData.contains(dataKey)) {
@@ -737,9 +737,9 @@ class CamperGasBleService @Inject constructor(
                         val jsonObject = jsonArray.getJSONObject(i)
                         val weightValue = jsonObject.getDouble("w").toFloat()
                         val millisecondsAgo =
-                            jsonObject.getLong("t") // MILISEGUNDOS transcurridos desde que se tomó la medición
+                            jsonObject.getLong("t") // MILLISECONDS elapsed since measurement was taken
 
-                        // Crear una clave única para este dato
+                        // Create unique key for this data
                         val dataKey = "${weightValue}_${millisecondsAgo}"
 
                         // Si ya procesamos este dato exacto, saltarlo
@@ -754,7 +754,7 @@ class CamperGasBleService @Inject constructor(
                         // Marcar este dato como procesado
                         processedOfflineData.add(dataKey)
 
-                        // Calcular el timestamp real de cuando se tomó la medición
+                        // Calcular el timestamp real de when tomó la medición
                         val actualTimestamp = calculateHistoricalTimestamp(millisecondsAgo)
 
                         Log.d(
@@ -787,11 +787,11 @@ class CamperGasBleService @Inject constructor(
                             "📈 Total acumulado: ${allHistoryData.size} mediciones de combustible"
                         )
 
-                        // Guardar datos históricos del lote actual en la base de datos
+                        // Save historical data from current batch to database
                         try {
                             val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
                             if (activeCylinder != null) {
-                                // Guardar datos HISTÓRICOS/OFFLINE en la base de datos
+                                // Save HISTORICAL/OFFLINE data to database
                                 // Estos datos provienen de OFFLINE_CHARACTERISTIC_UUID y se marcan como isHistorical = true
                                 val result = saveFuelMeasurementUseCase.saveHistoricalMeasurements(
                                     cylinderId = activeCylinder.id,
@@ -856,9 +856,9 @@ class CamperGasBleService @Inject constructor(
                             )
                         }
 
-                        // Continuar leyendo más datos si estamos en modo de lectura continua y no hay duplicados
+                        // Continue reading more data if we are in continuous reading mode and there are no duplicates
                         if (isReadingOfflineData) {
-                            // Hacer una pausa pequeña antes de solicitar más datos
+                            // Make small pause before requesting more data
                             delay(100) // 100ms de pausa entre lecturas
                             continueOfflineDataReading()
                         }
@@ -901,10 +901,10 @@ class CamperGasBleService @Inject constructor(
     }
 
     fun disconnect() {
-        Log.d(TAG, "🔌 Iniciando desconexión del sensor CamperGas")
+        Log.d(TAG, "🔌 Iniciando desconexión from sensor CamperGas")
         Log.d(TAG, "🔌 Estado actual de conexión: ${_connectionState.value}")
 
-        // Detener lectura periódica
+        // Stop periodic reading
         stopPeriodicDataReading()
 
         // IMPORTANTE: Actualizar el estado inmediatamente
@@ -919,7 +919,7 @@ class CamperGasBleService @Inject constructor(
                 @SuppressLint("MissingPermission")
                 gatt.disconnect()
 
-                // Pequeña pausa antes de cerrar
+                // Short pause before closing
                 serviceScope.launch {
                     delay(100)
                     if (bleManager.hasBluetoothConnectPermission()) {
@@ -948,7 +948,7 @@ class CamperGasBleService @Inject constructor(
     private fun startAutomaticOfflineDataReading() {
         offlineCharacteristic?.let { characteristic ->
             bluetoothGatt?.let { gatt ->
-                // Verificar permisos antes de solicitar datos históricos
+                // Verify permissions before requesting historical data
                 if (!bleManager.hasBluetoothConnectPermission()) {
                     Log.e(TAG, "No hay permisos para lectura automática de datos offline")
                     return
@@ -959,9 +959,9 @@ class CamperGasBleService @Inject constructor(
                 // Inicializar la lectura continua de datos offline
                 startOfflineDataReading()
 
-                // Iniciar la primera lectura después de una pausa
+                // Start first reading after a pause
                 serviceScope.launch {
-                    delay(500) // Pausa para estabilizar la conexión
+                    delay(500) // Pause to stabilize connection
                     if (isReadingOfflineData) {
                         Log.d(TAG, "Ejecutando primera lectura de datos offline...")
                         continueOfflineDataReading()
@@ -1039,7 +1039,7 @@ class CamperGasBleService @Inject constructor(
             )
             Log.d(TAG, "🎯 Datos offline sincronizados automáticamente al conectar")
         } else {
-            Log.d(TAG, "ℹ️ No se encontraron datos offline en el sensor")
+            Log.d(TAG, "ℹ️ No se encontraron datos offline in the sensor")
         }
     }
 
@@ -1053,10 +1053,10 @@ class CamperGasBleService @Inject constructor(
     private fun cleanup() {
         Log.d(TAG, "🧹 Iniciando limpieza de recursos BLE")
 
-        // Detener lectura offline si está en progreso
+        // Stop offline reading if in progress
         stopOfflineDataReading()
 
-        // Detener lectura periódica si está en progreso
+        // Stop periodic reading if in progress
         stopPeriodicDataReading()
 
         bluetoothGatt = null
@@ -1064,7 +1064,7 @@ class CamperGasBleService @Inject constructor(
         inclinationCharacteristic = null
         offlineCharacteristic = null
 
-        // Limpiar estado de la cola de lecturas BLE
+        // Limpiar estado of the cola de lecturas BLE
         synchronized(readingQueue) {
             readingQueue.clear()
             isReadingInProgress = false
@@ -1072,7 +1072,7 @@ class CamperGasBleService @Inject constructor(
         readingTimeoutJob?.cancel()
         readingTimeoutJob = null
 
-        // Limpiar datos cuando se desconecta
+        // Limpiar datos when desconecta
         _fuelMeasurementData.value = null
         _fuelData.value = null
         _inclinationData.value = null

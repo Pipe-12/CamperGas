@@ -122,7 +122,7 @@ class InclinationViewModel @Inject constructor(
     }
 
     /**
-     * Solicita una lectura manual de datos de inclinación del sensor BLE
+     * Solicita una lectura manual de datos de inclinación from sensor BLE
      * Incluye protección contra múltiples peticiones seguidas
      */
     fun requestInclinationDataManually() {
@@ -153,5 +153,5 @@ data class WheelElevations(
     val rearRight: Float = 0f,
     val frontLeft: Float = 0f,
     val frontRight: Float = 0f,
-    val frontSupport: Float = 0f // Para el ruedín delantero de la caravana
+    val frontSupport: Float = 0f // Para el ruedín delantero of the caravana
 )

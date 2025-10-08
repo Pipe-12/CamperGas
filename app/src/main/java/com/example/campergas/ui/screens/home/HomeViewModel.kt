@@ -56,7 +56,7 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        // Intentar conectar con el último dispositivo utilizado
+        // Intentar conectar with the último dispositivo utilizado
         viewModelScope.launch {
             connectBleDeviceUseCase.getLastConnectedDevice().collectLatest { lastDeviceAddress ->
                 if (lastDeviceAddress.isNotEmpty() && !_connectionState.value) {
@@ -133,7 +133,7 @@ class HomeViewModel @Inject constructor(
     }
 
     /**
-     * Solicita una lectura única de todos los datos del sensor
+     * Solicita una lectura única de todos los datos from sensor
      * Se llama cada vez que se abre la pantalla Home
      */
     fun requestSensorDataOnScreenOpen() {

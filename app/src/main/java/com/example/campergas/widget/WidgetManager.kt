@@ -31,7 +31,7 @@ class WidgetManager @Inject constructor(
     }
     
     /**
-     * Actualiza todos los widgets de la aplicación
+     * Actualiza todos los widgets of the aplicación
      */
     fun updateAllWidgets() {
         updateGasCylinderWidgets()

@@ -66,7 +66,7 @@ fun SettingsScreen(
     var inclinationIntervalText by remember { mutableStateOf("") }
     var gasThresholdText by remember { mutableStateOf("") }
 
-    // Actualizar campos de texto cuando cambian los valores
+    // Actualizar campos de texto when changesn los valores
     LaunchedEffect(weightInterval) {
         weightIntervalText = weightInterval.toString()
     }
@@ -94,7 +94,7 @@ fun SettingsScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Botón de volver atrás y título
+        // Back button y título
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically

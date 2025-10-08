@@ -113,7 +113,7 @@ class GetConsumptionHistoryUseCase @Inject constructor(
 }
 
 /**
- * Representa un punto de datos para el gráfico
+ * Representa un punto de datos for the gráfico
  */
 data class ChartDataPoint(
     val date: Long,      // timestamp del día

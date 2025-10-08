@@ -1,7 +1,7 @@
 package com.example.campergas.domain.model
 
 object CamperGasUuids {
-    // Un único servicio para el sensor de peso con inclinación
+    // Un único servicio for the sensor de peso con inclinación
     const val SENSOR_SERVICE_UUID = "91bad492-b950-4226-aa2b-4ede9fa42f59"
 
     // Tres características dentro del mismo servicio
@@ -11,8 +11,8 @@ object CamperGasUuids {
 
     /**
      * Verifica si un dispositivo BLE es compatible con CamperGas
-     * @param serviceUuids Lista de UUIDs de servicios del dispositivo
-     * @return true si el dispositivo es compatible
+     * @param serviceUuids Lista de UUIDs de servicios of the device
+     * @return true if the device es compatible
      */
     fun isCompatibleDevice(serviceUuids: List<String>): Boolean {
         return serviceUuids.any { uuid ->

@@ -22,7 +22,7 @@ class ConsumptionViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ConsumptionUiState())
     val uiState: StateFlow<ConsumptionUiState> = _uiState.asStateFlow()
 
-    // Job para cancelar la corrutina de carga cuando sea necesario
+    // Job para cancelar la corrutina de carga whena necesario
     private var loadingJob: Job? = null
 
     init {

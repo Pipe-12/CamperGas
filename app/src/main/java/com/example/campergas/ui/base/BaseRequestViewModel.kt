@@ -35,7 +35,7 @@ abstract class BaseRequestViewModel(
     ) {
         val currentTime = System.currentTimeMillis()
 
-        // Verificar si ha pasado suficiente tiempo desde la última petición
+        // Verificar si ha pasado suficiente tiempo desof the última petición
         if (currentTime - lastRequestTime < requestCooldownMs) {
             android.util.Log.d(logTag, "⏱️ Petición bloqueada - cooldown activo")
             return

@@ -44,11 +44,11 @@ class BluetoothPermissionManager(
             }
         }
 
-        // Launcher para activar ubicación
+        // Launcher to activate location
         enableLocationLauncher = activity.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            // Verificar si la ubicación está ahora activada
+            // Verify if location is now active
             if (isLocationEnabled()) {
                 checkAndRequestPermissions()
             } else {
@@ -80,7 +80,7 @@ class BluetoothPermissionManager(
                     // Solicitar ACCESS_BACKGROUND_LOCATION por separado
                     requestPermissionsLauncher.launch(arrayOf(backgroundLocationPermission))
                 } else {
-                    // Todos los permisos necesarios están otorgados
+                    // All necessary permissions are granted
                     onPermissionsGranted()
                 }
             } else {
@@ -161,13 +161,13 @@ class BluetoothPermissionManager(
                         activity,
                         backgroundLocationPermission
                     ) != PackageManager.PERMISSION_GRANTED -> {
-                // Si los permisos normales están ok, solicitar background location si es necesario
+                // If normal permissions are ok, request background location if necessary
                 // Para Android 11+, este permiso debe solicitarse por separado
                 requestPermissionsLauncher.launch(arrayOf(backgroundLocationPermission))
             }
 
             else -> {
-                // Todos los permisos están otorgados
+                // All permissions are granted
                 onPermissionsGranted()
             }
         }
@@ -195,13 +195,13 @@ class BluetoothPermissionManager(
             )
         }
 
-        // Permiso de ubicación siempre necesario para BLE (desde API 23)
+        // Location permission always necessary for BLE (from API 23)
         permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
 
-        // ACCESS_COARSE_LOCATION también puede ser útil
+        // ACCESS_COARSE_LOCATION can also be useful
         permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
 
-        // Permiso de ubicación en segundo plano para Android 10+ si se usa BLE en background
+        // Background location permission for Android 10+ if BLE is used in background
         // IMPORTANTE: Este permiso debe solicitarse por separado en Android 11+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             permissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)

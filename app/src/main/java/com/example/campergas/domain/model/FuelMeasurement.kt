@@ -2,9 +2,9 @@ package com.example.campergas.domain.model
 
 data class FuelMeasurement(
     val id: Long = 0,
-    val cylinderId: Long, // ID de la bombona
-    val cylinderName: String, // Nombre de la bombona para referencia
-    val timestamp: Long, // Timestamp de cuando se tomó la medición
+    val cylinderId: Long, // ID of the bombona
+    val cylinderName: String, // Nombre of the bombona para referencia
+    val timestamp: Long, // Timestamp de when tomó la medición
     val fuelKilograms: Float, // Kilogramos de combustible disponible (ya calculados)
     val fuelPercentage: Float, // Porcentaje de combustible (0-100)
     val totalWeight: Float, // Peso total medido (bombona + combustible)
@@ -22,12 +22,12 @@ data class FuelMeasurement(
     fun getFormattedPercentage(): String = "%.1f%%".format(fuelPercentage)
 
     /**
-     * Formatea el peso total medido para mostrar en la UI
+     * Formatea el total weight medido para mostrar en la UI
      */
     fun getFormattedTotalWeight(): String = "%.2f kg".format(totalWeight)
 
     /**
-     * Obtiene la fecha formateada de la medición
+     * Gets formatted date of the medición
      */
     fun getFormattedTimestamp(): String {
         val date = java.util.Date(timestamp)

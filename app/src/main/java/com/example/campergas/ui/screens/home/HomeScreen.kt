@@ -67,7 +67,7 @@ fun HomeScreen(
 
     var showAddCylinderDialog by remember { mutableStateOf(false) }
 
-    // Hacer petición de datos del sensor al abrir la pantalla
+    // Hacer petición de datos from sensor al abrir la pantalla
     LaunchedEffect(Unit) {
         viewModel.requestSensorDataOnScreenOpen()
     }
@@ -149,7 +149,7 @@ fun HomeScreen(
                         isLargeButton = true,
                         verticalLayout = true
                     ) {
-                        // Mostrar la bombona con el porcentaje actual
+                        // Mostrar la bombona with the porcentaje actual
                         fuelData?.let { fuel ->
                             GasCylinderVisualizer(
                                 fuelPercentage = fuel.fuelPercentage,
@@ -248,7 +248,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Botón de conexión BLE
+                    // BLE connection button
                     ConfigurationButton(
                         title = stringResource(R.string.home_connect_ble_title),
                         text = "🔗",
@@ -256,7 +256,7 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f)
                     )
 
-                    // Botón de configuración
+                    // Configuration button
                     ConfigurationButton(
                         title = stringResource(R.string.home_configuration_title),
                         icon = Icons.Default.Settings,
@@ -264,7 +264,7 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f)
                     )
 
-                    // Botón de ajustes de vehículo
+                    // Vehicle settings button
                     val vehicleIcon = getVehicleIcon(vehicleConfig?.type)
                     ConfigurationButton(
                         title = stringResource(R.string.home_vehicle_settings_title),

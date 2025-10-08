@@ -113,7 +113,7 @@ private fun DrawScope.drawGasCylinder(
         cornerRadius = CornerRadius(cylinderWidth * 0.05f)
     )
 
-    // Dibujar el contorno principal de la bombona (más grueso)
+    // Dibujar el contorno principal of the bombona (más grueso)
     val strokeWidth = 8f
     drawRoundRect(
         color = Color.Gray,
@@ -122,7 +122,7 @@ private fun DrawScope.drawGasCylinder(
         cornerRadius = CornerRadius(cylinderWidth * 0.08f)
     )
 
-    // Dibujar el interior con el color de fondo según el tema
+    // Dibujar el interior with the color de fondo según el tema
     drawRoundRect(
         color = backgroundColor,
         topLeft = Offset(startX, startY + topCapHeight),
@@ -160,7 +160,7 @@ private fun DrawScope.drawGasCylinder(
         cornerRadius = CornerRadius(valveWidth * 0.15f)
     )
 
-    // Dibujar el pico de la válvula
+    // Dibujar el pico of the válvula
     val nozzleWidth = valveWidth * 0.4f
     val nozzleHeight = valveHeight * 0.3f
     val nozzleX = (size.width - nozzleWidth) / 2f

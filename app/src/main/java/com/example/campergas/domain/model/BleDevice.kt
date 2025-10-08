@@ -3,7 +3,7 @@ package com.example.campergas.domain.model
 data class BleDevice(
     val name: String,
     val address: String,
-    val rssi: Int, // Intensidad de la señal
+    val rssi: Int, // Intensidad of the señal
     val isConnected: Boolean = false,
     val services: List<String> = emptyList(), // UUIDs de servicios disponibles
     val isConnectable: Boolean = true,
@@ -24,13 +24,13 @@ data class BleDevice(
         get() = CamperGasUuids.isCompatibleDevice(services)
 
     /**
-     * Indica si el dispositivo tiene el servicio principal de CamperGas
+     * Indica if the device tiene el servicio principal de CamperGas
      */
     val hasCamperGasService: Boolean
         get() = services.any { CamperGasUuids.isSensorService(it) }
 
     /**
-     * Obtiene el tipo de dispositivo basado en el nombre
+     * Obtiene el tipo de dispositivo basado in the nombre
      */
     val deviceType: String
         get() = when {

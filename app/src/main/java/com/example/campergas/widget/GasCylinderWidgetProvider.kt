@@ -38,7 +38,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        // Asegurar que el servicio BLE está ejecutándose para las solicitudes periódicas
+        // Ensure BLE service is running for periodic requests
         ensureBleServiceRunning(context)
         
         for (appWidgetId in appWidgetIds) {
@@ -47,15 +47,15 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
     }
     
     override fun onEnabled(context: Context) {
-        // Este método se llama cuando se agrega el primer widget de este tipo
+        // This method is called when first widget of this type is added
         Log.d("GasCylinderWidget", "Primer widget añadido - iniciando servicio BLE")
         ensureBleServiceRunning(context)
     }
     
     override fun onDisabled(context: Context) {
-        // Este método se llama cuando se elimina el último widget de este tipo
+        // This method is called when last widget of this type is removed
         Log.d("GasCylinderWidget", "Último widget eliminado")
-        // Verificar si queda algún widget activo antes de detener el servicio
+        // Verify if any active widget remains before stopping service
         checkAndStopServiceIfNoWidgets(context)
     }
     
@@ -68,7 +68,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                 Log.w("GasCylinderWidget", "No se pudo iniciar servicio BLE - continuando sin servicio de fondo")
             }
         } catch (e: Exception) {
-            Log.e("GasCylinderWidget", "Error al iniciar servicio BLE", e)
+            Log.e("GasCylinderWidget", "Error on start servicio BLE", e)
             // Don't rethrow - this prevents infinite loops
         }
     }
@@ -104,7 +104,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                 val gasCylinderRepository = entryPoint.gasCylinderRepository()
                 val bleRepository = entryPoint.bleRepository()
                 
-                // Obtener solo datos actuales del sensor BLE
+                // Obtener solo datos actuales from sensor BLE
                 val currentFuelMeasurement = bleRepository.fuelMeasurementData.first()
                 val activeCylinder = gasCylinderRepository.getActiveCylinder().first()
                 val isConnected = bleRepository.connectionState.first()
@@ -118,7 +118,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                     views.setTextViewText(R.id.widget_fuel_percentage, currentFuelMeasurement.getFormattedPercentage())
                     views.setTextViewText(R.id.widget_fuel_kg, currentFuelMeasurement.getFormattedFuelKilograms())
                     
-                    // Crear imagen de la bombona
+                    // Crear imagen of the bombona
                     val cylinderBitmap = createCylinderBitmap(currentFuelMeasurement.fuelPercentage / 100f)
                     views.setImageViewBitmap(R.id.widget_cylinder_image, cylinderBitmap)
                 } else {
@@ -126,12 +126,12 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                     views.setTextViewText(R.id.widget_fuel_percentage, "--")
                     views.setTextViewText(R.id.widget_fuel_kg, "--")
                     
-                    // Imagen de bombona vacía
+                    // Empty cylinder image
                     val cylinderBitmap = createCylinderBitmap(0f)
                     views.setImageViewBitmap(R.id.widget_cylinder_image, cylinderBitmap)
                 }
 
-                // Configurar estado de conexión
+                // Configure connection state
                 val connectionText = if (isConnected) "🟢 Conectado" else "🔴 Desconectado"
                 views.setTextViewText(R.id.widget_connection_status, connectionText)
 
@@ -155,7 +155,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
     }
 
     private fun setupIntents(context: Context, views: RemoteViews) {
-        // Intent para abrir la aplicación
+        // Intent to open application
         val openAppIntent = Intent(context, MainActivity::class.java)
         val openAppPendingIntent = PendingIntent.getActivity(
             context, 0, openAppIntent, 
@@ -166,7 +166,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        // Solo manejar eventos estándar del widget
+        // Only handle standard widget events
     }
 
     private fun createCylinderBitmap(fillPercentage: Float): Bitmap {
@@ -182,20 +182,20 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
         // Fondo transparente
         canvas.drawColor(Color.TRANSPARENT)
 
-        // Dimensiones de la bombona
+        // Dimensiones of the bombona
         val cylinderWidth = width * 0.6f
         val cylinderHeight = height * 0.8f
         val startX = (width - cylinderWidth) / 2
         val startY = height * 0.1f
 
-        // Contorno de la bombona
+        // Contorno of the bombona
         paint.color = Color.GRAY
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = 8f
         val cylinderRect = RectF(startX, startY, startX + cylinderWidth, startY + cylinderHeight)
         canvas.drawRoundRect(cylinderRect, 20f, 20f, paint)
 
-        // Interior de la bombona (fondo)
+        // Interior of the bombona (fondo)
         paint.color = Color.WHITE
         paint.style = Paint.Style.FILL
         canvas.drawRoundRect(cylinderRect, 18f, 18f, paint)

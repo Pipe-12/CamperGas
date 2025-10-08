@@ -40,20 +40,20 @@ class WidgetUpdateManager @Inject constructor(
             }
         }
 
-        // Escuchar cambios en los datos de inclinación
+        // Listen for changes in inclination data
         scope.launch {
             bleRepository.inclinationData.collect { inclinationData ->
                 if (inclinationData != null) {
-                    // Actualizar widget de estabilidad del vehículo
+                    // Update vehicle stability widget
                     VehicleStabilityWidgetProvider.updateAllWidgets(context)
                 }
             }
         }
 
-        // Escuchar cambios en el estado de conexión
+        // Listen for changes in connection state
         scope.launch {
             bleRepository.connectionState.collect { isConnected ->
-                // Actualizar ambos widgets cuando cambie el estado de conexión
+                // Update both widgets when connection state changes
                 GasCylinderWidgetProvider.updateAllWidgets(context)
                 VehicleStabilityWidgetProvider.updateAllWidgets(context)
             }

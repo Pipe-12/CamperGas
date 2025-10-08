@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
- * Caso de uso para configurar los intervalos de lectura del sensor BLE
+ * Caso de uso para configurar los intervalos de lectura from sensor BLE
  */
 class ConfigureReadingIntervalsUseCase @Inject constructor(
     private val bleRepository: BleRepository

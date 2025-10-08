@@ -9,7 +9,7 @@ class GetFuelDataUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
     /**
-     * Obtiene los datos de combustible en tiempo real del sensor BLE
+     * Obtiene los datos de combustible en tiempo real from sensor BLE
      */
     operator fun invoke(): Flow<FuelMeasurement?> {
         return bleRepository.fuelData

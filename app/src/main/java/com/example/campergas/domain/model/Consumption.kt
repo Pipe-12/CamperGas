@@ -2,7 +2,7 @@ package com.example.campergas.domain.model
 
 /**
  * Modelo que representa un registro de consumo de combustible
- * Es una vista simplificada de FuelMeasurement enfocada en el historial de consumo
+ * Es una vista simplificada de FuelMeasurement enfocada in the historial de consumo
  */
 data class Consumption(
     val id: Long = 0,

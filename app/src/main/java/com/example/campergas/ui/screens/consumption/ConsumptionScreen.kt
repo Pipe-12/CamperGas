@@ -77,7 +77,7 @@ fun ConsumptionScreen(
             .statusBarsPadding()
             .padding(16.dp)
     ) {
-        // Botón de volver atrás y título
+        // Back button y título
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -153,7 +153,7 @@ fun ConsumptionScreen(
             val datePickerState = rememberDatePickerState()
             DatePicker(state = datePickerState)
 
-            // Aplicar la fecha seleccionada cuando se confirma
+            // Aplicar la fecha seleccionada when confirma
             LaunchedEffect(datePickerState.selectedDateMillis) {
                 datePickerState.selectedDateMillis?.let { selectedDate ->
                     val startOfDay = selectedDate - (selectedDate % (24 * 60 * 60 * 1000L))
@@ -184,7 +184,7 @@ fun ConsumptionScreen(
             val datePickerState = rememberDatePickerState()
             DatePicker(state = datePickerState)
 
-            // Aplicar la fecha seleccionada cuando se confirma
+            // Aplicar la fecha seleccionada when confirma
             LaunchedEffect(datePickerState.selectedDateMillis) {
                 datePickerState.selectedDateMillis?.let { selectedDate ->
                     val endOfDay = selectedDate + (24 * 60 * 60 * 1000L - 1)

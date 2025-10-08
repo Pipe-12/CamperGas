@@ -57,7 +57,7 @@ class BleDeviceScanner @Inject constructor(
     private fun addDeviceToList(device: BleDevice) {
         val currentList = _scanResults.value.toMutableList()
 
-        // Comprueba si el dispositivo ya está en la lista
+        // Comprueba if the device ya está en la lista
         val existingIndex = currentList.indexOfFirst { it.address == device.address }
 
         if (existingIndex >= 0) {

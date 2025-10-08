@@ -52,7 +52,7 @@ fun AddGasCylinderDialog(
                         name = it
                         nameError = it.isBlank()
                     },
-                    label = { Text("Nombre de la bombona") },
+                    label = { Text("Nombre of the bombona") },
                     placeholder = { Text("Ej: Bombona Principal") },
                     isError = nameError,
                     supportingText = if (nameError) {
@@ -67,7 +67,7 @@ fun AddGasCylinderDialog(
                         tare = it
                         tareError = it.toFloatOrNull() == null || it.toFloatOrNull()!! < 0
                     },
-                    label = { Text("Peso de la bombona vacía (kg)") },
+                    label = { Text("Peso of the bombona vacía (kg)") },
                     placeholder = { Text("Ej: 15.5") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = tareError,

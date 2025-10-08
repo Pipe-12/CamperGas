@@ -27,7 +27,7 @@ class BleConnectViewModel @Inject constructor(
     val connectionState = checkBleConnectionUseCase()
 
     init {
-        // Observar cambios en el estado de conexión
+        // Observar cambios in the estado de conexión
         viewModelScope.launch {
             connectionState.collect { isConnected ->
                 android.util.Log.d(
@@ -127,7 +127,7 @@ class BleConnectViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isConnecting = null,
-                    error = e.message ?: "Error al conectar con el dispositivo"
+                    error = e.message ?: "Error al conectar with the dispositivo"
                 )
             }
         }
@@ -151,7 +151,7 @@ class BleConnectViewModel @Inject constructor(
                     "BleConnectViewModel",
                     "🔌 Llamando a connectBleDeviceUseCase.disconnect()"
                 )
-                // Desconectar del dispositivo - el estado se actualizará automáticamente
+                // Desconectar of the device - el estado se actualizará automáticamente
                 // a través del observable connectionState del use case
                 connectBleDeviceUseCase.disconnect()
 
@@ -200,7 +200,7 @@ data class BleConnectUiState(
     val connectedDevice: BleDevice? = null,
     val isConnected: Boolean = false,
     val isScanning: Boolean = false,
-    val isConnecting: String? = null, // MAC address del dispositivo que se está conectando
+    val isConnecting: String? = null, // MAC address of the device que se está conectando
     val error: String? = null,
     val showOnlyCompatibleDevices: Boolean = false
 )
