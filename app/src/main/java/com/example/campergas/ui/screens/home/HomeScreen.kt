@@ -72,7 +72,7 @@ fun HomeScreen(
         viewModel.requestSensorDataOnScreenOpen()
     }
 
-    // Diálogo for agregar bombona
+    // Diálogo for agregar cylinder
     if (showAddCylinderDialog) {
         AddGasCylinderDialog(
             onDismiss = { showAddCylinderDialog = false },
@@ -149,7 +149,7 @@ fun HomeScreen(
                         isLargeButton = true,
                         verticalLayout = true
                     ) {
-                        // Mostrar la bombona with the porcentaje actual
+                        // Mostrar la cylinder with the porcentaje actual
                         fuelData?.let { fuel ->
                             GasCylinderVisualizer(
                                 fuelPercentage = fuel.fuelPercentage,
@@ -188,7 +188,7 @@ fun HomeScreen(
                     onClick = { navController.navigate(Screen.Inclination.route) },
                     isLargeButton = true
                 ) {
-                    // Mostrar vista compacta del vehículo con inclinación for la home screen
+                    // Show compact view of the vehicle with inclination for the home screen
                     vehicleConfig?.let { config ->
                         VehicleInclinationView(
                             vehicleType = config.type,
@@ -198,7 +198,7 @@ fun HomeScreen(
                             compact = true
                         )
                     } ?: run {
-                        // Vista por defecto si no hay configuración
+                        // Default view if there is no configuration
                         VehicleInclinationView(
                             vehicleType = VehicleType.CARAVAN,
                             pitchAngle = inclinationPitch,
@@ -330,7 +330,7 @@ private fun NavigationButtonWithPreview(
                     )
                 }
                 
-                // Content section (bombona, gráfico, etc.)
+                // Content section (cylinder, chart, etc.)
                 Box(
                     modifier = Modifier.weight(1f),
                     contentAlignment = Alignment.Center
@@ -368,7 +368,7 @@ private fun NavigationButtonWithPreview(
                     )
                 }
                 
-                // Contenido del preview (bombona, gráfico, etc.)
+                // Preview content (cylinder, chart, etc.)
                 Box(
                     modifier = Modifier.width(if (isLargeButton) 140.dp else 80.dp),
                     contentAlignment = Alignment.Center

@@ -30,11 +30,11 @@ class BleDeviceScanner @Inject constructor(
         @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val device = result.device
-            val deviceName = device.name ?: "Dispositivo desconocido"
+            val deviceName = device.name ?: "Unknown device"
             val deviceAddress = device.address
             val rssi = result.rssi
 
-            // Get servicios de los data del scan
+            // Get services from scan data
             val services = result.scanRecord?.serviceUuids?.map { it.toString() } ?: emptyList()
 
             val bleDevice = BleDevice(
@@ -64,7 +64,7 @@ class BleDeviceScanner @Inject constructor(
             // Updatesr device existente
             currentList[existingIndex] = device
         } else {
-            // Añadir nuevo device solo si pasa el filtro o si el filtro está desactivado
+            // Add nuevo device solo si pasa el filtro o si el filtro está desactivado
             if (!showOnlyCompatibleDevices || device.isCompatibleWithCamperGas) {
                 currentList.add(device)
             }

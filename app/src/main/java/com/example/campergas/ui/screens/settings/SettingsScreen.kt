@@ -94,7 +94,7 @@ fun SettingsScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Back button y título
+        // Back button y title
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -109,7 +109,7 @@ fun SettingsScreen(
             )
         }
 
-        // Mostrar state of operación si hay uno
+        // Show operation state if there is one
         operationStatus?.let { status ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -133,7 +133,7 @@ fun SettingsScreen(
             }
         }
 
-        // Configuración de tema
+        // Theme configuration
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -176,7 +176,7 @@ fun SettingsScreen(
             }
         }
 
-        // Configuración de idioma
+        // Language configuration
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -237,7 +237,7 @@ fun SettingsScreen(
             }
         }
 
-        // Configuración de notificaciones
+        // Notifications configuration
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -309,7 +309,7 @@ fun SettingsScreen(
                 }
             }
         }
-        // Configuración de intervalo of weight
+        // Interval configuration of weight
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -367,7 +367,7 @@ fun SettingsScreen(
             }
         }
 
-        // Configuración de intervalo of inclination
+        // Interval configuration of inclination
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -410,7 +410,7 @@ fun SettingsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = inclinationIntervalText.toIntOrNull()?.let { it in 1..300 } == true
                 ) {
-                    Text("Aplicar Intervalo de Inclinación")
+                    Text("Apply Inclination Interval")
                 }
 
                 Text(
@@ -425,7 +425,7 @@ fun SettingsScreen(
             }
         }
 
-        // Información adicional
+        // Additional information
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {

@@ -84,7 +84,7 @@ class SaveFuelMeasurementUseCaseTest {
 
         // Assert
         assertTrue(result.isFailure)
-        assertEquals("No hay bombona activa configurada", result.exceptionOrNull()?.message)
+        assertEquals("No active cylinder configured", result.exceptionOrNull()?.message)
 
         coVerify(exactly = 0) { fuelMeasurementRepository.insertMeasurement(any()) }
     }

@@ -67,7 +67,7 @@ fun BleConnectScreen(
     val uiState by viewModel.uiState.collectAsState()
     val connectionState by viewModel.connectionState.collectAsState()
 
-    // Estados for controlar diálogos de permisos
+    // States to control permission dialogs
     var showPermissionDialog by remember { mutableStateOf(false) }
     var showBluetoothDialog by remember { mutableStateOf(false) }
 
@@ -78,7 +78,7 @@ fun BleConnectScreen(
         }
     }
 
-    // Diálogo for activar Bluetooth
+    // Dialog to enable Bluetooth
     if (showBluetoothDialog) {
         BluetoothDisabledDialog(
             onAccept = {
@@ -90,7 +90,7 @@ fun BleConnectScreen(
         )
     }
 
-    // Diálogo for permisos
+    // Permissions dialog
     if (showPermissionDialog) {
         BluetoothPermissionDialog(
             onAccept = {
@@ -108,7 +108,7 @@ fun BleConnectScreen(
             .statusBarsPadding()
             .padding(16.dp)
     ) {
-        // Back button y título
+        // Back button y title
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -124,7 +124,7 @@ fun BleConnectScreen(
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        // Header con state of conexión
+        // Header with connection state
         ConnectionStatusCard(
             isConnected = connectionState,
             isScanning = uiState.isScanning,
@@ -377,7 +377,7 @@ private fun AvailableDeviceCard(
                     // Signal strength indicator
                     Icon(
                         imageVector = getSignalIcon(device.rssi),
-                        contentDescription = "Señal: ${device.signalStrength}",
+                        contentDescription = "Signal: ${device.signalStrength}",
                         modifier = Modifier.size(20.dp),
                         tint = getSignalColor(device.rssi)
                     )
@@ -420,7 +420,7 @@ private fun AvailableDeviceCard(
                 )
             }
 
-            // Información de compatibilidad
+            // Compatibility information
             if (device.isCompatibleWithCamperGas) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
@@ -507,7 +507,7 @@ fun ConnectionStatusCard(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = if (isConnected) "Sensor Connected" else "Conexión Bluetooth",
+                        text = if (isConnected) "Sensor Connected" else "Bluetooth Connection",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )

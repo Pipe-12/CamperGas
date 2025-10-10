@@ -55,9 +55,9 @@ class SaveFuelMeasurementUseCase @Inject constructor(
                 )
             }
 
-            // Get la bombona activa
+            // Get la cylinder activa
             val activeCylinder = gasCylinderRepository.getActiveCylinder().first()
-                ?: return Result.failure(Exception("No hay bombona activa configurada"))
+                ?: return Result.failure(Exception("No active cylinder configured"))
 
             // Calculatesr el combustible disponible
             val fuelKilograms = maxOf(0f, totalWeight - activeCylinder.tare)
@@ -119,7 +119,7 @@ class SaveFuelMeasurementUseCase @Inject constructor(
      * Saves multiple measurements HISTORICAL de combustible
      * This data comes from characteristics HISTORY y se marcan como isHistorical = true
      *
-     * @form cylinderId ID of the bombona a la que pertenecen las mediciones
+     * @form cylinderId ID of the cylinder a la que pertenecen las mediciones
      * @form weightMeasurements Lista de pares (total weight, timestamp)
      */
     suspend fun saveHistoricalMeasurements(
@@ -162,17 +162,17 @@ class SaveFuelMeasurementUseCase @Inject constructor(
     }
 
     /**
-     * Detecta y elimina erroneous measurements (outliers) basándose en patrones of weight.
+     * Detects and removes erroneous measurements (outliers) based on weight patterns.
      * 
-     * Cuando una measurement se desvía sustancialmente of the tendencia y luego vuelve a valores
+     * When a measurement deviates substantially from the trend and then returns to values
      * normales, la measurement desviada se considera un error y se elimina.
      * 
-     * Patrón de detección:
+     * Detection pattern:
      * - Anterior: peso normal
      * - Outlier: peso sustancialmente diferente (>30% cambio)
      * - Actual: peso similar al anterior (vuelve a la normalidad)
      *
-     * @form cylinderId ID of the bombona for analizar
+     * @form cylinderId ID of the cylinder for analizar
      */
     private suspend fun detectAndRemoveOutliers(cylinderId: Long) {
         try {
@@ -204,17 +204,17 @@ class SaveFuelMeasurementUseCase @Inject constructor(
     }
 
     /**
-     * Determina si una measurement es un outlier basándose in the patrón:
+     * Determines if a measurement is an outlier based on the pattern:
      * previous -> outlier -> current
      * 
      * Una measurement se considera outlier si:
-     * 1. Se desvía sustancialmente (>30%) del valor anterior
+     * 1. Deviates substantially (>30%) from previous value
      * 2. El valor actual regresa cerca del valor anterior (diferencia <30%)
-     * 3. La desviación del outlier es mayor que la desviación entre anterior y actual
+     * 3. The outlier deviation is greater than the deviation between previous and current
      *
-     * @form previous Medición anterior
-     * @form outlier Medición candidata a outlier  
-     * @form current Medición actual
+     * @form previous Previous measurement
+     * @form outlier Candidate outlier measurement  
+     * @form current Current measurement
      * @return true si la measurement del medio es un outlier
      */
     private fun isOutlierMeasurement(

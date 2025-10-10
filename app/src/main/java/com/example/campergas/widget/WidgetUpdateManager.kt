@@ -27,7 +27,7 @@ class WidgetUpdateManager @Inject constructor(
         // Escuchar cambios en las mediciones de combustible
         scope.launch {
             fuelMeasurementRepository.getLatestRealTimeMeasurement().collect { fuelMeasurement ->
-                // Updatesr widget de bombona de gas siempre, con o sin data
+                // Updatesr widget de cylinder de gas siempre, con o sin data
                 GasCylinderWidgetProvider.updateAllWidgets(context)
             }
         }

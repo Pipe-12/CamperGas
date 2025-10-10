@@ -82,7 +82,7 @@ class GetConsumptionHistoryUseCase @Inject constructor(
                 // El consumption es la diferencia: measurement inicial - measurement final
                 val calculatedConsumption = lastMeasurement.fuelKilograms - firstMeasurement.fuelKilograms
                 
-                // Evitar valores negativos (puede ocurrir durante recargas de bombonas)
+                // Evitar valores negativos (puede ocurrir durante recargas de cylinders)
                 // En caso de recarga, el consumption se considera 0 for ese period
                 kotlin.math.max(0f, calculatedConsumption)
             }
@@ -90,7 +90,7 @@ class GetConsumptionHistoryUseCase @Inject constructor(
     }
 
     /**
-     * Prefor data for gráfico agrupando consumptions por día
+     * Prefor data for chart agrupando consumptions por día
      */
     fun prepareChartData(consumptions: List<Consumption>): List<ChartDataPoint> {
         if (consumptions.isEmpty()) return emptyList()
@@ -113,7 +113,7 @@ class GetConsumptionHistoryUseCase @Inject constructor(
 }
 
 /**
- * Representa un punto of data for the gráfico
+ * Representa un punto of data for the chart
  */
 data class ChartDataPoint(
     val date: Long,      // timestamp del día

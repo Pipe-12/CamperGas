@@ -23,16 +23,16 @@ class BleConnectViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(BleConnectUiState())
     val uiState: StateFlow<BleConnectUiState> = _uiState.asStateFlow()
 
-    // Observar state of conexión
+    // Observe connection state
     val connectionState = checkBleConnectionUseCase()
 
     init {
-        // Observar cambios in the state of conexión
+        // Observe changes in connection state
         viewModelScope.launch {
             connectionState.collect { isConnected ->
                 android.util.Log.d(
                     "BleConnectViewModel",
-                    "🔄 Estado de conexión cambió a: $isConnected"
+                    "🔄 Connection state changed to: $isConnected"
                 )
                 _uiState.value = _uiState.value.copy(
                     isConnected = isConnected,
@@ -136,9 +136,9 @@ class BleConnectViewModel @Inject constructor(
     fun disconnectDevice() {
         viewModelScope.launch {
             try {
-                android.util.Log.d("BleConnectViewModel", "🔌 Iniciando desconexión from ViewModel")
+                android.util.Log.d("BleConnectViewModel", "🔌 Starting disconnection from ViewModel")
 
-                // Detener escaneo si está activo
+                // Stop scan if active
                 if (_uiState.value.isScanning) {
                     android.util.Log.d(
                         "BleConnectViewModel",
@@ -151,12 +151,12 @@ class BleConnectViewModel @Inject constructor(
                     "BleConnectViewModel",
                     "🔌 Llamando a connectBleDeviceUseCase.disconnect()"
                 )
-                // Desconectar of the device - el estado se actualizará automáticamente
-                // a través del observable connectionState del use case
+                // Disconnect from device - state will update automatically
+                // through observable connectionState from use case
                 connectBleDeviceUseCase.disconnect()
 
                 android.util.Log.d("BleConnectViewModel", "🔌 Limpiando estado local del ViewModel")
-                // Solo limpiar data locales del UI, no el state of conexión
+                // Only clear local UI data, not connection state
                 _uiState.value = _uiState.value.copy(
                     connectedDevice = null,
                     isConnecting = null,
@@ -166,7 +166,7 @@ class BleConnectViewModel @Inject constructor(
 
                 android.util.Log.d(
                     "BleConnectViewModel",
-                    "🔌 Desconexión completada from ViewModel"
+                    "🔌 Disconnection completed from ViewModel"
                 )
 
             } catch (e: Exception) {
@@ -186,7 +186,7 @@ class BleConnectViewModel @Inject constructor(
         return scanBleDevicesUseCase.isBluetoothEnabled()
     }
 
-    // Gestión de filtros
+    // Filter management
     fun toggleCompatibleDevicesFilter() {
         scanBleDevicesUseCase.toggleCompatibleDevicesFilter()
         _uiState.value = _uiState.value.copy(
@@ -200,7 +200,7 @@ data class BleConnectUiState(
     val connectedDevice: BleDevice? = null,
     val isConnected: Boolean = false,
     val isScanning: Boolean = false,
-    val isConnecting: String? = null, // MAC address of the device que se está conectando
+    val isConnecting: String? = null, // MAC address of the device that is connecting
     val error: String? = null,
     val showOnlyCompatibleDevices: Boolean = false
 )

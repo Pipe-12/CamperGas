@@ -28,7 +28,7 @@ class InclinationViewModel @Inject constructor(
     val uiState: StateFlow<InclinationUiState> = _uiState.asStateFlow()
 
     init {
-        // Loadr configuración del vehículo
+        // Load vehicle configuration
         loadVehicleConfig()
 
         // Get data of inclination en real time
@@ -65,7 +65,7 @@ class InclinationViewModel @Inject constructor(
                         distanceToFrontSupport = config.distanceToFrontSupport,
                         distanceBetweenFrontWheels = config.distanceBetweenFrontWheels ?: 0f
                     ).let { newState ->
-                        // Recalcular elevaciones con la nueva configuración
+                        // Recalculate elevations with new configuration
                         newState.copy(wheelElevations = calculateWheelElevations(newState))
                     }
                 }
@@ -74,7 +74,7 @@ class InclinationViewModel @Inject constructor(
     }
 
     /**
-     * Calculates la elevación necesaria for cada rueda basándose en la inclinación
+     * Calculates necessary elevation for each wheel based on inclination
      */
     private fun calculateWheelElevations(state: InclinationUiState): WheelElevations {
         if (state.distanceBetweenRearWheels == 0f || state.distanceToFrontSupport == 0f) {
@@ -85,7 +85,7 @@ class InclinationViewModel @Inject constructor(
         val pitchRad = Math.toRadians(state.inclinationPitch.toDouble())
         val rollRad = Math.toRadians(state.inclinationRoll.toDouble())
 
-        // Calculatesr elevaciones basándose en las distancias configuradas
+        // Calculate elevations based on configured distances
         val halfRearWheelDistance = state.distanceBetweenRearWheels / 2
 
         // Para el roll (alabeo lateral)
@@ -97,7 +97,7 @@ class InclinationViewModel @Inject constructor(
 
         return when (state.vehicleType) {
             VehicleType.CARAVAN -> {
-                // Caravana: ruedas traseras + ruedín delantero
+                // Caravan: rear wheels + front support wheel
                 WheelElevations(
                     rearLeft = rearLeftElevationRoll.toFloat(),
                     rearRight = rearRightElevationRoll.toFloat(),
@@ -123,19 +123,19 @@ class InclinationViewModel @Inject constructor(
 
     /**
      * Solicita una lectura manual of data of inclination from sensor BLE
-     * Incluye protección contra múltiples peticiones seguidas
+     * Includes protection against multiple consecutive requests
      */
     fun requestInclinationDataManually() {
         executeManualRequest(
             requestAction = { requestInclinationDataUseCase() },
             logTag = "InclinationViewModel",
-            dataTypeDescription = "inclinación"
+            dataTypeDescription = "inclination"
         )
     }
 }
 
 data class InclinationUiState(
-    val inclinationPitch: Float = 0f, // Cabeceo (adelante/atrás)
+    val inclinationPitch: Float = 0f, // Pitch (front/back)
     val inclinationRoll: Float = 0f,  // Alabeo (lado a lado)
     val isLevel: Boolean = false,
     val isLoading: Boolean = true,
@@ -153,5 +153,5 @@ data class WheelElevations(
     val rearRight: Float = 0f,
     val frontLeft: Float = 0f,
     val frontRight: Float = 0f,
-    val frontSupport: Float = 0f // Para el ruedín delantero of the caravana
+    val frontSupport: Float = 0f // For the front support wheel of the caravana
 )

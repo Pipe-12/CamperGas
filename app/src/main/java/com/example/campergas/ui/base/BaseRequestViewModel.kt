@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 /**
  * Base ViewModel for manejar peticiones manuales con cooldown y control de spam
- * Centraliza la lógica común de los ViewModels que hacen peticiones BLE bajo demanda
+ * Centralizes common logic of ViewModels that make on-demand BLE requests
  */
 abstract class BaseRequestViewModel(
     private val checkBleConnectionUseCase: CheckBleConnectionUseCase
@@ -23,10 +23,10 @@ abstract class BaseRequestViewModel(
     val isRequestingData: StateFlow<Boolean> = _isRequestingData
 
     /**
-     * Ejecuta una petición manual con protección contra spam
-     * @form requestAction La acción específica a ejecutar (use case específico)
+     * Executes a manual request with spam protection
+     * @form requestAction The specific action to execute (use case specific)
      * @form logTag Tag for los logs de debug
-     * @form dataTypeDescription Descripción del tipo of data for los logs
+     * @form dataTypeDescription Description of data type for logs
      */
     protected fun executeManualRequest(
         requestAction: () -> Unit,
@@ -35,15 +35,15 @@ abstract class BaseRequestViewModel(
     ) {
         val currentTime = System.currentTimeMillis()
 
-        // Verificar si ha pasado suficiente tiempo desof the última petición
+        // Verify if enough time has passed since the last request
         if (currentTime - lastRequestTime < requestCooldownMs) {
-            android.util.Log.d(logTag, "⏱️ Petición bloqueada - cooldown activo")
+            android.util.Log.d(logTag, "⏱️ Request blocked - cooldown active")
             return
         }
 
-        // Verificar si ya hay una petición en curso
+        // Verify if there is already a request in progress
         if (_isRequestingData.value) {
-            android.util.Log.d(logTag, "⏱️ Petición bloqueada - ya hay una en curso")
+            android.util.Log.d(logTag, "⏱️ Request blocked - one already in progress")
             return
         }
 
@@ -53,7 +53,7 @@ abstract class BaseRequestViewModel(
 
         requestAction()
 
-        // Resetear el state ofspués de un tiempo razonable
+        // Reset state after a reasonable time
         viewModelScope.launch {
             kotlinx.coroutines.delay(1500) // 1.5 segundos
             _isRequestingData.value = false
@@ -61,14 +61,14 @@ abstract class BaseRequestViewModel(
     }
 
     /**
-     * Verifies if hay una conexión BLE activa
+     * Verifies if there is an active BLE connection
      */
     fun isConnected(): Boolean {
         return checkBleConnectionUseCase.isConnected()
     }
 
     /**
-     * Verifies if se puede hacer una nueva petición (no está en cooldown)
+     * Verifies if a new request can be made (no está en cooldown)
      */
     fun canMakeRequest(): Boolean {
         val currentTime = System.currentTimeMillis()

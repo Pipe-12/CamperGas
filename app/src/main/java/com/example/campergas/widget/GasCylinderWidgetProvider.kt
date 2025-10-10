@@ -48,13 +48,13 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
     
     override fun onEnabled(context: Context) {
         // This method is called when first widget of this type is added
-        Log.d("GasCylinderWidget", "Primer widget añadido - iniciando servicio BLE")
+        Log.d("GasCylinderWidget", "First widget added - starting service BLE")
         ensureBleServiceRunning(context)
     }
     
     override fun onDisabled(context: Context) {
         // This method is called when last widget of this type is removed
-        Log.d("GasCylinderWidget", "Último widget eliminado")
+        Log.d("GasCylinderWidget", "Last widget removed")
         // Verify if any active widget remains before stopping service
         checkAndStopServiceIfNoWidgets(context)
     }
@@ -118,11 +118,11 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                     views.setTextViewText(R.id.widget_fuel_percentage, currentFuelMeasurement.getFormattedPercentage())
                     views.setTextViewText(R.id.widget_fuel_kg, currentFuelMeasurement.getFormattedFuelKilograms())
                     
-                    // Crear imagen of the bombona
+                    // Crear imagen of the cylinder
                     val cylinderBitmap = createCylinderBitmap(currentFuelMeasurement.fuelPercentage / 100f)
                     views.setImageViewBitmap(R.id.widget_cylinder_image, cylinderBitmap)
                 } else {
-                    views.setTextViewText(R.id.widget_cylinder_name, "Sin bombona activa")
+                    views.setTextViewText(R.id.widget_cylinder_name, "Sin cylinder activa")
                     views.setTextViewText(R.id.widget_fuel_percentage, "--")
                     views.setTextViewText(R.id.widget_fuel_kg, "--")
                     
@@ -182,20 +182,20 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
         // Fondo transparente
         canvas.drawColor(Color.TRANSPARENT)
 
-        // Dimensiones of the bombona
+        // Dimensiones of the cylinder
         val cylinderWidth = width * 0.6f
         val cylinderHeight = height * 0.8f
         val startX = (width - cylinderWidth) / 2
         val startY = height * 0.1f
 
-        // Contorno of the bombona
+        // Contorno of the cylinder
         paint.color = Color.GRAY
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = 8f
         val cylinderRect = RectF(startX, startY, startX + cylinderWidth, startY + cylinderHeight)
         canvas.drawRoundRect(cylinderRect, 20f, 20f, paint)
 
-        // Interior of the bombona (fondo)
+        // Interior of the cylinder (fondo)
         paint.color = Color.WHITE
         paint.style = Paint.Style.FILL
         canvas.drawRoundRect(cylinderRect, 18f, 18f, paint)

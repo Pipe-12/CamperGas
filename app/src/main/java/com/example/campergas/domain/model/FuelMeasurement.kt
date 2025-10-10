@@ -2,13 +2,13 @@ package com.example.campergas.domain.model
 
 data class FuelMeasurement(
     val id: Long = 0,
-    val cylinderId: Long, // ID of the bombona
-    val cylinderName: String, // Nombre of the bombona for referencia
-    val timestamp: Long, // Timestamp de when tomó la measurement
+    val cylinderId: Long, // ID of the cylinder
+    val cylinderName: String, // Nombre of the cylinder for referencia
+    val timestamp: Long, // Timestamp of when measurement was taken
     val fuelKilograms: Float, // Kilogramos de combustible disponible (ya calculados)
     val fuelPercentage: Float, // Porcentaje de combustible (0-100)
-    val totalWeight: Float, // Peso total medido (bombona + combustible)
-    val isCalibrated: Boolean = true, // Indica si la measurement está calibrada
+    val totalWeight: Float, // Peso total medido (cylinder + combustible)
+    val isCalibrated: Boolean = true, // Indicates if measurement is calibrated
     val isHistorical: Boolean = false // Indica si es un dato historical
 ) {
     /**

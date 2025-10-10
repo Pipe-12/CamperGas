@@ -25,7 +25,7 @@ class ConsumptionRepository @Inject constructor(
     }
 
     /**
-     * Gets los registros de consumption de una bombona específica
+     * Gets los registros de consumption de una cylinder específica
      */
     fun getConsumptionsByCylinder(cylinderId: Long): Flow<List<Consumption>> {
         return fuelMeasurementRepository.getMeasurementsByCylinder(cylinderId).map { measurements ->
@@ -44,7 +44,7 @@ class ConsumptionRepository @Inject constructor(
     }
 
     /**
-     * Gets los registros de consumption de una bombona en un rango de dates
+     * Gets los registros de consumption de una cylinder en un rango de dates
      */
     fun getConsumptionsByCylinderAndDateRange(
         cylinderId: Long,

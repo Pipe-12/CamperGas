@@ -22,7 +22,7 @@ class BleManager @Inject constructor(
         get() = bluetoothManager.adapter
 
     /**
-     * Verifies if Bluetooth está habilitado in the device
+     * Verifies if Bluetooth is enabled in the device
      */
     fun isBluetoothEnabled(): Boolean {
         return bluetoothAdapter?.isEnabled == true

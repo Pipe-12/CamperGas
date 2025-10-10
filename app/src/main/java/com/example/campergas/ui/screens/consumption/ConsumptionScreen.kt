@@ -77,7 +77,7 @@ fun ConsumptionScreen(
             .statusBarsPadding()
             .padding(16.dp)
     ) {
-        // Back button y título
+        // Back button y title
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -121,7 +121,7 @@ fun ConsumptionScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Gráfico de consumption
+        // Consumption chart
         if (uiState.chartData.isNotEmpty()) {
             ConsumptionChart(
                 chartData = uiState.chartData,
@@ -244,7 +244,7 @@ fun DateFiltersSection(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Filtros rápidos
+            // Quick filters
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -291,7 +291,7 @@ fun DateFiltersSection(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Selección de dates específicas
+            // Specific dates selection
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -388,12 +388,12 @@ fun ConsumptionSummarySection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 SummaryItem(
-                    title = "Últimas 24h",
+                    title = "Last 24h",
                     value = lastDayConsumption,
                     modifier = Modifier.weight(1f)
                 )
                 SummaryItem(
-                    title = "Última semana",
+                    title = "Last week",
                     value = lastWeekConsumption,
                     modifier = Modifier.weight(1f)
                 )
@@ -406,14 +406,14 @@ fun ConsumptionSummarySection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 SummaryItem(
-                    title = "Último mes",
+                    title = "Last month",
                     value = lastMonthConsumption,
                     modifier = Modifier.weight(1f)
                 )
                 
                 if (hasCustomPeriod && startDate != null && endDate != null) {
                     SummaryItem(
-                        title = "Período seleccionado",
+                        title = "Selected period",
                         subtitle = "${formatDateOnly(startDate)} - ${formatDateOnly(endDate)}",
                         value = customPeriodConsumption,
                         modifier = Modifier.weight(1f)

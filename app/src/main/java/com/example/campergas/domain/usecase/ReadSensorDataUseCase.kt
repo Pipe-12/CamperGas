@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 /**
  * Caso de uso for leer data from sensor CamperGas bajo demanda
- * Permite solicitar readings específicas of weight e inclinación
+ * Permite solicitar readings específicas of weight e inclination
  */
 class ReadSensorDataUseCase @Inject constructor(
     private val bleRepository: BleRepository
@@ -29,7 +29,7 @@ class ReadSensorDataUseCase @Inject constructor(
     }
 
     /**
-     * Solicita lectura de todos los data from sensor (peso e inclinación) bajo demanda
+     * Solicita lectura of all data from sensor (peso e inclination) bajo demanda
      * Los data se actualizarán en sus StateFlows correspondientes
      */
     fun readAllSensorData() {

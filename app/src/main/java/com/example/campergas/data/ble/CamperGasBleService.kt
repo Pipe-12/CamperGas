@@ -39,7 +39,7 @@ import javax.inject.Singleton
  * - Offline: data historical en lotes (lectura continua al conectar)
  *
  * IMPORTANTE: El sensor ahora usa modo READ en lugar de notificaciones.
- * La aplicación debe solicitar activamente los data leyendo las characteristics.
+ * The application must actively request data by reading the characteristics.
  */
 @Singleton
 class CamperGasBleService @Inject constructor(
@@ -119,10 +119,10 @@ class CamperGasBleService @Inject constructor(
 
                     // Only update if we have not forced disconnection yet
                     if (_connectionState.value) {
-                        Log.d(TAG, "❌ Updatesndo state of conexión from callback")
+                        Log.d(TAG, "❌ Updating connection state from callback")
                         _connectionState.value = false
                     } else {
-                        Log.d(TAG, "❌ Estado ya había sido actualizado manualmente")
+                        Log.d(TAG, "❌ State was already updated manually")
                     }
 
                     _isLoadingHistory.value = false
@@ -132,7 +132,7 @@ class CamperGasBleService @Inject constructor(
 
                     // If disconnection was unexpected (status != 0), log it
                     if (status != BluetoothGatt.GATT_SUCCESS) {
-                        Log.w(TAG, "⚠️ Desconexión inesperada - status: $status")
+                        Log.w(TAG, "⚠️ Unexpected disconnection - status: $status")
                     }
                 }
 
@@ -222,9 +222,9 @@ class CamperGasBleService @Inject constructor(
             UUID.fromString(CamperGasUuids.WEIGHT_CHARACTERISTIC_UUID)
         )
         if (fuelMeasurementCharacteristic != null) {
-            Log.d(TAG, "Característica de measurement de combustible encontrada (READ-only)")
+            Log.d(TAG, "Fuel measurement characteristic found (READ-only)")
         } else {
-            Log.w(TAG, "Característica de measurement de combustible no encontrada")
+            Log.w(TAG, "Fuel measurement characteristic not found")
         }
 
         // Configure inclination characteristic (READ-only)
@@ -232,11 +232,11 @@ class CamperGasBleService @Inject constructor(
             UUID.fromString(CamperGasUuids.INCLINATION_CHARACTERISTIC_UUID)
         )
         if (inclinationCharacteristic != null) {
-            Log.d(TAG, "Característica of inclination encontrada (READ-only)")
-            Log.d(TAG, "UUID inclinación: ${inclinationCharacteristic?.uuid}")
-            Log.d(TAG, "Propiedades inclinación: ${inclinationCharacteristic?.properties}")
+            Log.d(TAG, "Inclination characteristic found (READ-only)")
+            Log.d(TAG, "UUID inclination: ${inclinationCharacteristic?.uuid}")
+            Log.d(TAG, "Propiedades inclination: ${inclinationCharacteristic?.properties}")
         } else {
-            Log.w(TAG, "Característica of inclination no encontrada")
+            Log.w(TAG, "Inclination characteristic not found")
             Log.w(TAG, "UUID buscado: ${CamperGasUuids.INCLINATION_CHARACTERISTIC_UUID}")
         }
 
@@ -407,13 +407,13 @@ class CamperGasBleService @Inject constructor(
     }
 
     /**
-     * Detiene la lectura periódica of data en real time
+     * Stops periodic real-time data reading
      */
     private fun stopPeriodicDataReading() {
         isPeriodicReadingActive = false
         periodicReadingJob?.cancel()
         periodicReadingJob = null
-        Log.d(TAG, "Lectura periódica of data en real time detenida")
+        Log.d(TAG, "Periodic real-time data reading stopped")
     }
 
     /**
@@ -438,7 +438,7 @@ class CamperGasBleService @Inject constructor(
                     }
                 }
             } ?: run {
-                Log.e(TAG, "Característica of weight no disponible")
+                Log.e(TAG, "Weight characteristic not available")
                 isReadingInProgress = false
                 processNextReadingInQueue()
             }
@@ -459,7 +459,7 @@ class CamperGasBleService @Inject constructor(
                         if (!success) {
                             Log.e(
                                 TAG,
-                                "Error al leer data of inclination - readCharacteristic() retornó false"
+                                "Error reading inclination data - readCharacteristic() returned false"
                             )
                             isReadingInProgress = false
                             processNextReadingInQueue()
@@ -473,7 +473,7 @@ class CamperGasBleService @Inject constructor(
                     }
                 }
             } ?: run {
-                Log.e(TAG, "Característica of inclination no disponible")
+                Log.e(TAG, "Inclination characteristic not available")
                 isReadingInProgress = false
                 processNextReadingInQueue()
             }
@@ -481,7 +481,7 @@ class CamperGasBleService @Inject constructor(
     }
 
     /**
-     * Function pública for leer data of weight bajo demanda
+     * Public function to read weight data on demand
      */
     fun readWeightDataOnDemand() {
         if (!isConnected()) {
@@ -492,7 +492,7 @@ class CamperGasBleService @Inject constructor(
     }
 
     /**
-     * Function pública for leer data of inclination bajo demanda
+     * Public function to read inclination data on demand
      */
     fun readInclinationDataOnDemand() {
         if (!isConnected()) {
@@ -847,7 +847,7 @@ class CamperGasBleService @Inject constructor(
                                     }
                                 )
                             } else {
-                                Log.w(TAG, "No hay bombona activa - data historical NO saveds")
+                                Log.w(TAG, "No hay cylinder activa - data historical NO saveds")
                             }
                         } catch (e: Exception) {
                             Log.e(

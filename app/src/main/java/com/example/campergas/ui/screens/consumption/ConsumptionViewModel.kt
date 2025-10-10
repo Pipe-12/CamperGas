@@ -90,7 +90,7 @@ class ConsumptionViewModel @Inject constructor(
     }
 
     /**
-     * Método helper for reducir duplicación de código en filtros de date
+     * Helper method to reduce code duplication en filtros de date
      */
     private fun setDateRangeFromCalendar(calendarField: Int, amount: Int) {
         val calendar = Calendar.getInstance()

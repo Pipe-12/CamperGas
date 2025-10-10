@@ -52,7 +52,7 @@ fun AddGasCylinderDialog(
                         name = it
                         nameError = it.isBlank()
                     },
-                    label = { Text("Nombre of the bombona") },
+                    label = { Text("Nombre of the cylinder") },
                     placeholder = { Text("Ej: Bombona Principal") },
                     isError = nameError,
                     supportingText = if (nameError) {
@@ -67,12 +67,12 @@ fun AddGasCylinderDialog(
                         tare = it
                         tareError = it.toFloatOrNull() == null || it.toFloatOrNull()!! < 0
                     },
-                    label = { Text("Peso of the bombona vacía (kg)") },
+                    label = { Text("Empty cylinder weight (kg)") },
                     placeholder = { Text("Ej: 15.5") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = tareError,
                     supportingText = if (tareError) {
-                        { Text("Introduce un peso válido") }
+                        { Text("Enter a valid weight") }
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -88,7 +88,7 @@ fun AddGasCylinderDialog(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = capacityError,
                     supportingText = if (capacityError) {
-                        { Text("Introduce una capacidad válida") }
+                        { Text("Enter a valid capacity") }
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -101,7 +101,7 @@ fun AddGasCylinderDialog(
                         onCheckedChange = { setAsActive = it }
                     )
                     Text(
-                        text = "Establecer como bombona activa",
+                        text = "Establecer como cylinder activa",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -123,7 +123,7 @@ fun AddGasCylinderDialog(
                         tare.toFloatOrNull() != null && tare.toFloatOrNull()!! >= 0 &&
                         capacity.toFloatOrNull() != null && capacity.toFloatOrNull()!! > 0
             ) {
-                Text("Añadir")
+                Text("Add")
             }
         },
         dismissButton = {

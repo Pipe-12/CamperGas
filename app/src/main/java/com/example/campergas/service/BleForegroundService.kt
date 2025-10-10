@@ -147,7 +147,7 @@ class BleForegroundService : Service() {
                             // Verificar umbral de gas for alertas
                             checkGasLevelThreshold(fuelMeasurement.fuelPercentage)
                             
-                            // Updatesr widget de bombona de gas
+                            // Updatesr widget de cylinder de gas
                             GasCylinderWidgetProvider.updateAllWidgets(this@BleForegroundService)
                         }
                     }

@@ -60,7 +60,7 @@ object ForegroundServiceUtils {
     }
     
     /**
-     * Verifies if a service específico is currently ejecutándose
+     * Verifies if a service specific is currently running
      */
     fun isServiceRunning(context: Context, serviceClass: Class<*>): Boolean {
         return try {
@@ -87,7 +87,7 @@ object ForegroundServiceUtils {
     }
     
     /**
-     * Intenta iniciar a service in foreground de forma segura, con respaldo a servicio regular
+     * Attempts to start a service in foreground de forma segura, con respaldo a servicio regular
      * Returns true if any service started successfully
      */
     fun startServiceSafely(
@@ -111,7 +111,7 @@ object ForegroundServiceUtils {
                 true
             } else {
                 // Fallback: start as regular service (widgets will continue receiving updates when app opens)
-                Log.d(TAG, "No se can start servicio in foreground, iniciando servicio regular for ${serviceClass.simpleName}")
+                Log.d(TAG, "No se can start servicio in foreground, starting service regular for ${serviceClass.simpleName}")
                 context.startService(intent)
                 true
             }
@@ -138,7 +138,7 @@ object ForegroundServiceUtils {
     }
     
     /**
-     * Intenta iniciar a service de forma segura solo si no está ya ejecutándose
+     * Attempts to start a service safely only if not already running
      * Avoids multiple start attempts that can cause infinite loops
      */
     fun startServiceSafelyIfNotRunning(

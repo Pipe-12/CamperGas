@@ -49,14 +49,14 @@ class HomeViewModel @Inject constructor(
     val inclinationRoll: StateFlow<Float> = _inclinationRoll
 
     init {
-        // Observar el state of conexión from ReadSensorDataUseCase
+        // Observe the connection state from ReadSensorDataUseCase
         viewModelScope.launch {
             readSensorDataUseCase.getConnectionState().collectLatest { isConnected ->
                 _connectionState.value = isConnected
             }
         }
 
-        // Intentar conectar with the último device utilizado
+        // Attempt to connect with the last device used
         viewModelScope.launch {
             connectBleDeviceUseCase.getLastConnectedDevice().collectLatest { lastDeviceAddress ->
                 if (lastDeviceAddress.isNotEmpty() && !_connectionState.value) {
@@ -76,7 +76,7 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        // Observar configuración del vehículo
+        // Observe vehicle configuration
         viewModelScope.launch {
             getVehicleConfigUseCase().collectLatest { config ->
                 _vehicleConfig.value = config
@@ -133,7 +133,7 @@ class HomeViewModel @Inject constructor(
     }
 
     /**
-     * Solicita una lectura única de todos los data from sensor
+     * Requests a single reading of all data from sensor
      * Se llama cada vez que se abre la screen Home
      */
     fun requestSensorDataOnScreenOpen() {
@@ -141,7 +141,7 @@ class HomeViewModel @Inject constructor(
             // Esperar un poco for que la UI se establezca
             kotlinx.coroutines.delay(500)
 
-            // Solo hacer la petición si hay conexión activa
+            // Only make the request if there is active connection
             if (_connectionState.value) {
                 try {
                     readSensorDataUseCase.readAllSensorData()

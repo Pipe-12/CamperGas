@@ -17,21 +17,21 @@ class WidgetManager @Inject constructor(
     }
     
     /**
-     * Updates todos los widgets de gas cylinder
+     * Updates all widgets de gas cylinder
      */
     fun updateGasCylinderWidgets() {
         GasCylinderWidgetProvider.updateAllWidgets(context)
     }
     
     /**
-     * Updates todos los widgets de estabilidad del vehículo
+     * Updates all widgets de vehicle stability
      */
     fun updateVehicleStabilityWidgets() {
         VehicleStabilityWidgetProvider.updateAllWidgets(context)
     }
     
     /**
-     * Updates todos los widgets of the aplicación
+     * Updates all widgets of the application
      */
     fun updateAllWidgets() {
         updateGasCylinderWidgets()
@@ -39,11 +39,11 @@ class WidgetManager @Inject constructor(
     }
     
     /**
-     * Asegura que el servicio BLE esté running y actualiza widgets
+     * Ensures that the service BLE is running y actualiza widgets
      */
     fun ensureBleServiceAndUpdateWidgets() {
         try {
-            // Asegurar que el servicio BLE está running
+            // Asegurar que el servicio BLE is running
             ensureBleServiceRunning()
             
             // Updatesr todos los widgets con los data actuales
@@ -57,11 +57,11 @@ class WidgetManager @Inject constructor(
     
     /**
      * Solicita data of inclination manualmente y actualiza widgets
-     * También asegura que el servicio BLE esté running
+     * Also ensures que el servicio BLE is running
      */
     fun requestInclinationDataAndUpdateWidgets() {
         try {
-            // Asegurar que el servicio BLE está running
+            // Asegurar que el servicio BLE is running
             ensureBleServiceRunning()
             
             // Enviar broadcast for solicitar data
@@ -77,7 +77,7 @@ class WidgetManager @Inject constructor(
     }
     
     /**
-     * Asegura que el servicio BLE esté running for mantener las periodic requests
+     * Ensures that the service BLE is running to maintain the periodic requests
      */
     private fun ensureBleServiceRunning() {
         try {
@@ -94,7 +94,7 @@ class WidgetManager @Inject constructor(
     }
     
     /**
-     * Inicia el servicio BLE for widgets (método público for uso externo)
+     * Starts the service BLE for widgets (public method for external use)
      */
     fun startBleServiceForWidgets() {
         ensureBleServiceRunning()

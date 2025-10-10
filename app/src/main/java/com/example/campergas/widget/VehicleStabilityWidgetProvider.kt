@@ -42,13 +42,13 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
     
     override fun onEnabled(context: Context) {
         // This method is called when first widget of this type is added
-        Log.d("VehicleStabilityWidget", "Primer widget añadido - iniciando servicio BLE")
+        Log.d("VehicleStabilityWidget", "First widget added - starting service BLE")
         ensureBleServiceRunning(context)
     }
     
     override fun onDisabled(context: Context) {
         // This method is called when last widget of this type is removed
-        Log.d("VehicleStabilityWidget", "Último widget eliminado")
+        Log.d("VehicleStabilityWidget", "Last widget removed")
         // Verify if any active widget remains before stopping service
         checkAndStopServiceIfNoWidgets(context)
     }
@@ -143,7 +143,7 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
                 views.setTextViewText(R.id.widget_roll_value, "R: --°")
                 views.setTextViewText(R.id.widget_stability_status, "❌ ERROR")
                 views.setTextViewText(R.id.widget_connection_status, "🔴 Error")
-                views.setTextViewText(R.id.widget_last_update, "Error de conexión")
+                views.setTextViewText(R.id.widget_last_update, "Connection error")
                 appWidgetManager.updateAppWidget(appWidgetId, views)
             }
         }

@@ -16,7 +16,7 @@ abstract class VehicleDatabase : RoomDatabase() {
     abstract fun vehicleDao(): VehicleDao
 
     companion object {
-        // Migración of the versión 1 a la 2 (agregar campo distanceBetweenFrontWheels y cambiar MOTORHOME a AUTOCARAVANA)
+        // Migration from version 1 to 2 (add field distanceBetweenFrontWheels y cambiar MOTORHOME a AUTOCARAVANA)
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // Agregar nueva columna

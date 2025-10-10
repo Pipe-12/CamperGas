@@ -55,7 +55,7 @@ fun CaravanConfigScreen(
             .statusBarsPadding()
             .padding(16.dp)
     ) {
-        // Back button y título
+        // Back button y title
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -72,7 +72,7 @@ fun CaravanConfigScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Tipo de vehículo
+        // Vehicle type
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -131,7 +131,7 @@ fun CaravanConfigScreen(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                // Distancia entre ruedas traseras (común for ambos tipos)
+                // Distance between rear wheels (common for both types)
                 OutlinedTextField(
                     value = if (uiState.distanceBetweenWheels == 0f) "" else uiState.distanceBetweenWheels.toString(),
                     onValueChange = { value ->
@@ -144,7 +144,7 @@ fun CaravanConfigScreen(
                         .padding(bottom = 8.dp)
                 )
 
-                // Campo específico according to el tipo de vehículo
+                // Specific field according to vehicle type
                 when (uiState.selectedVehicleType) {
                     VehicleType.CARAVAN -> {
                         OutlinedTextField(
@@ -205,7 +205,7 @@ fun CaravanConfigScreen(
             }
         }
 
-        // Botones de acción
+        // Action buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)

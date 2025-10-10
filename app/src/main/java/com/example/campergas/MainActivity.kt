@@ -129,7 +129,7 @@ class MainActivity : ComponentActivity() {
                     // State to control whether to show permissions dialog
                     var showPermissionDialog by remember { mutableStateOf(false) }
 
-                    // Verificar permisos on start
+                    // Verify permissions on start
                     LaunchedEffect(Unit) {
                         if (!bluetoothPermissionManager.hasAllPermissions()) {
                             showPermissionDialog = true
