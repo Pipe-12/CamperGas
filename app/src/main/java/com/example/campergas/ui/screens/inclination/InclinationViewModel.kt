@@ -28,10 +28,10 @@ class InclinationViewModel @Inject constructor(
     val uiState: StateFlow<InclinationUiState> = _uiState.asStateFlow()
 
     init {
-        // Cargar configuración del vehículo
+        // Loadr configuración del vehículo
         loadVehicleConfig()
 
-        // Obtener datos de inclinación en tiempo real
+        // Get data of inclination en real time
         viewModelScope.launch {
             getInclinationUseCase().collectLatest { inclination ->
                 _uiState.value = if (inclination != null) {
@@ -43,7 +43,7 @@ class InclinationViewModel @Inject constructor(
                         error = null,
                         timestamp = inclination.timestamp
                     )
-                    // Calcular elevaciones de ruedas
+                    // Calculatesr elevaciones de ruedas
                     newState.copy(wheelElevations = calculateWheelElevations(newState))
                 } else {
                     _uiState.value.copy(
@@ -74,7 +74,7 @@ class InclinationViewModel @Inject constructor(
     }
 
     /**
-     * Calcula la elevación necesaria para cada rueda basándose en la inclinación
+     * Calculates la elevación necesaria for cada rueda basándose en la inclinación
      */
     private fun calculateWheelElevations(state: InclinationUiState): WheelElevations {
         if (state.distanceBetweenRearWheels == 0f || state.distanceToFrontSupport == 0f) {
@@ -85,7 +85,7 @@ class InclinationViewModel @Inject constructor(
         val pitchRad = Math.toRadians(state.inclinationPitch.toDouble())
         val rollRad = Math.toRadians(state.inclinationRoll.toDouble())
 
-        // Calcular elevaciones basándose en las distancias configuradas
+        // Calculatesr elevaciones basándose en las distancias configuradas
         val halfRearWheelDistance = state.distanceBetweenRearWheels / 2
 
         // Para el roll (alabeo lateral)
@@ -122,7 +122,7 @@ class InclinationViewModel @Inject constructor(
     }
 
     /**
-     * Solicita una lectura manual de datos de inclinación from sensor BLE
+     * Solicita una lectura manual of data of inclination from sensor BLE
      * Incluye protección contra múltiples peticiones seguidas
      */
     fun requestInclinationDataManually() {

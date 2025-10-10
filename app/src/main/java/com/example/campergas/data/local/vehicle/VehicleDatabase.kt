@@ -22,7 +22,7 @@ abstract class VehicleDatabase : RoomDatabase() {
                 // Agregar nueva columna
                 database.execSQL("ALTER TABLE vehicle_config ADD COLUMN distanceBetweenFrontWheels REAL")
 
-                // Actualizar enum MOTORHOME a AUTOCARAVANA si existe
+                // Updatesr enum MOTORHOME a AUTOCARAVANA si existe
                 database.execSQL("UPDATE vehicle_config SET type = 'AUTOCARAVANA' WHERE type = 'MOTORHOME'")
             }
         }

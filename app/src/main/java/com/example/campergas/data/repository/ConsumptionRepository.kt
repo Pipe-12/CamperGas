@@ -7,8 +7,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Repositorio para gestionar los datos de consumo de combustible
- * Utiliza FuelMeasurementRepository como fuente de datos y convierte a modelo Consumption
+ * Repositorio for gestionar los data de consumption de combustible
+ * Utiliza FuelMeasurementRepository como fuente of data y convierte a modelo Consumption
  */
 @Singleton
 class ConsumptionRepository @Inject constructor(
@@ -16,7 +16,7 @@ class ConsumptionRepository @Inject constructor(
 ) {
 
     /**
-     * Obtiene todos los registros de consumo ordenados por fecha descendente
+     * Gets todos los registros de consumption ordenados por date descendente
      */
     fun getAllConsumptions(): Flow<List<Consumption>> {
         return fuelMeasurementRepository.getAllMeasurements().map { measurements ->
@@ -25,7 +25,7 @@ class ConsumptionRepository @Inject constructor(
     }
 
     /**
-     * Obtiene los registros de consumo de una bombona específica
+     * Gets los registros de consumption de una bombona específica
      */
     fun getConsumptionsByCylinder(cylinderId: Long): Flow<List<Consumption>> {
         return fuelMeasurementRepository.getMeasurementsByCylinder(cylinderId).map { measurements ->
@@ -34,7 +34,7 @@ class ConsumptionRepository @Inject constructor(
     }
 
     /**
-     * Obtiene los registros de consumo en un rango de fechas
+     * Gets los registros de consumption en un rango de dates
      */
     fun getConsumptionsByDateRange(startDate: Long, endDate: Long): Flow<List<Consumption>> {
         return fuelMeasurementRepository.getMeasurementsByTimeRange(startDate, endDate)
@@ -44,7 +44,7 @@ class ConsumptionRepository @Inject constructor(
     }
 
     /**
-     * Obtiene los registros de consumo de una bombona en un rango de fechas
+     * Gets los registros de consumption de una bombona en un rango de dates
      */
     fun getConsumptionsByCylinderAndDateRange(
         cylinderId: Long,

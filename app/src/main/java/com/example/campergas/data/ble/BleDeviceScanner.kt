@@ -20,7 +20,7 @@ class BleDeviceScanner @Inject constructor(
     private val _isScanning = MutableStateFlow(false)
     val isScanning: StateFlow<Boolean> = _isScanning
 
-    // Filtro para mostrar solo dispositivos compatibles
+    // Filtro for mostrar solo devices compatibles
     private var showOnlyCompatibleDevices = false
 
     private val bluetoothAdapter: BluetoothAdapter? get() = bleManager.bluetoothAdapter
@@ -34,7 +34,7 @@ class BleDeviceScanner @Inject constructor(
             val deviceAddress = device.address
             val rssi = result.rssi
 
-            // Obtener servicios de los datos del scan
+            // Get servicios de los data del scan
             val services = result.scanRecord?.serviceUuids?.map { it.toString() } ?: emptyList()
 
             val bleDevice = BleDevice(
@@ -61,10 +61,10 @@ class BleDeviceScanner @Inject constructor(
         val existingIndex = currentList.indexOfFirst { it.address == device.address }
 
         if (existingIndex >= 0) {
-            // Actualizar dispositivo existente
+            // Updatesr device existente
             currentList[existingIndex] = device
         } else {
-            // Añadir nuevo dispositivo solo si pasa el filtro o si el filtro está desactivado
+            // Añadir nuevo device solo si pasa el filtro o si el filtro está desactivado
             if (!showOnlyCompatibleDevices || device.isCompatibleWithCamperGas) {
                 currentList.add(device)
             }
@@ -81,7 +81,7 @@ class BleDeviceScanner @Inject constructor(
     }
 
     /**
-     * Establece el filtro para mostrar solo dispositivos compatibles con CamperGas
+     * Establece el filtro for mostrar solo devices compatibles con CamperGas
      */
     fun setCompatibleDevicesFilter(enabled: Boolean) {
         showOnlyCompatibleDevices = enabled
@@ -89,12 +89,12 @@ class BleDeviceScanner @Inject constructor(
     }
 
     /**
-     * Obtiene el estado current del filtro
+     * Gets el estado current del filtro
      */
     fun isCompatibleFilterEnabled(): Boolean = showOnlyCompatibleDevices
 
     /**
-     * Actualiza los resultados aplicando el filtro si está activado
+     * Updates los resultados aplicando el filtro si está activado
      */
     private fun updateFilteredResults() {
         val allDevices = _scanResults.value

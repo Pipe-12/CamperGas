@@ -8,14 +8,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
- * Base ViewModel para manejar peticiones manuales con cooldown y control de spam
+ * Base ViewModel for manejar peticiones manuales con cooldown y control de spam
  * Centraliza la lógica común de los ViewModels que hacen peticiones BLE bajo demanda
  */
 abstract class BaseRequestViewModel(
     private val checkBleConnectionUseCase: CheckBleConnectionUseCase
 ) : ViewModel() {
 
-    // Control de peticiones para evitar spam
+    // Control de peticiones for evitar spam
     private var lastRequestTime = 0L
     private val requestCooldownMs = 2000L // 2 segundos entre peticiones
 
@@ -24,9 +24,9 @@ abstract class BaseRequestViewModel(
 
     /**
      * Ejecuta una petición manual con protección contra spam
-     * @param requestAction La acción específica a ejecutar (use case específico)
-     * @param logTag Tag para los logs de debug
-     * @param dataTypeDescription Descripción del tipo de datos para los logs
+     * @form requestAction La acción específica a ejecutar (use case específico)
+     * @form logTag Tag for los logs de debug
+     * @form dataTypeDescription Descripción del tipo of data for los logs
      */
     protected fun executeManualRequest(
         requestAction: () -> Unit,
@@ -47,13 +47,13 @@ abstract class BaseRequestViewModel(
             return
         }
 
-        android.util.Log.d(logTag, "📊 Solicitando datos de $dataTypeDescription manualmente")
+        android.util.Log.d(logTag, "📊 Requesting data de $dataTypeDescription manualmente")
         _isRequestingData.value = true
         lastRequestTime = currentTime
 
         requestAction()
 
-        // Resetear el estado después de un tiempo razonable
+        // Resetear el state ofspués de un tiempo razonable
         viewModelScope.launch {
             kotlinx.coroutines.delay(1500) // 1.5 segundos
             _isRequestingData.value = false
@@ -61,14 +61,14 @@ abstract class BaseRequestViewModel(
     }
 
     /**
-     * Verifica si hay una conexión BLE activa
+     * Verifies if hay una conexión BLE activa
      */
     fun isConnected(): Boolean {
         return checkBleConnectionUseCase.isConnected()
     }
 
     /**
-     * Verifica si se puede hacer una nueva petición (no está en cooldown)
+     * Verifies if se puede hacer una nueva petición (no está en cooldown)
      */
     fun canMakeRequest(): Boolean {
         val currentTime = System.currentTimeMillis()

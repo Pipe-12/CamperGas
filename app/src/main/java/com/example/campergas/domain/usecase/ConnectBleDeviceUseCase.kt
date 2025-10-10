@@ -11,7 +11,7 @@ class ConnectBleDeviceUseCase @Inject constructor(
         // Conectamos al sensor unificado
         bleRepository.connectToSensor(deviceAddress)
 
-        // Guardamos la dirección del último dispositivo conectado
+        // Guardamos la dirección del último device conectado
         bleRepository.saveLastConnectedDevice(deviceAddress)
     }
 

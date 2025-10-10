@@ -26,10 +26,10 @@ class SaveFuelMeasurementUseCase @Inject constructor(
      * This data comes from the characteristic WEIGHT_CHARACTERISTIC_UUID
      * y se marcan como isHistorical = false
      *
-     * IMPORTANTE: Solo se guardan mediciones cada 2 minutos para evitar spam en la base de datos
+     * IMPORTANTE: Solo se guardan mediciones cada 2 minutos for evitar spam en la database
      *
-     * @param totalWeight Peso total medido by the sensor
-     * @param timestamp Timestamp of when the measurement was taken (default now)
+     * @form totalWeight Peso total medido by the sensor
+     * @form timestamp Timestamp of when the measurement was taken (default now)
      * @return Result con SaveMeasurementResult o information about why it was not saved
      */
     suspend fun saveRealTimeMeasurement(
@@ -55,11 +55,11 @@ class SaveFuelMeasurementUseCase @Inject constructor(
                 )
             }
 
-            // Obtener la bombona activa
+            // Get la bombona activa
             val activeCylinder = gasCylinderRepository.getActiveCylinder().first()
                 ?: return Result.failure(Exception("No hay bombona activa configurada"))
 
-            // Calcular el combustible disponible
+            // Calculatesr el combustible disponible
             val fuelKilograms = maxOf(0f, totalWeight - activeCylinder.tare)
             val fuelPercentage = if (activeCylinder.capacity > 0) {
                 (fuelKilograms / activeCylinder.capacity * 100).coerceIn(0f, 100f)
@@ -110,17 +110,17 @@ class SaveFuelMeasurementUseCase @Inject constructor(
      * This data comes from the characteristic OFFLINE_CHARACTERISTIC_UUID
      * y se marcan como isHistorical = true
      *
-     * @param cylinderId Specific cylinder ID
-     * @param totalWeight Peso total medido by the sensor
-     * @param timestamp Timestamp historical of when the measurement was taken
-     * @param isCalibrated If the measurement is calibrated
+     * @form cylinderId Specific cylinder ID
+     * @form totalWeight Peso total medido by the sensor
+     * @form timestamp Timestamp historical of when the measurement was taken
+     * @form isCalibrated If the measurement is calibrated
      */
     /**
      * Saves multiple measurements HISTORICAL de combustible
-     * This data comes from características HISTORY y se marcan como isHistorical = true
+     * This data comes from characteristics HISTORY y se marcan como isHistorical = true
      *
-     * @param cylinderId ID of the bombona a la que pertenecen las mediciones
-     * @param weightMeasurements Lista de pares (total weight, timestamp)
+     * @form cylinderId ID of the bombona a la que pertenecen las mediciones
+     * @form weightMeasurements Lista de pares (total weight, timestamp)
      */
     suspend fun saveHistoricalMeasurements(
         cylinderId: Long,
@@ -162,17 +162,17 @@ class SaveFuelMeasurementUseCase @Inject constructor(
     }
 
     /**
-     * Detecta y elimina erroneous measurements (outliers) basándose en patrones de peso.
+     * Detecta y elimina erroneous measurements (outliers) basándose en patrones of weight.
      * 
-     * Cuando una medición se desvía sustancialmente of the tendencia y luego vuelve a valores
-     * normales, la medición desviada se considera un error y se elimina.
+     * Cuando una measurement se desvía sustancialmente of the tendencia y luego vuelve a valores
+     * normales, la measurement desviada se considera un error y se elimina.
      * 
      * Patrón de detección:
      * - Anterior: peso normal
      * - Outlier: peso sustancialmente diferente (>30% cambio)
      * - Actual: peso similar al anterior (vuelve a la normalidad)
      *
-     * @param cylinderId ID of the bombona para analizar
+     * @form cylinderId ID of the bombona for analizar
      */
     private suspend fun detectAndRemoveOutliers(cylinderId: Long) {
         try {
@@ -204,18 +204,18 @@ class SaveFuelMeasurementUseCase @Inject constructor(
     }
 
     /**
-     * Determina si una medición es un outlier basándose in the patrón:
+     * Determina si una measurement es un outlier basándose in the patrón:
      * previous -> outlier -> current
      * 
-     * Una medición se considera outlier si:
+     * Una measurement se considera outlier si:
      * 1. Se desvía sustancialmente (>30%) del valor anterior
      * 2. El valor actual regresa cerca del valor anterior (diferencia <30%)
      * 3. La desviación del outlier es mayor que la desviación entre anterior y actual
      *
-     * @param previous Medición anterior
-     * @param outlier Medición candidata a outlier  
-     * @param current Medición actual
-     * @return true si la medición del medio es un outlier
+     * @form previous Medición anterior
+     * @form outlier Medición candidata a outlier  
+     * @form current Medición actual
+     * @return true si la measurement del medio es un outlier
      */
     private fun isOutlierMeasurement(
         previous: FuelMeasurement,
@@ -232,12 +232,12 @@ class SaveFuelMeasurementUseCase @Inject constructor(
             return false
         }
 
-        // Calcular porcentajes de cambio
+        // Calculatesr porcentajes de cambio
         val outlierVsPrevious = kotlin.math.abs(outlierWeight - prevWeight) / prevWeight * 100f
         val currentVsPrevious = kotlin.math.abs(currentWeight - prevWeight) / prevWeight * 100f
         val currentVsOutlier = kotlin.math.abs(currentWeight - outlierWeight) / outlierWeight * 100f
 
-        // Condiciones para considerar outlier:
+        // Condiciones for considerar outlier:
         // 1. The outlier deviates substantially from previous (>30%)
         val isSignificantDeviation = outlierVsPrevious > OUTLIER_THRESHOLD_PERCENTAGE
         

@@ -94,7 +94,7 @@ fun ConsumptionScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Filtros de fecha
+        // Filtros de date
         DateFiltersSection(
             startDate = uiState.startDate,
             endDate = uiState.endDate,
@@ -108,7 +108,7 @@ fun ConsumptionScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Resumen de consumo
+        // Resumen de consumption
         ConsumptionSummarySection(
             lastDayConsumption = uiState.lastDayConsumption,
             lastWeekConsumption = uiState.lastWeekConsumption,
@@ -121,7 +121,7 @@ fun ConsumptionScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Gráfico de consumo
+        // Gráfico de consumption
         if (uiState.chartData.isNotEmpty()) {
             ConsumptionChart(
                 chartData = uiState.chartData,
@@ -153,7 +153,7 @@ fun ConsumptionScreen(
             val datePickerState = rememberDatePickerState()
             DatePicker(state = datePickerState)
 
-            // Aplicar la fecha seleccionada when confirma
+            // Aplicar la date seleccionada when confirma
             LaunchedEffect(datePickerState.selectedDateMillis) {
                 datePickerState.selectedDateMillis?.let { selectedDate ->
                     val startOfDay = selectedDate - (selectedDate % (24 * 60 * 60 * 1000L))
@@ -184,7 +184,7 @@ fun ConsumptionScreen(
             val datePickerState = rememberDatePickerState()
             DatePicker(state = datePickerState)
 
-            // Aplicar la fecha seleccionada when confirma
+            // Aplicar la date seleccionada when confirma
             LaunchedEffect(datePickerState.selectedDateMillis) {
                 datePickerState.selectedDateMillis?.let { selectedDate ->
                     val endOfDay = selectedDate + (24 * 60 * 60 * 1000L - 1)
@@ -291,7 +291,7 @@ fun DateFiltersSection(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Selección de fechas específicas
+            // Selección de dates específicas
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -552,7 +552,7 @@ fun SimpleLineChart(
             )
         )
         
-        // Calculate bounds
+        // Calculateste bounds
         val minValue = data.minOf { it.kilograms }
         val maxValue = data.maxOf { it.kilograms }
         val valueRange = max(maxValue - minValue, 0.1f) // Avoid division by zero
@@ -636,7 +636,7 @@ fun SimpleLineChart(
             }
         }
         
-        // Calculate points
+        // Calculateste points
         val points = data.map { point ->
             val x = leftPadding + ((point.date - minDate).toFloat() / dateRange) * (chartWidth - leftPadding - rightPadding)
             val y = chartHeight - bottomPadding - ((point.kilograms - minValue) / valueRange) * (chartHeight - topPadding - bottomPadding)

@@ -63,7 +63,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
         try {
             val serviceStarted = com.example.campergas.service.BleForegroundService.startForWidgets(context)
             if (serviceStarted) {
-                Log.d("GasCylinderWidget", "Servicio BLE iniciado para widgets")
+                Log.d("GasCylinderWidget", "Service BLE iniciado for widgets")
             } else {
                 Log.w("GasCylinderWidget", "No se pudo iniciar servicio BLE - continuando sin servicio de fondo")
             }
@@ -91,7 +91,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                     com.example.campergas.service.BleForegroundService.stopService(context)
                 }
             } catch (e: Exception) {
-                Log.e("GasCylinderWidget", "Error al verificar widgets activos", e)
+                Log.e("GasCylinderWidget", "Error verifying widgets activos", e)
             }
         }
     }
@@ -104,7 +104,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                 val gasCylinderRepository = entryPoint.gasCylinderRepository()
                 val bleRepository = entryPoint.bleRepository()
                 
-                // Obtener solo datos actuales from sensor BLE
+                // Get solo data actuales from sensor BLE
                 val currentFuelMeasurement = bleRepository.fuelMeasurementData.first()
                 val activeCylinder = gasCylinderRepository.getActiveCylinder().first()
                 val isConnected = bleRepository.connectionState.first()
@@ -138,7 +138,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                 // Configurar intents
                 setupIntents(context, views)
 
-                // Actualizar widget
+                // Updatesr widget
                 appWidgetManager.updateAppWidget(appWidgetId, views)
                 
             } catch (e: Exception) {

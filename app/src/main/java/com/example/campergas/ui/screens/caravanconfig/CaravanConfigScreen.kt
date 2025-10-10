@@ -131,7 +131,7 @@ fun CaravanConfigScreen(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                // Distancia entre ruedas traseras (común para ambos tipos)
+                // Distancia entre ruedas traseras (común for ambos tipos)
                 OutlinedTextField(
                     value = if (uiState.distanceBetweenWheels == 0f) "" else uiState.distanceBetweenWheels.toString(),
                     onValueChange = { value ->
@@ -144,7 +144,7 @@ fun CaravanConfigScreen(
                         .padding(bottom = 8.dp)
                 )
 
-                // Campo específico según el tipo de vehículo
+                // Campo específico according to el tipo de vehículo
                 when (uiState.selectedVehicleType) {
                     VehicleType.CARAVAN -> {
                         OutlinedTextField(

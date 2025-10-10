@@ -41,17 +41,17 @@ class BleRepository @Inject constructor(
     fun isBluetoothEnabled(): Boolean = bleManager.isBluetoothEnabled()
 
     /**
-     * Verifica si se tienen todos los permisos necesarios para operaciones BLE
+     * Verifies if se tienen todos los permisos necesarios for operaciones BLE
      */
     fun hasAllBluetoothPermissions(): Boolean = bleManager.hasAllBluetoothPermissions()
 
     /**
-     * Verifica si se tienen permisos para escanear dispositivos BLE
+     * Verifies if se tienen permisos for escanear devices BLE
      */
     fun hasBluetoothScanPermission(): Boolean = bleManager.hasBluetoothScanPermission()
 
     /**
-     * Verifica si se tienen permisos para conectar dispositivos BLE
+     * Verifies if se tienen permisos for conectar devices BLE
      */
     fun hasBluetoothConnectPermission(): Boolean = bleManager.hasBluetoothConnectPermission()
 
@@ -71,17 +71,17 @@ class BleRepository @Inject constructor(
     fun ensureOfflineDataReading() = camperGasBleService.ensureOfflineDataReading()
 
     /**
-     * Solicita lectura de datos de peso bajo demanda
+     * Solicita lectura of data of weight bajo demanda
      */
     fun readWeightDataOnDemand() = camperGasBleService.readWeightDataOnDemand()
 
     /**
-     * Solicita lectura de datos de inclinación bajo demanda
+     * Solicita lectura of data of inclination bajo demanda
      */
     fun readInclinationDataOnDemand() = camperGasBleService.readInclinationDataOnDemand()
 
     /**
-     * Configura los intervalos de lectura para peso e inclinación
+     * Configura los intervalos de lectura for peso e inclinación
      */
     fun configureReadingIntervals(weightIntervalMs: Long, inclinationIntervalMs: Long) {
         camperGasBleService.configureReadingIntervals(weightIntervalMs, inclinationIntervalMs)
@@ -95,12 +95,12 @@ class BleRepository @Inject constructor(
     }
 
     /**
-     * Obtiene el intervalo actual de lectura de peso
+     * Gets el intervalo actual de lectura of weight
      */
     fun getWeightReadInterval(): Long = camperGasBleService.getWeightReadInterval()
 
     /**
-     * Obtiene el intervalo actual de lectura de inclinación
+     * Gets el intervalo actual de lectura of inclination
      */
     fun getInclinationReadInterval(): Long = camperGasBleService.getInclinationReadInterval()
 
@@ -113,7 +113,7 @@ class BleRepository @Inject constructor(
     suspend fun saveInclinationReadInterval(intervalMs: Long) =
         preferencesDataStore.setInclinationReadInterval(intervalMs)
 
-    // Filtrado de dispositivos
+    // Filtrado de devices
     fun setCompatibleDevicesFilter(enabled: Boolean) =
         bleDeviceScanner.setCompatibleDevicesFilter(enabled)
 

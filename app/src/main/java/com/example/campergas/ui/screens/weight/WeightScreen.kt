@@ -122,7 +122,7 @@ private fun DrawScope.drawGasCylinder(
         cornerRadius = CornerRadius(cylinderWidth * 0.08f)
     )
 
-    // Dibujar el interior with the color de fondo según el tema
+    // Dibujar el interior with the color de fondo according to el tema
     drawRoundRect(
         color = backgroundColor,
         topLeft = Offset(startX, startY + topCapHeight),
@@ -130,7 +130,7 @@ private fun DrawScope.drawGasCylinder(
         cornerRadius = CornerRadius(cylinderWidth * 0.06f)
     )
 
-    // Dibujar el nivel de gas (lleno) desde abajo hacia arriba
+    // Dibujar el nivel de gas (lleno) from abajo hacia arriba
     if (fillPercentage > 0) {
         val fillHeight = cylinderHeight * fillPercentage
         val fillY = startY + topCapHeight + (cylinderHeight - fillHeight)
@@ -365,7 +365,7 @@ fun WeightScreen(
                         }
                     }
                 } ?: run {
-                    // Estado cuando no hay datos
+                    // Estado when no hay data
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {

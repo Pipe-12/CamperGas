@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
                 // Permisos concedidos, la app puede usar BLE
             },
             onPermissionsDenied = { deniedPermissions ->
-                // Manejar permisos denegados
+                // Handle permisos denegados
             }
         )
 

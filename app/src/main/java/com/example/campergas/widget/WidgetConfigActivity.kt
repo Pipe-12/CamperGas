@@ -38,7 +38,7 @@ class WidgetConfigActivity : ComponentActivity() {
         // Configurar resultado como cancelado por defecto
         setResult(RESULT_CANCELED)
         
-        // Obtener el ID del widget from the intent
+        // Get el ID del widget from the intent
         appWidgetId = intent?.extras?.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID

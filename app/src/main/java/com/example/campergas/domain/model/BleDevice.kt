@@ -18,7 +18,7 @@ data class BleDevice(
         }
 
     /**
-     * Verifica si este dispositivo es compatible con CamperGas
+     * Verifies if este device es compatible con CamperGas
      */
     val isCompatibleWithCamperGas: Boolean
         get() = CamperGasUuids.isCompatibleDevice(services)
@@ -30,7 +30,7 @@ data class BleDevice(
         get() = services.any { CamperGasUuids.isSensorService(it) }
 
     /**
-     * Obtiene el tipo de dispositivo basado in the nombre
+     * Gets el tipo de device basado in the nombre
      */
     val deviceType: String
         get() = when {

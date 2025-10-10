@@ -67,18 +67,18 @@ fun BleConnectScreen(
     val uiState by viewModel.uiState.collectAsState()
     val connectionState by viewModel.connectionState.collectAsState()
 
-    // Estados para controlar diálogos de permisos
+    // Estados for controlar diálogos de permisos
     var showPermissionDialog by remember { mutableStateOf(false) }
     var showBluetoothDialog by remember { mutableStateOf(false) }
 
-    // Verificar permisos al entrar a la pantalla
+    // Verificar permisos al entrar a la screen
     LaunchedEffect(Unit) {
         if (!viewModel.isBluetoothEnabled()) {
             showBluetoothDialog = true
         }
     }
 
-    // Diálogo para activar Bluetooth
+    // Diálogo for activar Bluetooth
     if (showBluetoothDialog) {
         BluetoothDisabledDialog(
             onAccept = {
@@ -90,7 +90,7 @@ fun BleConnectScreen(
         )
     }
 
-    // Diálogo para permisos
+    // Diálogo for permisos
     if (showPermissionDialog) {
         BluetoothPermissionDialog(
             onAccept = {
@@ -124,7 +124,7 @@ fun BleConnectScreen(
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        // Header con estado de conexión
+        // Header con state of conexión
         ConnectionStatusCard(
             isConnected = connectionState,
             isScanning = uiState.isScanning,
@@ -241,7 +241,7 @@ fun BleConnectScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // Available devices section (solo si no está conectado)
+        // Available devices section (only if not conectado)
         if (!connectionState) {
             Text(
                 text = stringResource(R.string.ble_available_devices, uiState.availableDevices.size),
@@ -414,7 +414,7 @@ private fun AvailableDeviceCard(
             if (device.services.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Servicios: ${device.services.size} disponibles",
+                    text = "Services: ${device.services.size} disponibles",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -507,15 +507,15 @@ fun ConnectionStatusCard(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = if (isConnected) "Sensor Conectado" else "Conexión Bluetooth",
+                        text = if (isConnected) "Sensor Connected" else "Conexión Bluetooth",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = when {
                             isConnected && connectedDevice != null -> "${connectedDevice.name} • Para cambiar de sensor, desconecta primero"
-                            isScanning -> "Escaneando dispositivos..."
-                            else -> "Buscar dispositivos BLE"
+                            isScanning -> "Escaneando devices..."
+                            else -> "Buscar devices BLE"
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant

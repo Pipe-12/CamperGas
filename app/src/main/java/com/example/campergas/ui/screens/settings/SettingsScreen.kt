@@ -56,17 +56,17 @@ fun SettingsScreen(
     val scrollState = rememberScrollState()
     val uiState by viewModel.uiState.collectAsState()
 
-    // Estados para intervalos BLE
+    // Estados for intervalos BLE
     val weightInterval by viewModel.weightInterval.collectAsState()
     val inclinationInterval by viewModel.inclinationInterval.collectAsState()
     val operationStatus by viewModel.operationStatus.collectAsState()
 
-    // Estados locales para campos de texto
+    // Estados locales for campos de texto
     var weightIntervalText by remember { mutableStateOf("") }
     var inclinationIntervalText by remember { mutableStateOf("") }
     var gasThresholdText by remember { mutableStateOf("") }
 
-    // Actualizar campos de texto when changesn los valores
+    // Updatesr campos de texto when changesn los valores
     LaunchedEffect(weightInterval) {
         weightIntervalText = weightInterval.toString()
     }
@@ -75,7 +75,7 @@ fun SettingsScreen(
         inclinationIntervalText = inclinationInterval.toString()
     }
 
-    // Actualizar campo de texto del umbral de gas
+    // Updatesr campo de texto del umbral de gas
     LaunchedEffect(uiState.gasLevelThreshold) {
         gasThresholdText = uiState.gasLevelThreshold.toString()
     }
@@ -109,7 +109,7 @@ fun SettingsScreen(
             )
         }
 
-        // Mostrar estado de operación si hay uno
+        // Mostrar state of operación si hay uno
         operationStatus?.let { status ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -309,7 +309,7 @@ fun SettingsScreen(
                 }
             }
         }
-        // Configuración de intervalo de peso
+        // Configuración de intervalo of weight
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -367,7 +367,7 @@ fun SettingsScreen(
             }
         }
 
-        // Configuración de intervalo de inclinación
+        // Configuración de intervalo of inclination
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {

@@ -5,32 +5,32 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
- * Caso de uso para leer datos from sensor CamperGas bajo demanda
- * Permite solicitar lecturas específicas de peso e inclinación
+ * Caso de uso for leer data from sensor CamperGas bajo demanda
+ * Permite solicitar readings específicas of weight e inclinación
  */
 class ReadSensorDataUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
 
     /**
-     * Solicita lectura de datos de peso bajo demanda
-     * Los datos se actualizarán in the StateFlow correspondiente
+     * Solicita lectura of data of weight bajo demanda
+     * Los data se actualizarán in the StateFlow correspondiente
      */
     fun readWeightData() {
         bleRepository.readWeightDataOnDemand()
     }
 
     /**
-     * Solicita lectura de datos de inclinación bajo demanda
-     * Los datos se actualizarán in the StateFlow correspondiente
+     * Solicita lectura of data of inclination bajo demanda
+     * Los data se actualizarán in the StateFlow correspondiente
      */
     fun readInclinationData() {
         bleRepository.readInclinationDataOnDemand()
     }
 
     /**
-     * Solicita lectura de todos los datos from sensor (peso e inclinación) bajo demanda
-     * Los datos se actualizarán en sus StateFlows correspondientes
+     * Solicita lectura de todos los data from sensor (peso e inclinación) bajo demanda
+     * Los data se actualizarán en sus StateFlows correspondientes
      */
     fun readAllSensorData() {
         readWeightData()
@@ -38,7 +38,7 @@ class ReadSensorDataUseCase @Inject constructor(
     }
 
     /**
-     * Obtiene el estado de conexión como StateFlow
+     * Gets el state of conexión como StateFlow
      */
     fun getConnectionState(): StateFlow<Boolean> {
         return bleRepository.connectionState

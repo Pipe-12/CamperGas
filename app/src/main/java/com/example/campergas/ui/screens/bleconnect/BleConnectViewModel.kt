@@ -23,11 +23,11 @@ class BleConnectViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(BleConnectUiState())
     val uiState: StateFlow<BleConnectUiState> = _uiState.asStateFlow()
 
-    // Observar estado de conexión
+    // Observar state of conexión
     val connectionState = checkBleConnectionUseCase()
 
     init {
-        // Observar cambios in the estado de conexión
+        // Observar cambios in the state of conexión
         viewModelScope.launch {
             connectionState.collect { isConnected ->
                 android.util.Log.d(
@@ -70,12 +70,12 @@ class BleConnectViewModel @Inject constructor(
             } catch (_: SecurityException) {
                 _uiState.value = _uiState.value.copy(
                     isScanning = false,
-                    error = "Permisos de Bluetooth requeridos para escanear dispositivos"
+                    error = "Permisos de Bluetooth requeridos for escanear devices"
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isScanning = false,
-                    error = e.message ?: "Error al escanear dispositivos"
+                    error = e.message ?: "Error al escanear devices"
                 )
             }
         }
@@ -88,7 +88,7 @@ class BleConnectViewModel @Inject constructor(
         } catch (_: SecurityException) {
             _uiState.value = _uiState.value.copy(
                 isScanning = false,
-                error = "Permisos de Bluetooth requeridos para detener el escaneo"
+                error = "Permisos de Bluetooth requeridos for detener el escaneo"
             )
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(
@@ -112,7 +112,7 @@ class BleConnectViewModel @Inject constructor(
                 error = null
             )
             try {
-                // Usar el use case para conectar y guardar dispositivo
+                // Usar el use case for conectar y guardar device
                 connectBleDeviceUseCase(device.address)
 
                 _uiState.value = _uiState.value.copy(
@@ -122,12 +122,12 @@ class BleConnectViewModel @Inject constructor(
             } catch (_: SecurityException) {
                 _uiState.value = _uiState.value.copy(
                     isConnecting = null,
-                    error = "Permisos de Bluetooth requeridos para conectar"
+                    error = "Permisos de Bluetooth requeridos for conectar"
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isConnecting = null,
-                    error = e.message ?: "Error al conectar with the dispositivo"
+                    error = e.message ?: "Error connecting with the device"
                 )
             }
         }
@@ -136,7 +136,7 @@ class BleConnectViewModel @Inject constructor(
     fun disconnectDevice() {
         viewModelScope.launch {
             try {
-                android.util.Log.d("BleConnectViewModel", "🔌 Iniciando desconexión desde ViewModel")
+                android.util.Log.d("BleConnectViewModel", "🔌 Iniciando desconexión from ViewModel")
 
                 // Detener escaneo si está activo
                 if (_uiState.value.isScanning) {
@@ -156,23 +156,23 @@ class BleConnectViewModel @Inject constructor(
                 connectBleDeviceUseCase.disconnect()
 
                 android.util.Log.d("BleConnectViewModel", "🔌 Limpiando estado local del ViewModel")
-                // Solo limpiar datos locales del UI, no el estado de conexión
+                // Solo limpiar data locales del UI, no el state of conexión
                 _uiState.value = _uiState.value.copy(
                     connectedDevice = null,
                     isConnecting = null,
                     error = null,
-                    availableDevices = emptyList() // Limpiar lista para forzar nuevo escaneo
+                    availableDevices = emptyList() // Limpiar lista for forzar nuevo escaneo
                 )
 
                 android.util.Log.d(
                     "BleConnectViewModel",
-                    "🔌 Desconexión completada desde ViewModel"
+                    "🔌 Desconexión completada from ViewModel"
                 )
 
             } catch (e: Exception) {
                 android.util.Log.e("BleConnectViewModel", "🔌 Error al desconectar: ${e.message}", e)
                 _uiState.value = _uiState.value.copy(
-                    error = e.message ?: "Error al desconectar dispositivo"
+                    error = e.message ?: "Error al desconectar device"
                 )
             }
         }

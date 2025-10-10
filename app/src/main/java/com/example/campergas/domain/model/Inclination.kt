@@ -6,19 +6,19 @@ data class Inclination(
     val timestamp: Long = System.currentTimeMillis() // Measurement time
 ) {
     /**
-     * Calculates if device is leveled en pitch (tolerance ±2°)
+     * Calculatestes if device is leveled en pitch (tolerance ±2°)
      */
     val isLevelPitch: Boolean
         get() = kotlin.math.abs(pitch) <= 2.0f
 
     /**
-     * Calculates if device is leveled en roll (tolerance ±2°)
+     * Calculatestes if device is leveled en roll (tolerance ±2°)
      */
     val isLevelRoll: Boolean
         get() = kotlin.math.abs(roll) <= 2.0f
 
     /**
-     * Calcula if the device está completamente nivelado
+     * Calculates if the device está completely nivelado
      */
     val isLevel: Boolean
         get() = isLevelPitch && isLevelRoll
@@ -29,7 +29,7 @@ data class Inclination(
     fun getFormattedValue(): String = "P: %.1f° R: %.1f°".format(pitch, roll)
 
     /**
-     * Gets formatted date of the medición
+     * Gets formatted date of the measurement
      */
     fun getFormattedTimestamp(): String {
         val date = java.util.Date(timestamp)

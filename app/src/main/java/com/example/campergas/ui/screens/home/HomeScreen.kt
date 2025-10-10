@@ -67,12 +67,12 @@ fun HomeScreen(
 
     var showAddCylinderDialog by remember { mutableStateOf(false) }
 
-    // Hacer petición de datos from sensor al abrir la pantalla
+    // Hacer petición of data from sensor al abrir la screen
     LaunchedEffect(Unit) {
         viewModel.requestSensorDataOnScreenOpen()
     }
 
-    // Diálogo para agregar bombona
+    // Diálogo for agregar bombona
     if (showAddCylinderDialog) {
         AddGasCylinderDialog(
             onDismiss = { showAddCylinderDialog = false },
@@ -156,7 +156,7 @@ fun HomeScreen(
                                 modifier = Modifier.size(60.dp, 90.dp)
                             )
                         } ?: run {
-                            // Bombona vacía si no hay datos
+                            // Bombona vacía si no hay data
                             GasCylinderVisualizer(
                                 fuelPercentage = 0f,
                                 modifier = Modifier.size(60.dp, 90.dp)
@@ -173,7 +173,7 @@ fun HomeScreen(
                         isLargeButton = true,
                         verticalLayout = true
                     ) {
-                        // Mostrar resumen compacto de consumo
+                        // Mostrar resumen compacto de consumption
                         ConsumptionPreview(
                             lastDayConsumption = lastDayConsumption,
                             lastWeekConsumption = lastWeekConsumption
@@ -188,7 +188,7 @@ fun HomeScreen(
                     onClick = { navController.navigate(Screen.Inclination.route) },
                     isLargeButton = true
                 ) {
-                    // Mostrar vista compacta del vehículo con inclinación para la home screen
+                    // Mostrar vista compacta del vehículo con inclinación for la home screen
                     vehicleConfig?.let { config ->
                         VehicleInclinationView(
                             vehicleType = config.type,

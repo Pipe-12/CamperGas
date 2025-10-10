@@ -25,31 +25,31 @@ data class FuelMeasurementEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val cylinderId: Long, // ID of the bombona
-    val cylinderName: String, // Nombre of the bombona para referencia
-    val timestamp: Long, // Timestamp de when tomó la medición
+    val cylinderName: String, // Nombre of the bombona for referencia
+    val timestamp: Long, // Timestamp de when tomó la measurement
     val fuelKilograms: Float, // Kilogramos de combustible disponible (ya calculados)
     val fuelPercentage: Float, // Porcentaje de combustible (0-100)
     val totalWeight: Float, // Peso total medido (bombona + combustible)
-    val isCalibrated: Boolean = true, // Indica si la medición está calibrada
-    val isHistorical: Boolean = false // Indica si es un dato histórico
+    val isCalibrated: Boolean = true, // Indica si la measurement está calibrada
+    val isHistorical: Boolean = false // Indica si es un dato historical
 ) {
     /**
-     * Formatea los kilogramos de combustible para mostrar en la UI
+     * Formatea los kilogramos de combustible for mostrar en la UI
      */
     fun getFormattedFuelKilograms(): String = "%.2f kg".format(fuelKilograms)
 
     /**
-     * Formatea el porcentaje para mostrar en la UI
+     * Formatea el porcentaje for mostrar en la UI
      */
     fun getFormattedPercentage(): String = "%.1f%%".format(fuelPercentage)
 
     /**
-     * Formatea el total weight medido para mostrar en la UI
+     * Formatea el total weight medido for mostrar en la UI
      */
     fun getFormattedTotalWeight(): String = "%.2f kg".format(totalWeight)
 
     /**
-     * Gets formatted date of the medición
+     * Gets formatted date of the measurement
      */
     fun getFormattedTimestamp(): String {
         val date = java.util.Date(timestamp)
@@ -58,7 +58,7 @@ data class FuelMeasurementEntity(
     }
 
     /**
-     * Obtiene la fecha y hora completa formateada
+     * Gets la date y hora completa formatted
      */
     fun getFullFormattedTimestamp(): String {
         val date = java.util.Date(timestamp)
@@ -68,7 +68,7 @@ data class FuelMeasurementEntity(
     }
 
     /**
-     * Verifica si la medición es válida
+     * Verifica si la measurement es válida
      */
     fun isValid(): Boolean =
         !fuelKilograms.isNaN() && !fuelKilograms.isInfinite() && fuelKilograms >= 0 &&

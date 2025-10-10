@@ -49,14 +49,14 @@ class HomeViewModel @Inject constructor(
     val inclinationRoll: StateFlow<Float> = _inclinationRoll
 
     init {
-        // Observar el estado de conexión desde ReadSensorDataUseCase
+        // Observar el state of conexión from ReadSensorDataUseCase
         viewModelScope.launch {
             readSensorDataUseCase.getConnectionState().collectLatest { isConnected ->
                 _connectionState.value = isConnected
             }
         }
 
-        // Intentar conectar with the último dispositivo utilizado
+        // Intentar conectar with the último device utilizado
         viewModelScope.launch {
             connectBleDeviceUseCase.getLastConnectedDevice().collectLatest { lastDeviceAddress ->
                 if (lastDeviceAddress.isNotEmpty() && !_connectionState.value) {
@@ -69,7 +69,7 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        // Observar los datos de combustible
+        // Observar los data de combustible
         viewModelScope.launch {
             getFuelDataUseCase().collectLatest {
                 _fuelData.value = it
@@ -83,7 +83,7 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        // Observar datos de inclinación
+        // Observar data of inclination
         viewModelScope.launch {
             getInclinationUseCase().collectLatest { inclination ->
                 inclination?.let {
@@ -93,7 +93,7 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        // Cargar datos de consumo
+        // Loadr data de consumption
         loadConsumptionSummaries()
     }
 
@@ -127,18 +127,18 @@ class HomeViewModel @Inject constructor(
                 connectBleDeviceUseCase.disconnect()
                 _connectionState.value = false
             } catch (_: Exception) {
-                // Manejar error
+                // Handle error
             }
         }
     }
 
     /**
-     * Solicita una lectura única de todos los datos from sensor
-     * Se llama cada vez que se abre la pantalla Home
+     * Solicita una lectura única de todos los data from sensor
+     * Se llama cada vez que se abre la screen Home
      */
     fun requestSensorDataOnScreenOpen() {
         viewModelScope.launch {
-            // Esperar un poco para que la UI se establezca
+            // Esperar un poco for que la UI se establezca
             kotlinx.coroutines.delay(500)
 
             // Solo hacer la petición si hay conexión activa
@@ -146,7 +146,7 @@ class HomeViewModel @Inject constructor(
                 try {
                     readSensorDataUseCase.readAllSensorData()
                 } catch (_: Exception) {
-                    // Manejar error silenciosamente para no afectar la UI
+                    // Handle error silenciosamente for no afectar la UI
                 }
             }
         }

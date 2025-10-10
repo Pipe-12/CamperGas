@@ -1,8 +1,8 @@
 package com.example.campergas.domain.model
 
 /**
- * Modelo que representa un registro de consumo de combustible
- * Es una vista simplificada de FuelMeasurement enfocada in the historial de consumo
+ * Modelo que representa un registro de consumption de combustible
+ * Es una vista simplificada de FuelMeasurement enfocada in the historial de consumption
  */
 data class Consumption(
     val id: Long = 0,
@@ -13,7 +13,7 @@ data class Consumption(
     val fuelPercentage: Float,
     val totalWeight: Float,
     val isCalibrated: Boolean = true,
-    val isHistorical: Boolean = false // Indica si es un dato histórico/offline
+    val isHistorical: Boolean = false // Indica si es un dato historical/offline
 ) {
     /**
      * Convierte un FuelMeasurement a Consumption

@@ -11,7 +11,7 @@ class GasCylinderRepository @Inject constructor(
     private val gasCylinderDao: GasCylinderDao
 ) {
 
-    // CRUD operaciones para bombonas
+    // CRUD operaciones for bombonas
     fun getAllCylinders(): Flow<List<GasCylinder>> = gasCylinderDao.getAllCylinders()
 
     fun getActiveCylinder(): Flow<GasCylinder?> = gasCylinderDao.getActiveCylinder()

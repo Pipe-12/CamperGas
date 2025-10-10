@@ -57,7 +57,7 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
         try {
             val serviceStarted = com.example.campergas.service.BleForegroundService.startForWidgets(context)
             if (serviceStarted) {
-                Log.d("VehicleStabilityWidget", "Servicio BLE iniciado para widgets")
+                Log.d("VehicleStabilityWidget", "Service BLE started for widgets")
             } else {
                 Log.w("VehicleStabilityWidget", "No se pudo iniciar servicio BLE - continuando sin servicio de fondo")
             }
@@ -85,7 +85,7 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
                     com.example.campergas.service.BleForegroundService.stopService(context)
                 }
             } catch (e: Exception) {
-                Log.e("VehicleStabilityWidget", "Error al verificar widgets activos", e)
+                Log.e("VehicleStabilityWidget", "Error verifying widgets activos", e)
             }
         }
     }
@@ -116,23 +116,23 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
                     views.setTextViewText(R.id.widget_stability_indicator, stabilityIndicator)
                     
                     // Timestamp
-                    views.setTextViewText(R.id.widget_last_update, "Actualizado: ${inclinationData.getFormattedTimestamp()}")
+                    views.setTextViewText(R.id.widget_last_update, "Updated: ${inclinationData.getFormattedTimestamp()}")
                 } else {
                     views.setTextViewText(R.id.widget_pitch_value, "P: --°")
                     views.setTextViewText(R.id.widget_roll_value, "R: --°")
                     views.setTextViewText(R.id.widget_stability_status, "⚠️ SIN DATOS")
                     views.setTextViewText(R.id.widget_stability_indicator, "❓")
-                    views.setTextViewText(R.id.widget_last_update, "Sin datos disponibles")
+                    views.setTextViewText(R.id.widget_last_update, "Sin data disponibles")
                 }
 
                 // Configure connection state
-                val connectionText = if (isConnected) "🟢 Conectado" else "🔴 Desconectado"
+                val connectionText = if (isConnected) "🟢 Connected" else "🔴 Disconnected"
                 views.setTextViewText(R.id.widget_connection_status, connectionText)
 
                 // Configurar intents
                 setupIntents(context, views)
 
-                // Actualizar widget
+                // Updatesr widget
                 appWidgetManager.updateAppWidget(appWidgetId, views)
                 
             } catch (e: Exception) {
@@ -158,7 +158,7 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
         )
         views.setOnClickPendingIntent(R.id.widget_container, openAppPendingIntent)
 
-        // Intent para solicitar datos de inclinación
+        // Intent for solicitar data of inclination
         val requestDataIntent = Intent(context, VehicleStabilityWidgetProvider::class.java).apply {
             action = ACTION_REQUEST_INCLINATION_DATA
         }
@@ -181,10 +181,10 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
                         val entryPoint = getEntryPoint(context)
                         val bleRepository = entryPoint.bleRepository()
                         
-                        // Solicitar datos de inclinación manualmente
+                        // Solicitar data of inclination manualmente
                         bleRepository.readInclinationDataOnDemand()
                         
-                        // Actualizar todos los widgets
+                        // Updatesr todos los widgets
                         val appWidgetManager = AppWidgetManager.getInstance(context)
                         val componentName = ComponentName(context, VehicleStabilityWidgetProvider::class.java)
                         val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)

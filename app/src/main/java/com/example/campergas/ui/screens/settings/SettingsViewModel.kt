@@ -26,7 +26,7 @@ class SettingsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
-    // StateFlows para intervalos de lectura BLE
+    // StateFlows for intervalos de lectura BLE
     val weightInterval: StateFlow<Int> =
         configureReadingIntervalsUseCase.getWeightReadIntervalSeconds()
             .map { it / 60 } // Convertir segundos a minutos
@@ -44,7 +44,7 @@ class SettingsViewModel @Inject constructor(
                 initialValue = 15  //1 segundo por defecto
             )
 
-    // Estado para feedback visual de operaciones BLE
+    // Estado for feedback visual de operaciones BLE
     private val _operationStatus = MutableStateFlow<String?>(null)
     val operationStatus: StateFlow<String?> = _operationStatus.asStateFlow()
 

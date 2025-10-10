@@ -64,33 +64,33 @@ class GetConsumptionHistoryUseCase @Inject constructor(
     }
 
     /**
-     * Calcula el total de gas consumido en una lista de mediciones
+     * Calculates el total de gas consumido en una lista de mediciones
      */
     fun calculateTotalConsumption(consumptions: List<Consumption>): Float {
         if (consumptions.isEmpty()) return 0f
         
-        // Agrupar por cilindro y calcular el consumo para cada uno
+        // Agrupar por cilindro y calcular el consumption for cada uno
         return consumptions.groupBy { it.cylinderId }
             .map { (_, cylinderConsumptions) ->
                 val sortedConsumptions = cylinderConsumptions.sortedByDescending { it.date }
                 if (sortedConsumptions.size < 2) return@map 0f
                 
-                // Calcular la diferencia entre la primera y última medición del período
+                // Calculatesr la diferencia entre la primera y última measurement del period
                 val firstMeasurement = sortedConsumptions.first()  // Más reciente
                 val lastMeasurement = sortedConsumptions.last()    // Más antigua
                 
-                // El consumo es la diferencia: medición inicial - medición final
+                // El consumption es la diferencia: measurement inicial - measurement final
                 val calculatedConsumption = lastMeasurement.fuelKilograms - firstMeasurement.fuelKilograms
                 
                 // Evitar valores negativos (puede ocurrir durante recargas de bombonas)
-                // En caso de recarga, el consumo se considera 0 para ese período
+                // En caso de recarga, el consumption se considera 0 for ese period
                 kotlin.math.max(0f, calculatedConsumption)
             }
             .sum()
     }
 
     /**
-     * Prepara datos para gráfico agrupando consumos por día
+     * Prefor data for gráfico agrupando consumptions por día
      */
     fun prepareChartData(consumptions: List<Consumption>): List<ChartDataPoint> {
         if (consumptions.isEmpty()) return emptyList()
@@ -113,7 +113,7 @@ class GetConsumptionHistoryUseCase @Inject constructor(
 }
 
 /**
- * Representa un punto de datos for the gráfico
+ * Representa un punto of data for the gráfico
  */
 data class ChartDataPoint(
     val date: Long,      // timestamp del día

@@ -403,7 +403,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
     )
 
     // Detalles adicionales
-    // Roof separation line
+    // Roof sefortion line
     drawLine(
         color = Color.Black.copy(alpha = 0.3f),
         start = Offset(-width / 2 + 15, bodyOffsetY),
