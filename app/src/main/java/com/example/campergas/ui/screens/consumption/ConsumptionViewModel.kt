@@ -22,7 +22,7 @@ class ConsumptionViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ConsumptionUiState())
     val uiState: StateFlow<ConsumptionUiState> = _uiState.asStateFlow()
 
-    // Job para cancelar la corrutina de carga cuando sea necesario
+    // Job for cancelar la corrutina de carga whena necesario
     private var loadingJob: Job? = null
 
     init {
@@ -90,7 +90,7 @@ class ConsumptionViewModel @Inject constructor(
     }
 
     /**
-     * Método helper para reducir duplicación de código en filtros de fecha
+     * Helper method to reduce code duplication en filtros de date
      */
     private fun setDateRangeFromCalendar(calendarField: Int, amount: Int) {
         val calendar = Calendar.getInstance()

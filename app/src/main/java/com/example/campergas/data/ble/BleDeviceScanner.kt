@@ -20,7 +20,7 @@ class BleDeviceScanner @Inject constructor(
     private val _isScanning = MutableStateFlow(false)
     val isScanning: StateFlow<Boolean> = _isScanning
 
-    // Filtro para mostrar solo dispositivos compatibles
+    // Filter to show only compatible devices
     private var showOnlyCompatibleDevices = false
 
     private val bluetoothAdapter: BluetoothAdapter? get() = bleManager.bluetoothAdapter
@@ -30,11 +30,11 @@ class BleDeviceScanner @Inject constructor(
         @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val device = result.device
-            val deviceName = device.name ?: "Dispositivo desconocido"
+            val deviceName = device.name ?: "Unknown device"
             val deviceAddress = device.address
             val rssi = result.rssi
 
-            // Obtener servicios de los datos del scan
+            // Get services from scan data
             val services = result.scanRecord?.serviceUuids?.map { it.toString() } ?: emptyList()
 
             val bleDevice = BleDevice(
@@ -50,27 +50,27 @@ class BleDeviceScanner @Inject constructor(
 
         override fun onScanFailed(errorCode: Int) {
             _isScanning.value = false
-            // Podrías emitir un error aquí si necesitas manejar fallos de scan
+            // Could emit error here if you need to handle scan failures
         }
     }
 
     private fun addDeviceToList(device: BleDevice) {
         val currentList = _scanResults.value.toMutableList()
 
-        // Comprueba si el dispositivo ya está en la lista
+        // Check if device is already in the list
         val existingIndex = currentList.indexOfFirst { it.address == device.address }
 
         if (existingIndex >= 0) {
-            // Actualizar dispositivo existente
+            // Updatesr device existente
             currentList[existingIndex] = device
         } else {
-            // Añadir nuevo dispositivo solo si pasa el filtro o si el filtro está desactivado
+            // Add new device only if it passes filter or if filter is disabled
             if (!showOnlyCompatibleDevices || device.isCompatibleWithCamperGas) {
                 currentList.add(device)
             }
         }
 
-        // Aplicar filtro a toda la lista si está activado
+        // Apply filter to entire list if enabled
         val filteredList = if (showOnlyCompatibleDevices) {
             currentList.filter { it.isCompatibleWithCamperGas }
         } else {
@@ -81,7 +81,7 @@ class BleDeviceScanner @Inject constructor(
     }
 
     /**
-     * Establece el filtro para mostrar solo dispositivos compatibles con CamperGas
+     * Establece el filtro for mostrar solo devices compatibles con CamperGas
      */
     fun setCompatibleDevicesFilter(enabled: Boolean) {
         showOnlyCompatibleDevices = enabled
@@ -89,12 +89,12 @@ class BleDeviceScanner @Inject constructor(
     }
 
     /**
-     * Obtiene el estado current del filtro
+     * Gets el estado current del filtro
      */
     fun isCompatibleFilterEnabled(): Boolean = showOnlyCompatibleDevices
 
     /**
-     * Actualiza los resultados aplicando el filtro si está activado
+     * Updates results applying filter if enabled
      */
     private fun updateFilteredResults() {
         val allDevices = _scanResults.value

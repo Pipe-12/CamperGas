@@ -15,15 +15,15 @@ class AddGasCylinderUseCase @Inject constructor(
     ): Result<Long> {
         return try {
             if (name.isBlank()) {
-                return Result.failure(IllegalArgumentException("El nombre no puede estar vacío"))
+                return Result.failure(IllegalArgumentException("Name cannot be empty"))
             }
 
             if (tare < 0) {
-                return Result.failure(IllegalArgumentException("La tara no puede ser negativa"))
+                return Result.failure(IllegalArgumentException("Tare cannot be negative"))
             }
 
             if (capacity <= 0) {
-                return Result.failure(IllegalArgumentException("La capacidad debe ser mayor que cero"))
+                return Result.failure(IllegalArgumentException("Capacity must be greater than zero"))
             }
 
             val cylinder = GasCylinder(
@@ -35,7 +35,7 @@ class AddGasCylinderUseCase @Inject constructor(
 
             val id = repository.insertCylinder(cylinder)
 
-            // Si se debe establecer como activa, desactivar las demás
+            // If should be set as active, deactivate the others
             if (setAsActive) {
                 repository.setActiveCylinder(id)
             }

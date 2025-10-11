@@ -4,13 +4,13 @@ import com.example.campergas.data.repository.BleRepository
 import javax.inject.Inject
 
 /**
- * UseCase para solicitar datos de peso del sensor BLE bajo demanda
+ * UseCase for solicitar data of weight from sensor BLE bajo demanda
  */
 class RequestWeightDataUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
     /**
-     * Ejecuta la solicitud de datos de peso
+     * Ejecuta la request of data of weight
      */
     operator fun invoke() {
         bleRepository.readWeightDataOnDemand()

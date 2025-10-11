@@ -8,14 +8,14 @@ data class GasCylinder(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
-    val tare: Float, // Peso de la bombona vacía en kg
+    val tare: Float, // Empty cylinder weight en kg
     val capacity: Float, // Capacidad de gas en kg
-    val isActive: Boolean = false, // Solo una bombona puede estar activa
+    val isActive: Boolean = false, // Solo una cylinder puede estar activa
     val createdAt: Long = System.currentTimeMillis()
 ) {
     /**
-     * Calcula el contenido de gas basado en el peso total
-     * @param totalWeight Peso total de la bombona (tara + gas)
+     * Calculates el contenido de gas basado in the total weight
+     * @form totalWeight Peso total of the cylinder (tara + gas)
      * @return Peso del gas en kg
      */
     fun calculateGasContent(totalWeight: Float): Float {
@@ -24,8 +24,8 @@ data class GasCylinder(
     }
 
     /**
-     * Calcula el porcentaje de gas restante
-     * @param totalWeight Peso total de la bombona
+     * Calculates el porcentaje de gas restante
+     * @form totalWeight Peso total of the cylinder
      * @return Porcentaje de gas (0-100)
      */
     fun calculateGasPercentage(totalWeight: Float): Float {
@@ -34,21 +34,21 @@ data class GasCylinder(
     }
 
     /**
-     * Determina si la bombona está vacía (menos del 5% de gas)
+     * Determines if cylinder is empty (less than 5% gas)
      */
     fun isEmpty(totalWeight: Float): Boolean {
         return calculateGasPercentage(totalWeight) < 5f
     }
 
     /**
-     * Determina si la bombona está casi vacía (menos del 20% de gas)
+     * Determines if cylinder is almost empty (less than 20% gas)
      */
     fun isLowGas(totalWeight: Float): Boolean {
         return calculateGasPercentage(totalWeight) < 20f
     }
 
     /**
-     * Devuelve una descripción formateada de la bombona
+     * Returns una description formatted of the cylinder
      */
     fun getDisplayName(): String {
         return "$name (${tare}kg + ${capacity}kg)"

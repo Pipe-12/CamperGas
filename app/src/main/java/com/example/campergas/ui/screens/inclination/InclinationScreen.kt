@@ -84,11 +84,11 @@ fun InclinationScreen(
                     ) {
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("Esperando datos del sensor...")
+                        Text("Waiting for sensor data...")
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Botón para solicitar datos cuando está cargando
+                        // Button to request data when loading
                         OutlinedButton(
                             onClick = { viewModel.requestInclinationDataManually() },
                             enabled = viewModel.isConnected() && viewModel.canMakeRequest()
@@ -106,7 +106,7 @@ fun InclinationScreen(
                                 )
                             }
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(if (isRequestingData) "Solicitando..." else "Solicitar Datos")
+                            Text(if (isRequestingData) "Requesting..." else "Request Data")
                         }
 
                         if (!viewModel.isConnected()) {
@@ -133,7 +133,7 @@ fun InclinationScreen(
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Estado de nivelación
+                    // Level status
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -150,7 +150,7 @@ fun InclinationScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = if (uiState.isLevel) "✅ VEHÍCULO NIVELADO" else "⚠️ VEHÍCULO DESNIVELADO",
+                                text = if (uiState.isLevel) "✅ VEHICLE LEVELED" else "⚠️ VEHICLE NOT LEVELED",
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = if (uiState.isLevel)
@@ -163,7 +163,7 @@ fun InclinationScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Visualización del vehículo inclinado
+                    // Vehicle inclination visualization
 
                     Card(
                         modifier = Modifier.fillMaxWidth()
@@ -173,7 +173,7 @@ fun InclinationScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "🚐 Visualización del Nivelado",
+                                text = "🚐 Level Visualization",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(bottom = 12.dp)
@@ -189,10 +189,10 @@ fun InclinationScreen(
                             Spacer(modifier = Modifier.height(8.dp))
 
                             Text(
-                                text = "Tipo de vehículo: ${
+                                text = "Vehicle type: ${
                                     when (uiState.vehicleType) {
-                                        VehicleType.CARAVAN -> "Caravana"
-                                        VehicleType.AUTOCARAVANA -> "Autocaravana"
+                                        VehicleType.CARAVAN -> "Caravan"
+                                        VehicleType.AUTOCARAVANA -> "Motorhome"
                                     }
                                 }",
                                 style = MaterialTheme.typography.bodyMedium,
@@ -203,7 +203,7 @@ fun InclinationScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Mostrar elevaciones de ruedas solo si hay configuración
+                    // Show wheel elevations only if there is configuration
                     if (uiState.distanceBetweenRearWheels > 0 && uiState.distanceToFrontSupport > 0) {
                         WheelElevationsDisplay(
                             vehicleType = uiState.vehicleType,
@@ -213,7 +213,7 @@ fun InclinationScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
                     } else {
-                        // Mensaje para configurar el vehículo
+                        // Message to configure the vehicle
                         Card(
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.secondaryContainer
@@ -223,12 +223,12 @@ fun InclinationScreen(
                                 modifier = Modifier.padding(16.dp)
                             ) {
                                 Text(
-                                    text = "⚙️ Configuración Requerida",
+                                    text = "⚙️ Configuration Required",
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = "Para mostrar las estimaciones de elevación de ruedas, configura las dimensiones del vehículo en la sección de configuración.",
+                                    text = "To display wheel elevation estimates, configure the vehicle dimensions in the configuration section.",
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -237,7 +237,7 @@ fun InclinationScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
-                    // Información adicional
+                    // Additional information
                     Card(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -245,27 +245,27 @@ fun InclinationScreen(
                             modifier = Modifier.padding(16.dp)
                         ) {
                             Text(
-                                text = "Información del Sensor",
+                                text = "Sensor Information",
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
 
                             if (uiState.timestamp > 0) {
                                 Text(
-                                    text = "Última actualización: ${formatTimestamp(uiState.timestamp)}",
+                                    text = "Last update: ${formatTimestamp(uiState.timestamp)}",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }
 
-                            // Mostrar si cada eje está nivelado
+                            // Show if each axis is leveled
                             Text(
-                                text = "Estado Pitch: ${if (kotlin.math.abs(uiState.inclinationPitch) <= 2.0f) "✅ Nivelado" else "⚠️ Desnivelado"}",
+                                text = "Pitch Status: ${if (kotlin.math.abs(uiState.inclinationPitch) <= 2.0f) "✅ Leveled" else "⚠️ Not Leveled"}",
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(top = 4.dp)
                             )
 
                             Text(
-                                text = "Estado Roll: ${if (kotlin.math.abs(uiState.inclinationRoll) <= 2.0f) "✅ Nivelado" else "⚠️ Desnivelado"}",
+                                text = "Roll Status: ${if (kotlin.math.abs(uiState.inclinationRoll) <= 2.0f) "✅ Leveled" else "⚠️ Not Leveled"}",
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -273,7 +273,7 @@ fun InclinationScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Botón para solicitar datos de inclinación manualmente
+                    // Button to manually request inclination data
                     Button(
                         onClick = { viewModel.requestInclinationDataManually() },
                         modifier = Modifier.fillMaxWidth(),
@@ -292,7 +292,7 @@ fun InclinationScreen(
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(if (isRequestingData) "Solicitando..." else "Actualizar Inclinación")
+                        Text(if (isRequestingData) "Requesting..." else "Update Inclination")
                     }
 
                     if (!viewModel.isConnected()) {
@@ -315,7 +315,7 @@ fun InclinationScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Información de ayuda
+                    // Help information
                     Card(
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -325,16 +325,16 @@ fun InclinationScreen(
                             modifier = Modifier.padding(16.dp)
                         ) {
                             Text(
-                                text = "💡 Información",
+                                text = "💡 Information",
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "• Tolerancia de nivelación: ±2°\n" +
-                                        "• Pitch: Inclinación frontal/trasera (cabeceo)\n" +
-                                        "• Roll: Inclinación lateral (alabeo)\n" +
-                                        "• Pitch + = frente hacia arriba\n" +
-                                        "• Roll + = derecha hacia arriba",
+                                text = "• Leveling tolerance: ±2°\n" +
+                                        "• Pitch: Front/rear tilt (pitch)\n" +
+                                        "• Roll: Side tilt (roll)\n" +
+                                        "• Pitch + = front up\n" +
+                                        "• Roll + = right up",
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }

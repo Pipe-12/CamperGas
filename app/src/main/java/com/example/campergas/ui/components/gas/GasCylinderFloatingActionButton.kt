@@ -20,7 +20,7 @@ fun GasCylinderFloatingActionButton(
     ) {
         Icon(
             imageVector = Icons.Default.Add,
-            contentDescription = "Añadir bombona",
+            contentDescription = "Add cylinder",
             tint = MaterialTheme.colorScheme.onPrimary
         )
     }

@@ -36,21 +36,21 @@ class WeightViewModel @Inject constructor(
     val activeCylinder: StateFlow<GasCylinder?> = _activeCylinder
 
     init {
-        // Obtener configuración del vehículo
+        // Get vehicle configuration
         viewModelScope.launch {
             getVehicleConfigUseCase().collectLatest { vehicle ->
                 _vehicleState.value = vehicle
             }
         }
 
-        // Obtener bombona activa
+        // Get cylinder activa
         viewModelScope.launch {
             getActiveCylinderUseCase().collectLatest { cylinder ->
                 _activeCylinder.value = cylinder
             }
         }
 
-        // Obtener datos de combustible
+        // Get data de combustible
         viewModelScope.launch {
             getFuelDataUseCase().collectLatest { fuel ->
                 _fuelState.value = fuel
@@ -59,8 +59,8 @@ class WeightViewModel @Inject constructor(
     }
 
     /**
-     * Solicita una lectura manual de datos de peso del sensor BLE
-     * Incluye protección contra múltiples peticiones seguidas
+     * Solicita una lectura manual of data of weight from sensor BLE
+     * Includes protection against multiple consecutive requests
      */
     fun requestWeightDataManually() {
         executeManualRequest(

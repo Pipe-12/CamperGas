@@ -38,13 +38,13 @@ class WidgetConfigActivity : ComponentActivity() {
         // Configurar resultado como cancelado por defecto
         setResult(RESULT_CANCELED)
         
-        // Obtener el ID del widget desde el intent
+        // Get el ID del widget from the intent
         appWidgetId = intent?.extras?.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
         ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
         
-        // Si no hay ID válido, cerrar
+        // If no valid ID, close
         if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish()
             return
@@ -54,13 +54,13 @@ class WidgetConfigActivity : ComponentActivity() {
             CamperGasTheme {
                 WidgetConfigScreen(
                     onConfirm = {
-                        // Actualizar el widget y confirmar configuración
+                        // Update widget and confirm configuration
                         val appWidgetManager = AppWidgetManager.getInstance(this@WidgetConfigActivity)
                         
-                        // Determinar qué tipo de widget es y actualizarlo
+                        // Determine widget type and update it
                         updateWidget(appWidgetManager)
                         
-                        // Configurar resultado exitoso
+                        // Configure successful result
                         val resultValue = Intent().apply {
                             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                         }
@@ -76,8 +76,8 @@ class WidgetConfigActivity : ComponentActivity() {
     }
     
     private fun updateWidget(appWidgetManager: AppWidgetManager) {
-        // Intentar actualizar ambos tipos de widgets
-        // En una implementación real, podrías determinar el tipo específico
+        // Try to update both widget types
+        // In a real implementation, you could determine the specific type
         try {
             GasCylinderWidgetProvider().onUpdate(
                 this,
@@ -134,7 +134,7 @@ fun WidgetConfigScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Text(
-                    text = "• Toca el widget para abrir la aplicación\n• Toca el botón de actualizar para solicitar nuevos datos\n• El widget se actualiza automáticamente cuando hay cambios",
+                    text = "• Tap the widget to open the application\n• Tap the refresh button to request new data\n• The widget updates automatically when there are changes",
                     style = MaterialTheme.typography.bodySmall
                 )
                 

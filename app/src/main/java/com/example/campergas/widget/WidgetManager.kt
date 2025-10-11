@@ -17,21 +17,21 @@ class WidgetManager @Inject constructor(
     }
     
     /**
-     * Actualiza todos los widgets de gas cylinder
+     * Updates all widgets de gas cylinder
      */
     fun updateGasCylinderWidgets() {
         GasCylinderWidgetProvider.updateAllWidgets(context)
     }
     
     /**
-     * Actualiza todos los widgets de estabilidad del vehículo
+     * Updates all widgets de vehicle stability
      */
     fun updateVehicleStabilityWidgets() {
         VehicleStabilityWidgetProvider.updateAllWidgets(context)
     }
     
     /**
-     * Actualiza todos los widgets de la aplicación
+     * Updates all widgets of the application
      */
     fun updateAllWidgets() {
         updateGasCylinderWidgets()
@@ -39,51 +39,51 @@ class WidgetManager @Inject constructor(
     }
     
     /**
-     * Asegura que el servicio BLE esté ejecutándose y actualiza widgets
+     * Ensures that the service BLE is running y actualiza widgets
      */
     fun ensureBleServiceAndUpdateWidgets() {
         try {
-            // Asegurar que el servicio BLE está ejecutándose
+            // Asegurar que el servicio BLE is running
             ensureBleServiceRunning()
             
-            // Actualizar todos los widgets con los datos actuales
+            // Updatesr todos los widgets con los data actuales
             updateAllWidgets()
             
-            Log.d(TAG, "Servicio BLE asegurado y widgets actualizados")
+            Log.d(TAG, "Service BLE asegurado y widgets actualizados")
         } catch (e: Exception) {
             Log.e(TAG, "Error al asegurar servicio BLE y actualizar widgets", e)
         }
     }
     
     /**
-     * Solicita datos de inclinación manualmente y actualiza widgets
-     * También asegura que el servicio BLE esté ejecutándose
+     * Solicita data of inclination manualmente y actualiza widgets
+     * Also ensures que el servicio BLE is running
      */
     fun requestInclinationDataAndUpdateWidgets() {
         try {
-            // Asegurar que el servicio BLE está ejecutándose
+            // Asegurar que el servicio BLE is running
             ensureBleServiceRunning()
             
-            // Enviar broadcast para solicitar datos
+            // Enviar broadcast for solicitar data
             val intent = Intent(context, VehicleStabilityWidgetProvider::class.java).apply {
                 action = VehicleStabilityWidgetProvider.ACTION_REQUEST_INCLINATION_DATA
             }
             context.sendBroadcast(intent)
             
-            Log.d(TAG, "Solicitud de datos de inclinación enviada")
+            Log.d(TAG, "Solicitud of data of inclination enviada")
         } catch (e: Exception) {
-            Log.e(TAG, "Error al solicitar datos de inclinación", e)
+            Log.e(TAG, "Error al solicitar data of inclination", e)
         }
     }
     
     /**
-     * Asegura que el servicio BLE esté ejecutándose para mantener las solicitudes periódicas
+     * Ensures that the service BLE is running to maintain the periodic requests
      */
     private fun ensureBleServiceRunning() {
         try {
             val serviceStarted = com.example.campergas.service.BleForegroundService.startForWidgets(context)
             if (serviceStarted) {
-                Log.d(TAG, "Servicio BLE asegurado para widgets")
+                Log.d(TAG, "Service BLE asegurado for widgets")
             } else {
                 Log.w(TAG, "No se pudo iniciar servicio BLE - continuando sin servicio de fondo")
             }
@@ -94,7 +94,7 @@ class WidgetManager @Inject constructor(
     }
     
     /**
-     * Inicia el servicio BLE para widgets (método público para uso externo)
+     * Starts the service BLE for widgets (public method for external use)
      */
     fun startBleServiceForWidgets() {
         ensureBleServiceRunning()

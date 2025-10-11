@@ -9,8 +9,8 @@ class SaveVehicleConfigUseCase @Inject constructor(
     private val vehicleRepository: VehicleRepository
 ) {
     /**
-     * Guarda o actualiza la configuración del vehículo.
-     * Si ya existe una configuración, se actualizará en lugar de crear una nueva.
+     * Saves or updates vehicle configuration.
+     * If configuration already exists, it will be updated instead of creating a new one.
      */
     suspend operator fun invoke(
         type: VehicleType,
@@ -29,8 +29,8 @@ class SaveVehicleConfigUseCase @Inject constructor(
     }
 
     /**
-     * Guarda o actualiza un objeto de configuración completo.
-     * Si ya existe una configuración, se actualizará en lugar de crear una nueva.
+     * Saves or updates a complete configuration object.
+     * If configuration already exists, it will be updated instead of creating a new one.
      */
     suspend fun saveVehicleConfig(config: VehicleConfig) {
         vehicleRepository.saveVehicleConfig(config)

@@ -27,33 +27,33 @@ class WidgetUpdateManager @Inject constructor(
         // Escuchar cambios en las mediciones de combustible
         scope.launch {
             fuelMeasurementRepository.getLatestRealTimeMeasurement().collect { fuelMeasurement ->
-                // Actualizar widget de bombona de gas siempre, con o sin datos
+                // Updatesr widget de cylinder de gas siempre, con o sin data
                 GasCylinderWidgetProvider.updateAllWidgets(context)
             }
         }
 
-        // Escuchar cambios en los datos BLE de combustible en tiempo real
+        // Escuchar cambios en los data BLE de combustible en real time
         scope.launch {
             bleRepository.fuelMeasurementData.collect { fuelMeasurement ->
-                // Actualizar widget cuando lleguen datos BLE nuevos
+                // Updatesr widget when lleguen data BLE nuevos
                 GasCylinderWidgetProvider.updateAllWidgets(context)
             }
         }
 
-        // Escuchar cambios en los datos de inclinación
+        // Listen for changes in inclination data
         scope.launch {
             bleRepository.inclinationData.collect { inclinationData ->
                 if (inclinationData != null) {
-                    // Actualizar widget de estabilidad del vehículo
+                    // Update vehicle stability widget
                     VehicleStabilityWidgetProvider.updateAllWidgets(context)
                 }
             }
         }
 
-        // Escuchar cambios en el estado de conexión
+        // Listen for changes in connection state
         scope.launch {
             bleRepository.connectionState.collect { isConnected ->
-                // Actualizar ambos widgets cuando cambie el estado de conexión
+                // Update both widgets when connection state changes
                 GasCylinderWidgetProvider.updateAllWidgets(context)
                 VehicleStabilityWidgetProvider.updateAllWidgets(context)
             }

@@ -109,7 +109,7 @@ class AddGasCylinderUseCaseTest {
         // Assert
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        assertEquals("El nombre no puede estar vacío", result.exceptionOrNull()?.message)
+        assertEquals("Name cannot be empty", result.exceptionOrNull()?.message)
 
         coVerify(exactly = 0) { repository.insertCylinder(any()) }
     }
@@ -127,7 +127,7 @@ class AddGasCylinderUseCaseTest {
         // Assert
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        assertEquals("El nombre no puede estar vacío", result.exceptionOrNull()?.message)
+        assertEquals("Name cannot be empty", result.exceptionOrNull()?.message)
 
         coVerify(exactly = 0) { repository.insertCylinder(any()) }
     }
@@ -145,7 +145,7 @@ class AddGasCylinderUseCaseTest {
         // Assert
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        assertEquals("La tara no puede ser negativa", result.exceptionOrNull()?.message)
+        assertEquals("Tare cannot be negative", result.exceptionOrNull()?.message)
 
         coVerify(exactly = 0) { repository.insertCylinder(any()) }
     }
@@ -163,7 +163,7 @@ class AddGasCylinderUseCaseTest {
         // Assert
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        assertEquals("La capacidad debe ser mayor que cero", result.exceptionOrNull()?.message)
+        assertEquals("Capacity must be greater than zero", result.exceptionOrNull()?.message)
 
         coVerify(exactly = 0) { repository.insertCylinder(any()) }
     }
@@ -181,7 +181,7 @@ class AddGasCylinderUseCaseTest {
         // Assert
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        assertEquals("La capacidad debe ser mayor que cero", result.exceptionOrNull()?.message)
+        assertEquals("Capacity must be greater than zero", result.exceptionOrNull()?.message)
 
         coVerify(exactly = 0) { repository.insertCylinder(any()) }
     }
