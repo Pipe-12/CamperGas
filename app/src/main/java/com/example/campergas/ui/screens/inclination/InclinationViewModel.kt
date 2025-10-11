@@ -86,11 +86,11 @@ class InclinationViewModel @Inject constructor(
         val rollRad = Math.toRadians(state.inclinationRoll.toDouble())
 
         // Calcular elevaciones basándose en las distancias configuradas
-        val halfRearWheelDistance = state.distanceBetweenRearWheels / 2
+        val rearWheelDistance = state.distanceBetweenRearWheels 
 
         // Para el roll (alabeo lateral)
-        val rearLeftElevationRoll = halfRearWheelDistance * tan(rollRad)
-        val rearRightElevationRoll = -halfRearWheelDistance * tan(rollRad)
+        val rearLeftElevationRoll = rearWheelDistance * tan(rollRad)
+        val rearRightElevationRoll = -rearWheelDistance * tan(rollRad)
 
         // Para el pitch (cabeceo frontal/trasero)
         val frontElevationPitch = state.distanceToFrontSupport * tan(pitchRad)
@@ -107,9 +107,9 @@ class InclinationViewModel @Inject constructor(
 
             VehicleType.AUTOCARAVANA -> {
                 // Autocaravana: 4 ruedas
-                val halfFrontWheelDistance = state.distanceBetweenFrontWheels / 2
-                val frontLeftElevationRoll = halfFrontWheelDistance * tan(rollRad)
-                val frontRightElevationRoll = -halfFrontWheelDistance * tan(rollRad)
+                val frontWheelDistance = state.distanceBetweenFrontWheels
+                val frontLeftElevationRoll = frontWheelDistance * tan(rollRad)
+                val frontRightElevationRoll = -frontWheelDistance * tan(rollRad)
 
                 WheelElevations(
                     rearLeft = rearLeftElevationRoll.toFloat(),
