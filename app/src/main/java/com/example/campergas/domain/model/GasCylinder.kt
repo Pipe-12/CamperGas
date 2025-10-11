@@ -34,14 +34,14 @@ data class GasCylinder(
     }
 
     /**
-     * Determina si la cylinder está vacía (menos del 5% de gas)
+     * Determines if cylinder is empty (less than 5% gas)
      */
     fun isEmpty(totalWeight: Float): Boolean {
         return calculateGasPercentage(totalWeight) < 5f
     }
 
     /**
-     * Determina si la cylinder está casi vacía (menos del 20% de gas)
+     * Determines if cylinder is almost empty (less than 20% gas)
      */
     fun isLowGas(totalWeight: Float): Boolean {
         return calculateGasPercentage(totalWeight) < 20f

@@ -68,7 +68,7 @@ abstract class BaseRequestViewModel(
     }
 
     /**
-     * Verifies if a new request can be made (no está en cooldown)
+     * Verifies if a new request can be made (not in cooldown)
      */
     fun canMakeRequest(): Boolean {
         val currentTime = System.currentTimeMillis()

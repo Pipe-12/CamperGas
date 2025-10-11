@@ -46,7 +46,7 @@ data class FuelMeasurement(
     }
 
     /**
-     * Verifies if la measurement es válida
+     * Verifies if measurement is valid
      */
     fun isValid(): Boolean =
         !fuelKilograms.isNaN() && !fuelKilograms.isInfinite() && fuelKilograms >= 0 &&

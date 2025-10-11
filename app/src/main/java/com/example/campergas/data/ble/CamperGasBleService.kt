@@ -503,7 +503,7 @@ class CamperGasBleService @Inject constructor(
     }
 
     /**
-     * Añade una lectura BLE a la cola for evitar readings concurrentes
+     * Adds a BLE reading to queue to avoid concurrent readings
      */
     private fun queueBleRead(readOperation: () -> Unit) {
         synchronized(readingQueue) {
@@ -548,7 +548,7 @@ class CamperGasBleService @Inject constructor(
         gatt?.services?.forEach { service ->
             Log.d(TAG, "Service disponible: ${service.uuid}")
             service.characteristics.forEach { characteristic ->
-                Log.d(TAG, "  - Característica: ${characteristic.uuid}")
+                Log.d(TAG, "  - Characteristic: ${characteristic.uuid}")
             }
         }
     }
@@ -586,12 +586,12 @@ class CamperGasBleService @Inject constructor(
                             } else {
                                 Log.d(
                                     TAG,
-                                    "Medición omitida - ${saveResult.reason}"
+                                    "Measurement skipped - ${saveResult.reason}"
                                 )
                             }
 
                             // Siempre actualizar el StateFlow con los data de combustible
-                            // independientemente de si se guardó o no en la database
+                            // regardless of whether it was saved to database or not
                             val activeCylinder = getActiveCylinderUseCase.getActiveCylinderSync()
                             if (activeCylinder != null) {
                                 val fuelKilograms = maxOf(0f, totalWeight - activeCylinder.tare)
@@ -657,7 +657,7 @@ class CamperGasBleService @Inject constructor(
             _inclinationData.value = inclination
             Log.d(
                 TAG,
-                "Inclinación actualizada: pitch=${inclination.pitch}°, roll=${inclination.roll}°"
+                "Inclination updated: pitch=${inclination.pitch}°, roll=${inclination.roll}°"
             )
 
         } catch (e: Exception) {
@@ -667,9 +667,9 @@ class CamperGasBleService @Inject constructor(
     }
 
     /**
-     * Procesa data OFFLINE/HISTÓRICOS from sensor
-     * Estos data provienen of the characteristic OFFLINE_CHARACTERISTIC_UUID
-     * y se marcan automáticamente como isHistorical = true
+     * Processes OFFLINE/HISTORICAL data from sensor
+     * This data comes from the OFFLINE_CHARACTERISTIC_UUID characteristic
+     * and are automatically marked as isHistorical = true
      */
     private fun processOfflineData(data: ByteArray) {
         try {
@@ -677,10 +677,10 @@ class CamperGasBleService @Inject constructor(
             Log.d(TAG, "Datos offline recibidos (lote ${offlineDataCount + 1}): $jsonString")
 
             /*
-             * IMPORTANTE: Los data offline vienen con timestamps relativos
-             * El campo "t" contiene los MILISEGUNDOS transcurridos from que se tomó la measurement
-             * Debemos calcular el timestamp absoluto restando estos milisegundos del momento actual
-             * Ejemplo: Si "t":300000, significa que la measurement se tomó hace 5 minutos (300000 ms)
+             * IMPORTANT: Offline data comes with relative timestamps
+             * The "t" field contains MILLISECONDS elapsed since measurement was taken
+             * We must calculate absolute timestamp by subtracting these milliseconds from current time
+             * Example: If "t":300000, it means measurement was taken 5 minutes ago (300000 ms)
              */
 
             // Verify if data is empty, is "0", or indicates end of data
@@ -690,7 +690,7 @@ class CamperGasBleService @Inject constructor(
                 jsonString.equals("END", ignoreCase = true) ||
                 jsonString.trim() == "0"
             ) {
-                Log.d(TAG, "Fin of data offline detectado (data vacíos o 0)")
+                Log.d(TAG, "End of offline data detected (empty data or 0)")
                 finishOfflineDataReading()
                 return
             }
@@ -700,7 +700,7 @@ class CamperGasBleService @Inject constructor(
 
             // If array is empty, we are done
             if (jsonArray.length() == 0) {
-                Log.d(TAG, "Array vacío recibido - fin of data offline")
+                Log.d(TAG, "Empty array received - end of offline data")
                 finishOfflineDataReading()
                 return
             }
@@ -754,12 +754,12 @@ class CamperGasBleService @Inject constructor(
                         // Marcar este dato como procesado
                         processedOfflineData.add(dataKey)
 
-                        // Calculatesr el timestamp real de when tomó la measurement
+                        // Calculate real timestamp of when measurement was taken
                         val actualTimestamp = calculateHistoricalTimestamp(millisecondsAgo)
 
                         Log.d(
                             TAG,
-                            "📊 Procesando measurement histórica: ${weightValue}kg tomada hace ${millisecondsAgo}ms"
+                            "📊 Processing historical measurement: ${weightValue}kg taken ${millisecondsAgo}ms"
                         )
                         Log.d(
                             TAG, "🕒 Timestamp calculado: $actualTimestamp (${
@@ -901,8 +901,8 @@ class CamperGasBleService @Inject constructor(
     }
 
     fun disconnect() {
-        Log.d(TAG, "🔌 Iniciando desconexión from sensor CamperGas")
-        Log.d(TAG, "🔌 Estado actual de conexión: ${_connectionState.value}")
+        Log.d(TAG, "🔌 Starting disconnection from sensor CamperGas")
+        Log.d(TAG, "🔌 Current connection state: ${_connectionState.value}")
 
         // Stop periodic reading
         stopPeriodicDataReading()
@@ -910,7 +910,7 @@ class CamperGasBleService @Inject constructor(
         // IMPORTANTE: Updatesr el estado inmediatamente
         // No esperar al callback porque a veces no se ejecuta
         _connectionState.value = false
-        Log.d(TAG, "🔌 Estado de conexión actualizado a: false")
+        Log.d(TAG, "🔌 Connection state updated to: false")
 
         bluetoothGatt?.let { gatt ->
             // Verificar permisos antes de desconectar
@@ -939,22 +939,22 @@ class CamperGasBleService @Inject constructor(
             cleanup()
         }
 
-        Log.d(TAG, "🔌 Desconexión completada - Estado final: ${_connectionState.value}")
+        Log.d(TAG, "🔌 Disconnection completed - Final state: ${_connectionState.value}")
     }
 
     /**
-     * Inicia la lectura automática of data offline al conectar
+     * Starts automatic offline data reading on connect
      */
     private fun startAutomaticOfflineDataReading() {
         offlineCharacteristic?.let { characteristic ->
             bluetoothGatt?.let { gatt ->
                 // Verify permissions before requesting historical data
                 if (!bleManager.hasBluetoothConnectPermission()) {
-                    Log.e(TAG, "No hay permisos for lectura automática of data offline")
+                    Log.e(TAG, "No permissions for automatic offline data reading")
                     return
                 }
 
-                Log.d(TAG, "🔄 Iniciando lectura automática of data offline al conectar...")
+                Log.d(TAG, "🔄 Starting automatic offline data reading on connect...")
 
                 // Inicializar la lectura continua of data offline
                 startOfflineDataReading()
@@ -969,10 +969,10 @@ class CamperGasBleService @Inject constructor(
                 }
 
             } ?: run {
-                Log.e(TAG, "No connection GATT disponible for lectura automática")
+                Log.e(TAG, "No GATT connection available for automatic reading")
             }
         } ?: run {
-            Log.w(TAG, "Característica offline no disponible for lectura automática")
+            Log.w(TAG, "Offline characteristic not available for automatic reading")
         }
     }
 
@@ -1014,7 +1014,7 @@ class CamperGasBleService @Inject constructor(
                 finishOfflineDataReading()
             }
         } ?: run {
-            Log.e(TAG, "Característica offline no disponible for continuar")
+            Log.e(TAG, "Offline characteristic not available to continue")
             finishOfflineDataReading()
         }
     }
@@ -1032,12 +1032,12 @@ class CamperGasBleService @Inject constructor(
         _historyData.value = sortedHistoryData
 
         if (allHistoryData.isNotEmpty()) {
-            Log.d(TAG, "✅ Sincronización offline completada con éxito")
+            Log.d(TAG, "✅ Offline synchronization completed successfully")
             Log.d(
                 TAG,
                 "📊 Rango of data: ${allHistoryData.minOfOrNull { it.timestamp }} - ${allHistoryData.maxOfOrNull { it.timestamp }}"
             )
-            Log.d(TAG, "🎯 Datos offline sincronizados automáticamente al conectar")
+            Log.d(TAG, "🎯 Offline data synchronized automatically on connect")
         } else {
             Log.d(TAG, "ℹ️ No se encontraron data offline in the sensor")
         }
@@ -1078,13 +1078,13 @@ class CamperGasBleService @Inject constructor(
         _inclinationData.value = null
         processedOfflineData.clear() // Limpiar data procesados al desconectar
 
-        Log.d(TAG, "🧹 Limpieza completada - Estado conexión: ${_connectionState.value}")
+        Log.d(TAG, "🧹 Cleanup completed - Connection state: ${_connectionState.value}")
     }
 
     fun isConnected(): Boolean = _connectionState.value
 
     /**
-     * Fuerza la verificación y lectura of data offline si hay conexión activa
+     * Forces verification and reading of offline data if there is active connection
      */
     fun ensureOfflineDataReading() {
         if (isConnected() && !isReadingOfflineData) {
@@ -1098,8 +1098,8 @@ class CamperGasBleService @Inject constructor(
     }
 
     /**
-     * Calculates el timestamp real de una measurement basándose en cuántos milisegundos han pasado
-     * from que se tomó la measurement to ahora
+     * Calculates real timestamp of a measurement based on how many milliseconds have passed
+     * since measurement was taken until now
      */
     private fun calculateHistoricalTimestamp(millisecondsAgo: Long): Long {
         return System.currentTimeMillis() - millisecondsAgo

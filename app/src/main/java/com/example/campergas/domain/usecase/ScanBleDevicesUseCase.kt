@@ -42,7 +42,7 @@ class ScanBleDevicesUseCase @Inject constructor(
     }
 
     /**
-     * Verifies if el filtro está activado
+     * Verifies if filter is enabled
      */
     fun isCompatibleFilterEnabled(): Boolean {
         return bleRepository.isCompatibleFilterEnabled()

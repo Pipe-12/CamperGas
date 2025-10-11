@@ -3,7 +3,7 @@ package com.example.campergas.domain.model
 data class BleDevice(
     val name: String,
     val address: String,
-    val rssi: Int, // Intensidad of the señal
+    val rssi: Int, // Signal strength
     val isConnected: Boolean = false,
     val services: List<String> = emptyList(), // UUIDs de servicios disponibles
     val isConnectable: Boolean = true,
@@ -14,7 +14,7 @@ data class BleDevice(
             rssi >= -50 -> "Excelente"
             rssi >= -70 -> "Buena"
             rssi >= -85 -> "Regular"
-            else -> "Débil"
+            else -> "Weak"
         }
 
     /**
@@ -36,7 +36,7 @@ data class BleDevice(
         get() = when {
             name.contains("CamperGas", ignoreCase = true) -> "Sensor CamperGas"
             name.contains("Weight", ignoreCase = true) -> "Sensor de Peso"
-            name.contains("Inclination", ignoreCase = true) -> "Sensor de Inclinación"
+            name.contains("Inclination", ignoreCase = true) -> "Inclination Sensor"
             isCompatibleWithCamperGas -> "Dispositivo Compatible"
             else -> "Dispositivo BLE"
         }

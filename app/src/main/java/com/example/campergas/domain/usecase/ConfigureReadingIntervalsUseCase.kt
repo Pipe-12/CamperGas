@@ -74,7 +74,7 @@ class ConfigureReadingIntervalsUseCase @Inject constructor(
     }
 
     /**
-     * Reinicia la lectura periódica con los intervalos actuales
+     * Restarts periodic reading with current intervals
      */
     fun restartPeriodicReading() {
         bleRepository.restartPeriodicDataReading()

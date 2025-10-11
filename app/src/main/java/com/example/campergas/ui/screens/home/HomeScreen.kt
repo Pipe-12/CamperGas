@@ -67,12 +67,12 @@ fun HomeScreen(
 
     var showAddCylinderDialog by remember { mutableStateOf(false) }
 
-    // Hacer petición of data from sensor al abrir la screen
+    // Make data request from sensor when opening screen
     LaunchedEffect(Unit) {
         viewModel.requestSensorDataOnScreenOpen()
     }
 
-    // Diálogo for agregar cylinder
+    // Dialog to add cylinder
     if (showAddCylinderDialog) {
         AddGasCylinderDialog(
             onDismiss = { showAddCylinderDialog = false },
@@ -156,7 +156,7 @@ fun HomeScreen(
                                 modifier = Modifier.size(60.dp, 90.dp)
                             )
                         } ?: run {
-                            // Bombona vacía si no hay data
+                            // Empty cylinder if no data
                             GasCylinderVisualizer(
                                 fuelPercentage = 0f,
                                 modifier = Modifier.size(60.dp, 90.dp)

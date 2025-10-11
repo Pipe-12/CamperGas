@@ -20,7 +20,7 @@ class BleDeviceScanner @Inject constructor(
     private val _isScanning = MutableStateFlow(false)
     val isScanning: StateFlow<Boolean> = _isScanning
 
-    // Filtro for mostrar solo devices compatibles
+    // Filter to show only compatible devices
     private var showOnlyCompatibleDevices = false
 
     private val bluetoothAdapter: BluetoothAdapter? get() = bleManager.bluetoothAdapter
@@ -50,27 +50,27 @@ class BleDeviceScanner @Inject constructor(
 
         override fun onScanFailed(errorCode: Int) {
             _isScanning.value = false
-            // Podrías emitir un error aquí si necesitas manejar fallos de scan
+            // Could emit error here if you need to handle scan failures
         }
     }
 
     private fun addDeviceToList(device: BleDevice) {
         val currentList = _scanResults.value.toMutableList()
 
-        // Comprueba if the device ya está en la lista
+        // Check if device is already in the list
         val existingIndex = currentList.indexOfFirst { it.address == device.address }
 
         if (existingIndex >= 0) {
             // Updatesr device existente
             currentList[existingIndex] = device
         } else {
-            // Add nuevo device solo si pasa el filtro o si el filtro está desactivado
+            // Add new device only if it passes filter or if filter is disabled
             if (!showOnlyCompatibleDevices || device.isCompatibleWithCamperGas) {
                 currentList.add(device)
             }
         }
 
-        // Aplicar filtro a toda la lista si está activado
+        // Apply filter to entire list if enabled
         val filteredList = if (showOnlyCompatibleDevices) {
             currentList.filter { it.isCompatibleWithCamperGas }
         } else {
@@ -94,7 +94,7 @@ class BleDeviceScanner @Inject constructor(
     fun isCompatibleFilterEnabled(): Boolean = showOnlyCompatibleDevices
 
     /**
-     * Updates los resultados aplicando el filtro si está activado
+     * Updates results applying filter if enabled
      */
     private fun updateFilteredResults() {
         val allDevices = _scanResults.value

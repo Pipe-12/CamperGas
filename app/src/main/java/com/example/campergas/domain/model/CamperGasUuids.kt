@@ -1,7 +1,7 @@
 package com.example.campergas.domain.model
 
 object CamperGasUuids {
-    // Un único servicio for the sensor of weight con inclination
+    // Single service for weight sensor with inclination
     const val SENSOR_SERVICE_UUID = "91bad492-b950-4226-aa2b-4ede9fa42f59"
 
     // Tres characteristics dentro del mismo servicio

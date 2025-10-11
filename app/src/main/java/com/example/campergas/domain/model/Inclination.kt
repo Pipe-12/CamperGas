@@ -18,7 +18,7 @@ data class Inclination(
         get() = kotlin.math.abs(roll) <= 2.0f
 
     /**
-     * Calculates if the device está completely nivelado
+     * Calculates if device is completely leveled
      */
     val isLevel: Boolean
         get() = isLevelPitch && isLevelRoll

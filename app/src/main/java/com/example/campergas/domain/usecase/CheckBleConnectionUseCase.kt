@@ -5,20 +5,20 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
- * UseCase for verificar el state of conexión BLE
+ * UseCase to verify BLE connection state
  */
 class CheckBleConnectionUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
     /**
-     * Retorna el StateFlow del state of conexión BLE
+     * Returns StateFlow of BLE connection state
      */
     operator fun invoke(): StateFlow<Boolean> {
         return bleRepository.connectionState
     }
 
     /**
-     * Verifica si hay una conexión BLE activa en este momento
+     * Verifies if there is an active BLE connection at this moment
      */
     fun isConnected(): Boolean {
         return bleRepository.connectionState.value

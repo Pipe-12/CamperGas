@@ -61,7 +61,7 @@ class BleRepository @Inject constructor(
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun stopScan() = bleDeviceScanner.stopScan()
 
-    // Conexión unificada al sensor CamperGas
+    // Unified connection to sensor CamperGas
     fun connectToSensor(deviceAddress: String) = camperGasBleService.connect(deviceAddress)
 
     fun disconnectSensor() = camperGasBleService.disconnect()
@@ -88,7 +88,7 @@ class BleRepository @Inject constructor(
     }
 
     /**
-     * Reinicia la lectura periódica con los nuevos intervalos
+     * Restarts periodic reading with new intervals
      */
     fun restartPeriodicDataReading() {
         camperGasBleService.restartPeriodicDataReading()
