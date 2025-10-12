@@ -50,7 +50,7 @@ class WeightViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
-    // Flujos para los datos simulados
+    // Flows for simulated data
     private val fuelDataFlow = MutableStateFlow<FuelMeasurement?>(null)
     private val vehicleConfigFlow = MutableStateFlow<VehicleConfig?>(null)
     private val activeCylinderFlow = MutableStateFlow<GasCylinder?>(null)

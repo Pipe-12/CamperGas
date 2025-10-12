@@ -49,7 +49,7 @@ class ConsumptionViewModelTest {
         mockkStatic(Log::class)
         every { Log.d(any(), any()) } returns 0
 
-        // Por defecto, cuando se llama al use case sin fechas, devuelve todas las consumptions
+        // By default, when the use case is called without dates, it returns all consumptions
         every { getConsumptionHistoryUseCase(null, null) } returns consumptionsFlow
 
         // Mock the new summary methods
@@ -59,7 +59,7 @@ class ConsumptionViewModelTest {
         every { getConsumptionHistoryUseCase.calculateTotalConsumption(any()) } returns 0f
         every { getConsumptionHistoryUseCase.prepareChartData(any()) } returns emptyList()
 
-        // Inicializar el ViewModel, que llamará a loadConsumptionHistory en init
+        // Initialize the ViewModel, which will call loadConsumptionHistory in init
         viewModel = ConsumptionViewModel(getConsumptionHistoryUseCase)
     }
 
@@ -75,7 +75,7 @@ class ConsumptionViewModelTest {
         // Assert
         val state = viewModel.uiState.value
         assertTrue(state.consumptions.isEmpty())
-        assertFalse(state.isLoading) // El estado inicial es false hasta que se ejecuta loadConsumptionHistory
+        assertFalse(state.isLoading) // The initial state is false until loadConsumptionHistory executes
         assertNull(state.error)
         assertNull(state.startDate)
         assertNull(state.endDate)
@@ -85,7 +85,7 @@ class ConsumptionViewModelTest {
         assertEquals(0f, state.customPeriodConsumption, 0.01f)
         assertTrue(state.chartData.isEmpty())
 
-        // Después de avanzar hasta que termine la corrutina inicial
+        // After advancing until the initial coroutine finishes
         advanceUntilIdle()
         assertFalse(viewModel.uiState.value.isLoading)
     }
@@ -129,13 +129,13 @@ class ConsumptionViewModelTest {
         assertEquals(startDate, state.startDate)
         assertEquals(endDate, state.endDate)
         assertEquals(filteredConsumptions, state.consumptions)
-        // Verificar que se llama el método al menos una vez (puede ser más debido a updateCustomPeriodSummary)
+        // Verify that the method is called at least once (could be more due to updateCustomPeriodSummary)
         verify(atLeast = 1) { getConsumptionHistoryUseCase(startDate, endDate) }
     }
 
     @Test
     fun `clearDateFilter resets date range and reloads all data`() = runTest {
-        // Arrange - Primero establecer un filtro de fecha
+        // Arrange - First set a date filter
         val startDate = 1000L
         val endDate = 2000L
         every { getConsumptionHistoryUseCase(startDate, endDate) } returns flowOf(emptyList())
@@ -143,7 +143,7 @@ class ConsumptionViewModelTest {
         viewModel.setDateRange(startDate, endDate)
         advanceUntilIdle()
 
-        // Verificar que el filtro se estableció
+        // Verify that the filter was set
         assertEquals(startDate, viewModel.uiState.value.startDate)
 
         // Act - Ahora limpiar el filtro
@@ -164,8 +164,8 @@ class ConsumptionViewModelTest {
 
     @Test
     fun `setLastWeekFilter sets correct date range`() = runTest {
-        // Mockear la función setDateRangeFromCalendar que es privada
-        // mediante la verificación del método público que la llama
+        // Mock the private setDateRangeFromCalendar function
+        // by verifying the public method that calls it
         every { getConsumptionHistoryUseCase(any(), any()) } returns flowOf(emptyList())
 
         // Act
@@ -176,7 +176,7 @@ class ConsumptionViewModelTest {
         verify { getConsumptionHistoryUseCase(any(), any()) }
         assertNotNull(viewModel.uiState.value.startDate)
         assertNotNull(viewModel.uiState.value.endDate)
-        // No podemos verificar los valores exactos porque son calculados internamente con Calendar
+        // We cannot verify exact values because they are calculated internally with Calendar
     }
 
     @Test
@@ -192,7 +192,7 @@ class ConsumptionViewModelTest {
         verify { getConsumptionHistoryUseCase(any(), any()) }
         assertNotNull(viewModel.uiState.value.startDate)
         assertNotNull(viewModel.uiState.value.endDate)
-        // No podemos verificar los valores exactos porque son calculados internamente con Calendar
+        // We cannot verify exact values because they are calculated internally with Calendar
     }
 
     @Test
@@ -208,16 +208,16 @@ class ConsumptionViewModelTest {
         verify { getConsumptionHistoryUseCase(any(), any()) }
         assertNotNull(viewModel.uiState.value.startDate)
         assertNotNull(viewModel.uiState.value.endDate)
-        // No podemos verificar los valores exactos porque son calculados internamente con Calendar
+        // We cannot verify exact values because they are calculated internally with Calendar
     }
 
     @Test
     fun `exception during loadConsumptionHistory updates error state`() = runTest {
         // Arrange
-        val errorMessage = "Error cargando datos"
+        val errorMessage = "Error loading data"
         every { getConsumptionHistoryUseCase(null, null) } throws Exception(errorMessage)
 
-        // Act - Recrear el ViewModel para forzar la carga con error
+        // Act - Recreate the ViewModel to force loading with error
         viewModel = ConsumptionViewModel(getConsumptionHistoryUseCase)
         advanceUntilIdle()
 

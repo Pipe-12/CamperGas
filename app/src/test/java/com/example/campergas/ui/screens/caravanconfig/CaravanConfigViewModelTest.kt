@@ -41,7 +41,7 @@ class CaravanConfigViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
-    // Flujo para simular la configuración del vehículo
+    // Flow to simulate vehicle configuration
     private val vehicleConfigFlow = MutableStateFlow<VehicleConfig?>(null)
 
     @Before

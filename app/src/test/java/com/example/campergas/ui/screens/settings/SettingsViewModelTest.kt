@@ -44,13 +44,13 @@ class SettingsViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
-    // Flujos para simular preferencias
+    // Flows to simulate preferences
     private val themeModeFlow = MutableStateFlow(ThemeMode.DARK)
     private val languageFlow = MutableStateFlow(Language.SYSTEM)
     private val notificationsEnabledFlow = MutableStateFlow(true)
     private val gasLevelThresholdFlow = MutableStateFlow(15.0f)
-    private val weightIntervalFlow = MutableStateFlow(60) // 60 segundos = 1 minuto
-    private val inclinationIntervalFlow = MutableStateFlow(15) // 15 segundos
+    private val weightIntervalFlow = MutableStateFlow(60) // 60 seconds = 1 minute
+    private val inclinationIntervalFlow = MutableStateFlow(15) // 15 seconds
 
     @Before
     fun setUp() {
