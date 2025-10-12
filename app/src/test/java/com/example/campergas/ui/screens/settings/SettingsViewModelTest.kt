@@ -174,10 +174,10 @@ class SettingsViewModelTest {
     @Test
     fun `setWeightInterval converts minutes to seconds and updates use case`() = runTest {
         // Act
-        viewModel.setWeightInterval(5) // 5 minutos
+        viewModel.setWeightInterval(5) // 5 minutes
 
         // Assert - Check the status message is set before delay
-        assertEquals("Intervalo de peso configurado: 5 min", viewModel.operationStatus.value)
+        assertEquals("Weight interval configured: 5 min", viewModel.operationStatus.value)
         coVerify { configureReadingIntervalsUseCase.setWeightReadInterval(300) } // 5*60 = 300s
 
         // Verify message is cleared after delay
@@ -188,10 +188,10 @@ class SettingsViewModelTest {
     @Test
     fun `setInclinationInterval updates use case directly with seconds`() = runTest {
         // Act
-        viewModel.setInclinationInterval(30) // 30 segundos
+        viewModel.setInclinationInterval(30) // 30 seconds
 
         // Assert - Check the status message is set before delay
-        assertEquals("Intervalo de inclinación configurado: 30s", viewModel.operationStatus.value)
+        assertEquals("Inclination interval configured: 30s", viewModel.operationStatus.value)
         coVerify { configureReadingIntervalsUseCase.setInclinationReadInterval(30) }
 
         // Verify message is cleared after delay
@@ -203,14 +203,14 @@ class SettingsViewModelTest {
     fun `setWeightInterval handles exceptions`() = runTest {
         // Arrange
         coEvery { configureReadingIntervalsUseCase.setWeightReadInterval(any()) } throws
-                Exception("Error de conexión")
+                Exception("Connection error")
 
         // Act
         viewModel.setWeightInterval(5)
 
         // Assert - Check the error message is set before delay
         assertEquals(
-            "Error al configurar intervalo de peso: Error de conexión",
+            "Error configuring weight interval: Connection error",
             viewModel.operationStatus.value
         )
 
@@ -223,14 +223,14 @@ class SettingsViewModelTest {
     fun `setInclinationInterval handles exceptions`() = runTest {
         // Arrange
         coEvery { configureReadingIntervalsUseCase.setInclinationReadInterval(any()) } throws
-                Exception("Error de conexión")
+                Exception("Connection error")
 
         // Act
         viewModel.setInclinationInterval(10)
 
         // Assert - Check the error message is set before delay
         assertEquals(
-            "Error al configurar intervalo de inclinación: Error de conexión",
+            "Error configuring inclination interval: Connection error",
             viewModel.operationStatus.value
         )
 

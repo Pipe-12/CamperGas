@@ -41,17 +41,17 @@ class BleForegroundService : Service() {
     private val alertChannelId = "gas_alert_channel"
     private val alertNotificationId = 124
     
-    // Estado para evitar spam de notificaciones
+    // Estado for evitar spam de notificaciones
     private var lastAlertThreshold: Float? = null
     private var hasAlertBeenSent = false
     
-    // Control para las solicitudes periódicas de BLE
+    // Control for periodic BLE requests
     private var isPeriodicRequestsActive = false
     private var periodicRequestsJob: kotlinx.coroutines.Job? = null
     private var lastWeightRequestTime = 0L
     private var lastInclinationRequestTime = 0L
     
-    // Intervalos configurables (se cargan desde preferencias)
+    // Intervalos configurables (se cargan from preferencias)
     private var weightRequestInterval = 5000L // 5 segundos por defecto
     private var inclinationRequestInterval = 5000L // 5 segundos por defecto
 
@@ -98,17 +98,17 @@ class BleForegroundService : Service() {
 
         when (intent?.action) {
             ACTION_START_FOR_WIDGETS -> {
-                Log.d(TAG, "Servicio iniciado para widgets")
-                // Intentar conectar al último dispositivo conocido
+                Log.d(TAG, "Servicio iniciado for widgets")
+                // Try to connect to last known device
                 connectToLastKnownDevice()
             }
             else -> {
-                Log.d(TAG, "Servicio iniciado - conectando al último dispositivo conocido")
+                Log.d(TAG, "Service started - connecting to last known device")
                 connectToLastKnownDevice()
             }
         }
 
-        // Retornamos START_STICKY para que el servicio se reinicie automáticamente si el sistema lo mata
+        // Return START_STICKY so service restarts automatically if system kills it
         return START_STICKY
     }
     
@@ -117,15 +117,15 @@ class BleForegroundService : Service() {
             try {
                 val lastDeviceAddress = preferencesDataStore.lastConnectedDeviceAddress.first()
                 if (lastDeviceAddress.isNotEmpty()) {
-                    Log.d(TAG, "Conectando al último dispositivo conocido: $lastDeviceAddress")
+                    Log.d(TAG, "Connecting to last known device: $lastDeviceAddress")
                     connectToDevice(lastDeviceAddress)
                 } else {
-                    Log.d(TAG, "No hay dispositivo conocido previo, iniciando solicitudes periódicas sin conexión")
-                    // Aún así cargar configuración y estar preparado para cuando se conecte
+                    Log.d(TAG, "No previous known device, starting periodic requests without connection")
+                    // Still load configuration and be ready for when it connects
                     loadConfigurationAndStartPeriodicRequests()
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error al conectar al último dispositivo conocido: ${e.message}")
+                Log.e(TAG, "Error connecting to last known device: ${e.message}")
                 loadConfigurationAndStartPeriodicRequests()
             }
         }
@@ -134,87 +134,87 @@ class BleForegroundService : Service() {
     private fun connectToDevice(deviceAddress: String) {
         serviceScope.launch {
             try {
-                // Conectar al dispositivo BLE
+                // Conectar al device BLE
                 bleRepository.connectToSensor(deviceAddress)
 
-                // Cargar configuración de intervalos desde preferencias
+                // Load interval configuration from preferences
                 loadConfigurationAndStartPeriodicRequests()
 
-                // Monitorear las mediciones de combustible y actualizar la notificación
+                // Monitor fuel measurements and update notification
                 launch {
                     bleRepository.fuelMeasurementData.collect { fuelMeasurement ->
                         if (fuelMeasurement != null) {
-                            // Verificar umbral de gas para alertas
+                            // Verificar umbral de gas for alertas
                             checkGasLevelThreshold(fuelMeasurement.fuelPercentage)
                             
-                            // Actualizar widget de bombona de gas
+                            // Updatesr widget de cylinder de gas
                             GasCylinderWidgetProvider.updateAllWidgets(this@BleForegroundService)
                         }
                     }
                 }
 
-                // Monitorear datos de inclinación para actualizar widget
+                // Monitor inclination data to update widget
                 launch {
                     bleRepository.inclinationData.collect { inclinationData ->
                         if (inclinationData != null) {
-                            // Actualizar widget de estabilidad del vehículo
+                            // Update vehicle stability widget
                             VehicleStabilityWidgetProvider.updateAllWidgets(this@BleForegroundService)
                         }
                     }
                 }
                 
-                // Monitorear estado de conexión para manejar reconexiones
+                // Monitor connection state to handle reconnections
                 launch {
                     bleRepository.connectionState.collect { isConnected ->
                         if (isConnected) {
-                            Log.d(TAG, "Conectado - iniciando solicitudes periódicas")
+                            Log.d(TAG, "Connected - starting periodic requests")
                             if (!isPeriodicRequestsActive) {
                                 startPeriodicBleRequests()
                             }
                         } else {
-                            Log.d(TAG, "Desconectado - deteniendo solicitudes periódicas")
+                            Log.d(TAG, "Disconnected - stopping periodic requests")
                             stopPeriodicBleRequests()
                         }
                         
-                        // Actualizar widgets cuando cambie el estado de conexión
+                        // Update widgets when connection state changes
                         GasCylinderWidgetProvider.updateAllWidgets(this@BleForegroundService)
                         VehicleStabilityWidgetProvider.updateAllWidgets(this@BleForegroundService)
                     }
                 }
 
-                // Guardar la dirección del dispositivo conectado
+                // Save connected device address
                 bleRepository.saveLastConnectedDevice(deviceAddress)
 
             } catch (e: Exception) {
-                Log.e(TAG, "Error al conectar al dispositivo: ${e.message}")
-                // No detenemos el servicio para permitir reintentos automáticos
-                updateNotification("Error de conexión - reintentando...")
+                Log.e(TAG, "Error al conectar al device: ${e.message}")
+                // Do not stop service to allow automatic retries
+                updateNotification("Connection error - retrying...")
             }
         }
     }
     
     /**
-     * Carga la configuración de intervalos desde preferencias e inicia las solicitudes periódicas
+     * Loads interval configuration from preferences and starts periodic requests
      */
     private fun loadConfigurationAndStartPeriodicRequests() {
         serviceScope.launch {
             try {
-                // Cargar intervalos desde preferencias
+                // Loadr intervalos from preferencias
                 weightRequestInterval = preferencesDataStore.weightReadInterval.first()
                 inclinationRequestInterval = preferencesDataStore.inclinationReadInterval.first()
                 
-                Log.d(TAG, "Configuración cargada - Peso: ${weightRequestInterval}ms, Inclinación: ${inclinationRequestInterval}ms")
+                Log.d(TAG, "Configuration loaded - Weight: ${weightRequestInterval}ms, Inclination: ${inclinationRequestInterval}ms")
                 
-                // Iniciar solicitudes periódicas si hay conexión
+                // Start periodic requests if there is connection
                 if (bleRepository.connectionState.first()) {
                     startPeriodicBleRequests()
                 }
                 
-                // Escuchar cambios en la configuración para actualizar intervalos
+                // Listen for configuration changes to update intervals
                 launch {
                     preferencesDataStore.weightReadInterval.collect { newInterval ->
                         if (newInterval != weightRequestInterval) {
-                            Log.d(TAG, "Intervalo de peso actualizado: $newInterval ms")
+                            Log.d(TAG, "Intervalo of weight actualizado: $newInterval ms")
                             weightRequestInterval = newInterval
                             restartPeriodicRequestsIfActive()
                         }
@@ -224,7 +224,7 @@ class BleForegroundService : Service() {
                 launch {
                     preferencesDataStore.inclinationReadInterval.collect { newInterval ->
                         if (newInterval != inclinationRequestInterval) {
-                            Log.d(TAG, "Intervalo de inclinación actualizado: $newInterval ms")
+                            Log.d(TAG, "Intervalo of inclination actualizado: $newInterval ms")
                             inclinationRequestInterval = newInterval
                             restartPeriodicRequestsIfActive()
                         }
@@ -232,7 +232,7 @@ class BleForegroundService : Service() {
                 }
                 
             } catch (e: Exception) {
-                Log.e(TAG, "Error al cargar configuración: ${e.message}")
+                Log.e(TAG, "Error loading configuration: ${e.message}")
                 // Usar valores por defecto si falla
                 weightRequestInterval = 5000L
                 inclinationRequestInterval = 5000L
@@ -241,80 +241,80 @@ class BleForegroundService : Service() {
     }
     
     /**
-     * Inicia las solicitudes periódicas de datos BLE según los intervalos configurados
+     * Starts periodic BLE data requests according to configured intervals
      */
     private fun startPeriodicBleRequests() {
         if (isPeriodicRequestsActive) {
-            Log.d(TAG, "Las solicitudes periódicas ya están activas")
+            Log.d(TAG, "Periodic requests are already active")
             return
         }
         
         isPeriodicRequestsActive = true
         periodicRequestsJob = serviceScope.launch {
-            Log.d(TAG, "🔄 Iniciando solicitudes periódicas de datos BLE...")
-            Log.d(TAG, "📊 Intervalo peso: ${weightRequestInterval}ms, Intervalo inclinación: ${inclinationRequestInterval}ms")
+            Log.d(TAG, "🔄 Starting periodic requests of data BLE...")
+            Log.d(TAG, "📊 Weight interval: ${weightRequestInterval}ms, Inclination interval: ${inclinationRequestInterval}ms")
             
             while (isPeriodicRequestsActive && isActive) {
                 try {
                     val currentTime = System.currentTimeMillis()
                     
-                    // Verificar si hay conexión BLE antes de hacer solicitudes
+                    // Verify if there is BLE connection before making requests
                     val isConnected = bleRepository.connectionState.first()
                     if (!isConnected) {
-                        Log.d(TAG, "No hay conexión BLE, pausando solicitudes...")
-                        delay(2000) // Pausa si no hay conexión
+                        Log.d(TAG, "No connection BLE, pausing requests...")
+                        delay(2000) // Pause if no connection
                         continue
                     }
                     
-                    // Solicitar datos de peso si han pasado más del intervalo configurado
+                    // Request weight data if more than configured interval has passed
                     if (currentTime - lastWeightRequestTime > weightRequestInterval) {
-                        Log.d(TAG, "Solicitando datos de peso...")
+                        Log.d(TAG, "Requesting data of weight...")
                         bleRepository.readWeightDataOnDemand()
                         lastWeightRequestTime = currentTime
                     }
                     
-                    // Esperar un poco antes de solicitar inclinación para evitar conflictos BLE
+                    // Wait a bit before requesting inclination to avoid BLE conflicts
                     delay(500)
                     
-                    // Solicitar datos de inclinación si han pasado más del intervalo configurado
+                    // Request inclination data if more than configured interval has passed
                     if (currentTime - lastInclinationRequestTime > inclinationRequestInterval) {
-                        Log.d(TAG, "Solicitando datos de inclinación...")
+                        Log.d(TAG, "Requesting data of inclination...")
                         bleRepository.readInclinationDataOnDemand()
                         lastInclinationRequestTime = currentTime
                     }
                     
-                    // Pausa entre ciclos de verificación (1000ms)
+                    // Pause between verification cycles (1000ms)
                     delay(1000)
                     
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error en solicitud periódica BLE: ${e.message}")
-                    delay(2000) // Pausa más larga en caso de error
+                    Log.e(TAG, "Error in periodic BLE request: ${e.message}")
+                    delay(2000) // Longer pause in case of error
                 }
             }
             
-            Log.d(TAG, "Solicitudes periódicas de datos BLE finalizadas")
+            Log.d(TAG, "Periodic BLE data requests finished")
         }
     }
     
     /**
-     * Detiene las solicitudes periódicas de datos BLE
+     * Stops periodic BLE data requests
      */
     private fun stopPeriodicBleRequests() {
         isPeriodicRequestsActive = false
         periodicRequestsJob?.cancel()
         periodicRequestsJob = null
-        Log.d(TAG, "Solicitudes periódicas de datos BLE detenidas")
+        Log.d(TAG, "Periodic BLE data requests stopped")
     }
     
     /**
-     * Reinicia las solicitudes periódicas si están activas (útil cuando cambian los intervalos)
+     * Restarts periodic requests if active (useful when intervals change)
      */
     private fun restartPeriodicRequestsIfActive() {
         if (isPeriodicRequestsActive) {
-            Log.d(TAG, "Reiniciando solicitudes periódicas con nuevos intervalos...")
+            Log.d(TAG, "Restarting periodic requests with new intervals...")
             stopPeriodicBleRequests()
             
-            // Pequeña pausa antes de reiniciar
+            // Short pause before restarting
             serviceScope.launch {
                 delay(500)
                 if (bleRepository.connectionState.first()) {
@@ -326,7 +326,7 @@ class BleForegroundService : Service() {
 
     private fun createNotificationChannel() {
         val name = "CamperGas BLE Service"
-        val descriptionText = "Canal para el servicio BLE de CamperGas"
+        val descriptionText = "Canal for the servicio BLE de CamperGas"
         val importance = NotificationManager.IMPORTANCE_LOW
         val channel = NotificationChannel(channelId, name, importance).apply {
             description = descriptionText
@@ -339,7 +339,7 @@ class BleForegroundService : Service() {
 
     private fun createAlertNotificationChannel() {
         val name = "Alertas de Gas"
-        val descriptionText = "Notificaciones de alerta cuando el gas está bajo"
+        val descriptionText = "Alert notifications when gas is low"
         val importance = NotificationManager.IMPORTANCE_HIGH
         val channel = NotificationChannel(alertChannelId, name, importance).apply {
             description = descriptionText
@@ -374,29 +374,29 @@ class BleForegroundService : Service() {
                 
                 val threshold = preferencesDataStore.gasLevelThreshold.first()
                 
-                // Solo enviar alerta si el gas está por debajo del umbral
+                // Only send alert if gas is below threshold
                 if (currentPercentage <= threshold) {
-                    // Evitar spam: solo enviar si no se ha enviado para este umbral o si el umbral cambió
+                    // Avoid spam: only send if not sent for this threshold or if threshold changed
                     if (!hasAlertBeenSent || lastAlertThreshold != threshold) {
                         sendGasAlert(currentPercentage, threshold)
                         hasAlertBeenSent = true
                         lastAlertThreshold = threshold
                     }
                 } else {
-                    // Reset del estado de alerta cuando el gas está por encima del umbral
+                    // Reset alert state when gas is above threshold
                     if (hasAlertBeenSent) {
                         hasAlertBeenSent = false
                     }
                 }
             } catch (_: Exception) {
-                // Manejar errores silenciosamente para no afectar el servicio principal
+                // Handle errores silenciosamente for no afectar el servicio principal
             }
         }
     }
 
     private fun sendGasAlert(currentPercentage: Float, threshold: Float) {
         val title = "⚠️ Nivel de Gas Bajo"
-        val message = "El gas está al ${currentPercentage.toInt()}% (por debajo del ${threshold.toInt()}%)"
+        val message = "Gas is at ${currentPercentage.toInt()}% (below ${threshold.toInt()}%)"
         
         val alertNotification = NotificationCompat.Builder(this, alertChannelId)
             .setContentTitle(title)
@@ -414,7 +414,7 @@ class BleForegroundService : Service() {
     override fun onDestroy() {
         Log.d(TAG, "Destruyendo BleForegroundService...")
         
-        // Detener solicitudes periódicas
+        // Stop periodic requests
         stopPeriodicBleRequests()
         
         serviceScope.launch {

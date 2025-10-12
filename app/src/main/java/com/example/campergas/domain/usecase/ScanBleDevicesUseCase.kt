@@ -28,28 +28,28 @@ class ScanBleDevicesUseCase @Inject constructor(
 
 
     /**
-     * Activa el filtro para mostrar solo dispositivos compatibles con CamperGas
+     * Activa el filtro for mostrar solo devices compatibles con CamperGas
      */
     fun enableCompatibleDevicesFilter() {
         bleRepository.setCompatibleDevicesFilter(true)
     }
 
     /**
-     * Desactiva el filtro y muestra todos los dispositivos BLE
+     * Desactiva el filtro y muestra todos los devices BLE
      */
     fun disableCompatibleDevicesFilter() {
         bleRepository.setCompatibleDevicesFilter(false)
     }
 
     /**
-     * Verifica si el filtro está activado
+     * Verifies if filter is enabled
      */
     fun isCompatibleFilterEnabled(): Boolean {
         return bleRepository.isCompatibleFilterEnabled()
     }
 
     /**
-     * Alterna el estado del filtro
+     * Alterna el state ofl filtro
      */
     fun toggleCompatibleDevicesFilter() {
         val currentState = bleRepository.isCompatibleFilterEnabled()

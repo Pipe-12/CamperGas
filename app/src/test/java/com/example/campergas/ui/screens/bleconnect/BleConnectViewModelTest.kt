@@ -112,7 +112,7 @@ class BleConnectViewModelTest {
         // Assert
         val state = viewModel.uiState.value
         assertFalse(state.isScanning)
-        assertEquals("Bluetooth no está habilitado", state.error)
+        assertEquals("Bluetooth is not enabled", state.error)
     }
 
     @Test
@@ -184,7 +184,7 @@ class BleConnectViewModelTest {
 
         // Assert
         val state = viewModel.uiState.value
-        assertEquals("Bluetooth no está habilitado", state.error)
+        assertEquals("Bluetooth is not enabled", state.error)
         assertNull(state.connectedDevice)
     }
 

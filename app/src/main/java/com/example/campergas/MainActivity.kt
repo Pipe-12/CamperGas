@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
                 // Permisos concedidos, la app puede usar BLE
             },
             onPermissionsDenied = { deniedPermissions ->
-                // Manejar permisos denegados
+                // Handle permisos denegados
             }
         )
 
@@ -126,17 +126,17 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
 
-                    // Estado para controlar si mostrar el diálogo de permisos
+                    // State to control whether to show permissions dialog
                     var showPermissionDialog by remember { mutableStateOf(false) }
 
-                    // Verificar permisos al iniciar
+                    // Verify permissions on start
                     LaunchedEffect(Unit) {
                         if (!bluetoothPermissionManager.hasAllPermissions()) {
                             showPermissionDialog = true
                         }
                     }
 
-                    // Mostrar diálogo de permisos si es necesario
+                    // Show permissions dialog if necessary
                     if (showPermissionDialog) {
                         PermissionDialog(
                             title = stringResource(R.string.permissions_needed_title),

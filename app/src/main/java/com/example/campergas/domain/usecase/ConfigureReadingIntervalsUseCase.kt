@@ -6,15 +6,15 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
- * Caso de uso para configurar los intervalos de lectura del sensor BLE
+ * Caso de uso for configurar los intervalos de lectura from sensor BLE
  */
 class ConfigureReadingIntervalsUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
 
     /**
-     * Configurar el intervalo de lectura de peso
-     * @param intervalSeconds Intervalo en segundos
+     * Configurar el intervalo de lectura of weight
+     * @form intervalSeconds Intervalo en segundos
      */
     suspend fun setWeightReadInterval(intervalSeconds: Int) {
         val intervalMs = intervalSeconds * 1000L
@@ -26,8 +26,8 @@ class ConfigureReadingIntervalsUseCase @Inject constructor(
     }
 
     /**
-     * Configurar el intervalo de lectura de inclinación
-     * @param intervalSeconds Intervalo en segundos
+     * Configurar el intervalo de lectura of inclination
+     * @form intervalSeconds Intervalo en segundos
      */
     suspend fun setInclinationReadInterval(intervalSeconds: Int) {
         val intervalMs = intervalSeconds * 1000L
@@ -40,8 +40,8 @@ class ConfigureReadingIntervalsUseCase @Inject constructor(
 
     /**
      * Configurar ambos intervalos a la vez
-     * @param weightIntervalSeconds Intervalo de peso en segundos
-     * @param inclinationIntervalSeconds Intervalo de inclinación en segundos
+     * @form weightIntervalSeconds Intervalo of weight en segundos
+     * @form inclinationIntervalSeconds Intervalo of inclination en segundos
      */
     suspend fun setReadingIntervals(weightIntervalSeconds: Int, inclinationIntervalSeconds: Int) {
         val weightIntervalMs = weightIntervalSeconds * 1000L
@@ -53,28 +53,28 @@ class ConfigureReadingIntervalsUseCase @Inject constructor(
     }
 
     /**
-     * Obtener el intervalo actual de lectura de peso en segundos
+     * Get el intervalo actual de lectura of weight en segundos
      */
     fun getWeightReadIntervalSeconds(): Flow<Int> {
         return bleRepository.weightReadInterval.map { it.toInt() / 1000 }
     }
 
     /**
-     * Obtener el intervalo actual de lectura de inclinación en segundos
+     * Get el intervalo actual de lectura of inclination en segundos
      */
     fun getInclinationReadIntervalSeconds(): Flow<Int> {
         return bleRepository.inclinationReadInterval.map { it.toInt() / 1000 }
     }
 
     /**
-     * Resetear intervalos a valores por defecto (Peso: 1 minuto, Inclinación: 5 segundos)
+     * Resetear intervalos a valores por defecto (Weight: 1 minuto, Inclination: 5 segundos)
      */
     suspend fun resetToDefaultIntervals() {
-        setReadingIntervals(60, 5) // Peso: 60 segundos (1 minuto), Inclinación: 5 segundos
+        setReadingIntervals(60, 5) // Weight: 60 segundos (1 minuto), Inclination: 5 segundos
     }
 
     /**
-     * Reinicia la lectura periódica con los intervalos actuales
+     * Restarts periodic reading with current intervals
      */
     fun restartPeriodicReading() {
         bleRepository.restartPeriodicDataReading()

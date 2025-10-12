@@ -28,10 +28,10 @@ class InclinationViewModel @Inject constructor(
     val uiState: StateFlow<InclinationUiState> = _uiState.asStateFlow()
 
     init {
-        // Cargar configuración del vehículo
+        // Load vehicle configuration
         loadVehicleConfig()
 
-        // Obtener datos de inclinación en tiempo real
+        // Get data of inclination en real time
         viewModelScope.launch {
             getInclinationUseCase().collectLatest { inclination ->
                 _uiState.value = if (inclination != null) {
@@ -43,7 +43,7 @@ class InclinationViewModel @Inject constructor(
                         error = null,
                         timestamp = inclination.timestamp
                     )
-                    // Calcular elevaciones de ruedas
+                    // Calculatesr elevaciones de ruedas
                     newState.copy(wheelElevations = calculateWheelElevations(newState))
                 } else {
                     _uiState.value.copy(
@@ -65,7 +65,7 @@ class InclinationViewModel @Inject constructor(
                         distanceToFrontSupport = config.distanceToFrontSupport,
                         distanceBetweenFrontWheels = config.distanceBetweenFrontWheels ?: 0f
                     ).let { newState ->
-                        // Recalcular elevaciones con la nueva configuración
+                        // Recalculate elevations with new configuration
                         newState.copy(wheelElevations = calculateWheelElevations(newState))
                     }
                 }
@@ -74,7 +74,7 @@ class InclinationViewModel @Inject constructor(
     }
 
     /**
-     * Calcula la elevación necesaria para cada rueda basándose en la inclinación
+     * Calculates necessary elevation for each wheel based on inclination
      */
     private fun calculateWheelElevations(state: InclinationUiState): WheelElevations {
         if (state.distanceBetweenRearWheels == 0f || state.distanceToFrontSupport == 0f) {
@@ -97,7 +97,7 @@ class InclinationViewModel @Inject constructor(
 
         return when (state.vehicleType) {
             VehicleType.CARAVAN -> {
-                // Caravana: ruedas traseras + ruedín delantero
+                // Caravan: rear wheels + front support wheel
                 WheelElevations(
                     rearLeft = rearLeftElevationRoll.toFloat(),
                     rearRight = rearRightElevationRoll.toFloat(),
@@ -122,20 +122,20 @@ class InclinationViewModel @Inject constructor(
     }
 
     /**
-     * Solicita una lectura manual de datos de inclinación del sensor BLE
-     * Incluye protección contra múltiples peticiones seguidas
+     * Solicita una lectura manual of data of inclination from sensor BLE
+     * Includes protection against multiple consecutive requests
      */
     fun requestInclinationDataManually() {
         executeManualRequest(
             requestAction = { requestInclinationDataUseCase() },
             logTag = "InclinationViewModel",
-            dataTypeDescription = "inclinación"
+            dataTypeDescription = "inclination"
         )
     }
 }
 
 data class InclinationUiState(
-    val inclinationPitch: Float = 0f, // Cabeceo (adelante/atrás)
+    val inclinationPitch: Float = 0f, // Pitch (front/back)
     val inclinationRoll: Float = 0f,  // Alabeo (lado a lado)
     val isLevel: Boolean = false,
     val isLoading: Boolean = true,
@@ -153,5 +153,5 @@ data class WheelElevations(
     val rearRight: Float = 0f,
     val frontLeft: Float = 0f,
     val frontRight: Float = 0f,
-    val frontSupport: Float = 0f // Para el ruedín delantero de la caravana
+    val frontSupport: Float = 0f // For the front support wheel of the caravana
 )

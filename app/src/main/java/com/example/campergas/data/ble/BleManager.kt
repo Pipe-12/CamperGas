@@ -22,14 +22,14 @@ class BleManager @Inject constructor(
         get() = bluetoothManager.adapter
 
     /**
-     * Verifica si Bluetooth está habilitado en el dispositivo
+     * Verifies if Bluetooth is enabled in the device
      */
     fun isBluetoothEnabled(): Boolean {
         return bluetoothAdapter?.isEnabled == true
     }
 
     /**
-     * Verifica si se tienen los permisos necesarios para conectar dispositivos BLE
+     * Verifies if se tienen los permisos necesarios for conectar devices BLE
      */
     fun hasBluetoothConnectPermission(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -46,7 +46,7 @@ class BleManager @Inject constructor(
     }
 
     /**
-     * Verifica si se tienen los permisos necesarios para escanear dispositivos BLE
+     * Verifies if se tienen los permisos necesarios for escanear devices BLE
      */
     fun hasBluetoothScanPermission(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -68,7 +68,7 @@ class BleManager @Inject constructor(
 
 
     /**
-     * Verifica si se tienen todos los permisos necesarios para operaciones BLE
+     * Verifies if se tienen todos los permisos necesarios for operaciones BLE
      */
     fun hasAllBluetoothPermissions(): Boolean {
         return hasBluetoothConnectPermission() && hasBluetoothScanPermission()

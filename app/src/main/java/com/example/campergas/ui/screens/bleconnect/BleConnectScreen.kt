@@ -67,18 +67,18 @@ fun BleConnectScreen(
     val uiState by viewModel.uiState.collectAsState()
     val connectionState by viewModel.connectionState.collectAsState()
 
-    // Estados para controlar diálogos de permisos
+    // States to control permission dialogs
     var showPermissionDialog by remember { mutableStateOf(false) }
     var showBluetoothDialog by remember { mutableStateOf(false) }
 
-    // Verificar permisos al entrar a la pantalla
+    // Verificar permisos al entrar a la screen
     LaunchedEffect(Unit) {
         if (!viewModel.isBluetoothEnabled()) {
             showBluetoothDialog = true
         }
     }
 
-    // Diálogo para activar Bluetooth
+    // Dialog to enable Bluetooth
     if (showBluetoothDialog) {
         BluetoothDisabledDialog(
             onAccept = {
@@ -90,7 +90,7 @@ fun BleConnectScreen(
         )
     }
 
-    // Diálogo para permisos
+    // Permissions dialog
     if (showPermissionDialog) {
         BluetoothPermissionDialog(
             onAccept = {
@@ -108,7 +108,7 @@ fun BleConnectScreen(
             .statusBarsPadding()
             .padding(16.dp)
     ) {
-        // Botón de volver atrás y título
+        // Back button y title
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -124,7 +124,7 @@ fun BleConnectScreen(
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        // Header con estado de conexión
+        // Header with connection state
         ConnectionStatusCard(
             isConnected = connectionState,
             isScanning = uiState.isScanning,
@@ -241,7 +241,7 @@ fun BleConnectScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // Available devices section (solo si no está conectado)
+        // Available devices section (only if not conectado)
         if (!connectionState) {
             Text(
                 text = stringResource(R.string.ble_available_devices, uiState.availableDevices.size),
@@ -377,7 +377,7 @@ private fun AvailableDeviceCard(
                     // Signal strength indicator
                     Icon(
                         imageVector = getSignalIcon(device.rssi),
-                        contentDescription = "Señal: ${device.signalStrength}",
+                        contentDescription = "Signal: ${device.signalStrength}",
                         modifier = Modifier.size(20.dp),
                         tint = getSignalColor(device.rssi)
                     )
@@ -414,13 +414,13 @@ private fun AvailableDeviceCard(
             if (device.services.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Servicios: ${device.services.size} disponibles",
+                    text = "Services: ${device.services.size} disponibles",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
             }
 
-            // Información de compatibilidad
+            // Compatibility information
             if (device.isCompatibleWithCamperGas) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
@@ -507,15 +507,15 @@ fun ConnectionStatusCard(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = if (isConnected) "Sensor Conectado" else "Conexión Bluetooth",
+                        text = if (isConnected) "Sensor Connected" else "Bluetooth Connection",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = when {
                             isConnected && connectedDevice != null -> "${connectedDevice.name} • Para cambiar de sensor, desconecta primero"
-                            isScanning -> "Escaneando dispositivos..."
-                            else -> "Buscar dispositivos BLE"
+                            isScanning -> "Escaneando devices..."
+                            else -> "Buscar devices BLE"
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant

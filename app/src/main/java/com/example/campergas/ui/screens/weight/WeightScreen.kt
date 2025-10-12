@@ -113,7 +113,7 @@ private fun DrawScope.drawGasCylinder(
         cornerRadius = CornerRadius(cylinderWidth * 0.05f)
     )
 
-    // Dibujar el contorno principal de la bombona (más grueso)
+    // Draw main cylinder outline (thicker)
     val strokeWidth = 8f
     drawRoundRect(
         color = Color.Gray,
@@ -122,7 +122,7 @@ private fun DrawScope.drawGasCylinder(
         cornerRadius = CornerRadius(cylinderWidth * 0.08f)
     )
 
-    // Dibujar el interior con el color de fondo según el tema
+    // Dibujar el interior with the color de fondo according to el tema
     drawRoundRect(
         color = backgroundColor,
         topLeft = Offset(startX, startY + topCapHeight),
@@ -130,7 +130,7 @@ private fun DrawScope.drawGasCylinder(
         cornerRadius = CornerRadius(cylinderWidth * 0.06f)
     )
 
-    // Dibujar el nivel de gas (lleno) desde abajo hacia arriba
+    // Dibujar el nivel de gas (lleno) from abajo hacia arriba
     if (fillPercentage > 0) {
         val fillHeight = cylinderHeight * fillPercentage
         val fillY = startY + topCapHeight + (cylinderHeight - fillHeight)
@@ -151,7 +151,7 @@ private fun DrawScope.drawGasCylinder(
         cornerRadius = CornerRadius(topCapHeight * 0.3f)
     )
 
-    // Dibujar la válvula superior (más realista)
+    // Draw upper valve (more realistic)
     val valveX = (size.width - valveWidth) / 2f
     drawRoundRect(
         color = Color.Gray,
@@ -160,7 +160,7 @@ private fun DrawScope.drawGasCylinder(
         cornerRadius = CornerRadius(valveWidth * 0.15f)
     )
 
-    // Dibujar el pico de la válvula
+    // Draw valve tip
     val nozzleWidth = valveWidth * 0.4f
     val nozzleHeight = valveHeight * 0.3f
     val nozzleX = (size.width - nozzleWidth) / 2f
@@ -188,7 +188,7 @@ fun WeightScreen(
                 title = { Text(stringResource(R.string.weight_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -207,7 +207,7 @@ fun WeightScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 fuelState?.let { fuelMeasurement ->
-                    // Tarjeta principal con información esencial
+                    // Main card with essential information
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -227,14 +227,14 @@ fun WeightScreen(
 
                             Spacer(modifier = Modifier.height(24.dp))
 
-                            // Bombona de gas visual centrada
+                            // Gas cylinder visual centered
                             GasCylinderVisualizer(
                                 fuelPercentage = fuelMeasurement.fuelPercentage
                             )
 
                             Spacer(modifier = Modifier.height(24.dp))
 
-                            // Información de combustible centrada
+                            // Fuel information centered
                             Text(
                                 text = fuelMeasurement.getFormattedFuelKilograms(),
                                 style = MaterialTheme.typography.headlineLarge,
@@ -255,9 +255,9 @@ fun WeightScreen(
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // Peso medido por el sensor
+                            // Weight measured by sensor
                             Text(
-                                text = "Peso medido: ${fuelMeasurement.getFormattedTotalWeight()}",
+                                text = "Measured weight: ${fuelMeasurement.getFormattedTotalWeight()}",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -265,16 +265,16 @@ fun WeightScreen(
 
                             Spacer(modifier = Modifier.height(20.dp))
 
-                            // Tiempo de medición centrado
+                            // Measurement time centered
                             Text(
-                                text = "Última medición: ${formatTimestamp(fuelMeasurement.timestamp)}",
+                                text = "Last measurement: ${formatTimestamp(fuelMeasurement.timestamp)}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // Botón para solicitar datos manualmente
+                            // Button to manually request data
                             Row(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
@@ -318,10 +318,10 @@ fun WeightScreen(
 
                             Spacer(modifier = Modifier.height(20.dp))
 
-                            // Datos de la bombona actual centrados
+                            // Current cylinder data centered
                             activeCylinder?.let { cylinder ->
                                 Text(
-                                    text = "Bombona Actual",
+                                    text = "Current Cylinder",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -329,12 +329,12 @@ fun WeightScreen(
                                 Spacer(modifier = Modifier.height(12.dp))
 
                                 Text(
-                                    text = "Nombre: ${cylinder.name}",
+                                    text = "Name: ${cylinder.name}",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
 
                                 Text(
-                                    text = "Capacidad: ${
+                                    text = "Capacity: ${
                                         String.format(
                                             Locale.getDefault(),
                                             "%.1f",
@@ -345,7 +345,7 @@ fun WeightScreen(
                                 )
 
                                 Text(
-                                    text = "Peso vacía: ${
+                                    text = "Empty weight: ${
                                         String.format(
                                             Locale.getDefault(),
                                             "%.1f",
@@ -356,7 +356,7 @@ fun WeightScreen(
                                 )
                             } ?: run {
                                 Text(
-                                    text = "⚠️ No hay bombona configurada",
+                                    text = "⚠️ No cylinder configured",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.error,
                                     fontWeight = FontWeight.Medium
@@ -365,26 +365,26 @@ fun WeightScreen(
                         }
                     }
                 } ?: run {
-                    // Estado cuando no hay datos
+                    // Estado when no hay data
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Esperando datos del sensor...",
+                            text = "Waiting for sensor data...",
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Asegúrate de que el sensor esté conectado",
+                            text = "Make sure the sensor is connected",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Botón para solicitar datos cuando no hay datos disponibles
+                        // Button to request data when no data is available
                         OutlinedButton(
                             onClick = { viewModel.requestWeightDataManually() },
                             enabled = viewModel.isConnected() && viewModel.canMakeRequest()
