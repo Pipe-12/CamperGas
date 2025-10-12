@@ -212,7 +212,7 @@ class HomeViewModelTest {
         )
         advanceUntilIdle()
 
-        // Assert - No debería intentar conectar
+        // Assert - Should not attempt to connect
         coVerify(exactly = 0) { connectBleDeviceUseCase.invoke(any()) }
     }
 
