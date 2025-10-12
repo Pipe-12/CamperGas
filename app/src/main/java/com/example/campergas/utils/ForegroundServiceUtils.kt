@@ -6,18 +6,18 @@ import android.os.Build
 import android.util.Log
 
 /**
- * Clase de utilidad for manejar las restricciones de inicio de servicios in foreground en Android 12+
+ * Utility class to handle foreground service startup restrictions on Android 12+
  */
 object ForegroundServiceUtils {
     
     private const val TAG = "ForegroundServiceUtils"
     
     /**
-     * Verifies if the application can start a service in foreground from the current context
+     * Verifies if the application can start a foreground service from the current context
      * 
      * Starting from Android 12 (API 31), there are strict limitations about when
-     * applications in background can start services in foreground. This method
-     * verifica si el contexto actual permite iniciar servicios in foreground.
+     * applications in background can start foreground services. This method
+     * verifies if the current context allows starting foreground services.
      */
     fun canStartForegroundService(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -49,12 +49,12 @@ object ForegroundServiceUtils {
             }
             
             val isInForeground = foregroundProcess != null
-            Log.d(TAG, "State of primer plano of the application: $isInForeground")
+            Log.d(TAG, "Application foreground state: $isInForeground")
             return isInForeground
             
         } catch (e: Exception) {
-            Log.e(TAG, "Error al verificar el state of primer plano", e)
-            // Por defecto falso por seguridad when no podemos determinar el estado
+            Log.e(TAG, "Error verifying foreground state", e)
+            // Default to false for safety when we cannot determine the state
             false
         }
     }
@@ -68,7 +68,7 @@ object ForegroundServiceUtils {
             
             // For Android 7.0+ (API 24), use getRunningServices with lower limit for performance
             val maxServices = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) 100 else Integer.MAX_VALUE
-            @Suppress("DEPRECATION") // Necesario for compatibilidad con widgets
+            @Suppress("DEPRECATION") // Necessary for widget compatibility
             val runningServices = activityManager.getRunningServices(maxServices)
             
             val serviceName = serviceClass.name
@@ -87,7 +87,7 @@ object ForegroundServiceUtils {
     }
     
     /**
-     * Attempts to start a service in foreground de forma segura, con respaldo a servicio regular
+     * Attempts to safely start a foreground service, with fallback to regular service
      * Returns true if any service started successfully
      */
     fun startServiceSafely(
@@ -101,8 +101,8 @@ object ForegroundServiceUtils {
             }
             
             if (canStartForegroundService(context)) {
-                // Intentar iniciar como servicio in foreground
-                Log.d(TAG, "Iniciando servicio in foreground for ${serviceClass.simpleName}")
+                // Attempt to start as foreground service
+                Log.d(TAG, "Starting foreground service for ${serviceClass.simpleName}")
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     context.startForegroundService(intent)
                 } else {
@@ -111,15 +111,15 @@ object ForegroundServiceUtils {
                 true
             } else {
                 // Fallback: start as regular service (widgets will continue receiving updates when app opens)
-                Log.d(TAG, "No se can start servicio in foreground, starting service regular for ${serviceClass.simpleName}")
+                Log.d(TAG, "Cannot start foreground service, starting regular service for ${serviceClass.simpleName}")
                 context.startService(intent)
                 true
             }
         } catch (e: Exception) {
-            // Verificar si esta es una ForegroundServiceStartNotAllowedException (API 31+)
+            // Check if this is a ForegroundServiceStartNotAllowedException (API 31+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && 
                 e::class.java.simpleName == "ForegroundServiceStartNotAllowedException") {
-                Log.w(TAG, "Inicio de servicio in foreground no permitido, intentando iniciar servicio regular", e)
+                Log.w(TAG, "Foreground service start not allowed, attempting to start regular service", e)
                 return try {
                     val intent = android.content.Intent(context, serviceClass).apply {
                         configureIntent(this)
@@ -127,7 +127,7 @@ object ForegroundServiceUtils {
                     context.startService(intent)
                     true
                 } catch (regularServiceException: Exception) {
-                    Log.e(TAG, "Error on start servicio regular como respaldo", regularServiceException)
+                    Log.e(TAG, "Error starting regular service as fallback", regularServiceException)
                     false
                 }
             } else {
