@@ -43,7 +43,7 @@ class InclinationViewModel @Inject constructor(
                         error = null,
                         timestamp = inclination.timestamp
                     )
-                    // Calculatesr elevaciones de ruedas
+                    // Calculate wheel elevations
                     newState.copy(wheelElevations = calculateWheelElevations(newState))
                 } else {
                     _uiState.value.copy(
@@ -81,18 +81,18 @@ class InclinationViewModel @Inject constructor(
             return WheelElevations()
         }
 
-        // Convertir grados a radianes
+        // Convert degrees to radians
         val pitchRad = Math.toRadians(state.inclinationPitch.toDouble())
         val rollRad = Math.toRadians(state.inclinationRoll.toDouble())
 
-        // Calcular elevaciones basándose en las distancias configuradas
+        // Calculate elevations based on configured distances
         val rearWheelDistance = state.distanceBetweenRearWheels 
 
-        // Para el roll (alabeo lateral)
+        // For roll (side tilt)
         val rearLeftElevationRoll = rearWheelDistance * tan(rollRad)
         val rearRightElevationRoll = -rearWheelDistance * tan(rollRad)
 
-        // Para el pitch (cabeceo frontal/trasero)
+        // For pitch (front/rear tilt)
         val frontElevationPitch = state.distanceToFrontSupport * tan(pitchRad)
 
         return when (state.vehicleType) {

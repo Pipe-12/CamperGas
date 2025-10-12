@@ -43,14 +43,14 @@ class WeightViewModel @Inject constructor(
             }
         }
 
-        // Get cylinder activa
+        // Get active cylinder
         viewModelScope.launch {
             getActiveCylinderUseCase().collectLatest { cylinder ->
                 _activeCylinder.value = cylinder
             }
         }
 
-        // Get data de combustible
+        // Get fuel data
         viewModelScope.launch {
             getFuelDataUseCase().collectLatest { fuel ->
                 _fuelState.value = fuel
