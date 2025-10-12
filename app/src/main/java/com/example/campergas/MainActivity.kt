@@ -83,14 +83,14 @@ class MainActivity : ComponentActivity() {
         // Apply system bars configuration immediately to prevent white flash
         configureSystemBars(isDarkThemeForSystemBars)
 
-        // Configurar el gestor de permisos
+        // Configure permissions manager
         bluetoothPermissionManager = BluetoothPermissionManager(
             activity = this,
             onPermissionsGranted = {
-                // Permisos concedidos, la app puede usar BLE
+                // Permissions granted, the app can use BLE
             },
             onPermissionsDenied = { deniedPermissions ->
-                // Handle permisos denegados
+                // Handle denied permissions
             }
         )
 

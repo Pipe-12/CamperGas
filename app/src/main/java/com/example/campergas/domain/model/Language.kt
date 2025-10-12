@@ -1,7 +1,7 @@
 package com.example.campergas.domain.model
 
 /**
- * Idiomas soportados por the application
+ * Languages supported by the application
  */
 enum class Language(val code: String, val displayName: String) {
     SPANISH("es", "Español"),

@@ -32,12 +32,12 @@ class BluetoothPermissionManager(
     }
 
     private fun setupLaunchers() {
-        // Launcher for activar Bluetooth
+        // Launcher to enable Bluetooth
         enableBluetoothLauncher = activity.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                // Bluetooth activado, ahora verificar permisos
+                // Bluetooth enabled, now verify permissions
                 checkAndRequestPermissions()
             } else {
                 onPermissionsDenied(listOf(activity.getString(R.string.error_bluetooth_not_enabled)))
@@ -56,7 +56,7 @@ class BluetoothPermissionManager(
             }
         }
 
-        // Launcher for solicitar permisos
+        // Launcher to request permissions
         @TargetApi(Build.VERSION_CODES.Q)
         requestPermissionsLauncher = activity.registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
@@ -64,8 +64,8 @@ class BluetoothPermissionManager(
             val deniedPermissions = permissions.filter { !it.value }.keys.toList()
 
             if (deniedPermissions.isEmpty()) {
-                // Todos los permisos solicitados fueron otorgados
-                // Verificar si necesitamos solicitar ACCESS_BACKGROUND_LOCATION por sefordo
+                // All requested permissions were granted
+                // Verify if we need to request ACCESS_BACKGROUND_LOCATION separately
                 val backgroundLocationPermission = Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 val needsBackgroundLocation = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
                         getRequiredPermissions().contains(backgroundLocationPermission)
@@ -77,7 +77,7 @@ class BluetoothPermissionManager(
                     ) != PackageManager.PERMISSION_GRANTED &&
                     !permissions.containsKey(backgroundLocationPermission)
                 ) {
-                    // Solicitar ACCESS_BACKGROUND_LOCATION por sefordo
+                    // Request ACCESS_BACKGROUND_LOCATION separately
                     requestPermissionsLauncher.launch(arrayOf(backgroundLocationPermission))
                 } else {
                     // All necessary permissions are granted
@@ -139,19 +139,19 @@ class BluetoothPermissionManager(
     private fun checkAndRequestPermissions() {
         val requiredPermissions = getRequiredPermissions()
 
-        // Seforr permisos normales de ACCESS_BACKGROUND_LOCATION
+        // Separate normal permissions from ACCESS_BACKGROUND_LOCATION
         val backgroundLocationPermission = Manifest.permission.ACCESS_BACKGROUND_LOCATION
         val normalPermissions = requiredPermissions.filter { it != backgroundLocationPermission }
         val needsBackgroundLocation = requiredPermissions.contains(backgroundLocationPermission)
 
-        // Verificar permisos normales primero
+        // Verify normal permissions first
         val missingNormalPermissions = normalPermissions.filter {
             ContextCompat.checkSelfPermission(activity, it) != PackageManager.PERMISSION_GRANTED
         }
 
         when {
             missingNormalPermissions.isNotEmpty() -> {
-                // Solicitar permisos normales primero
+                // Request normal permissions first
                 requestPermissionsLauncher.launch(missingNormalPermissions.toTypedArray())
             }
 
@@ -162,7 +162,7 @@ class BluetoothPermissionManager(
                         backgroundLocationPermission
                     ) != PackageManager.PERMISSION_GRANTED -> {
                 // If normal permissions are ok, request background location if necessary
-                // Para Android 11+, este permiso debe solicitarse por sefordo
+                // For Android 11+, this permission must be requested separately
                 requestPermissionsLauncher.launch(arrayOf(backgroundLocationPermission))
             }
 
@@ -176,7 +176,7 @@ class BluetoothPermissionManager(
     private fun getRequiredPermissions(): List<String> {
         val permissions = mutableListOf<String>()
 
-        // Permisos for Android 12+ (API 31+)
+        // Permissions for Android 12+ (API 31+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             permissions.addAll(
                 listOf(
@@ -186,7 +186,7 @@ class BluetoothPermissionManager(
                 )
             )
         } else {
-            // Permisos for versiones anteriores a Android 12
+            // Permissions for versions prior to Android 12
             permissions.addAll(
                 listOf(
                     Manifest.permission.BLUETOOTH,
@@ -202,7 +202,7 @@ class BluetoothPermissionManager(
         permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
 
         // Background location permission for Android 10+ if BLE is used in background
-        // IMPORTANTE: Este permiso debe solicitarse por sefordo en Android 11+
+        // IMPORTANT: This permission must be requested separately on Android 11+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             permissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
         }

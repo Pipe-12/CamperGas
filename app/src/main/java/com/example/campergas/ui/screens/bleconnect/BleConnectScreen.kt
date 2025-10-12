@@ -71,7 +71,7 @@ fun BleConnectScreen(
     var showPermissionDialog by remember { mutableStateOf(false) }
     var showBluetoothDialog by remember { mutableStateOf(false) }
 
-    // Verificar permisos al entrar a la screen
+    // Verify permissions when entering the screen
     LaunchedEffect(Unit) {
         if (!viewModel.isBluetoothEnabled()) {
             showBluetoothDialog = true
@@ -108,7 +108,7 @@ fun BleConnectScreen(
             .statusBarsPadding()
             .padding(16.dp)
     ) {
-        // Back button y title
+        // Back button and title
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -241,7 +241,7 @@ fun BleConnectScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // Available devices section (only if not conectado)
+        // Available devices section (only if not connected)
         if (!connectionState) {
             Text(
                 text = stringResource(R.string.ble_available_devices, uiState.availableDevices.size),
@@ -329,7 +329,7 @@ private fun AvailableDeviceCard(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Badge de compatibilidad
+            // Compatibility badge
             if (isCompatible) {
                 Row(
                     modifier = Modifier

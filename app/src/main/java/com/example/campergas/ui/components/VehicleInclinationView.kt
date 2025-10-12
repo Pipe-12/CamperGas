@@ -1025,7 +1025,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         center = Offset(width / 2 - 60f, -wheelRadius + 15f)
     )
 
-    // Siof thedder (larger)
+    // Side ladder (larger)
     for (i in 0..2) {
         val stepY = bodyOffsetY + height / 2 + (i * 15f)
         drawLine(
@@ -1036,7 +1036,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         )
     }
     
-    // Soporte of the escalera
+    // Ladder support
     drawLine(
         color = Color.Gray,
         start = Offset(width / 2 - 12f, bodyOffsetY + height / 2),

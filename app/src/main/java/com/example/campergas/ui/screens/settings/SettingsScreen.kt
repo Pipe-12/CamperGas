@@ -56,17 +56,17 @@ fun SettingsScreen(
     val scrollState = rememberScrollState()
     val uiState by viewModel.uiState.collectAsState()
 
-    // Estados for intervalos BLE
+    // States for BLE intervals
     val weightInterval by viewModel.weightInterval.collectAsState()
     val inclinationInterval by viewModel.inclinationInterval.collectAsState()
     val operationStatus by viewModel.operationStatus.collectAsState()
 
-    // Estados locales for campos de texto
+    // Local states for text fields
     var weightIntervalText by remember { mutableStateOf("") }
     var inclinationIntervalText by remember { mutableStateOf("") }
     var gasThresholdText by remember { mutableStateOf("") }
 
-    // Updatesr campos de texto when changesn los valores
+    // Update text fields when values change
     LaunchedEffect(weightInterval) {
         weightIntervalText = weightInterval.toString()
     }
@@ -75,12 +75,12 @@ fun SettingsScreen(
         inclinationIntervalText = inclinationInterval.toString()
     }
 
-    // Updatesr campo de texto del umbral de gas
+    // Update gas threshold text field
     LaunchedEffect(uiState.gasLevelThreshold) {
         gasThresholdText = uiState.gasLevelThreshold.toString()
     }
 
-    // Determinar si el switch debe estar activado
+    // Determine if the switch should be enabled
     val isDarkModeEnabled = when (uiState.themeMode) {
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
@@ -94,7 +94,7 @@ fun SettingsScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Back button y title
+        // Back button and title
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -157,13 +157,13 @@ fun SettingsScreen(
                     Switch(
                         checked = isDarkModeEnabled,
                         onCheckedChange = { isEnabled ->
-                            // Si se activa, poner modo oscuro; si se desactiva, poner modo claro
+                            // If activated, set dark mode; if deactivated, set light mode
                             viewModel.setThemeMode(if (isEnabled) ThemeMode.DARK else ThemeMode.LIGHT)
                         }
                     )
                 }
 
-                // Texto explicativo del estado actual
+                // Explanatory text of current state
                 Text(
                     text = when (uiState.themeMode) {
                         ThemeMode.LIGHT -> stringResource(R.string.theme_light)

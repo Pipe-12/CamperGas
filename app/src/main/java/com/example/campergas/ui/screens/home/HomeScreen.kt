@@ -149,7 +149,7 @@ fun HomeScreen(
                         isLargeButton = true,
                         verticalLayout = true
                     ) {
-                        // Mostrar la cylinder with the porcentaje actual
+                        // Show the cylinder with the current percentage
                         fuelData?.let { fuel ->
                             GasCylinderVisualizer(
                                 fuelPercentage = fuel.fuelPercentage,
