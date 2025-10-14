@@ -41,7 +41,7 @@ class GasCylinderViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
-    // Flujo para simular la bombona activa
+    // Flow to simulate the active cylinder
     private val activeCylinderFlow = MutableStateFlow<GasCylinder?>(null)
 
     @Before

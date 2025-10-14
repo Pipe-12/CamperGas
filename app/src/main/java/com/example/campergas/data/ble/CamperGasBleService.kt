@@ -32,13 +32,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Service BLE unificado for manejar todas las characteristics from sensor CamperGas
- * El sensor tiene un solo servicio con tres characteristics READ-only:
- * - FuelMeasurement: data de measurement de combustible (lectura bajo demanda)
- * - Inclination: data of inclination (lectura bajo demanda)
- * - Offline: data historical en lotes (lectura continua al conectar)
+ * Unified BLE service to handle all characteristics from CamperGas sensor
+ * The sensor has a single service with three READ-only characteristics:
+ * - FuelMeasurement: fuel measurement data (on-demand reading)
+ * - Inclination: inclination data (on-demand reading)
+ * - Offline: historical data in batches (continuous reading on connect)
  *
- * IMPORTANTE: El sensor ahora usa modo READ en lugar de notificaciones.
+ * IMPORTANT: The sensor now uses READ mode instead of notifications.
  * The application must actively request data by reading the characteristics.
  */
 @Singleton
@@ -53,18 +53,18 @@ class CamperGasBleService @Inject constructor(
         private const val TAG = "CamperGasBleService"
     }
 
-    // Scope for operaciones en segundo plano
+    // Scope for background operations
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     // Connection states
     private val _connectionState = MutableStateFlow(false)
     val connectionState: StateFlow<Boolean> = _connectionState
 
-    // Datos of weight en real time (mantener for compatibilidad con sensores)
+    // Real-time weight data (maintain for sensor compatibility)
     private val _fuelMeasurementData = MutableStateFlow<FuelMeasurement?>(null)
     val fuelMeasurementData: StateFlow<FuelMeasurement?> = _fuelMeasurementData
 
-    // Datos de combustible calculados
+    // Calculated fuel data
     private val _fuelData = MutableStateFlow<FuelMeasurement?>(null)
     val fuelData: StateFlow<FuelMeasurement?> = _fuelData
 
@@ -102,14 +102,14 @@ class CamperGasBleService @Inject constructor(
             Log.d(TAG, "🔄 onConnectionStateChange - status: $status, newState: $newState")
             when (newState) {
                 BluetoothProfile.STATE_CONNECTED -> {
-                    Log.d(TAG, "✅ Connected al sensor CamperGas")
+                    Log.d(TAG, "✅ Connected to CamperGas sensor")
                     _connectionState.value = true
-                    // Descubrir servicios solo si tenemos permisos
+                    // Discover services only if we have permissions
                     if (bleManager.hasBluetoothConnectPermission()) {
                         @SuppressLint("MissingPermission")
                         gatt?.discoverServices()
                     } else {
-                        Log.e(TAG, "❌ No hay permisos for descubrir servicios")
+                        Log.e(TAG, "❌ No permissions to discover services")
                         disconnect()
                     }
                 }
@@ -141,7 +141,7 @@ class CamperGasBleService @Inject constructor(
                 }
 
                 BluetoothProfile.STATE_DISCONNECTING -> {
-                    Log.d(TAG, "🔄 Desconectando from sensor CamperGas...")
+                    Log.d(TAG, "🔄 Disconnecting from CamperGas sensor...")
                     // Stop periodic reading when starting disconnection
                     stopPeriodicDataReading()
                 }
@@ -150,19 +150,19 @@ class CamperGasBleService @Inject constructor(
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d(TAG, "Services descubiertos")
+                Log.d(TAG, "Services discovered")
 
-                // Buscar el servicio from sensor CamperGas
+                // Search for CamperGas sensor service
                 val sensorService =
                     gatt?.getService(UUID.fromString(CamperGasUuids.SENSOR_SERVICE_UUID))
 
                 if (sensorService != null) {
-                    Log.d(TAG, "Service CamperGas encontrado")
+                    Log.d(TAG, "CamperGas service found")
 
                     // Get all characteristics
                     setupCharacteristics(sensorService)
                 } else {
-                    Log.e(TAG, "Service CamperGas no encontrado")
+                    Log.e(TAG, "CamperGas service not found")
                     listAvailableServices(gatt)
                 }
             } else {
@@ -274,7 +274,7 @@ class CamperGasBleService @Inject constructor(
                 startPeriodicDataReading()
             } catch (e: Exception) {
                 Log.e(TAG, "Error loading configuration: ${e.message}")
-                // Usar valores por defecto si falla
+                // Use default values if it fails
                 configureReadingIntervals(5000L, 5000L)
                 startPeriodicDataReading()
             }

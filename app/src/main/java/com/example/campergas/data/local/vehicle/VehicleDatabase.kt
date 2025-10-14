@@ -16,13 +16,13 @@ abstract class VehicleDatabase : RoomDatabase() {
     abstract fun vehicleDao(): VehicleDao
 
     companion object {
-        // Migration from version 1 to 2 (add field distanceBetweenFrontWheels y cambiar MOTORHOME a AUTOCARAVANA)
+        // Migration from version 1 to 2 (add field distanceBetweenFrontWheels and change MOTORHOME to AUTOCARAVANA)
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                // Agregar nueva columna
+                // Add new column
                 database.execSQL("ALTER TABLE vehicle_config ADD COLUMN distanceBetweenFrontWheels REAL")
 
-                // Updatesr enum MOTORHOME a AUTOCARAVANA si existe
+                // Update enum MOTORHOME to AUTOCARAVANA if it exists
                 database.execSQL("UPDATE vehicle_config SET type = 'AUTOCARAVANA' WHERE type = 'MOTORHOME'")
             }
         }

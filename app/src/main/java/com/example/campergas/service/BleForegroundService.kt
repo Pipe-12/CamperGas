@@ -98,7 +98,7 @@ class BleForegroundService : Service() {
 
         when (intent?.action) {
             ACTION_START_FOR_WIDGETS -> {
-                Log.d(TAG, "Servicio iniciado for widgets")
+                Log.d(TAG, "Service started for widgets")
                 // Try to connect to last known device
                 connectToLastKnownDevice()
             }
@@ -134,7 +134,7 @@ class BleForegroundService : Service() {
     private fun connectToDevice(deviceAddress: String) {
         serviceScope.launch {
             try {
-                // Conectar al device BLE
+                // Connect to BLE device
                 bleRepository.connectToSensor(deviceAddress)
 
                 // Load interval configuration from preferences
@@ -144,10 +144,10 @@ class BleForegroundService : Service() {
                 launch {
                     bleRepository.fuelMeasurementData.collect { fuelMeasurement ->
                         if (fuelMeasurement != null) {
-                            // Verificar umbral de gas for alertas
+                            // Check gas level threshold for alerts
                             checkGasLevelThreshold(fuelMeasurement.fuelPercentage)
                             
-                            // Updatesr widget de cylinder de gas
+                            // Update gas cylinder widget
                             GasCylinderWidgetProvider.updateAllWidgets(this@BleForegroundService)
                         }
                     }
@@ -186,7 +186,7 @@ class BleForegroundService : Service() {
                 bleRepository.saveLastConnectedDevice(deviceAddress)
 
             } catch (e: Exception) {
-                Log.e(TAG, "Error al conectar al device: ${e.message}")
+                Log.e(TAG, "Error connecting to device: ${e.message}")
                 // Do not stop service to allow automatic retries
                 updateNotification("Connection error - retrying...")
             }
@@ -199,7 +199,7 @@ class BleForegroundService : Service() {
     private fun loadConfigurationAndStartPeriodicRequests() {
         serviceScope.launch {
             try {
-                // Loadr intervalos from preferencias
+                // Load intervals from preferences
                 weightRequestInterval = preferencesDataStore.weightReadInterval.first()
                 inclinationRequestInterval = preferencesDataStore.inclinationReadInterval.first()
                 
@@ -214,7 +214,7 @@ class BleForegroundService : Service() {
                 launch {
                     preferencesDataStore.weightReadInterval.collect { newInterval ->
                         if (newInterval != weightRequestInterval) {
-                            Log.d(TAG, "Intervalo of weight actualizado: $newInterval ms")
+                            Log.d(TAG, "Weight interval updated: $newInterval ms")
                             weightRequestInterval = newInterval
                             restartPeriodicRequestsIfActive()
                         }
@@ -224,7 +224,7 @@ class BleForegroundService : Service() {
                 launch {
                     preferencesDataStore.inclinationReadInterval.collect { newInterval ->
                         if (newInterval != inclinationRequestInterval) {
-                            Log.d(TAG, "Intervalo of inclination actualizado: $newInterval ms")
+                            Log.d(TAG, "Inclination interval updated: $newInterval ms")
                             inclinationRequestInterval = newInterval
                             restartPeriodicRequestsIfActive()
                         }
@@ -233,7 +233,7 @@ class BleForegroundService : Service() {
                 
             } catch (e: Exception) {
                 Log.e(TAG, "Error loading configuration: ${e.message}")
-                // Usar valores por defecto si falla
+                // Use default values if it fails
                 weightRequestInterval = 5000L
                 inclinationRequestInterval = 5000L
             }
@@ -389,7 +389,7 @@ class BleForegroundService : Service() {
                     }
                 }
             } catch (_: Exception) {
-                // Handle errores silenciosamente for no afectar el servicio principal
+                // Handle errors silently to not affect the main service
             }
         }
     }

@@ -55,7 +55,7 @@ fun CaravanConfigScreen(
             .statusBarsPadding()
             .padding(16.dp)
     ) {
-        // Back button y title
+        // Back button and title
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically

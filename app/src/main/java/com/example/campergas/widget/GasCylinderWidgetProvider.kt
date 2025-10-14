@@ -76,18 +76,18 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
     private fun checkAndStopServiceIfNoWidgets(context: Context) {
         scope.launch {
             try {
-                // Verificar si hay widgets de gas activos
+                // Check if there are active gas widgets
                 val gasWidgetManager = AppWidgetManager.getInstance(context)
                 val gasComponentName = ComponentName(context, GasCylinderWidgetProvider::class.java)
                 val gasWidgetIds = gasWidgetManager.getAppWidgetIds(gasComponentName)
                 
-                // Verificar si hay widgets de estabilidad activos
+                // Check if there are active stability widgets
                 val stabilityComponentName = ComponentName(context, VehicleStabilityWidgetProvider::class.java)
                 val stabilityWidgetIds = gasWidgetManager.getAppWidgetIds(stabilityComponentName)
                 
-                // Si no hay widgets activos, detener el servicio
+                // If there are no active widgets, stop the service
                 if (gasWidgetIds.isEmpty() && stabilityWidgetIds.isEmpty()) {
-                    Log.d("GasCylinderWidget", "No hay widgets activos - deteniendo servicio BLE")
+                    Log.d("GasCylinderWidget", "No active widgets - stopping BLE service")
                     com.example.campergas.service.BleForegroundService.stopService(context)
                 }
             } catch (e: Exception) {

@@ -29,7 +29,7 @@ class BleManager @Inject constructor(
     }
 
     /**
-     * Verifies if se tienen los permisos necesarios for conectar devices BLE
+     * Verifies if we have the necessary permissions to connect BLE devices
      */
     fun hasBluetoothConnectPermission(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -46,7 +46,7 @@ class BleManager @Inject constructor(
     }
 
     /**
-     * Verifies if se tienen los permisos necesarios for escanear devices BLE
+     * Verifies if we have the necessary permissions to scan BLE devices
      */
     fun hasBluetoothScanPermission(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -68,7 +68,7 @@ class BleManager @Inject constructor(
 
 
     /**
-     * Verifies if se tienen todos los permisos necesarios for operaciones BLE
+     * Verifies if we have all the necessary permissions for BLE operations
      */
     fun hasAllBluetoothPermissions(): Boolean {
         return hasBluetoothConnectPermission() && hasBluetoothScanPermission()

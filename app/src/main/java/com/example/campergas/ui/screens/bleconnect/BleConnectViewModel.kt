@@ -112,7 +112,7 @@ class BleConnectViewModel @Inject constructor(
                 error = null
             )
             try {
-                // Usar el use case for conectar y guardar device
+                // Use the use case to connect and save device
                 connectBleDeviceUseCase(device.address)
 
                 _uiState.value = _uiState.value.copy(
@@ -149,13 +149,13 @@ class BleConnectViewModel @Inject constructor(
 
                 android.util.Log.d(
                     "BleConnectViewModel",
-                    "🔌 Llamando a connectBleDeviceUseCase.disconnect()"
+                    "🔌 Calling connectBleDeviceUseCase.disconnect()"
                 )
                 // Disconnect from device - state will update automatically
                 // through observable connectionState from use case
                 connectBleDeviceUseCase.disconnect()
 
-                android.util.Log.d("BleConnectViewModel", "🔌 Limpiando estado local del ViewModel")
+                android.util.Log.d("BleConnectViewModel", "🔌 Cleaning local ViewModel state")
                 // Only clear local UI data, not connection state
                 _uiState.value = _uiState.value.copy(
                     connectedDevice = null,

@@ -69,7 +69,7 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        // Observar los data de combustible
+        // Observe fuel data
         viewModelScope.launch {
             getFuelDataUseCase().collectLatest {
                 _fuelData.value = it
@@ -83,7 +83,7 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        // Observar data of inclination
+        // Observe inclination data
         viewModelScope.launch {
             getInclinationUseCase().collectLatest { inclination ->
                 inclination?.let {
@@ -93,7 +93,7 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        // Loadr data de consumption
+        // Load consumption data
         loadConsumptionSummaries()
     }
 
@@ -138,7 +138,7 @@ class HomeViewModel @Inject constructor(
      */
     fun requestSensorDataOnScreenOpen() {
         viewModelScope.launch {
-            // Esperar un poco for que la UI se establezca
+            // Wait a bit for the UI to settle
             kotlinx.coroutines.delay(500)
 
             // Only make the request if there is active connection
@@ -146,7 +146,7 @@ class HomeViewModel @Inject constructor(
                 try {
                     readSensorDataUseCase.readAllSensorData()
                 } catch (_: Exception) {
-                    // Handle error silenciosamente for no afectar la UI
+                    // Handle error silently to not affect the UI
                 }
             }
         }

@@ -26,10 +26,10 @@ class SettingsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
-    // StateFlows for intervalos de lectura BLE
+    // StateFlows for BLE reading intervals
     val weightInterval: StateFlow<Int> =
         configureReadingIntervalsUseCase.getWeightReadIntervalSeconds()
-            .map { it / 60 } // Convertir segundos a minutos
+            .map { it / 60 } // Convert seconds to minutes
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),

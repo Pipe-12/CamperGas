@@ -54,7 +54,7 @@ class HomeViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
-    // Flujos para los datos simulados
+    // Flows for simulated data
     private val fuelDataFlow = MutableStateFlow<FuelMeasurement?>(null)
     private val connectionStateFlow = MutableStateFlow(false)
     private val lastConnectedDeviceFlow = MutableStateFlow("")
@@ -212,7 +212,7 @@ class HomeViewModelTest {
         )
         advanceUntilIdle()
 
-        // Assert - No debería intentar conectar
+        // Assert - Should not attempt to connect
         coVerify(exactly = 0) { connectBleDeviceUseCase.invoke(any()) }
     }
 
@@ -234,7 +234,7 @@ class HomeViewModelTest {
 
         // Act
         viewModel.requestSensorDataOnScreenOpen()
-        advanceTimeBy(600) // Más que el delay de 500ms
+        advanceTimeBy(600) // More than the 500ms delay
         advanceUntilIdle()
 
         // Assert
@@ -249,13 +249,13 @@ class HomeViewModelTest {
 
             // Act
             viewModel.requestSensorDataOnScreenOpen()
-            advanceTimeBy(600) // Más que el delay de 500ms
+            advanceTimeBy(600) // More than the 500ms delay
             advanceUntilIdle()
 
             // Assert
             coVerify(exactly = 0) { readSensorDataUseCase.readAllSensorData() }
         }
 
-    // Nota: No podemos probar directamente onCleared porque es protected
-    // pero indirectamente ya verificamos que disconnectDevice funciona correctamente
+    // Note: We cannot test onCleared directly because it is protected
+    // but we have indirectly verified that disconnectDevice works correctly
 }
