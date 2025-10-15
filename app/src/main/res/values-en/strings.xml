@@ -56,16 +56,9 @@
     <string name="dialog_cancel">Cancel</string>
     <string name="permissions_needed_title">Permissions Required</string>
     <string name="permissions_needed_message">CamperGas needs Bluetooth and location permissions to work properly.</string>
-    <string name="bluetooth_permission_title">Bluetooth Permissions</string>
-    <string name="bluetooth_permission_message">CamperGas needs access to Bluetooth and location to connect with caravan devices and get weight, inclination and gas consumption data.</string>
-    <string name="bluetooth_permission_grant">Grant permissions</string>
-    <string name="bluetooth_permission_later">Not now</string>
     <string name="bluetooth_disabled_title">Bluetooth Disabled</string>
     <string name="bluetooth_disabled_message">To use CamperGas you need to enable Bluetooth. Do you want to enable it now?</string>
     <string name="bluetooth_disabled_enable">Enable Bluetooth</string>
-    <string name="location_disabled_title">Location Disabled</string>
-    <string name="location_disabled_message">To scan Bluetooth devices you need to have location enabled. Do you want to enable it now?</string>
-    <string name="location_disabled_enable">Enable location</string>
     
     <!-- BLE Connect Screen -->
     <string name="ble_connection_title">Bluetooth Connection</string>

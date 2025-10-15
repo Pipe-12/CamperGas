@@ -73,21 +73,6 @@ fun PermissionDialog(
 }
 
 @Composable
-fun BluetoothPermissionDialog(
-    onAccept: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    PermissionDialog(
-        title = stringResource(R.string.bluetooth_permission_title),
-        message = stringResource(R.string.bluetooth_permission_message),
-        onAccept = onAccept,
-        onDismiss = onDismiss,
-        acceptText = stringResource(R.string.bluetooth_permission_grant),
-        dismissText = stringResource(R.string.bluetooth_permission_later)
-    )
-}
-
-@Composable
 fun BluetoothDisabledDialog(
     onAccept: () -> Unit,
     onDismiss: () -> Unit
@@ -98,21 +83,6 @@ fun BluetoothDisabledDialog(
         onAccept = onAccept,
         onDismiss = onDismiss,
         acceptText = stringResource(R.string.bluetooth_disabled_enable),
-        dismissText = stringResource(R.string.dialog_cancel)
-    )
-}
-
-@Composable
-fun LocationDisabledDialog(
-    onAccept: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    PermissionDialog(
-        title = stringResource(R.string.location_disabled_title),
-        message = stringResource(R.string.location_disabled_message),
-        onAccept = onAccept,
-        onDismiss = onDismiss,
-        acceptText = stringResource(R.string.location_disabled_enable),
         dismissText = stringResource(R.string.dialog_cancel)
     )
 }

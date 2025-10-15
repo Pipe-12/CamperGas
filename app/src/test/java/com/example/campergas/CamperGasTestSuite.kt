@@ -1,7 +1,6 @@
 package com.example.campergas
 
 import com.example.campergas.domain.model.FuelMeasurementTest
-import com.example.campergas.domain.model.GasCylinderTest
 import com.example.campergas.domain.usecase.AddGasCylinderUseCaseTest
 import com.example.campergas.domain.usecase.GetActiveCylinderUseCaseTest
 import com.example.campergas.domain.usecase.SaveFuelMeasurementUseCaseTest
@@ -30,7 +29,6 @@ import org.junit.runners.Suite
     AddGasCylinderUseCaseTest::class,
 
     // Domain Models Tests
-    GasCylinderTest::class,
     FuelMeasurementTest::class,
 
     // ViewModels Tests
