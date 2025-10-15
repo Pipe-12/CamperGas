@@ -55,7 +55,6 @@ import androidx.compose.ui.res.stringResource
 import com.example.campergas.R
 import com.example.campergas.domain.model.BleDevice
 import com.example.campergas.ui.components.BluetoothDisabledDialog
-import com.example.campergas.ui.components.BluetoothPermissionDialog
 import com.example.campergas.ui.theme.CamperGreenLight
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,8 +66,7 @@ fun BleConnectScreen(
     val uiState by viewModel.uiState.collectAsState()
     val connectionState by viewModel.connectionState.collectAsState()
 
-    // States to control permission dialogs
-    var showPermissionDialog by remember { mutableStateOf(false) }
+    // State to control Bluetooth dialog
     var showBluetoothDialog by remember { mutableStateOf(false) }
 
     // Verify permissions when entering the screen
@@ -86,18 +84,6 @@ fun BleConnectScreen(
             },
             onDismiss = {
                 showBluetoothDialog = false
-            }
-        )
-    }
-
-    // Permissions dialog
-    if (showPermissionDialog) {
-        BluetoothPermissionDialog(
-            onAccept = {
-                showPermissionDialog = false
-            },
-            onDismiss = {
-                showPermissionDialog = false
             }
         )
     }
