@@ -3,8 +3,8 @@ package com.example.campergas
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.SystemBarStyle
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -15,12 +15,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
-import com.example.campergas.R
 import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.domain.model.Language
 import com.example.campergas.domain.model.ThemeMode
@@ -30,6 +27,8 @@ import com.example.campergas.ui.theme.CamperGasTheme
 import com.example.campergas.utils.BluetoothPermissionManager
 import com.example.campergas.utils.LocaleUtils
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -50,13 +49,13 @@ class MainActivity : ComponentActivity() {
             val tempPreferences = PreferencesDataStore(context)
             val savedLanguage = try {
                 runBlocking { tempPreferences.language.first() }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Language.SYSTEM // Fallback to system if loading fails
             }
             
             val wrappedContext = LocaleUtils.setLocale(context, savedLanguage)
             super.attachBaseContext(wrappedContext)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Fallback to original context if locale setting fails
             super.attachBaseContext(newBase)
         }
@@ -71,7 +70,7 @@ class MainActivity : ComponentActivity() {
         // Load saved theme preference to determine correct system bar styling
         val savedThemeMode = try {
             runBlocking { preferencesDataStore.themeMode.first() }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             ThemeMode.DARK // Fallback to dark theme if loading fails
         }
         

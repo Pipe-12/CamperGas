@@ -15,8 +15,6 @@ import android.util.Log
 import android.widget.RemoteViews
 import com.example.campergas.MainActivity
 import com.example.campergas.R
-import com.example.campergas.data.repository.BleRepository
-import com.example.campergas.data.repository.GasCylinderRepository
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope

@@ -3,8 +3,8 @@ package com.example.campergas.ui.screens.consumption
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.domain.model.Consumption
-import com.example.campergas.domain.usecase.GetConsumptionHistoryUseCase
 import com.example.campergas.domain.usecase.ChartDataPoint
+import com.example.campergas.domain.usecase.GetConsumptionHistoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -110,7 +110,7 @@ class ConsumptionViewModel @Inject constructor(
                     val dayTotal = getConsumptionHistoryUseCase.calculateTotalConsumption(dayConsumptions)
                     _uiState.value = _uiState.value.copy(lastDayConsumption = dayTotal)
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Silently handle summary loading errors
             }
         }
@@ -122,7 +122,7 @@ class ConsumptionViewModel @Inject constructor(
                     val weekTotal = getConsumptionHistoryUseCase.calculateTotalConsumption(weekConsumptions)
                     _uiState.value = _uiState.value.copy(lastWeekConsumption = weekTotal)
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Silently handle summary loading errors
             }
         }
@@ -134,7 +134,7 @@ class ConsumptionViewModel @Inject constructor(
                     val monthTotal = getConsumptionHistoryUseCase.calculateTotalConsumption(monthConsumptions)
                     _uiState.value = _uiState.value.copy(lastMonthConsumption = monthTotal)
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Silently handle summary loading errors
             }
         }
@@ -148,7 +148,7 @@ class ConsumptionViewModel @Inject constructor(
                         val customTotal = getConsumptionHistoryUseCase.calculateTotalConsumption(consumptions)
                         _uiState.value = _uiState.value.copy(customPeriodConsumption = customTotal)
                     }
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     // Silently handle custom period summary errors
                 }
             }
