@@ -53,7 +53,7 @@ class SaveFuelMeasurementUseCaseTest {
         val saveResult = result.getOrNull()!!
         assertEquals(expectedId, saveResult.measurementId)
         assertTrue(saveResult.processed)
-        assertEquals("Medición guardada correctamente", saveResult.reason)
+        assertEquals("Measurement saved successfully", saveResult.reason)
 
         coVerify {
             fuelMeasurementRepository.insertMeasurement(
@@ -84,7 +84,7 @@ class SaveFuelMeasurementUseCaseTest {
 
         // Assert
         assertTrue(result.isFailure)
-        assertEquals("No hay bombona activa configurada", result.exceptionOrNull()?.message)
+        assertEquals("No active cylinder configured", result.exceptionOrNull()?.message)
 
         coVerify(exactly = 0) { fuelMeasurementRepository.insertMeasurement(any()) }
     }
@@ -281,13 +281,13 @@ class SaveFuelMeasurementUseCaseTest {
         coEvery { fuelMeasurementRepository.getLastNMeasurements(cylinderId, 3) } returns previousMeasurements
         coEvery { fuelMeasurementRepository.deleteMeasurementById(any()) } returns Unit
 
-        // Act - nueva medición que vuelve a peso normal (similar al anterior)
+        // Act - new measurement that returns to normal weight (similar to previous)
         val result = useCase.saveRealTimeMeasurement(11.8f, 4000L)
 
         // Assert
         assertTrue(result.isSuccess)
         
-        // Verificar que se detectó y eliminó el outlier (id = 2)
+        // Verify that the outlier was detected and removed (id = 2)
         coVerify { fuelMeasurementRepository.deleteMeasurementById(2L) }
     }
 
@@ -297,12 +297,12 @@ class SaveFuelMeasurementUseCaseTest {
         val cylinderId = 1L
         val activeCylinder = testCylinder.copy(id = cylinderId)
         
-        // Escenario: peso normal -> peso muy alto (outlier) -> peso normal
+        // Scenario: normal weight -> very high weight (outlier) -> normal weight
         val previousMeasurements = listOf(
             FuelMeasurement(id = 3, cylinderId = cylinderId, cylinderName = "Test", timestamp = 3000L, 
                            fuelKilograms = 6.5f, fuelPercentage = 65.0f, totalWeight = 11.5f),
             FuelMeasurement(id = 2, cylinderId = cylinderId, cylinderName = "Test", timestamp = 2000L, 
-                           fuelKilograms = 20.0f, fuelPercentage = 100.0f, totalWeight = 25.0f), // Outlier: muy alto
+                           fuelKilograms = 20.0f, fuelPercentage = 100.0f, totalWeight = 25.0f), // Outlier: very high
             FuelMeasurement(id = 1, cylinderId = cylinderId, cylinderName = "Test", timestamp = 1000L, 
                            fuelKilograms = 7.0f, fuelPercentage = 70.0f, totalWeight = 12.0f)
         )
@@ -312,13 +312,13 @@ class SaveFuelMeasurementUseCaseTest {
         coEvery { fuelMeasurementRepository.getLastNMeasurements(cylinderId, 3) } returns previousMeasurements
         coEvery { fuelMeasurementRepository.deleteMeasurementById(any()) } returns Unit
 
-        // Act - nueva medición que vuelve a peso normal
+        // Act - new measurement that returns to normal weight
         val result = useCase.saveRealTimeMeasurement(12.2f, 4000L)
 
         // Assert
         assertTrue(result.isSuccess)
         
-        // Verificar que se detectó y eliminó el outlier (id = 2)
+        // Verify that the outlier was detected and removed (id = 2)
         coVerify { fuelMeasurementRepository.deleteMeasurementById(2L) }
     }
 
@@ -328,12 +328,12 @@ class SaveFuelMeasurementUseCaseTest {
         val cylinderId = 1L
         val activeCylinder = testCylinder.copy(id = cylinderId)
         
-        // Escenario: progresión normal de consumo (peso va disminuyendo gradualmente)
+        // Scenario: normal consumption progression (weight decreasing gradually)
         val previousMeasurements = listOf(
             FuelMeasurement(id = 3, cylinderId = cylinderId, cylinderName = "Test", timestamp = 3000L, 
                            fuelKilograms = 6.0f, fuelPercentage = 60.0f, totalWeight = 11.0f),
             FuelMeasurement(id = 2, cylinderId = cylinderId, cylinderName = "Test", timestamp = 2000L, 
-                           fuelKilograms = 6.5f, fuelPercentage = 65.0f, totalWeight = 11.5f), // Consumo normal
+                           fuelKilograms = 6.5f, fuelPercentage = 65.0f, totalWeight = 11.5f), // Normal consumption
             FuelMeasurement(id = 1, cylinderId = cylinderId, cylinderName = "Test", timestamp = 1000L, 
                            fuelKilograms = 7.0f, fuelPercentage = 70.0f, totalWeight = 12.0f)
         )
@@ -343,13 +343,13 @@ class SaveFuelMeasurementUseCaseTest {
         coEvery { fuelMeasurementRepository.getLastNMeasurements(cylinderId, 3) } returns previousMeasurements
         coEvery { fuelMeasurementRepository.deleteMeasurementById(any()) } returns Unit
 
-        // Act - nueva medición que continua la tendencia normal
+        // Act - new measurement that continues the normal trend
         val result = useCase.saveRealTimeMeasurement(10.5f, 4000L)
 
         // Assert
         assertTrue(result.isSuccess)
         
-        // Verificar que NO se eliminó ninguna medición
+        // Verify that NO measurement was deleted
         coVerify(exactly = 0) { fuelMeasurementRepository.deleteMeasurementById(any()) }
     }
 
@@ -359,7 +359,7 @@ class SaveFuelMeasurementUseCaseTest {
         val cylinderId = 1L
         val activeCylinder = testCylinder.copy(id = cylinderId)
         
-        // Solo 2 mediciones previas - insuficientes para detección de outliers
+        // Only 2 previous measurements - insufficient for outlier detection
         val previousMeasurements = listOf(
             FuelMeasurement(id = 2, cylinderId = cylinderId, cylinderName = "Test", timestamp = 2000L, 
                            fuelKilograms = 7.0f, fuelPercentage = 70.0f, totalWeight = 12.0f),
@@ -378,7 +378,7 @@ class SaveFuelMeasurementUseCaseTest {
         // Assert
         assertTrue(result.isSuccess)
         
-        // Verificar que NO se intentó eliminar mediciones
+        // Verify that NO attempt was made to delete measurements
         coVerify(exactly = 0) { fuelMeasurementRepository.deleteMeasurementById(any()) }
     }
 
@@ -390,13 +390,13 @@ class SaveFuelMeasurementUseCaseTest {
 
         every { gasCylinderRepository.getActiveCylinder() } returns flowOf(activeCylinder)
         coEvery { fuelMeasurementRepository.insertMeasurement(any()) } returns 4L
-        // Simular error en getLastNMeasurements
+        // Simulate error in getLastNMeasurements
         coEvery { fuelMeasurementRepository.getLastNMeasurements(cylinderId, 3) } throws RuntimeException("Database error")
 
         // Act
         val result = useCase.saveRealTimeMeasurement(12.0f, 4000L)
 
-        // Assert - el error en outlier detection no debería afectar el guardado principal
+        // Assert - the outlier detection error should not affect the main save
         assertTrue(result.isSuccess)
         val saveResult = result.getOrNull()!!
         assertTrue(saveResult.processed)

@@ -56,17 +56,17 @@ fun SettingsScreen(
     val scrollState = rememberScrollState()
     val uiState by viewModel.uiState.collectAsState()
 
-    // Estados para intervalos BLE
+    // States for BLE intervals
     val weightInterval by viewModel.weightInterval.collectAsState()
     val inclinationInterval by viewModel.inclinationInterval.collectAsState()
     val operationStatus by viewModel.operationStatus.collectAsState()
 
-    // Estados locales para campos de texto
+    // Local states for text fields
     var weightIntervalText by remember { mutableStateOf("") }
     var inclinationIntervalText by remember { mutableStateOf("") }
     var gasThresholdText by remember { mutableStateOf("") }
 
-    // Actualizar campos de texto cuando cambian los valores
+    // Update text fields when values change
     LaunchedEffect(weightInterval) {
         weightIntervalText = weightInterval.toString()
     }
@@ -75,12 +75,12 @@ fun SettingsScreen(
         inclinationIntervalText = inclinationInterval.toString()
     }
 
-    // Actualizar campo de texto del umbral de gas
+    // Update gas threshold text field
     LaunchedEffect(uiState.gasLevelThreshold) {
         gasThresholdText = uiState.gasLevelThreshold.toString()
     }
 
-    // Determinar si el switch debe estar activado
+    // Determine if the switch should be enabled
     val isDarkModeEnabled = when (uiState.themeMode) {
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
@@ -94,7 +94,7 @@ fun SettingsScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Botón de volver atrás y título
+        // Back button and title
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -109,7 +109,7 @@ fun SettingsScreen(
             )
         }
 
-        // Mostrar estado de operación si hay uno
+        // Show operation state if there is one
         operationStatus?.let { status ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -133,7 +133,7 @@ fun SettingsScreen(
             }
         }
 
-        // Configuración de tema
+        // Theme configuration
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -157,13 +157,13 @@ fun SettingsScreen(
                     Switch(
                         checked = isDarkModeEnabled,
                         onCheckedChange = { isEnabled ->
-                            // Si se activa, poner modo oscuro; si se desactiva, poner modo claro
+                            // If activated, set dark mode; if deactivated, set light mode
                             viewModel.setThemeMode(if (isEnabled) ThemeMode.DARK else ThemeMode.LIGHT)
                         }
                     )
                 }
 
-                // Texto explicativo del estado actual
+                // Explanatory text of current state
                 Text(
                     text = when (uiState.themeMode) {
                         ThemeMode.LIGHT -> stringResource(R.string.theme_light)
@@ -176,7 +176,7 @@ fun SettingsScreen(
             }
         }
 
-        // Configuración de idioma
+        // Language configuration
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -237,7 +237,7 @@ fun SettingsScreen(
             }
         }
 
-        // Configuración de notificaciones
+        // Notifications configuration
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -309,7 +309,7 @@ fun SettingsScreen(
                 }
             }
         }
-        // Configuración de intervalo de peso
+        // Interval configuration of weight
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -367,7 +367,7 @@ fun SettingsScreen(
             }
         }
 
-        // Configuración de intervalo de inclinación
+        // Interval configuration of inclination
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -410,7 +410,7 @@ fun SettingsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = inclinationIntervalText.toIntOrNull()?.let { it in 1..300 } == true
                 ) {
-                    Text("Aplicar Intervalo de Inclinación")
+                    Text("Apply Inclination Interval")
                 }
 
                 Text(
@@ -425,7 +425,7 @@ fun SettingsScreen(
             }
         }
 
-        // Información adicional
+        // Additional information
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {

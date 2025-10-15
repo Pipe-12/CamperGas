@@ -92,7 +92,7 @@ fun VehicleInclinationSideView(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (compact) "Inclinación" else "Vista Lateral - Nivelado Vertical (Pitch)",
+                text = if (compact) "Inclination" else "Side View - Vertical Level (Pitch)",
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = if (compact) 4.dp else 8.dp)
@@ -121,14 +121,14 @@ fun VehicleInclinationSideView(
                 val centerY = size.height / 2
                 val groundLevel = centerY + if (compact) 20f else 25f // Adjusted for compact mode
 
-                // Dibujar línea de referencia horizontal (nivel del suelo) con graduación
+                // Draw horizontal reference line (ground level) with graduation
                 drawLine(
                     color = Color.Gray.copy(alpha = 0.7f),
                     start = Offset(if (compact) 15f else 20f, groundLevel),
                     end = Offset(size.width - if (compact) 15f else 20f, groundLevel),
                     strokeWidth = 2.dp.toPx()
                 )
-                // Aplicar solo rotación de pitch, centrado en el nivel del suelo
+                // Apply pitch rotation only, centered on ground level
                 translate(centerX, groundLevel) {
                     rotate(pitchAngle, pivot = Offset.Zero) {
                         when (vehicleType) {
@@ -166,7 +166,7 @@ fun VehicleInclinationRearView(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Vista Trasera - Nivelado Horizontal (Roll)",
+                text = "Rear View - Horizontal Level (Roll)",
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -189,16 +189,16 @@ fun VehicleInclinationRearView(
             ) {
                 val centerX = size.width / 2
                 val centerY = size.height / 2
-                val groundLevel = centerY + 25f // Nivel del suelo más abajo para que las ruedas estén en la línea
+                val groundLevel = centerY + 25f // Ground level lower so wheels are on the line
 
-                // Dibujar línea de referencia horizontal (nivel del suelo) con graduación
+                // Draw horizontal reference line (ground level) with graduation
                 drawLine(
                     color = Color.Gray.copy(alpha = 0.7f),
                     start = Offset(20f, groundLevel),
                     end = Offset(size.width - 20f, groundLevel),
                     strokeWidth = 2.dp.toPx()
                 )
-                // Aplicar solo rotación de roll, centrado en el nivel del suelo
+                // Apply roll rotation only, centered on ground level
                 translate(centerX, groundLevel) {
                     rotate(rollAngle, pivot = Offset.Zero) {
                         when (vehicleType) {
@@ -222,7 +222,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
     val strokeWidth = if (compact) 1.5.dp.toPx() else 2.dp.toPx()
     val bodyOffsetY = -height - wheelRadius + if (compact) 6f else 8f
 
-    // Sombra del vehículo
+    // Vehicle shadow
     drawRoundRect(
         color = Color.Black.copy(alpha = if (compact) 0.15f else 0.2f),
         topLeft = Offset(-width / 2 + if (compact) 2 else 3, bodyOffsetY + if (compact) 2 else 3),
@@ -230,7 +230,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         cornerRadius = CornerRadius(if (compact) 8f else 12f, if (compact) 8f else 12f)
     )
 
-    // Cuerpo principal de la caravana con esquinas redondeadas
+    // Main caravan body with rounded corners
     drawRoundRect(
         color = primaryColor,
         topLeft = Offset(-width / 2, bodyOffsetY),
@@ -238,7 +238,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         cornerRadius = CornerRadius(if (compact) 8f else 12f, if (compact) 8f else 12f)
     )
     
-    // Contorno del cuerpo
+    // Body outline
     drawRoundRect(
         color = Color.Black.copy(alpha = 0.8f),
         topLeft = Offset(-width / 2, bodyOffsetY),
@@ -247,11 +247,11 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         style = Stroke(width = strokeWidth)
     )
 
-    // Ventanas laterales con marcos (más grandes)
+    // Side windows with frames (larger)
     val windowHeight = 35f
     val windowWidth = 50f
     
-    // Ventana delantera
+    // Front window
     drawRoundRect(
         color = Color.White,
         topLeft = Offset(-width / 2 + 25, bodyOffsetY + 15),
@@ -266,7 +266,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         style = Stroke(width = 1.5.dp.toPx())
     )
     
-    // Ventana media
+    // Middle window
     drawRoundRect(
         color = Color.White,
         topLeft = Offset(-25f, bodyOffsetY + 15),
@@ -281,7 +281,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         style = Stroke(width = 1.5.dp.toPx())
     )
     
-    // Ventana trasera
+    // Rear window
     drawRoundRect(
         color = Color.White,
         topLeft = Offset(width / 2 - 75, bodyOffsetY + 15),
@@ -296,7 +296,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         style = Stroke(width = 1.5.dp.toPx())
     )
 
-    // Puerta lateral (más grande)
+    // Side door (larger)
     drawRoundRect(
         color = primaryColor.copy(alpha = 0.8f),
         topLeft = Offset(30f, bodyOffsetY + 10),
@@ -305,17 +305,17 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         style = Stroke(width = 2.dp.toPx())
     )
     
-    // Manija de la puerta
+    // Manija of the puerta
     drawCircle(
         color = Color.Black.copy(alpha = 0.8f),
         radius = 3f,
         center = Offset(70f, bodyOffsetY + height / 2)
     )
 
-    // Ruedas con llantas detalladas - Posicionadas para tocar la línea de referencia
-    val wheelCenter = Offset(0f, 0f) // Altura 0 para estar en la línea de referencia
+    // Detailed wheels with rims - Positioned to touch reference line
+    val wheelCenter = Offset(0f, 0f) // Height 0 to be on reference line
     
-    // Sombra de la rueda
+    // Sombra of the rueda
     drawCircle(
         color = Color.Black.copy(alpha = 0.3f),
         radius = wheelRadius + 2f,
@@ -329,7 +329,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         center = wheelCenter
     )
     
-    // Neumático
+    // Tire
     drawCircle(
         color = Color.Black,
         radius = wheelRadius - 2f,
@@ -343,7 +343,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         center = wheelCenter
     )
     
-    // Rayos de la llanta
+    // Rayos of the llanta
     for (i in 0..4) {
         val angle = (i * 72 * PI / 180).toFloat()
         val startRadius = 4f
@@ -361,7 +361,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         )
     }
 
-    // Timón/enganche delantero
+    // Front hitch/coupling
     val hitchWidth = 40f
     val hitchHeight = 18f
 
@@ -372,17 +372,17 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         cornerRadius = CornerRadius(4f, 4f)
     )
     
-    // Conexión del timón
+    // Hitch connection
     drawCircle(
         color = Color.Gray,
         radius = 8f,
         center = Offset(-width / 2 - hitchWidth + 5f, 0f)
     )
 
-    // Ruedín delantero con soporte
+    // Front support wheel with stand
     val jockeyWheelCenter = Offset(-width / 2 - hitchWidth - 8f, 0f)
     
-    // Soporte del ruedín
+    // Support wheel stand
     drawLine(
         color = Color.Gray,
         start = Offset(-width / 2 - 15f, bodyOffsetY + height / 1.5f - 15f),
@@ -390,7 +390,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         strokeWidth = 4.dp.toPx()
     )
     
-    // Ruedín
+    // Support wheel
     drawCircle(
         color = Color.Black,
         radius = 10f,
@@ -403,7 +403,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
     )
 
     // Detalles adicionales
-    // Línea de separación en el techo
+    // Roof sefortion line
     drawLine(
         color = Color.Black.copy(alpha = 0.3f),
         start = Offset(-width / 2 + 15, bodyOffsetY),
@@ -411,7 +411,7 @@ private fun DrawScope.drawCaravanSideView(primaryColor: Color, secondaryColor: C
         strokeWidth = 1.5.dp.toPx()
     )
     
-    // Ventilación en el techo (más grande)
+    // Roof ventilation (larger)
     drawRoundRect(
         color = Color.Gray,
         topLeft = Offset(-20f, bodyOffsetY - 5f),
@@ -435,7 +435,7 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
     val strokeWidth = if (compact) 1.5.dp.toPx() else 2.dp.toPx()
     val bodyOffsetY = -height - wheelRadius + if (compact) 6f else 8f
 
-    // Sombra del vehículo
+    // Vehicle shadow
     drawRoundRect(
         color = Color.Black.copy(alpha = 0.2f),
         topLeft = Offset(-width / 2 + 3, bodyOffsetY + 3),
@@ -443,7 +443,7 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
         cornerRadius = CornerRadius(12f, 12f)
     )
 
-    // Cuerpo principal (habitáculo)
+    // Main body (cabin)
     drawRoundRect(
         color = primaryColor,
         topLeft = Offset(-width / 2, bodyOffsetY),
@@ -451,7 +451,7 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
         cornerRadius = CornerRadius(12f, 12f)
     )
     
-    // Contorno del cuerpo principal
+    // Body outline principal
     drawRoundRect(
         color = Color.Black.copy(alpha = 0.8f),
         topLeft = Offset(-width / 2, bodyOffsetY),
@@ -460,7 +460,7 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
         style = Stroke(width = strokeWidth)
     )
 
-    // Cabina del conductor con forma más realista
+    // Driver cabin with more realistic shape
     val cabinPath = Path().apply {
         moveTo(width / 2 - 70f, bodyOffsetY)
         lineTo(width / 2, bodyOffsetY + 20f)
@@ -480,11 +480,11 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
         style = Stroke(width = strokeWidth)
     )
 
-    // Ventanas laterales del habitáculo (más grandes)
+    // Cabin side windows (larger)
     val windowHeight = 40f
     val windowWidth = 55f
     
-    // Ventana principal del habitáculo
+    // Main cabin window
     drawRoundRect(
         color = Color.White,
         topLeft = Offset(-width / 2 + 25, bodyOffsetY + 20),
@@ -499,7 +499,7 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
         style = Stroke(width = 1.5.dp.toPx())
     )
     
-    // Ventana media
+    // Middle window
     drawRoundRect(
         color = Color.White,
         topLeft = Offset(-15f, bodyOffsetY + 20),
@@ -514,7 +514,7 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
         style = Stroke(width = 1.5.dp.toPx())
     )
 
-    // Parabrisas de la cabina (forma trapecial más grande)
+    // Cabin windshield (larger trapezoidal shape)
     val windshieldPath = Path().apply {
         moveTo(width / 2 - 60f, bodyOffsetY + 20f)
         lineTo(width / 2 - 15f, bodyOffsetY + 25f)
@@ -534,7 +534,7 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
         style = Stroke(width = 1.5.dp.toPx())
     )
     
-    // Ventana lateral de la cabina
+    // Ventana lateral of the cabina
     drawRoundRect(
         color = Color.White.copy(alpha = 0.9f),
         topLeft = Offset(width / 2 - 55f, bodyOffsetY + height - 35f),
@@ -542,7 +542,7 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
         cornerRadius = CornerRadius(6f, 6f)
     )
 
-    // Puerta lateral del habitáculo (más grande)
+    // Cabin side door (larger)
     drawRoundRect(
         color = primaryColor.copy(alpha = 0.8f),
         topLeft = Offset(-width / 2 + 85f, bodyOffsetY + 15),
@@ -551,15 +551,15 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
         style = Stroke(width = 2.dp.toPx())
     )
     
-    // Manija de la puerta
+    // Manija of the puerta
     drawCircle(
         color = Color.Black.copy(alpha = 0.8f),
         radius = 4f,
         center = Offset(-width / 2 + 125f, bodyOffsetY + height / 2)
     )
 
-    // Ruedas detalladas - Posicionadas para tocar la línea de referencia
-    val rearWheelCenter = Offset(-width / 2 + 50f, 0f) // Altura 0 para estar en la línea de referencia
+    // Detailed wheels - Positioned to touch reference line
+    val rearWheelCenter = Offset(-width / 2 + 50f, 0f) // Height 0 to be on reference line
     val frontWheelCenter = Offset(width / 2 - 45f, 0f)
     
     // Rueda trasera
@@ -568,7 +568,7 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
     drawDetailedWheel(frontWheelCenter, wheelRadius)
 
     // Detalles adicionales
-    // Franja lateral decorativa (más visible)
+    // Decorative side stripe (more visible)
     drawLine(
         color = secondaryColor.copy(alpha = 0.7f),
         start = Offset(-width / 2 + 15, bodyOffsetY + height / 2),
@@ -576,7 +576,7 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
         strokeWidth = 5.dp.toPx()
     )
     
-    // Ventilación en el techo (más grande)
+    // Roof ventilation (larger)
     drawRoundRect(
         color = Color.Gray,
         topLeft = Offset(-35f, bodyOffsetY - 6f),
@@ -584,7 +584,7 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
         cornerRadius = CornerRadius(6f, 6f)
     )
     
-    // Faros delanteros (más grandes)
+    // Front headlights (larger)
     drawCircle(
         color = Color.Yellow.copy(alpha = 0.8f),
         radius = 8f,
@@ -605,7 +605,7 @@ private fun DrawScope.drawMotorHomeSideView(primaryColor: Color, secondaryColor:
 }
 
 private fun DrawScope.drawDetailedWheel(center: Offset, radius: Float) {
-    // Sombra de la rueda
+    // Sombra of the rueda
     drawCircle(
         color = Color.Black.copy(alpha = 0.3f),
         radius = radius + 2f,
@@ -619,7 +619,7 @@ private fun DrawScope.drawDetailedWheel(center: Offset, radius: Float) {
         center = center
     )
     
-    // Neumático
+    // Tire
     drawCircle(
         color = Color.Black,
         radius = radius - 2f,
@@ -633,7 +633,7 @@ private fun DrawScope.drawDetailedWheel(center: Offset, radius: Float) {
         center = center
     )
     
-    // Rayos de la llanta
+    // Rayos of the llanta
     for (i in 0..4) {
         val angle = (i * 72 * PI / 180).toFloat()
         val startRadius = 3f
@@ -653,13 +653,13 @@ private fun DrawScope.drawDetailedWheel(center: Offset, radius: Float) {
 }
 
 private fun DrawScope.drawCaravanRearView(primaryColor: Color) {
-    val width = 180f // Aumentado para vista más visible
+    val width = 180f // Increased for more visible view
     val height = 110f // Aumentado
     val wheelRadius = 16f // Aumentado
     val strokeWidth = 2.dp.toPx()
-    val bodyOffsetY = -height - wheelRadius + 8f // Ajustado para mejor posición
+    val bodyOffsetY = -height - wheelRadius + 8f // Adjusted for better position
 
-    // Sombra del vehículo
+    // Vehicle shadow
     drawRoundRect(
         color = Color.Black.copy(alpha = 0.2f),
         topLeft = Offset(-width / 2 + 3, bodyOffsetY + 3),
@@ -667,7 +667,7 @@ private fun DrawScope.drawCaravanRearView(primaryColor: Color) {
         cornerRadius = CornerRadius(12f, 12f)
     )
 
-    // Cuerpo principal de la caravana (vista trasera)
+    // Cuerpo principal of the caravana (vista trasera)
     drawRoundRect(
         color = primaryColor,
         topLeft = Offset(-width / 2, bodyOffsetY),
@@ -675,7 +675,7 @@ private fun DrawScope.drawCaravanRearView(primaryColor: Color) {
         cornerRadius = CornerRadius(12f, 12f)
     )
     
-    // Contorno del cuerpo
+    // Body outline
     drawRoundRect(
         color = Color.Black.copy(alpha = 0.8f),
         topLeft = Offset(-width / 2, bodyOffsetY),
@@ -684,7 +684,7 @@ private fun DrawScope.drawCaravanRearView(primaryColor: Color) {
         style = Stroke(width = strokeWidth)
     )
 
-    // Ventana trasera con marco (más grande)
+    // Rear window with frame (larger)
     val windowWidth = 100f
     val windowHeight = 45f
     drawRoundRect(
@@ -709,7 +709,7 @@ private fun DrawScope.drawCaravanRearView(primaryColor: Color) {
         strokeWidth = 3.dp.toPx()
     )
     
-    // Manijas de las puertas traseras (más grandes)
+    // Rear door handles (larger)
     drawCircle(
         color = Color.Black.copy(alpha = 0.8f),
         radius = 4f,
@@ -721,17 +721,17 @@ private fun DrawScope.drawCaravanRearView(primaryColor: Color) {
         center = Offset(20f, bodyOffsetY + height / 2 + 8f)
     )
 
-    // Ruedas traseras rectangulares - Posicionadas para tocar la línea de referencia
-    val leftWheelCenter = Offset(-width / 2 + 35, 0f) // Altura 0 para estar en la línea de referencia
+    // Rectangular rear wheels - Positioned to touch reference line
+    val leftWheelCenter = Offset(-width / 2 + 35, 0f) // Height 0 to be on reference line
     val rightWheelCenter = Offset(width / 2 - 35, 0f)
     
     drawRearViewWheel(leftWheelCenter)
     drawRearViewWheel(rightWheelCenter)
 
-    // Luces traseras (más grandes y visibles)
+    // Rear lights (larger and more visible)
     val lightRadius = 7f
     
-    // Luces de freno/posición
+    // Brake/position lights
     drawCircle(
         color = Color.Red,
         radius = lightRadius,
@@ -743,7 +743,7 @@ private fun DrawScope.drawCaravanRearView(primaryColor: Color) {
         center = Offset(width / 2 - 20, bodyOffsetY + height - 25f)
     )
     
-    // Luces de marcha atrás
+    // Reverse lights
     drawCircle(
         color = Color.White,
         radius = lightRadius - 1f,
@@ -755,7 +755,7 @@ private fun DrawScope.drawCaravanRearView(primaryColor: Color) {
         center = Offset(width / 2 - 20, bodyOffsetY + height - 8f)
     )
     
-    // Indicadores de dirección
+    // Turn signals
     drawCircle(
         color = Color.Yellow,
         radius = lightRadius - 1f,
@@ -767,7 +767,7 @@ private fun DrawScope.drawCaravanRearView(primaryColor: Color) {
         center = Offset(width / 2 - 45, bodyOffsetY + height - 25f)
     )
     
-    // Contornos de las luces
+    // Contornos of thes luces
     for (lightCenter in listOf(
         Offset(-width / 2 + 20, bodyOffsetY + height - 25f),
         Offset(width / 2 - 20, bodyOffsetY + height - 25f),
@@ -784,7 +784,7 @@ private fun DrawScope.drawCaravanRearView(primaryColor: Color) {
         )
     }
 
-    // Matrícula (más grande)
+    // License plate (larger)
     drawRoundRect(
         color = Color.White,
         topLeft = Offset(-35f, bodyOffsetY + height - 2f),
@@ -827,13 +827,13 @@ private fun DrawScope.drawCaravanRearView(primaryColor: Color) {
 }
 
 private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor: Color) {
-    val width = 200f // Aumentado para vista más visible
+    val width = 200f // Increased for more visible view
     val height = 120f // Aumentado
     val wheelRadius = 16f // Aumentado
     val strokeWidth = 2.dp.toPx()
-    val bodyOffsetY = -height  - wheelRadius + 8f // Ajustado para mejor posición
+    val bodyOffsetY = -height  - wheelRadius + 8f // Adjusted for better position
 
-    // Sombra del vehículo
+    // Vehicle shadow
     drawRoundRect(
         color = Color.Black.copy(alpha = 0.2f),
         topLeft = Offset(-width / 2 + 3, bodyOffsetY + 3),
@@ -849,7 +849,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         cornerRadius = CornerRadius(12f, 12f)
     )
     
-    // Contorno del cuerpo
+    // Body outline
     drawRoundRect(
         color = Color.Black.copy(alpha = 0.8f),
         topLeft = Offset(-width / 2, bodyOffsetY),
@@ -858,7 +858,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         style = Stroke(width = strokeWidth)
     )
 
-    // Ventana trasera grande con marco
+    // Rear window grande con marco
     val windowWidth = 120f
     val windowHeight = 50f
     drawRoundRect(
@@ -883,7 +883,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         strokeWidth = 5.dp.toPx()
     )
     
-    // Paneles de la puerta trasera
+    // Paneles of the puerta trasera
     drawRoundRect(
         color = primaryColor.copy(alpha = 0.8f),
         topLeft = Offset(-width / 2 + 15, bodyOffsetY + height - 40f),
@@ -899,7 +899,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         style = Stroke(width = 2.dp.toPx())
     )
     
-    // Manijas de las puertas traseras (más grandes)
+    // Rear door handles (larger)
     drawCircle(
         color = Color.Black.copy(alpha = 0.8f),
         radius = 5f,
@@ -911,7 +911,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         center = Offset(25f, bodyOffsetY + height - 22f)
     )
 
-    // Escalón trasero
+    // Rear step
     drawRoundRect(
         color = Color.Gray,
         topLeft = Offset(-width / 2 + 10, bodyOffsetY + height - 8f),
@@ -919,14 +919,14 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         cornerRadius = CornerRadius(3f, 3f)
     )
 
-    // Ruedas traseras rectangulares - Posicionadas para tocar la línea de referencia
-    val leftWheelCenter = Offset(-width / 2 + 35, 0f) // Altura 0 para estar en la línea de referencia
+    // Rectangular rear wheels - Positioned to touch reference line
+    val leftWheelCenter = Offset(-width / 2 + 35, 0f) // Height 0 to be on reference line
     val rightWheelCenter = Offset(width / 2 - 35, 0f)
     
     drawRearViewWheel(leftWheelCenter)
     drawRearViewWheel(rightWheelCenter)
 
-    // Sistema de luces traseras más completo y grande
+    // More complete and larger rear light system
     val lightRadius = 8f
     
     // Luces de freno principales
@@ -941,7 +941,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         center = Offset(width / 2 - 25, bodyOffsetY + height - 30f)
     )
     
-    // Luces de marcha atrás
+    // Reverse lights
     drawCircle(
         color = Color.White,
         radius = lightRadius - 1f,
@@ -953,7 +953,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         center = Offset(width / 2 - 25, bodyOffsetY + height - 12f)
     )
     
-    // Indicadores de dirección
+    // Turn signals
     drawCircle(
         color = Color.Yellow,
         radius = lightRadius - 1f,
@@ -965,7 +965,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         center = Offset(width / 2 - 50, bodyOffsetY + height - 30f)
     )
     
-    // Luces de posición
+    // Position lights
     drawCircle(
         color = Color.Red.copy(alpha = 0.7f),
         radius = lightRadius - 2f,
@@ -998,7 +998,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         )
     }
 
-    // Matrícula (más grande)
+    // License plate (larger)
     drawRoundRect(
         color = Color.White,
         topLeft = Offset(-40f, bodyOffsetY + height + 2f),
@@ -1013,7 +1013,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         style = Stroke(width = 1.5.dp.toPx())
     )
 
-    // Escape lateral (más visible)
+    // Side exhaust (more visible)
     drawCircle(
         color = Color.Gray,
         radius = 9f,
@@ -1025,7 +1025,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         center = Offset(width / 2 - 60f, -wheelRadius + 15f)
     )
 
-    // Escalera lateral (más grande)
+    // Side ladder (larger)
     for (i in 0..2) {
         val stepY = bodyOffsetY + height / 2 + (i * 15f)
         drawLine(
@@ -1036,7 +1036,7 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
         )
     }
     
-    // Soporte de la escalera
+    // Ladder support
     drawLine(
         color = Color.Gray,
         start = Offset(width / 2 - 12f, bodyOffsetY + height / 2),
@@ -1057,30 +1057,30 @@ private fun DrawScope.drawMotorHomeRearView(primaryColor: Color, secondaryColor:
     )
 }
 
-// Función para dibujar ruedas en vista trasera (rectangulares)
+// Function to draw wheels in rear view (rectangular)
 private fun DrawScope.drawRearViewWheel(center: Offset, width: Float = 20f, height: Float = 35f) {
-    // Sombra de la rueda
+    // Sombra of the rueda
     drawRect(
         color = Color.Black.copy(alpha = 0.3f),
         topLeft = Offset(center.x - width / 2 + 2f, center.y - height / 2 + 2f),
         size = Size(width, height)
     )
     
-    // Rueda principal (rectángulo negro vertical)
+    // Main wheel (black vertical rectangle)
     drawRect(
         color = Color.Black,
         topLeft = Offset(center.x - width / 2, center.y - height / 2),
         size = Size(width, height)
     )
     
-    // Borde metálico de la llanta
+    // Metal rim edge
     drawRect(
         color = Color.Gray,
         topLeft = Offset(center.x - width / 2 + 2f, center.y - height / 2 + 2f),
         size = Size(width - 4f, height - 4f)
     )
     
-    // Línea central de la banda de rodadura
+    // Center line of tread
     drawLine(
         color = Color.DarkGray,
         start = Offset(center.x, center.y - height / 2 + 3f),

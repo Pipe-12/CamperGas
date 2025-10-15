@@ -67,12 +67,12 @@ fun HomeScreen(
 
     var showAddCylinderDialog by remember { mutableStateOf(false) }
 
-    // Hacer petición de datos del sensor al abrir la pantalla
+    // Make data request from sensor when opening screen
     LaunchedEffect(Unit) {
         viewModel.requestSensorDataOnScreenOpen()
     }
 
-    // Diálogo para agregar bombona
+    // Dialog to add cylinder
     if (showAddCylinderDialog) {
         AddGasCylinderDialog(
             onDismiss = { showAddCylinderDialog = false },
@@ -149,14 +149,14 @@ fun HomeScreen(
                         isLargeButton = true,
                         verticalLayout = true
                     ) {
-                        // Mostrar la bombona con el porcentaje actual
+                        // Show the cylinder with the current percentage
                         fuelData?.let { fuel ->
                             GasCylinderVisualizer(
                                 fuelPercentage = fuel.fuelPercentage,
                                 modifier = Modifier.size(60.dp, 90.dp)
                             )
                         } ?: run {
-                            // Bombona vacía si no hay datos
+                            // Empty cylinder if no data
                             GasCylinderVisualizer(
                                 fuelPercentage = 0f,
                                 modifier = Modifier.size(60.dp, 90.dp)
@@ -173,7 +173,7 @@ fun HomeScreen(
                         isLargeButton = true,
                         verticalLayout = true
                     ) {
-                        // Mostrar resumen compacto de consumo
+                        // Mostrar resumen compacto de consumption
                         ConsumptionPreview(
                             lastDayConsumption = lastDayConsumption,
                             lastWeekConsumption = lastWeekConsumption
@@ -188,7 +188,7 @@ fun HomeScreen(
                     onClick = { navController.navigate(Screen.Inclination.route) },
                     isLargeButton = true
                 ) {
-                    // Mostrar vista compacta del vehículo con inclinación para la home screen
+                    // Show compact view of the vehicle with inclination for the home screen
                     vehicleConfig?.let { config ->
                         VehicleInclinationView(
                             vehicleType = config.type,
@@ -198,7 +198,7 @@ fun HomeScreen(
                             compact = true
                         )
                     } ?: run {
-                        // Vista por defecto si no hay configuración
+                        // Default view if there is no configuration
                         VehicleInclinationView(
                             vehicleType = VehicleType.CARAVAN,
                             pitchAngle = inclinationPitch,
@@ -248,7 +248,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Botón de conexión BLE
+                    // BLE connection button
                     ConfigurationButton(
                         title = stringResource(R.string.home_connect_ble_title),
                         text = "🔗",
@@ -256,7 +256,7 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f)
                     )
 
-                    // Botón de configuración
+                    // Configuration button
                     ConfigurationButton(
                         title = stringResource(R.string.home_configuration_title),
                         icon = Icons.Default.Settings,
@@ -264,7 +264,7 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f)
                     )
 
-                    // Botón de ajustes de vehículo
+                    // Vehicle settings button
                     val vehicleIcon = getVehicleIcon(vehicleConfig?.type)
                     ConfigurationButton(
                         title = stringResource(R.string.home_vehicle_settings_title),
@@ -330,7 +330,7 @@ private fun NavigationButtonWithPreview(
                     )
                 }
                 
-                // Content section (bombona, gráfico, etc.)
+                // Content section (cylinder, chart, etc.)
                 Box(
                     modifier = Modifier.weight(1f),
                     contentAlignment = Alignment.Center
@@ -368,7 +368,7 @@ private fun NavigationButtonWithPreview(
                     )
                 }
                 
-                // Contenido del preview (bombona, gráfico, etc.)
+                // Preview content (cylinder, chart, etc.)
                 Box(
                     modifier = Modifier.width(if (isLargeButton) 140.dp else 80.dp),
                     contentAlignment = Alignment.Center

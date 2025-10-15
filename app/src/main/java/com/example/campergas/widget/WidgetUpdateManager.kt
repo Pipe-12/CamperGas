@@ -24,36 +24,36 @@ class WidgetUpdateManager @Inject constructor(
     }
 
     private fun startListeningForUpdates() {
-        // Escuchar cambios en las mediciones de combustible
+        // Listen for changes in fuel measurements
         scope.launch {
             fuelMeasurementRepository.getLatestRealTimeMeasurement().collect { fuelMeasurement ->
-                // Actualizar widget de bombona de gas siempre, con o sin datos
+                // Update gas cylinder widget always, with or without data
                 GasCylinderWidgetProvider.updateAllWidgets(context)
             }
         }
 
-        // Escuchar cambios en los datos BLE de combustible en tiempo real
+        // Listen for changes in real-time BLE fuel data
         scope.launch {
             bleRepository.fuelMeasurementData.collect { fuelMeasurement ->
-                // Actualizar widget cuando lleguen datos BLE nuevos
+                // Update widget when new BLE data arrives
                 GasCylinderWidgetProvider.updateAllWidgets(context)
             }
         }
 
-        // Escuchar cambios en los datos de inclinación
+        // Listen for changes in inclination data
         scope.launch {
             bleRepository.inclinationData.collect { inclinationData ->
                 if (inclinationData != null) {
-                    // Actualizar widget de estabilidad del vehículo
+                    // Update vehicle stability widget
                     VehicleStabilityWidgetProvider.updateAllWidgets(context)
                 }
             }
         }
 
-        // Escuchar cambios en el estado de conexión
+        // Listen for changes in connection state
         scope.launch {
             bleRepository.connectionState.collect { isConnected ->
-                // Actualizar ambos widgets cuando cambie el estado de conexión
+                // Update both widgets when connection state changes
                 GasCylinderWidgetProvider.updateAllWidgets(context)
                 VehicleStabilityWidgetProvider.updateAllWidgets(context)
             }

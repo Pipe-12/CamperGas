@@ -76,7 +76,7 @@ fun ConsumptionScreen(
             .statusBarsPadding()
             .padding(16.dp)
     ) {
-        // Botón de volver atrás y título
+        // Back button and title
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -93,7 +93,7 @@ fun ConsumptionScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Filtros de fecha
+        // Filtros de date
         DateFiltersSection(
             startDate = uiState.startDate,
             endDate = uiState.endDate,
@@ -107,7 +107,7 @@ fun ConsumptionScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Resumen de consumo
+        // Resumen de consumption
         ConsumptionSummarySection(
             lastDayConsumption = uiState.lastDayConsumption,
             lastWeekConsumption = uiState.lastWeekConsumption,
@@ -120,7 +120,7 @@ fun ConsumptionScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Gráfico de consumo
+        // Consumption chart
         if (uiState.chartData.isNotEmpty()) {
             ConsumptionChart(
                 chartData = uiState.chartData,
@@ -152,7 +152,7 @@ fun ConsumptionScreen(
             val datePickerState = rememberDatePickerState()
             DatePicker(state = datePickerState)
 
-            // Aplicar la fecha seleccionada cuando se confirma
+            // Aplicar la date seleccionada when confirma
             LaunchedEffect(datePickerState.selectedDateMillis) {
                 datePickerState.selectedDateMillis?.let { selectedDate ->
                     val startOfDay = selectedDate - (selectedDate % (24 * 60 * 60 * 1000L))
@@ -183,7 +183,7 @@ fun ConsumptionScreen(
             val datePickerState = rememberDatePickerState()
             DatePicker(state = datePickerState)
 
-            // Aplicar la fecha seleccionada cuando se confirma
+            // Aplicar la date seleccionada when confirma
             LaunchedEffect(datePickerState.selectedDateMillis) {
                 datePickerState.selectedDateMillis?.let { selectedDate ->
                     val endOfDay = selectedDate + (24 * 60 * 60 * 1000L - 1)
@@ -243,7 +243,7 @@ fun DateFiltersSection(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Filtros rápidos
+            // Quick filters
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -290,7 +290,7 @@ fun DateFiltersSection(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Selección de fechas específicas
+            // Specific dates selection
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -387,12 +387,12 @@ fun ConsumptionSummarySection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 SummaryItem(
-                    title = "Últimas 24h",
+                    title = "Last 24h",
                     value = lastDayConsumption,
                     modifier = Modifier.weight(1f)
                 )
                 SummaryItem(
-                    title = "Última semana",
+                    title = "Last week",
                     value = lastWeekConsumption,
                     modifier = Modifier.weight(1f)
                 )
@@ -405,14 +405,14 @@ fun ConsumptionSummarySection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 SummaryItem(
-                    title = "Último mes",
+                    title = "Last month",
                     value = lastMonthConsumption,
                     modifier = Modifier.weight(1f)
                 )
                 
                 if (hasCustomPeriod && startDate != null && endDate != null) {
                     SummaryItem(
-                        title = "Período seleccionado",
+                        title = "Selected period",
                         subtitle = "${formatDateOnly(startDate)} - ${formatDateOnly(endDate)}",
                         value = customPeriodConsumption,
                         modifier = Modifier.weight(1f)
@@ -489,7 +489,7 @@ fun ConsumptionChart(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "📈 Gráfico de Consumo Diario",
+                text = "📈 Daily Consumption Chart",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -551,7 +551,7 @@ fun SimpleLineChart(
             )
         )
         
-        // Calculate bounds
+        // Calculateste bounds
         val minValue = data.minOf { it.kilograms }
         val maxValue = data.maxOf { it.kilograms }
         val valueRange = max(maxValue - minValue, 0.1f) // Avoid division by zero
@@ -635,7 +635,7 @@ fun SimpleLineChart(
             }
         }
         
-        // Calculate points
+        // Calculateste points
         val points = data.map { point ->
             val x = leftPadding + ((point.date - minDate).toFloat() / dateRange) * (chartWidth - leftPadding - rightPadding)
             val y = chartHeight - bottomPadding - ((point.kilograms - minValue) / valueRange) * (chartHeight - topPadding - bottomPadding)

@@ -24,32 +24,32 @@ import com.example.campergas.domain.model.GasCylinder
 data class FuelMeasurementEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val cylinderId: Long, // ID de la bombona
-    val cylinderName: String, // Nombre de la bombona para referencia
-    val timestamp: Long, // Timestamp de cuando se tomó la medición
+    val cylinderId: Long, // ID of the cylinder
+    val cylinderName: String, // Nombre of the cylinder for referencia
+    val timestamp: Long, // Timestamp of when measurement was taken
     val fuelKilograms: Float, // Kilogramos de combustible disponible (ya calculados)
     val fuelPercentage: Float, // Porcentaje de combustible (0-100)
-    val totalWeight: Float, // Peso total medido (bombona + combustible)
-    val isCalibrated: Boolean = true, // Indica si la medición está calibrada
-    val isHistorical: Boolean = false // Indica si es un dato histórico
+    val totalWeight: Float, // Peso total medido (cylinder + combustible)
+    val isCalibrated: Boolean = true, // Indicates if measurement is calibrated
+    val isHistorical: Boolean = false // Indica si es un dato historical
 ) {
     /**
-     * Formatea los kilogramos de combustible para mostrar en la UI
+     * Formatea los kilogramos de combustible for mostrar en la UI
      */
     fun getFormattedFuelKilograms(): String = "%.2f kg".format(fuelKilograms)
 
     /**
-     * Formatea el porcentaje para mostrar en la UI
+     * Formatea el porcentaje for mostrar en la UI
      */
     fun getFormattedPercentage(): String = "%.1f%%".format(fuelPercentage)
 
     /**
-     * Formatea el peso total medido para mostrar en la UI
+     * Formatea el total weight medido for mostrar en la UI
      */
     fun getFormattedTotalWeight(): String = "%.2f kg".format(totalWeight)
 
     /**
-     * Obtiene la fecha formateada de la medición
+     * Gets formatted date of the measurement
      */
     fun getFormattedTimestamp(): String {
         val date = java.util.Date(timestamp)
@@ -58,7 +58,7 @@ data class FuelMeasurementEntity(
     }
 
     /**
-     * Obtiene la fecha y hora completa formateada
+     * Gets la date y hora completa formatted
      */
     fun getFullFormattedTimestamp(): String {
         val date = java.util.Date(timestamp)
@@ -68,7 +68,7 @@ data class FuelMeasurementEntity(
     }
 
     /**
-     * Verifica si la medición es válida
+     * Verifies if measurement is valid
      */
     fun isValid(): Boolean =
         !fuelKilograms.isNaN() && !fuelKilograms.isInfinite() && fuelKilograms >= 0 &&

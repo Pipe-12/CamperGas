@@ -41,7 +41,7 @@ class GasCylinderViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
-    // Flujo para simular la bombona activa
+    // Flow to simulate the active cylinder
     private val activeCylinderFlow = MutableStateFlow<GasCylinder?>(null)
 
     @Before
@@ -73,7 +73,7 @@ class GasCylinderViewModelTest {
         // Assert
         val state = viewModel.uiState.value
         assertFalse(state.isLoading)
-        assertEquals("Sin bombona activa - Las mediciones no se guardarán", state.errorMessage)
+        assertEquals("No active cylinder - Measurements will not be saved", state.errorMessage)
         assertNull(state.successMessage)
         assertNull(viewModel.activeCylinder.value)
     }
@@ -95,7 +95,7 @@ class GasCylinderViewModelTest {
 
         // Assert
         assertEquals(testCylinder, viewModel.activeCylinder.value)
-        assertNull(viewModel.uiState.value.errorMessage) // El mensaje de error debería desaparecer
+        assertNull(viewModel.uiState.value.errorMessage) // Error message should disappear
     }
 
     @Test
@@ -118,7 +118,7 @@ class GasCylinderViewModelTest {
         // Assert
         assertNull(viewModel.activeCylinder.value)
         assertEquals(
-            "Sin bombona activa - Las mediciones no se guardarán",
+            "No active cylinder - Measurements will not be saved",
             viewModel.uiState.value.errorMessage
         )
     }
@@ -134,21 +134,21 @@ class GasCylinderViewModelTest {
         // Assert - Check immediate state after success (before delay clears the message)
         val state = viewModel.uiState.value
         assertFalse(state.isLoading)
-        assertEquals("Bombona añadida correctamente", state.successMessage)
+        assertEquals("Cylinder added successfully", state.successMessage)
         assertNull(state.errorMessage)
 
         // Verify the use case was called with correct parameters
         coVerify { addGasCylinderUseCase("Test Cylinder", 5.0f, 10.0f, true) }
 
         // Success message should clear after delay
-        advanceTimeBy(3100) // Más que el delay de 3s
+        advanceTimeBy(3100) // More than the 3s delay
         assertNull(viewModel.uiState.value.successMessage)
     }
 
     @Test
     fun `addCylinder failure updates uiState with error message`() = runTest {
         // Arrange
-        val errorMessage = "Error al añadir bombona: nombre duplicado"
+        val errorMessage = "Error adding cylinder: duplicate name"
         coEvery {
             addGasCylinderUseCase(any(), any(), any(), any())
         } returns Result.failure(Exception(errorMessage))
@@ -177,7 +177,7 @@ class GasCylinderViewModelTest {
 
         // Assert - After operation completes successfully, should have success message and not be loading
         assertFalse(viewModel.uiState.value.isLoading)
-        assertEquals("Bombona añadida correctamente", viewModel.uiState.value.successMessage)
+        assertEquals("Cylinder added successfully", viewModel.uiState.value.successMessage)
     }
 
     @Test
