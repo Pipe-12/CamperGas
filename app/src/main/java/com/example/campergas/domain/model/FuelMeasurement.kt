@@ -36,16 +36,6 @@ data class FuelMeasurement(
     }
 
     /**
-     * Gets la date y hora completa formatted
-     */
-    fun getFullFormattedTimestamp(): String {
-        val date = java.util.Date(timestamp)
-        val formatter =
-            java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss", java.util.Locale.getDefault())
-        return formatter.format(date)
-    }
-
-    /**
      * Verifies if measurement is valid
      */
     fun isValid(): Boolean =

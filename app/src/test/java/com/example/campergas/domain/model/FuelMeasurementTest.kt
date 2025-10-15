@@ -97,31 +97,6 @@ class FuelMeasurementTest {
     }
 
     @Test
-    fun `getFullFormattedTimestamp returns full date and time`() {
-        // Arrange
-        val calendar = Calendar.getInstance()
-        calendar.set(2023, 11, 25, 14, 30, 45) // December 25, 2023, 14:30:45
-        val timestamp = calendar.timeInMillis
-        
-        val measurement = FuelMeasurement(
-            id = 1L,
-            cylinderId = 1L,
-            cylinderName = "Test Cylinder",
-            timestamp = timestamp,
-            fuelKilograms = 7.456f,
-            fuelPercentage = 74.56f,
-            totalWeight = 12.456f,
-            isCalibrated = true
-        )
-
-        // Act
-        val formatted = measurement.getFullFormattedTimestamp()
-
-        // Assert
-        assertEquals("25/12/2023 14:30:45", formatted)
-    }
-
-    @Test
     fun `isValid returns true for valid measurement`() {
         // Arrange
         val measurement = FuelMeasurement(
