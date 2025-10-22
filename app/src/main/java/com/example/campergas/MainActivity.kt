@@ -31,14 +31,55 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
+/**
+ * Actividad principal de la aplicación CamperGas.
+ * 
+ * Esta actividad es el punto de entrada de la interfaz de usuario y gestiona:
+ * - La configuración del tema (claro/oscuro)
+ * - La internacionalización (idioma del sistema o seleccionado)
+ * - Los permisos de Bluetooth necesarios para la conexión BLE
+ * - La navegación entre pantallas mediante Jetpack Compose Navigation
+ * - El estilo edge-to-edge para las barras del sistema
+ * 
+ * Utiliza Jetpack Compose para toda la UI y Hilt para la inyección de dependencias.
+ * 
+ * @author Felipe García Gómez
+ */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    /**
+     * Almacén de preferencias del usuario.
+     * 
+     * Proporciona acceso a las configuraciones guardadas como:
+     * - Modo de tema (claro/oscuro)
+     * - Idioma seleccionado
+     * - Estado de notificaciones
+     * - Umbrales de nivel de gas
+     */
     @Inject
     lateinit var preferencesDataStore: PreferencesDataStore
 
+    /**
+     * Gestor de permisos de Bluetooth.
+     * 
+     * Maneja la solicitud y verificación de permisos necesarios para:
+     * - Escaneo de dispositivos BLE
+     * - Conexión a sensores BLE
+     * - Acceso a ubicación (requerido para BLE en Android)
+     */
     private lateinit var bluetoothPermissionManager: BluetoothPermissionManager
 
+    /**
+     * Adjunta el contexto base con la configuración de idioma aplicada.
+     * 
+     * Este método se llama antes de onCreate y permite aplicar el idioma guardado
+     * en las preferencias del usuario al contexto de la actividad. Esto asegura
+     * que la aplicación muestre el idioma correcto incluso después de recreaciones
+     * de la actividad (como cambios de configuración o rotación de pantalla).
+     * 
+     * @param newBase El contexto base proporcionado por el sistema
+     */
     override fun attachBaseContext(newBase: Context?) {
         val context = newBase ?: return super.attachBaseContext(newBase)
         
@@ -61,6 +102,19 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Inicializa la actividad y configura la interfaz de usuario.
+     * 
+     * Este método realiza las siguientes operaciones:
+     * 1. Carga las preferencias del usuario (tema e idioma)
+     * 2. Configura las barras del sistema en modo edge-to-edge
+     * 3. Inicializa el gestor de permisos de Bluetooth
+     * 4. Configura el contenido con Jetpack Compose
+     * 5. Establece el sistema de navegación
+     * 6. Muestra el diálogo de permisos si es necesario
+     * 
+     * @param savedInstanceState Estado guardado de la actividad si fue destruida previamente
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -157,8 +211,16 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Configure system bars (status bar and navigation bar) styling based on theme
-     * This method ensures consistent styling and prevents white flash during activity recreation
+     * Configura el estilo de las barras del sistema según el tema activo.
+     * 
+     * Este método aplica el estilo apropiado a la barra de estado y la barra de navegación
+     * basándose en si el tema oscuro está activo o no. Utiliza colores transparentes para
+     * permitir que el contenido se extienda hasta los bordes de la pantalla (edge-to-edge).
+     * 
+     * El método previene el destello blanco que puede ocurrir durante la recreación de la
+     * actividad al aplicar inmediatamente el estilo correcto de las barras del sistema.
+     * 
+     * @param isDarkTheme true si el tema oscuro está activo, false para tema claro
      */
     private fun configureSystemBars(isDarkTheme: Boolean) {
         enableEdgeToEdge(
