@@ -110,12 +110,28 @@ class BleDeviceScanner @Inject constructor(
             addDeviceToList(bleDevice)
         }
 
+        /**
+         * Llamado cuando falla el escaneo BLE.
+         * 
+         * Detiene el estado de escaneo y registra el código de error.
+         * 
+         * @param errorCode Código de error que indica por qué falló el escaneo
+         */
         override fun onScanFailed(errorCode: Int) {
             _isScanning.value = false
             // Could emit error here if you need to handle scan failures
         }
     }
 
+    /**
+     * Añade o actualiza un dispositivo en la lista de resultados.
+     * 
+     * Si el dispositivo ya existe en la lista (mismo dirección MAC), se actualiza
+     * su información. Si es nuevo, se añade solo si pasa el filtro de compatibilidad
+     * (si está activo). Después de la operación, aplica el filtro a toda la lista.
+     * 
+     * @param device Dispositivo BLE a añadir o actualizar
+     */
     private fun addDeviceToList(device: BleDevice) {
         val currentList = _scanResults.value.toMutableList()
 
@@ -143,7 +159,13 @@ class BleDeviceScanner @Inject constructor(
     }
 
     /**
-     * Establece el filtro for mostrar solo devices compatibles con CamperGas
+     * Establece el filtro para mostrar solo dispositivos compatibles con CamperGas.
+     * 
+     * Cuando se habilita, solo se muestran dispositivos que anuncian los servicios
+     * UUID específicos de CamperGas. Al cambiar el filtro, se reaplica automáticamente
+     * a todos los dispositivos ya encontrados.
+     * 
+     * @param enabled true para activar el filtro, false para mostrar todos los dispositivos
      */
     fun setCompatibleDevicesFilter(enabled: Boolean) {
         showOnlyCompatibleDevices = enabled
@@ -151,12 +173,18 @@ class BleDeviceScanner @Inject constructor(
     }
 
     /**
-     * Gets el estado current del filtro
+     * Obtiene el estado actual del filtro de compatibilidad.
+     * 
+     * @return true si el filtro está activo, false si está desactivado
      */
     fun isCompatibleFilterEnabled(): Boolean = showOnlyCompatibleDevices
 
     /**
-     * Updates results applying filter if enabled
+     * Actualiza los resultados aplicando el filtro si está habilitado.
+     * 
+     * Recorre la lista de dispositivos encontrados y filtra aquellos que son
+     * compatibles con CamperGas si el filtro está activo. Si está desactivado,
+     * muestra todos los dispositivos.
      */
     private fun updateFilteredResults() {
         val allDevices = _scanResults.value
@@ -168,6 +196,16 @@ class BleDeviceScanner @Inject constructor(
         _scanResults.value = filteredDevices
     }
 
+    /**
+     * Inicia el escaneo de dispositivos BLE.
+     * 
+     * Obtiene el escáner BLE del adaptador de Bluetooth y comienza a buscar
+     * dispositivos cercanos. Limpia la lista de resultados previos y marca el
+     * escaneo como activo. Si ya hay un escaneo en curso, no hace nada.
+     * 
+     * Requiere el permiso BLUETOOTH_SCAN en Android 12+ o BLUETOOTH_ADMIN
+     * en versiones anteriores.
+     */
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun startScan() {
         if (_isScanning.value) return
@@ -181,6 +219,15 @@ class BleDeviceScanner @Inject constructor(
         }
     }
 
+    /**
+     * Detiene el escaneo de dispositivos BLE.
+     * 
+     * Cancela el escaneo en curso y marca el estado como no escaneando.
+     * Si no hay escaneo activo, no hace nada.
+     * 
+     * Requiere el permiso BLUETOOTH_SCAN en Android 12+ o BLUETOOTH_ADMIN
+     * en versiones anteriores.
+     */
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun stopScan() {
         if (!_isScanning.value) return
