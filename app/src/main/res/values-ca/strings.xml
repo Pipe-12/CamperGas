@@ -56,16 +56,9 @@
     <string name="dialog_cancel">Cancel·lar</string>
     <string name="permissions_needed_title">Permisos necessaris</string>
     <string name="permissions_needed_message">CamperGas necessita permisos de Bluetooth i ubicació per funcionar correctament.</string>
-    <string name="bluetooth_permission_title">Permisos de Bluetooth</string>
-    <string name="bluetooth_permission_message">CamperGas necessita accés a Bluetooth i ubicació per connectar-se amb els dispositius de la caravana i obtenir dades de pes, inclinació i consum de gas.</string>
-    <string name="bluetooth_permission_grant">Concedir permisos</string>
-    <string name="bluetooth_permission_later">Ara no</string>
     <string name="bluetooth_disabled_title">Bluetooth Desactivat</string>
     <string name="bluetooth_disabled_message">Per usar CamperGas necessites activar el Bluetooth. Vols activar-lo ara?</string>
     <string name="bluetooth_disabled_enable">Activar Bluetooth</string>
-    <string name="location_disabled_title">Ubicació Desactivada</string>
-    <string name="location_disabled_message">Per escanejar dispositius Bluetooth necessites tenir la ubicació activada. Vols activar-la ara?</string>
-    <string name="location_disabled_enable">Activar ubicació</string>
     
     <!-- BLE Connect Screen -->
     <string name="ble_connection_title">Connexió Bluetooth</string>

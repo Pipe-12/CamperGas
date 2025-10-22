@@ -24,11 +24,6 @@ data class Inclination(
         get() = isLevelPitch && isLevelRoll
 
     /**
-     * Gets a formatted description of the inclination
-     */
-    fun getFormattedValue(): String = "P: %.1f° R: %.1f°".format(pitch, roll)
-
-    /**
      * Gets formatted date of the measurement
      */
     fun getFormattedTimestamp(): String {

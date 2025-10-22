@@ -16,7 +16,7 @@ class ReadSensorDataUseCase @Inject constructor(
      * Solicita lectura of data of weight bajo demanda
      * Data will be updated in corresponding StateFlow
      */
-    fun readWeightData() {
+    private fun readWeightData() {
         bleRepository.readWeightDataOnDemand()
     }
 
@@ -24,7 +24,7 @@ class ReadSensorDataUseCase @Inject constructor(
      * Solicita lectura of data of inclination bajo demanda
      * Data will be updated in corresponding StateFlow
      */
-    fun readInclinationData() {
+    private fun readInclinationData() {
         bleRepository.readInclinationDataOnDemand()
     }
 
