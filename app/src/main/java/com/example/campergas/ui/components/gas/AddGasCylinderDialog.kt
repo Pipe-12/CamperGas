@@ -24,6 +24,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.campergas.R
 
+/**
+ * Dialog for adding a new gas cylinder to the system.
+ *
+ * Collects cylinder information including name, tare weight (empty weight),
+ * fuel capacity, and whether to set it as the active cylinder. Validates
+ * input before allowing confirmation.
+ *
+ * @param onDismiss Callback invoked when dialog is dismissed without adding
+ * @param onConfirm Callback invoked with cylinder details when user confirms (name, tare, capacity, setAsActive)
+ */
 @Composable
 fun AddGasCylinderDialog(
     onDismiss: () -> Unit,

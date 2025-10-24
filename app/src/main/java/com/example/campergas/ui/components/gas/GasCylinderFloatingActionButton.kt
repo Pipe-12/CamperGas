@@ -8,6 +8,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
+/**
+ * Floating action button for adding a new gas cylinder.
+ *
+ * Material 3 FAB with a plus icon, typically positioned at the bottom-right
+ * of the screen to allow users to quickly add new cylinders.
+ *
+ * @param onClick Callback invoked when button is clicked
+ * @param modifier Modifier for layout customization
+ */
 @Composable
 fun GasCylinderFloatingActionButton(
     onClick: () -> Unit,
