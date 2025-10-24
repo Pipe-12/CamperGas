@@ -47,6 +47,19 @@ import com.example.campergas.R
 import com.example.campergas.domain.model.Language
 import com.example.campergas.domain.model.ThemeMode
 
+/**
+ * Settings screen for application configuration.
+ *
+ * Provides UI for managing:
+ * - Theme mode (Light/Dark)
+ * - Language selection
+ * - Notification preferences
+ * - BLE sensor reading intervals
+ * - Low fuel threshold
+ *
+ * @param navController Navigation controller for screen navigation
+ * @param viewModel ViewModel managing settings state and persistence
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(

@@ -6,8 +6,15 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Set of Material typography styles to start with
+/**
+ * Material 3 typography definitions for the CamperGas application.
+ *
+ * Currently uses default Material typography with customized body text.
+ * Can be extended to define custom font families and text styles for
+ * headlines, titles, labels, etc.
+ */
 val Typography = Typography(
+    /** Large body text style - used for primary content */
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,

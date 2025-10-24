@@ -12,12 +12,26 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * UI state for gas cylinder operations.
+ *
+ * @property isLoading Whether an operation is in progress
+ * @property errorMessage Error message to display, null if no error
+ * @property successMessage Success message to display, null if no success
+ */
 data class GasCylinderUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val successMessage: String? = null
 )
 
+/**
+ * ViewModel for managing gas cylinder operations in UI components.
+ *
+ * Handles adding new cylinders, tracking the active cylinder, and managing
+ * UI state for cylinder-related operations. Provides reactive state flows
+ * for UI updates.
+ */
 @HiltViewModel
 class GasCylinderViewModel @Inject constructor(
     private val addGasCylinderUseCase: AddGasCylinderUseCase,
@@ -25,9 +39,11 @@ class GasCylinderViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _activeCylinder = MutableStateFlow<GasCylinder?>(null)
+    /** Flow of the currently active gas cylinder, null if none active */
     val activeCylinder: StateFlow<GasCylinder?> = _activeCylinder
 
     private val _uiState = MutableStateFlow(GasCylinderUiState())
+    /** Flow of UI state for cylinder operations */
     val uiState: StateFlow<GasCylinderUiState> = _uiState
 
     init {
@@ -47,6 +63,17 @@ class GasCylinderViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Adds a new gas cylinder to the system.
+     *
+     * Validates input and creates a new cylinder with the provided details.
+     * Updates UI state to reflect success or failure.
+     *
+     * @param name Name/label for the cylinder
+     * @param tare Empty weight of the cylinder in kilograms
+     * @param capacity Maximum fuel capacity in kilograms
+     * @param setAsActive Whether to set this cylinder as the active one
+     */
     fun addCylinder(name: String, tare: Float, capacity: Float, setAsActive: Boolean) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)

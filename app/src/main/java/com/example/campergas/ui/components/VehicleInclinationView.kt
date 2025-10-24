@@ -30,6 +30,19 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * Vehicle inclination visualization component.
+ *
+ * Displays vehicle tilt/pitch and roll angles using graphical representations
+ * from side and rear perspectives. Supports both compact mode (side view only)
+ * and full mode (both views).
+ *
+ * @param vehicleType Type of vehicle (CARAVAN or AUTOCARAVANA) to render
+ * @param pitchAngle Pitch angle in degrees (forward/backward tilt)
+ * @param rollAngle Roll angle in degrees (left/right tilt)
+ * @param modifier Modifier for layout customization
+ * @param compact If true, shows only side view; if false, shows both views
+ */
 @Composable
 fun VehicleInclinationView(
     vehicleType: VehicleType,
@@ -71,6 +84,17 @@ fun VehicleInclinationView(
     }
 }
 
+/**
+ * Side view of vehicle inclination showing pitch (forward/backward tilt).
+ *
+ * Renders a 2D side profile of the vehicle with rotation based on pitch angle,
+ * including ground reference line and angle indicator.
+ *
+ * @param vehicleType Type of vehicle to render
+ * @param pitchAngle Pitch angle in degrees
+ * @param modifier Modifier for layout customization
+ * @param compact If true, uses compact layout without card wrapper
+ */
 @Composable
 fun VehicleInclinationSideView(
     vehicleType: VehicleType,

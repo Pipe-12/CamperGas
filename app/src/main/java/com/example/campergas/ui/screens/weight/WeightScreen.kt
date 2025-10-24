@@ -172,6 +172,18 @@ private fun DrawScope.drawGasCylinder(
     )
 }
 
+/**
+ * Screen for real-time gas cylinder weight monitoring.
+ *
+ * Features:
+ * - Visual gas cylinder representation with fill level
+ * - Request weight data from BLE sensor
+ * - Real-time fuel percentage and weight display
+ * - Active cylinder status and information
+ *
+ * @param navController Navigation controller for screen navigation
+ * @param viewModel ViewModel managing weight sensor data
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeightScreen(

@@ -50,6 +50,20 @@ import com.example.campergas.ui.components.gas.GasCylinderViewModel
 import com.example.campergas.ui.navigation.Screen
 import com.example.campergas.ui.screens.weight.GasCylinderVisualizer
 
+/**
+ * Main home screen of the CamperGas application.
+ *
+ * Displays:
+ * - Current gas cylinder status and fuel level
+ * - Real-time BLE connection status
+ * - Quick access to add new cylinders
+ * - Vehicle inclination overview (compact mode)
+ * - Navigation to detailed screens
+ *
+ * @param navController Navigation controller for screen navigation
+ * @param viewModel ViewModel managing home screen state
+ * @param gasCylinderViewModel ViewModel for gas cylinder operations
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(

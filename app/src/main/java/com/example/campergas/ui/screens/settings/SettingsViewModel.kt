@@ -17,6 +17,19 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel for application settings management.
+ *
+ * Manages user preferences including:
+ * - UI theme (light/dark mode)
+ * - Application language
+ * - Notification settings
+ * - BLE sensor reading intervals
+ * - Low fuel warning threshold
+ *
+ * Provides reactive state flows for settings values and handles
+ * persistence through PreferencesDataStore.
+ */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val preferencesDataStore: PreferencesDataStore,
@@ -24,9 +37,10 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
+    /** Flow of UI state for the settings screen */
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
-    // StateFlows for BLE reading intervals
+    /** Flow of weight sensor reading interval in minutes */
     val weightInterval: StateFlow<Int> =
         configureReadingIntervalsUseCase.getWeightReadIntervalSeconds()
             .map { it / 60 } // Convert seconds to minutes
@@ -36,6 +50,7 @@ class SettingsViewModel @Inject constructor(
                 initialValue = 1 // 1 minuto por defecto
             )
 
+    /** Flow of inclination sensor reading interval in seconds */
     val inclinationInterval: StateFlow<Int> =
         configureReadingIntervalsUseCase.getInclinationReadIntervalSeconds()
             .stateIn(
@@ -44,8 +59,8 @@ class SettingsViewModel @Inject constructor(
                 initialValue = 15  //1 segundo por defecto
             )
 
-    // Estado for feedback visual de operaciones BLE
     private val _operationStatus = MutableStateFlow<String?>(null)
+    /** Flow of BLE operation status messages for user feedback */
     val operationStatus: StateFlow<String?> = _operationStatus.asStateFlow()
 
     init {

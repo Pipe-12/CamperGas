@@ -17,6 +17,21 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.example.campergas.R
 
+/**
+ * Manager for handling complex Bluetooth and location permissions on Android.
+ *
+ * Handles permission requests across different Android versions, including:
+ * - Bluetooth permissions (BLUETOOTH_CONNECT, BLUETOOTH_SCAN for Android 12+)
+ * - Location permissions (required for BLE scanning on older Android versions)
+ * - Bluetooth and location enable/disable state management
+ *
+ * Simplifies the complex permission flow by managing activity launchers and
+ * providing callbacks for success and failure states.
+ *
+ * @property activity ComponentActivity that will host permission requests
+ * @property onPermissionsGranted Callback invoked when all required permissions are granted
+ * @property onPermissionsDenied Callback invoked with list of denied permission descriptions
+ */
 class BluetoothPermissionManager(
     private val activity: ComponentActivity,
     private val onPermissionsGranted: () -> Unit,

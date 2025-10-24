@@ -23,6 +23,17 @@ import com.example.campergas.ui.screens.inclination.WheelElevations
 import java.util.Locale
 import kotlin.math.abs
 
+/**
+ * Displays calculated wheel elevation adjustments for vehicle leveling.
+ *
+ * Shows how much each wheel needs to be raised or lowered to level the vehicle
+ * based on inclination sensor data. Supports both caravan (3 points) and
+ * motorhome (4 wheels) configurations.
+ *
+ * @param vehicleType Type of vehicle (CARAVAN or AUTOCARAVANA)
+ * @param wheelElevations Calculated elevation adjustments for each wheel/support point
+ * @param modifier Modifier for layout customization
+ */
 @Composable
 fun WheelElevationsDisplay(
     vehicleType: VehicleType,

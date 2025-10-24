@@ -13,6 +13,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel for BLE device connection management.
+ *
+ * Handles:
+ * - BLE device scanning with permission checks
+ * - Device connection/disconnection
+ * - Connection state monitoring
+ * - Error handling for BLE operations
+ *
+ * Provides reactive state flows for UI updates and coordinates with
+ * BLE use cases to perform actual Bluetooth operations.
+ */
 @HiltViewModel
 class BleConnectViewModel @Inject constructor(
     private val scanBleDevicesUseCase: ScanBleDevicesUseCase,
@@ -21,9 +33,10 @@ class BleConnectViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BleConnectUiState())
+    /** Flow of UI state for the BLE connection screen */
     val uiState: StateFlow<BleConnectUiState> = _uiState.asStateFlow()
 
-    // Observe connection state
+    /** Flow of current BLE connection state */
     val connectionState = checkBleConnectionUseCase()
 
     init {

@@ -6,6 +6,13 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
+/**
+ * Room database for vehicle configuration storage.
+ *
+ * Maintains vehicle physical dimensions and type information used for
+ * stability calculations. Includes migration from version 1 to 2 to support
+ * updated vehicle types and additional measurements.
+ */
 @Database(
     entities = [VehicleConfigEntity::class],
     version = 2,
@@ -13,10 +20,20 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 )
 @TypeConverters(VehicleTypeConverter::class)
 abstract class VehicleDatabase : RoomDatabase() {
+    /**
+     * Provides access to vehicle configuration database operations.
+     *
+     * @return DAO for managing vehicle configuration
+     */
     abstract fun vehicleDao(): VehicleDao
 
     companion object {
-        // Migration from version 1 to 2 (add field distanceBetweenFrontWheels and change MOTORHOME to AUTOCARAVANA)
+        /**
+         * Migration from database version 1 to 2.
+         *
+         * Adds the distanceBetweenFrontWheels column for motorhome support
+         * and updates the MOTORHOME enum value to AUTOCARAVANA.
+         */
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // Add new column
