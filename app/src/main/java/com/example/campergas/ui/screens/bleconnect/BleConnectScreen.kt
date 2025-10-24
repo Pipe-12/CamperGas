@@ -58,6 +58,19 @@ import com.example.campergas.domain.model.BleDevice
 import com.example.campergas.ui.components.BluetoothDisabledDialog
 import com.example.campergas.ui.theme.CamperGreenLight
 
+/**
+ * Screen for scanning and connecting to BLE gas cylinder sensors.
+ *
+ * Provides UI for:
+ * - Scanning for nearby BLE devices
+ * - Displaying available CamperGas sensors
+ * - Connecting to selected devices
+ * - Showing connection status
+ * - Handling Bluetooth permissions and enable/disable states
+ *
+ * @param navController Navigation controller for screen navigation
+ * @param viewModel ViewModel managing BLE connection state and operations
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BleConnectScreen(

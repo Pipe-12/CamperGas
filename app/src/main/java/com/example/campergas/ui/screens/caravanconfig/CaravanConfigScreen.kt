@@ -42,6 +42,21 @@ import androidx.navigation.NavController
 import com.example.campergas.R
 import com.example.campergas.domain.model.VehicleType
 
+/**
+ * Screen for configuring vehicle physical dimensions.
+ *
+ * Allows users to configure:
+ * - Vehicle type (Caravan or Motorhome)
+ * - Distance between rear wheels
+ * - Distance to front support point (caravan)
+ * - Distance between front wheels (motorhome)
+ *
+ * Configuration is used for accurate stability calculations and
+ * wheel elevation recommendations.
+ *
+ * @param navController Navigation controller for screen navigation
+ * @param viewModel ViewModel managing vehicle configuration
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CaravanConfigScreen(

@@ -59,6 +59,18 @@ import java.util.Date
 import java.util.Locale
 import kotlin.math.max
 
+/**
+ * Screen displaying gas consumption history and trends.
+ *
+ * Features:
+ * - Interactive consumption graph with date range filtering
+ * - Statistical summary (average, total consumption)
+ * - Daily/weekly/monthly consumption view options
+ * - Historical data visualization
+ *
+ * @param navController Navigation controller for screen navigation
+ * @param viewModel ViewModel managing consumption data and state
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConsumptionScreen(
