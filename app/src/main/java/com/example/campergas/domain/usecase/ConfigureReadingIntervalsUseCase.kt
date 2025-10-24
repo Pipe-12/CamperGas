@@ -6,15 +6,44 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
- * Caso de uso for configurar los intervalos de lectura from sensor BLE
+ * Caso de uso para configurar los intervalos de lectura periódica del sensor BLE.
+ * 
+ * Este caso de uso encapsula la lógica de negocio para ajustar la frecuencia con
+ * la que se solicitan datos al sensor BLE. Permite configurar intervalos diferentes
+ * para mediciones de peso e inclinación de forma independiente.
+ * 
+ * Intervalos configurables:
+ * - Peso: Define cada cuántos segundos se lee el peso del cilindro
+ * - Inclinación: Define cada cuántos segundos se lee la inclinación del vehículo
+ * 
+ * Consideraciones de los intervalos:
+ * - Intervalos más cortos: Mayor precisión y datos más actualizados, mayor consumo de batería
+ * - Intervalos más largos: Menor consumo de batería, menor frecuencia de actualización
+ * 
+ * Valores recomendados:
+ * - Peso: 60 segundos (1 minuto) - El gas no cambia rápidamente
+ * - Inclinación: 5-15 segundos - Permite monitoreo en tiempo real de estabilidad
+ * 
+ * La configuración se persiste y se aplica inmediatamente al sensor conectado.
+ * Si no hay sensor conectado, la configuración se aplicará en la próxima conexión.
+ * 
+ * @property bleRepository Repositorio BLE que gestiona la comunicación con el sensor
+ * @author Felipe García Gómez
  */
 class ConfigureReadingIntervalsUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
 
     /**
-     * Configurar el intervalo de lectura of weight
-     * @form intervalSeconds Intervalo en segundos
+     * Configura el intervalo de lectura de peso del sensor.
+     * 
+     * Establece cada cuántos segundos el sistema solicitará una nueva medición
+     * de peso al sensor BLE. El cambio se aplica inmediatamente si hay sensor
+     * conectado, y se guarda para futuras conexiones.
+     * 
+     * Esta función debe llamarse desde una coroutine o función suspend.
+     * 
+     * @param intervalSeconds Intervalo en segundos entre lecturas de peso (ej: 60 para 1 minuto)
      */
     suspend fun setWeightReadInterval(intervalSeconds: Int) {
         val intervalMs = intervalSeconds * 1000L
@@ -26,8 +55,15 @@ class ConfigureReadingIntervalsUseCase @Inject constructor(
     }
 
     /**
-     * Configurar el intervalo de lectura of inclination
-     * @form intervalSeconds Intervalo en segundos
+     * Configura el intervalo de lectura de inclinación del sensor.
+     * 
+     * Establece cada cuántos segundos el sistema solicitará una nueva medición
+     * de inclinación al sensor BLE. El cambio se aplica inmediatamente si hay
+     * sensor conectado, y se guarda para futuras conexiones.
+     * 
+     * Esta función debe llamarse desde una coroutine o función suspend.
+     * 
+     * @param intervalSeconds Intervalo en segundos entre lecturas de inclinación (ej: 15 para 15 segundos)
      */
     suspend fun setInclinationReadInterval(intervalSeconds: Int) {
         val intervalMs = intervalSeconds * 1000L
@@ -39,9 +75,16 @@ class ConfigureReadingIntervalsUseCase @Inject constructor(
     }
 
     /**
-     * Configurar ambos intervalos a la vez
-     * @form weightIntervalSeconds Intervalo of weight en segundos
-     * @form inclinationIntervalSeconds Intervalo of inclination en segundos
+     * Configura ambos intervalos (peso e inclinación) simultáneamente.
+     * 
+     * Establece los intervalos de lectura para peso e inclinación en una sola
+     * operación. Es más eficiente que llamar a setWeightReadInterval y
+     * setInclinationReadInterval por separado.
+     * 
+     * Esta función debe llamarse desde una coroutine o función suspend.
+     * 
+     * @param weightIntervalSeconds Intervalo en segundos entre lecturas de peso
+     * @param inclinationIntervalSeconds Intervalo en segundos entre lecturas de inclinación
      */
     suspend fun setReadingIntervals(weightIntervalSeconds: Int, inclinationIntervalSeconds: Int) {
         val weightIntervalMs = weightIntervalSeconds * 1000L
@@ -53,28 +96,48 @@ class ConfigureReadingIntervalsUseCase @Inject constructor(
     }
 
     /**
-     * Get el intervalo actual de lectura of weight en segundos
+     * Obtiene el intervalo actual de lectura de peso en segundos.
+     * 
+     * Retorna un Flow que emite el intervalo configurado en segundos y se
+     * actualiza cuando se modifica la configuración.
+     * 
+     * @return Flow que emite el intervalo de peso en segundos
      */
     fun getWeightReadIntervalSeconds(): Flow<Int> {
         return bleRepository.weightReadInterval.map { it.toInt() / 1000 }
     }
 
     /**
-     * Get el intervalo actual de lectura of inclination en segundos
+     * Obtiene el intervalo actual de lectura de inclinación en segundos.
+     * 
+     * Retorna un Flow que emite el intervalo configurado en segundos y se
+     * actualiza cuando se modifica la configuración.
+     * 
+     * @return Flow que emite el intervalo de inclinación en segundos
      */
     fun getInclinationReadIntervalSeconds(): Flow<Int> {
         return bleRepository.inclinationReadInterval.map { it.toInt() / 1000 }
     }
 
     /**
-     * Resetear intervalos a valores por defecto (Weight: 1 minuto, Inclination: 5 segundos)
+     * Restablece los intervalos a sus valores por defecto recomendados.
+     * 
+     * Configura:
+     * - Peso: 60 segundos (1 minuto) - Balance entre actualización y batería
+     * - Inclinación: 5 segundos - Monitoreo frecuente de estabilidad
+     * 
+     * Esta función debe llamarse desde una coroutine o función suspend.
      */
     suspend fun resetToDefaultIntervals() {
-        setReadingIntervals(60, 5) // Weight: 60 segundos (1 minuto), Inclination: 5 segundos
+        setReadingIntervals(60, 5)
     }
 
     /**
-     * Restarts periodic reading with current intervals
+     * Reinicia la lectura periódica con los intervalos configurados actuales.
+     * 
+     * Útil cuando se necesita forzar la reaplicación de los intervalos sin
+     * cambiar sus valores. Por ejemplo, después de reconectar el sensor o
+     * resolver problemas de sincronización.
      */
     fun restartPeriodicReading() {
         bleRepository.restartPeriodicDataReading()
