@@ -11,6 +11,17 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Manager for automatic widget updates based on data changes.
+ *
+ * Observes BLE sensor data, fuel measurements, and connection state to
+ * automatically update home screen widgets in real-time. Runs background
+ * coroutines to listen for changes and trigger widget refreshes.
+ *
+ * @property context Application context
+ * @property bleRepository Repository for BLE sensor data access
+ * @property fuelMeasurementRepository Repository for fuel measurement access
+ */
 @Singleton
 class WidgetUpdateManager @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -23,6 +34,12 @@ class WidgetUpdateManager @Inject constructor(
         startListeningForUpdates()
     }
 
+    /**
+     * Starts background listeners for data changes.
+     *
+     * Monitors fuel measurements, BLE data, inclination, and connection state
+     * to keep widgets updated in real-time.
+     */
     private fun startListeningForUpdates() {
         // Listen for changes in fuel measurements
         scope.launch {

@@ -27,6 +27,13 @@ import com.example.campergas.R
 import com.example.campergas.ui.theme.CamperGasTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Configuration activity for home screen widgets.
+ *
+ * Launched when user adds a CamperGas widget to their home screen.
+ * Provides a simple configuration UI where users can confirm widget placement.
+ * Handles widget ID validation and result reporting to the launcher.
+ */
 @AndroidEntryPoint
 class WidgetConfigActivity : ComponentActivity() {
     
