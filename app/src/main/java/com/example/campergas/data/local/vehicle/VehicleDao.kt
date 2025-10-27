@@ -8,44 +8,44 @@ import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Data Access Object (DAO) for vehicle configuration operations.
+ * Objeto de Acceso a Datos (DAO) para operaciones de configuración de vehículo.
  *
- * Manages persistence of vehicle physical dimensions and type configuration,
- * which are used for stability calculations and UI display.
+ * Gestiona la persistencia de las dimensiones físicas del vehículo y configuración de tipo,
+ * que se utilizan para cálculos de estabilidad y visualización en la UI.
  */
 @Dao
 interface VehicleDao {
     /**
-     * Inserts or replaces vehicle configuration.
+     * Inserta o reemplaza la configuración del vehículo.
      *
-     * @param config The vehicle configuration to insert
+     * @param config La configuración del vehículo a insertar
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertVehicleConfig(config: VehicleConfigEntity)
 
     /**
-     * Updates an existing vehicle configuration.
+     * Actualiza una configuración de vehículo existente.
      *
-     * @param config The vehicle configuration to update
-     * @return Number of rows updated
+     * @param config La configuración del vehículo a actualizar
+     * @return Número de filas actualizadas
      */
     @Update
     suspend fun updateVehicleConfig(config: VehicleConfigEntity): Int
 
     /**
-     * Retrieves the vehicle configuration as a Flow.
+     * Recupera la configuración del vehículo como un Flow.
      *
-     * @param id Configuration ID (default: "default_config")
-     * @return Flow emitting the vehicle configuration, or null if not found
+     * @param id ID de configuración (por defecto: "default_config")
+     * @return Flow que emite la configuración del vehículo, o null si no se encuentra
      */
     @Query("SELECT * FROM vehicle_config WHERE id = :id")
     fun getVehicleConfig(id: String = "default_config"): Flow<VehicleConfigEntity?>
 
     /**
-     * Checks if a vehicle configuration exists.
+     * Verifica si existe una configuración de vehículo.
      *
-     * @param id Configuration ID (default: "default_config")
-     * @return True if configuration exists, false otherwise
+     * @param id ID de configuración (por defecto: "default_config")
+     * @return True si la configuración existe, false en caso contrario
      */
     @Query("SELECT EXISTS(SELECT 1 FROM vehicle_config WHERE id = :id)")
     suspend fun configExists(id: String = "default_config"): Boolean

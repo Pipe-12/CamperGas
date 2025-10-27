@@ -4,17 +4,17 @@ import androidx.room.TypeConverter
 import com.example.campergas.domain.model.VehicleType
 
 /**
- * Type converter for Room database to handle VehicleType enum.
+ * Conversor de tipos para base de datos Room para manejar el enum VehicleType.
  *
- * Converts between VehicleType enum values and String representation
- * for database storage.
+ * Convierte entre valores del enum VehicleType y representación String
+ * para almacenamiento en base de datos.
  */
 class VehicleTypeConverter {
     /**
-     * Converts VehicleType enum to String for database storage.
+     * Convierte enum VehicleType a String para almacenamiento en base de datos.
      *
-     * @param vehicleType The VehicleType enum value
-     * @return String representation of the vehicle type
+     * @param vehicleType El valor del enum VehicleType
+     * @return Representación String del tipo de vehículo
      */
     @TypeConverter
     fun fromVehicleType(vehicleType: VehicleType): String {
@@ -22,10 +22,10 @@ class VehicleTypeConverter {
     }
 
     /**
-     * Converts String from database to VehicleType enum.
+     * Convierte String de base de datos a enum VehicleType.
      *
-     * @param value String representation of the vehicle type
-     * @return VehicleType enum value, defaults to CARAVAN if conversion fails
+     * @param value Representación String del tipo de vehículo
+     * @return Valor del enum VehicleType, por defecto CARAVAN si la conversión falla
      */
     @TypeConverter
     fun toVehicleType(value: String): VehicleType {
