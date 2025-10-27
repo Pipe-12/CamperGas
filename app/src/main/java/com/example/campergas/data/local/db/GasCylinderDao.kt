@@ -9,89 +9,89 @@ import com.example.campergas.domain.model.GasCylinder
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Objeto de Acceso a Datos (DAO) para operaciones de cilindros de gas.
+ * Objeto de Acceso a Datos (DAO) para operaciones de bombonas de gas.
  *
- * Proporciona métodos para gestionar cilindros de gas, incluyendo inserción, actualizaciones,
- * consultas y manejo del estado del cilindro activo. Solo un cilindro puede estar activo
+ * Proporciona métodos para gestionar bombonas de gas, incluyendo inserción, actualizaciones,
+ * consultas y manejo del estado de la bombona activa. Solo una bombona puede estar activa
  * a la vez.
  */
 @Dao
 interface GasCylinderDao {
 
     /**
-     * Recupera todos los cilindros de gas ordenados por fecha de creación.
+     * Recupera todas las bombonas de gas ordenadas por fecha de creación.
      *
-     * @return Flow que emite lista de todos los cilindros, los más recientes primero
+     * @return Flow que emite lista de todas las bombonas, las más recientes primero
      */
     @Query("SELECT * FROM gas_cylinders ORDER BY createdAt DESC")
     fun getAllCylinders(): Flow<List<GasCylinder>>
 
     /**
-     * Recupera todos los cilindros de gas de forma síncrona.
+     * Recupera todas las bombonas de gas de forma síncrona.
      *
-     * @return Lista de todos los cilindros, los más recientes primero
+     * @return Lista de todas las bombonas, las más recientes primero
      */
     @Query("SELECT * FROM gas_cylinders ORDER BY createdAt DESC")
     suspend fun getAllCylindersSync(): List<GasCylinder>
 
     /**
-     * Recupera el cilindro de gas actualmente activo.
+     * Recupera la bombona de gas actualmente activa.
      *
-     * Solo un cilindro puede estar activo a la vez.
+     * Solo una bombona puede estar activa a la vez.
      *
-     * @return Flow que emite el cilindro activo, o null si ninguno está activo
+     * @return Flow que emite la bombona activa, o null si ninguna está activa
      */
     @Query("SELECT * FROM gas_cylinders WHERE isActive = 1 LIMIT 1")
     fun getActiveCylinder(): Flow<GasCylinder?>
 
     /**
-     * Recupera el cilindro de gas actualmente activo de forma síncrona.
+     * Recupera la bombona de gas actualmente activa de forma síncrona.
      *
-     * @return El cilindro activo, o null si ninguno está activo
+     * @return La bombona activa, o null si ninguna está activa
      */
     @Query("SELECT * FROM gas_cylinders WHERE isActive = 1 LIMIT 1")
     suspend fun getActiveCylinderSync(): GasCylinder?
 
     /**
-     * Recupera un cilindro específico por su ID.
+     * Recupera una bombona específica por su ID.
      *
-     * @param id ID del cilindro a recuperar
-     * @return El cilindro con el ID especificado, o null si no se encuentra
+     * @param id ID de la bombona a recuperar
+     * @return La bombona con el ID especificado, o null si no se encuentra
      */
     @Query("SELECT * FROM gas_cylinders WHERE id = :id")
     suspend fun getCylinderById(id: Long): GasCylinder?
 
     /**
-     * Inserta un nuevo cilindro de gas.
+     * Inserta una nueva bombona de gas.
      *
-     * @param cylinder El cilindro a insertar
-     * @return ID de fila del cilindro insertado
+     * @param cylinder La bombona a insertar
+     * @return ID de fila de la bombona insertada
      */
     @Insert
     suspend fun insertCylinder(cylinder: GasCylinder): Long
 
     /**
-     * Actualiza un cilindro de gas existente.
+     * Actualiza una bombona de gas existente.
      *
-     * @param cylinder El cilindro a actualizar
+     * @param cylinder La bombona a actualizar
      */
     @Update
     suspend fun updateCylinder(cylinder: GasCylinder)
 
     /**
-     * Desactiva todos los cilindros de gas.
+     * Desactiva todas las bombonas de gas.
      *
-     * Se usa internamente para asegurar que solo un cilindro esté activo a la vez.
+     * Se usa internamente para asegurar que solo una bombona esté activa a la vez.
      */
     @Query("UPDATE gas_cylinders SET isActive = 0")
     suspend fun deactivateAllCylinders()
 
     /**
-     * Establece un cilindro como activo, desactivando todos los demás.
+     * Establece una bombona como activa, desactivando todas las demás.
      *
      * Esta es una operación transaccional que asegura la consistencia de datos.
      *
-     * @param cylinderId ID del cilindro a establecer como activo
+     * @param cylinderId ID de la bombona a establecer como activa
      */
     @Transaction
     suspend fun setActiveCylinder(cylinderId: Long) {
@@ -100,9 +100,9 @@ interface GasCylinderDao {
     }
 
     /**
-     * Actualiza el estado activo de un cilindro específico.
+     * Actualiza el estado activo de una bombona específica.
      *
-     * @param id ID del cilindro a actualizar
+     * @param id ID de la bombona a actualizar
      * @param isActive Nuevo estado activo
      */
     @Query("UPDATE gas_cylinders SET isActive = :isActive WHERE id = :id")

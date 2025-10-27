@@ -7,10 +7,10 @@ import com.example.campergas.domain.model.GasCylinder
 /**
  * Base de datos Room principal para la aplicación CamperGas.
  *
- * Esta base de datos gestiona la información de los cilindros de gas y las mediciones de combustible,
+ * Esta base de datos gestiona la información de las bombonas de gas y las mediciones de combustible,
  * proporcionando persistencia para datos de sensores en tiempo real y seguimiento histórico.
  *
- * @property gasCylinderDao Objeto de acceso a datos para operaciones de cilindros de gas
+ * @property gasCylinderDao Objeto de acceso a datos para operaciones de bombonas de gas
  * @property fuelMeasurementDao Objeto de acceso a datos para operaciones de mediciones de combustible
  */
 @Database(
@@ -24,9 +24,9 @@ import com.example.campergas.domain.model.GasCylinder
 abstract class CamperGasDatabase : RoomDatabase() {
 
     /**
-     * Proporciona acceso a las operaciones de base de datos de cilindros de gas.
+     * Proporciona acceso a las operaciones de base de datos de bombonas de gas.
      *
-     * @return DAO para gestionar entidades de cilindros de gas
+     * @return DAO para gestionar entidades de bombonas de gas
      */
     abstract fun gasCylinderDao(): GasCylinderDao
 

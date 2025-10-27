@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
  *
  * Proporciona métodos para insertar, actualizar, eliminar y consultar mediciones de combustible
  * desde la base de datos local. Soporta seguimiento de datos en tiempo real e históricos,
- * consultas por rangos de tiempo y mediciones específicas por cilindro.
+ * consultas por rangos de tiempo y mediciones específicas por bombona.
  */
 @Dao
 interface FuelMeasurementDao {
@@ -27,10 +27,10 @@ interface FuelMeasurementDao {
     fun getAllMeasurements(): Flow<List<FuelMeasurementEntity>>
 
     /**
-     * Recupera mediciones para un cilindro de gas específico.
+     * Recupera mediciones para una bombona de gas específica.
      *
-     * @param cylinderId ID del cilindro de gas
-     * @return Flow que emite mediciones para el cilindro especificado, las más recientes primero
+     * @param cylinderId ID de la bombona de gas
+     * @return Flow que emite mediciones para la bombona especificada, las más recientes primero
      */
     @Query("SELECT * FROM fuel_measurements WHERE cylinderId = :cylinderId ORDER BY timestamp DESC")
     fun getMeasurementsByCylinder(cylinderId: Long): Flow<List<FuelMeasurementEntity>>
@@ -44,10 +44,10 @@ interface FuelMeasurementDao {
     fun getLatestRealTimeMeasurement(): Flow<FuelMeasurementEntity?>
 
     /**
-     * Recupera todas las mediciones históricas para un cilindro específico.
+     * Recupera todas las mediciones históricas para una bombona específica.
      *
-     * @param cylinderId ID del cilindro de gas
-     * @return Flow que emite mediciones históricas para el cilindro, las más recientes primero
+     * @param cylinderId ID de la bombona de gas
+     * @return Flow que emite mediciones históricas para la bombona, las más recientes primero
      */
     @Query("SELECT * FROM fuel_measurements WHERE isHistorical = 1 AND cylinderId = :cylinderId ORDER BY timestamp DESC")
     fun getHistoricalMeasurements(cylinderId: Long): Flow<List<FuelMeasurementEntity>>
@@ -66,9 +66,9 @@ interface FuelMeasurementDao {
     ): Flow<List<FuelMeasurementEntity>>
 
     /**
-     * Recupera mediciones para un cilindro específico dentro de un rango de tiempo.
+     * Recupera mediciones para una bombona específica dentro de un rango de tiempo.
      *
-     * @param cylinderId ID del cilindro de gas
+     * @param cylinderId ID de la bombona de gas
      * @param startTime Inicio del rango de tiempo (milisegundos desde epoch)
      * @param endTime Fin del rango de tiempo (milisegundos desde epoch)
      * @return Flow que emite mediciones coincidentes, las más recientes primero
@@ -128,9 +128,9 @@ interface FuelMeasurementDao {
     suspend fun deleteMeasurementById(id: Long)
 
     /**
-     * Elimina todas las mediciones para un cilindro específico.
+     * Elimina todas las mediciones para una bombona específica.
      *
-     * @param cylinderId ID del cilindro de gas
+     * @param cylinderId ID de la bombona de gas
      */
     @Query("DELETE FROM fuel_measurements WHERE cylinderId = :cylinderId")
     suspend fun deleteMeasurementsByCylinder(cylinderId: Long)
@@ -161,12 +161,12 @@ interface FuelMeasurementDao {
     fun getRecentMeasurements(limit: Int): Flow<List<FuelMeasurementEntity>>
 
     /**
-     * Recupera las dos últimas mediciones para un cilindro específico.
+     * Recupera las dos últimas mediciones para una bombona específica.
      *
      * Se usa para calcular la tasa de consumo y tendencias.
      *
-     * @param cylinderId ID del cilindro de gas
-     * @return Lista de las dos mediciones más recientes para el cilindro
+     * @param cylinderId ID de la bombona de gas
+     * @return Lista de las dos mediciones más recientes para la bombona
      */
     @Query(
         """
@@ -179,11 +179,11 @@ interface FuelMeasurementDao {
     suspend fun getLastTwoMeasurements(cylinderId: Long): List<FuelMeasurementEntity>
 
     /**
-     * Recupera las últimas N mediciones para un cilindro específico.
+     * Recupera las últimas N mediciones para una bombona específica.
      *
-     * @param cylinderId ID del cilindro de gas
+     * @param cylinderId ID de la bombona de gas
      * @param limit Número de mediciones a recuperar
-     * @return Lista de las N mediciones más recientes para el cilindro
+     * @return Lista de las N mediciones más recientes para la bombona
      */
     @Query(
         """
