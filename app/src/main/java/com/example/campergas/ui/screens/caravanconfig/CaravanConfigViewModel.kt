@@ -12,6 +12,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel for vehicle configuration management.
+ *
+ * Manages:
+ * - Vehicle type selection (Caravan/Motorhome)
+ * - Physical dimension inputs and validation
+ * - Configuration persistence
+ * - Loading and saving vehicle setup
+ *
+ * Provides reactive state for the vehicle configuration screen.
+ */
 @HiltViewModel
 class CaravanConfigViewModel @Inject constructor(
     private val getVehicleConfigUseCase: GetVehicleConfigUseCase,
@@ -19,6 +30,7 @@ class CaravanConfigViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CaravanConfigUiState())
+    /** Flow of UI state for the vehicle configuration screen */
     val uiState: StateFlow<CaravanConfigUiState> = _uiState.asStateFlow()
 
     init {

@@ -44,6 +44,18 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Screen for monitoring vehicle inclination and stability.
+ *
+ * Features:
+ * - Real-time pitch and roll angle display
+ * - Vehicle visualization from side and rear views
+ * - Wheel elevation calculations for leveling
+ * - Request inclination data from BLE sensor
+ *
+ * @param navController Navigation controller for screen navigation
+ * @param viewModel ViewModel managing inclination sensor data
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InclinationScreen(

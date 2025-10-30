@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.example.campergas.domain.model.ThemeMode
 
+/** Dark color scheme for the CamperGas application using Material 3 design tokens */
 private val DarkColorScheme = darkColorScheme(
     primary = CamperBlueLight,
     secondary = CamperGreenLight,
@@ -35,6 +36,7 @@ private val DarkColorScheme = darkColorScheme(
     onSurfaceVariant = Color(0xFFE0E0E0)
 )
 
+/** Light color scheme for the CamperGas application using Material 3 design tokens */
 private val LightColorScheme = lightColorScheme(
     primary = CamperBlue,
     secondary = CamperGreen,
@@ -55,10 +57,21 @@ private val LightColorScheme = lightColorScheme(
     onSecondaryContainer = CamperGreenDark,
     tertiaryContainer = Color(0xFFFFF3E0),
     onTertiaryContainer = CamperOrangeDark,
-    surfaceVariant = Color(0xFFEEEEEE),
+    surfaceVariant = Color(0xFFEEEEE),
     onSurfaceVariant = Color(0xFF5F5F5F)
 )
 
+/**
+ * Main theme composable for the CamperGas application.
+ *
+ * Applies Material 3 theming with support for light/dark modes and dynamic colors
+ * (Android 12+). Automatically selects appropriate color scheme based on theme mode
+ * and system capabilities.
+ *
+ * @param themeMode Theme mode to apply (LIGHT or DARK), defaults to DARK
+ * @param dynamicColor Whether to use dynamic colors on Android 12+, defaults to true
+ * @param content The composable content to apply the theme to
+ */
 @Composable
 fun CamperGasTheme(
     themeMode: ThemeMode = ThemeMode.DARK,
