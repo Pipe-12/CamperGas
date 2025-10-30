@@ -21,7 +21,6 @@ import javax.inject.Inject
  * ViewModel for application settings management.
  *
  * Manages user preferences including:
- * - UI theme (light/dark mode)
  * - Application language
  * - Notification settings
  * - BLE sensor reading intervals
@@ -70,13 +69,12 @@ class SettingsViewModel @Inject constructor(
     private fun loadSettings() {
         viewModelScope.launch {
             combine(
-                preferencesDataStore.themeMode,
                 preferencesDataStore.language,
                 preferencesDataStore.areNotificationsEnabled,
                 preferencesDataStore.gasLevelThreshold
-            ) { themeMode, language, notificationsEnabled, gasLevelThreshold ->
+            ) { language, notificationsEnabled, gasLevelThreshold ->
                 SettingsUiState(
-                    themeMode = themeMode,
+                    themeMode = ThemeMode.DARK,
                     language = language,
                     notificationsEnabled = notificationsEnabled,
                     gasLevelThreshold = gasLevelThreshold
@@ -84,12 +82,6 @@ class SettingsViewModel @Inject constructor(
             }.collect { settings ->
                 _uiState.value = settings
             }
-        }
-    }
-
-    fun setThemeMode(themeMode: ThemeMode) {
-        viewModelScope.launch {
-            preferencesDataStore.setThemeMode(themeMode)
         }
     }
 

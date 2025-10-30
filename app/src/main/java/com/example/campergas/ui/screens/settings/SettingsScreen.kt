@@ -51,7 +51,6 @@ import com.example.campergas.domain.model.ThemeMode
  * Settings screen for application configuration.
  *
  * Provides UI for managing:
- * - Theme mode (Light/Dark)
  * - Language selection
  * - Notification preferences
  * - BLE sensor reading intervals
@@ -91,12 +90,6 @@ fun SettingsScreen(
     // Update gas threshold text field
     LaunchedEffect(uiState.gasLevelThreshold) {
         gasThresholdText = uiState.gasLevelThreshold.toString()
-    }
-
-    // Determine if the switch should be enabled
-    val isDarkModeEnabled = when (uiState.themeMode) {
-        ThemeMode.LIGHT -> false
-        ThemeMode.DARK -> true
     }
 
     Column(
@@ -143,49 +136,6 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
-            }
-        }
-
-        // Theme configuration
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.settings_appearance),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.settings_dark_mode),
-                        modifier = Modifier.weight(1f)
-                    )
-                    Switch(
-                        checked = isDarkModeEnabled,
-                        onCheckedChange = { isEnabled ->
-                            // If activated, set dark mode; if deactivated, set light mode
-                            viewModel.setThemeMode(if (isEnabled) ThemeMode.DARK else ThemeMode.LIGHT)
-                        }
-                    )
-                }
-
-                // Explanatory text of current state
-                Text(
-                    text = when (uiState.themeMode) {
-                        ThemeMode.LIGHT -> stringResource(R.string.theme_light)
-                        ThemeMode.DARK -> stringResource(R.string.theme_dark)
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
             }
         }
 

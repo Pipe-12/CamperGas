@@ -35,7 +35,7 @@ import javax.inject.Inject
  * Actividad principal de la aplicación CamperGas.
  * 
  * Esta actividad es el punto de entrada de la interfaz de usuario y gestiona:
- * - La configuración del tema (claro/oscuro)
+ * - La configuración del tema (modo oscuro únicamente)
  * - La internacionalización (idioma del sistema o seleccionado)
  * - Los permisos de Bluetooth necesarios para la conexión BLE
  * - La navegación entre pantallas mediante Jetpack Compose Navigation
@@ -52,7 +52,6 @@ class MainActivity : ComponentActivity() {
      * Almacén de preferencias del usuario.
      * 
      * Proporciona acceso a las configuraciones guardadas como:
-     * - Modo de tema (claro/oscuro)
      * - Idioma seleccionado
      * - Estado de notificaciones
      * - Umbrales de nivel de gas
@@ -106,8 +105,8 @@ class MainActivity : ComponentActivity() {
      * Inicializa la actividad y configura la interfaz de usuario.
      * 
      * Este método realiza las siguientes operaciones:
-     * 1. Carga las preferencias del usuario (tema e idioma)
-     * 2. Configura las barras del sistema en modo edge-to-edge
+     * 1. Carga las preferencias del usuario (idioma)
+     * 2. Configura las barras del sistema en modo edge-to-edge con tema oscuro
      * 3. Inicializa el gestor de permisos de Bluetooth
      * 4. Configura el contenido con Jetpack Compose
      * 5. Establece el sistema de navegación
@@ -118,23 +117,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Configure initial edge-to-edge styling with user's saved theme preference
-        // This prevents white system bars during activity recreation (e.g., when language changes)
-        
-        // Load saved theme preference to determine correct system bar styling
-        val savedThemeMode = try {
-            runBlocking { preferencesDataStore.themeMode.first() }
-        } catch (_: Exception) {
-            ThemeMode.DARK // Fallback to dark theme if loading fails
-        }
-        
-        val isDarkThemeForSystemBars = when (savedThemeMode) {
-            ThemeMode.LIGHT -> false
-            ThemeMode.DARK -> true
-        }
-        
-        // Apply system bars configuration immediately to prevent white flash
-        configureSystemBars(isDarkThemeForSystemBars)
+        // Configure initial edge-to-edge styling with dark theme
+        // The application uses only dark mode
+        configureSystemBars(true)
 
         // Configure permissions manager
         bluetoothPermissionManager = BluetoothPermissionManager(
@@ -148,19 +133,7 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.DARK)
             val language by preferencesDataStore.language.collectAsState(initial = Language.SYSTEM)
-
-            // Determine if dark theme should be used
-            val isDarkTheme = when (themeMode) {
-                ThemeMode.LIGHT -> false
-                ThemeMode.DARK -> true
-            }
-
-            // Configure edge-to-edge with proper system bar styling based on theme
-            LaunchedEffect(isDarkTheme) {
-                configureSystemBars(isDarkTheme)
-            }
 
             // Apply locale changes when language preference changes
             LaunchedEffect(language) {
@@ -172,7 +145,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            CamperGasTheme(themeMode = themeMode) {
+            CamperGasTheme(themeMode = ThemeMode.DARK) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -211,35 +184,18 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Configura el estilo de las barras del sistema según el tema activo.
+     * Configura el estilo de las barras del sistema con tema oscuro.
      * 
      * Este método aplica el estilo apropiado a la barra de estado y la barra de navegación
-     * basándose en si el tema oscuro está activo o no. Utiliza colores transparentes para
-     * permitir que el contenido se extienda hasta los bordes de la pantalla (edge-to-edge).
+     * para el tema oscuro. Utiliza colores transparentes para permitir que el contenido 
+     * se extienda hasta los bordes de la pantalla (edge-to-edge).
      * 
-     * El método previene el destello blanco que puede ocurrir durante la recreación de la
-     * actividad al aplicar inmediatamente el estilo correcto de las barras del sistema.
-     * 
-     * @param isDarkTheme true si el tema oscuro está activo, false para tema claro
+     * @param isDarkTheme siempre true ya que la aplicación usa solo tema oscuro
      */
     private fun configureSystemBars(isDarkTheme: Boolean) {
         enableEdgeToEdge(
-            statusBarStyle = if (isDarkTheme) {
-                SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
-            } else {
-                SystemBarStyle.light(
-                    android.graphics.Color.TRANSPARENT,
-                    android.graphics.Color.TRANSPARENT
-                )
-            },
-            navigationBarStyle = if (isDarkTheme) {
-                SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
-            } else {
-                SystemBarStyle.light(
-                    android.graphics.Color.TRANSPARENT,
-                    android.graphics.Color.TRANSPARENT
-                )
-            }
+            statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
         )
     }
 }
