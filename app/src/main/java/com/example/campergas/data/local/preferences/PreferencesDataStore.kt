@@ -49,16 +49,11 @@ class PreferencesDataStore @Inject constructor(
     /**
      * Flow of the current theme mode.
      *
-     * @return Flow emitting ThemeMode, defaults to DARK if not set or invalid
+     * @return Flow always emitting ThemeMode.DARK (application uses only dark mode)
      */
     val themeMode: Flow<ThemeMode> = context.dataStore.data
-        .map { preferences ->
-            val modeString = preferences[themeModeKey] ?: ThemeMode.DARK.name
-            try {
-                ThemeMode.valueOf(modeString)
-            } catch (_: IllegalArgumentException) {
-                ThemeMode.DARK
-            }
+        .map { _ ->
+            ThemeMode.DARK
         }
 
     /**
@@ -125,13 +120,12 @@ class PreferencesDataStore @Inject constructor(
 
     /**
      * Sets the application theme mode.
+     * Note: Application always uses dark mode, this method is kept for API compatibility.
      *
-     * @param themeMode The theme mode to apply (LIGHT, DARK, or SYSTEM)
+     * @param themeMode The theme mode (always DARK)
      */
     suspend fun setThemeMode(themeMode: ThemeMode) {
-        context.dataStore.edit { preferences ->
-            preferences[themeModeKey] = themeMode.name
-        }
+        // No-op: application always uses dark mode
     }
 
     /**
