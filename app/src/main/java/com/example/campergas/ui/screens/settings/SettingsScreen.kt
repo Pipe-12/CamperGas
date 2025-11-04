@@ -44,12 +44,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.campergas.R
+import com.example.campergas.domain.model.ThemeMode
 
 /**
  * Settings screen for application configuration.
  *
  * Provides UI for managing:
- * - Language selection
+ * - Theme mode (light, dark, system)
  * - Notification preferences
  * - BLE sensor reading intervals
  * - Low fuel threshold
@@ -113,7 +114,7 @@ fun SettingsScreen(
             )
         }
 
-        // Show operation state if there is one
+        // Mostrar el estado de la operación si hay uno
         operationStatus?.let { status ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -137,7 +138,15 @@ fun SettingsScreen(
             }
         }
 
-        // Notifications configuration
+        // Configuración de tema de la aplicación
+        ThemeSelectionCard(
+            currentThemeMode = uiState.themeMode,
+            onThemeModeSelected = { themeMode ->
+                viewModel.setThemeMode(themeMode)
+            }
+        )
+
+        // Configuración de notificaciones
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -358,6 +367,114 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+        }
+    }
+}
+
+/**
+ * Theme selection card for the application.
+ * 
+ * Provides a user interface to select between different available theme modes:
+ * light, dark, and system. Uses a dropdown menu for selection.
+ * 
+ * @param currentThemeMode Currently selected theme mode
+ * @param onThemeModeSelected Callback invoked when user selects a new theme
+ */
+@Composable
+private fun ThemeSelectionCard(
+    currentThemeMode: ThemeMode,
+    onThemeModeSelected: (ThemeMode) -> Unit
+) {
+    // Estado para controlar si el menú desplegable está expandido
+    var expanded by remember { mutableStateOf(false) }
+    
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.settings_theme),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            Text(
+                text = stringResource(R.string.settings_theme_description),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+            
+            // Botón que muestra el tema actual y abre el menú desplegable
+            Box {
+                Button(
+                    onClick = { expanded = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = when (currentThemeMode) {
+                                ThemeMode.LIGHT -> stringResource(R.string.theme_mode_light)
+                                ThemeMode.DARK -> stringResource(R.string.theme_mode_dark)
+                                ThemeMode.SYSTEM -> stringResource(R.string.theme_mode_system)
+                            }
+                        )
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null
+                        )
+                    }
+                }
+                
+                // Menú desplegable con las opciones de tema
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    // Opción de tema claro
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.theme_mode_light)) },
+                        onClick = {
+                            onThemeModeSelected(ThemeMode.LIGHT)
+                            expanded = false
+                        }
+                    )
+                    // Opción de tema oscuro
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.theme_mode_dark)) },
+                        onClick = {
+                            onThemeModeSelected(ThemeMode.DARK)
+                            expanded = false
+                        }
+                    )
+                    // Opción de tema del sistema
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.theme_mode_system)) },
+                        onClick = {
+                            onThemeModeSelected(ThemeMode.SYSTEM)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+            
+            // Mostrar el estado actual del tema
+            Text(
+                text = when (currentThemeMode) {
+                    ThemeMode.LIGHT -> stringResource(R.string.theme_light)
+                    ThemeMode.DARK -> stringResource(R.string.theme_dark)
+                    ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }

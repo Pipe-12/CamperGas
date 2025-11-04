@@ -20,6 +20,7 @@ import javax.inject.Inject
  * ViewModel for application settings management.
  *
  * Manages user preferences including:
+ * - Theme mode (light, dark, system)
  * - Notification settings
  * - BLE sensor reading intervals
  * - Low fuel warning threshold
@@ -40,7 +41,7 @@ class SettingsViewModel @Inject constructor(
     /** Flow of weight sensor reading interval in minutes */
     val weightInterval: StateFlow<Int> =
         configureReadingIntervalsUseCase.getWeightReadIntervalSeconds()
-            .map { it / 60 } // Convert seconds to minutes
+            .map { it / 60 } // Convertir segundos a minutos
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
@@ -53,7 +54,7 @@ class SettingsViewModel @Inject constructor(
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = 15  //1 segundo por defecto
+                initialValue = 15  // 15 segundos por defecto
             )
 
     private val _operationStatus = MutableStateFlow<String?>(null)
@@ -64,14 +65,21 @@ class SettingsViewModel @Inject constructor(
         loadSettings()
     }
 
+    /**
+     * Loads initial settings from user preferences.
+     * 
+     * Combines multiple preference flows (theme, notifications, gas threshold)
+     * into a single UI state that updates reactively.
+     */
     private fun loadSettings() {
         viewModelScope.launch {
             combine(
+                preferencesDataStore.themeMode,
                 preferencesDataStore.areNotificationsEnabled,
                 preferencesDataStore.gasLevelThreshold
-            ) { notificationsEnabled, gasLevelThreshold ->
+            ) { themeMode, notificationsEnabled, gasLevelThreshold ->
                 SettingsUiState(
-                    themeMode = ThemeMode.DARK,
+                    themeMode = themeMode,
                     notificationsEnabled = notificationsEnabled,
                     gasLevelThreshold = gasLevelThreshold
                 )
@@ -81,19 +89,50 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Changes the application theme mode.
+     * 
+     * Saves the new theme mode to user preferences.
+     * The change applies immediately across the entire application.
+     * 
+     * @param themeMode New theme mode (LIGHT, DARK, or SYSTEM)
+     */
+    fun setThemeMode(themeMode: ThemeMode) {
+        viewModelScope.launch {
+            preferencesDataStore.setThemeMode(themeMode)
+        }
+    }
+
+    /**
+     * Toggles the notification state (enabled/disabled).
+     * 
+     * Inverts the current notification state and saves it to preferences.
+     */
     fun toggleNotifications() {
         viewModelScope.launch {
             preferencesDataStore.setNotificationsEnabled(!_uiState.value.notificationsEnabled)
         }
     }
 
+    /**
+     * Sets the gas level threshold for low fuel warnings.
+     * 
+     * @param threshold Threshold percentage (0-100)
+     */
     fun setGasLevelThreshold(threshold: Float) {
         viewModelScope.launch {
             preferencesDataStore.setGasLevelThreshold(threshold)
         }
     }
 
-    // Methods to configure BLE reading intervals
+    /**
+     * Configures the weight sensor reading interval.
+     * 
+     * Converts the interval from minutes to seconds and applies it via the use case.
+     * Displays status messages during the operation.
+     * 
+     * @param intervalMinutes Interval in minutes (converted to seconds internally)
+     */
     fun setWeightInterval(intervalMinutes: Int) {
         viewModelScope.launch {
             try {
@@ -114,6 +153,14 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Configures the inclination sensor reading interval.
+     * 
+     * Applies the interval in seconds via the use case.
+     * Displays status messages during the operation.
+     * 
+     * @param intervalSeconds Interval in seconds
+     */
     fun setInclinationInterval(intervalSeconds: Int) {
         viewModelScope.launch {
             try {
@@ -134,8 +181,17 @@ class SettingsViewModel @Inject constructor(
     }
 }
 
+/**
+ * UI state for the settings screen.
+ * 
+ * @param themeMode Current theme mode (LIGHT, DARK, or SYSTEM)
+ * @param notificationsEnabled Indicates if notifications are enabled
+ * @param gasLevelThreshold Gas level threshold for warnings (percentage)
+ * @param isLoading Indicates if an operation is in progress
+ * @param error Error message if any
+ */
 data class SettingsUiState(
-    val themeMode: ThemeMode = ThemeMode.DARK,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val notificationsEnabled: Boolean = true,
     val gasLevelThreshold: Float = 15.0f,
     val isLoading: Boolean = false,
