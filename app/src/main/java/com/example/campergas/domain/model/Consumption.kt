@@ -2,18 +2,18 @@ package com.example.campergas.domain.model
 
 /**
  * Modelo de dominio que representa un registro de consumo de combustible.
- * 
+ *
  * Esta clase de datos es una vista simplificada de FuelMeasurement, enfocada
  * específicamente en el historial de consumo de gas para su visualización en
  * gráficos y listas de consumo histórico.
- * 
+ *
  * Contiene información sobre:
  * - El cilindro de gas asociado (ID y nombre)
  * - La fecha/hora de la medición
  * - Los valores de combustible (kilogramos, porcentaje, peso total)
  * - Estado de calibración
  * - Origen de los datos (tiempo real vs histórico/offline)
- * 
+ *
  * @property id Identificador único del registro de consumo
  * @property cylinderId ID del cilindro de gas al que pertenece esta medición
  * @property cylinderName Nombre descriptivo del cilindro de gas
@@ -39,11 +39,11 @@ data class Consumption(
     companion object {
         /**
          * Convierte una medición de combustible completa a un registro de consumo.
-         * 
+         *
          * Este método de fábrica transforma un objeto FuelMeasurement (que contiene
          * información detallada de medición) en un objeto Consumption más simple
          * orientado a visualización de historial.
-         * 
+         *
          * @param fuelMeasurement Medición de combustible completa a convertir
          * @return Objeto Consumption con los datos relevantes para historial
          */

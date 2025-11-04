@@ -237,34 +237,5 @@ class BluetoothPermissionManager(
                 }
     }
 
-    companion object {
-        fun hasBluetoothPermissions(context: Context): Boolean {
-            val requiredPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                listOf(
-                    Manifest.permission.BLUETOOTH_SCAN,
-                    Manifest.permission.BLUETOOTH_CONNECT,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            } else {
-                // Para Android 10 (API 29) y anteriores
-                val permissions = mutableListOf(
-                    Manifest.permission.BLUETOOTH,
-                    Manifest.permission.BLUETOOTH_ADMIN,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-
-                // Agregar ACCESS_BACKGROUND_LOCATION for Android 10+
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    permissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-                }
-
-                permissions
-            }
-
-            return requiredPermissions.all {
-                ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-            }
-        }
-    }
+    companion object
 }

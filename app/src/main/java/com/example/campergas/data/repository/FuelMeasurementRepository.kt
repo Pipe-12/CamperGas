@@ -10,23 +10,23 @@ import javax.inject.Singleton
 
 /**
  * Repositorio para gestionar mediciones de combustible en la base de datos.
- * 
+ *
  * Este repositorio actúa como una capa de abstracción entre la capa de dominio
  * y la capa de persistencia (Room Database). Proporciona operaciones CRUD
  * para mediciones de combustible y maneja la conversión entre entidades de
  * base de datos (FuelMeasurementEntity) y modelos de dominio (FuelMeasurement).
- * 
+ *
  * Responsabilidades principales:
  * - Proveer acceso a mediciones de combustible con diferentes filtros
  * - Insertar nuevas mediciones (individuales o en lote)
  * - Eliminar mediciones antiguas o por criterios específicos
  * - Convertir entre modelos de dominio y entidades de base de datos
  * - Exponer datos como Flows reactivos para actualización automática de UI
- * 
+ *
  * Tipos de mediciones soportadas:
  * - Tiempo real (isHistorical = false): Mediciones actuales del sensor
  * - Históricas/Offline (isHistorical = true): Datos sincronizados del sensor
- * 
+ *
  * @property fuelMeasurementDao DAO de Room para acceso a la base de datos
  * @author Felipe García Gómez
  */
@@ -36,7 +36,7 @@ class FuelMeasurementRepository @Inject constructor(
 ) {
     /**
      * Obtiene todas las mediciones de combustible ordenadas por timestamp descendente.
-     * 
+     *
      * @return Flow que emite la lista completa de mediciones
      */
     fun getAllMeasurements(): Flow<List<FuelMeasurement>> {
@@ -47,7 +47,7 @@ class FuelMeasurementRepository @Inject constructor(
 
     /**
      * Obtiene las mediciones de un cilindro específico.
-     * 
+     *
      * @param cylinderId ID del cilindro a consultar
      * @return Flow que emite la lista de mediciones del cilindro
      */
@@ -59,9 +59,9 @@ class FuelMeasurementRepository @Inject constructor(
 
     /**
      * Obtiene la medición en tiempo real más reciente.
-     * 
+     *
      * Solo devuelve mediciones marcadas como isHistorical = false.
-     * 
+     *
      * @return Flow que emite la medición más reciente o null si no hay ninguna
      */
     fun getLatestRealTimeMeasurement(): Flow<FuelMeasurement?> {
@@ -71,23 +71,8 @@ class FuelMeasurementRepository @Inject constructor(
     }
 
     /**
-     * Obtiene las mediciones históricas/offline de un cilindro.
-     * 
-     * Solo devuelve mediciones marcadas como isHistorical = true,
-     * que son datos sincronizados del almacenamiento del sensor.
-     * 
-     * @param cylinderId ID del cilindro a consultar
-     * @return Flow que emite la lista de mediciones históricas
-     */
-    fun getHistoricalMeasurements(cylinderId: Long): Flow<List<FuelMeasurement>> {
-        return fuelMeasurementDao.getHistoricalMeasurements(cylinderId).map { entities ->
-            entities.map { it.toDomainModel() }
-        }
-    }
-
-    /**
      * Obtiene mediciones en un rango de tiempo específico.
-     * 
+     *
      * @param startTime Timestamp Unix del inicio del período
      * @param endTime Timestamp Unix del fin del período
      * @return Flow que emite la lista de mediciones en el rango
@@ -100,9 +85,9 @@ class FuelMeasurementRepository @Inject constructor(
 
     /**
      * Obtiene mediciones de un cilindro en un rango de tiempo.
-     * 
+     *
      * Combina filtros de cilindro y tiempo para consultas específicas.
-     * 
+     *
      * @param cylinderId ID del cilindro a consultar
      * @param startTime Timestamp Unix del inicio del período
      * @param endTime Timestamp Unix del fin del período
@@ -123,22 +108,10 @@ class FuelMeasurementRepository @Inject constructor(
     }
 
     /**
-     * Obtiene las N mediciones más recientes.
-     * 
-     * @param limit Número máximo de mediciones a obtener
-     * @return Flow que emite la lista de mediciones recientes
-     */
-    fun getRecentMeasurements(limit: Int): Flow<List<FuelMeasurement>> {
-        return fuelMeasurementDao.getRecentMeasurements(limit).map { entities ->
-            entities.map { it.toDomainModel() }
-        }
-    }
-
-    /**
      * Inserta una nueva medición de combustible en la base de datos.
-     * 
+     *
      * Esta función debe llamarse desde una coroutine o función suspend.
-     * 
+     *
      * @param measurement Medición a insertar
      * @return ID asignado a la medición insertada
      */
@@ -148,10 +121,10 @@ class FuelMeasurementRepository @Inject constructor(
 
     /**
      * Inserta múltiples mediciones en la base de datos en lote.
-     * 
+     *
      * Optimizado para insertar grandes cantidades de datos históricos.
      * Esta función debe llamarse desde una coroutine o función suspend.
-     * 
+     *
      * @param measurements Lista de mediciones a insertar
      */
     suspend fun insertMeasurements(measurements: List<FuelMeasurement>) {
@@ -160,58 +133,11 @@ class FuelMeasurementRepository @Inject constructor(
 
 
     /**
-     * Elimina todas las mediciones de un cilindro específico.
-     * 
-     * Útil cuando se elimina un cilindro del sistema.
-     * Esta función debe llamarse desde una coroutine o función suspend.
-     * 
-     * @param cylinderId ID del cilindro cuyas mediciones se eliminarán
-     */
-    suspend fun deleteMeasurementsByCylinder(cylinderId: Long) {
-        fuelMeasurementDao.deleteMeasurementsByCylinder(cylinderId)
-    }
-
-    /**
-     * Elimina mediciones anteriores a un timestamp específico.
-     * 
-     * Útil para limpiar datos antiguos y liberar espacio en la base de datos.
-     * Esta función debe llamarse desde una coroutine o función suspend.
-     * 
-     * @param beforeTimestamp Timestamp Unix; se eliminarán mediciones anteriores a esta fecha
-     */
-    suspend fun deleteOldMeasurements(beforeTimestamp: Long) {
-        fuelMeasurementDao.deleteOldMeasurements(beforeTimestamp)
-    }
-
-    /**
-     * Elimina todas las mediciones de combustible de la base de datos.
-     * 
-     * ¡PRECAUCIÓN! Esta operación es irreversible.
-     * Esta función debe llamarse desde una coroutine o función suspend.
-     */
-    suspend fun deleteAllMeasurements() {
-        fuelMeasurementDao.deleteAllMeasurements()
-    }
-
-    /**
-     * Obtiene las dos últimas mediciones de un cilindro.
-     * 
-     * Útil para calcular tendencias o diferencias recientes.
-     * Esta función debe llamarse desde una coroutine o función suspend.
-     * 
-     * @param cylinderId ID del cilindro a consultar
-     * @return Lista con las dos mediciones más recientes (puede tener menos de 2 elementos)
-     */
-    suspend fun getLastTwoMeasurements(cylinderId: Long): List<FuelMeasurement> {
-        return fuelMeasurementDao.getLastTwoMeasurements(cylinderId).map { it.toDomainModel() }
-    }
-
-    /**
      * Obtiene las N últimas mediciones de un cilindro.
-     * 
+     *
      * Útil para análisis de patrones y detección de outliers.
      * Esta función debe llamarse desde una coroutine o función suspend.
-     * 
+     *
      * @param cylinderId ID del cilindro a consultar
      * @param limit Número máximo de mediciones a obtener
      * @return Lista con las N mediciones más recientes ordenadas por timestamp descendente
@@ -222,10 +148,10 @@ class FuelMeasurementRepository @Inject constructor(
 
     /**
      * Elimina una medición específica por su ID.
-     * 
+     *
      * Útil para eliminar outliers detectados.
      * Esta función debe llamarse desde una coroutine o función suspend.
-     * 
+     *
      * @param id ID de la medición a eliminar
      */
     suspend fun deleteMeasurementById(id: Long) {
@@ -234,7 +160,7 @@ class FuelMeasurementRepository @Inject constructor(
 
     /**
      * Convierte una entidad de base de datos a modelo de dominio.
-     * 
+     *
      * @return Objeto FuelMeasurement del modelo de dominio
      */
     private fun FuelMeasurementEntity.toDomainModel(): FuelMeasurement {
@@ -253,7 +179,7 @@ class FuelMeasurementRepository @Inject constructor(
 
     /**
      * Convierte un modelo de dominio a entidad de base de datos.
-     * 
+     *
      * @return Objeto FuelMeasurementEntity para persistir en Room
      */
     private fun FuelMeasurement.toEntity(): FuelMeasurementEntity {

@@ -119,10 +119,12 @@ fun HomeScreen(
                                 fontWeight = FontWeight.Bold
                             )
                         }
-                        
+
                         // Connection status in topbar
                         Text(
-                            text = if (connectionState) stringResource(R.string.connection_status_connected) else stringResource(R.string.connection_status_disconnected),
+                            text = if (connectionState) stringResource(R.string.connection_status_connected) else stringResource(
+                                R.string.connection_status_disconnected
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.padding(end = 8.dp)
@@ -257,7 +259,7 @@ fun HomeScreen(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -303,7 +305,7 @@ private fun NavigationButtonWithPreview(
     content: @Composable () -> Unit
 ) {
     val buttonHeight = if (isLargeButton) 280.dp else 160.dp
-    
+
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
@@ -343,7 +345,7 @@ private fun NavigationButtonWithPreview(
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 }
-                
+
                 // Content section (cylinder, chart, etc.)
                 Box(
                     modifier = Modifier.weight(1f),
@@ -381,7 +383,7 @@ private fun NavigationButtonWithPreview(
                         lineHeight = MaterialTheme.typography.bodySmall.lineHeight
                     )
                 }
-                
+
                 // Preview content (cylinder, chart, etc.)
                 Box(
                     modifier = Modifier.width(if (isLargeButton) 140.dp else 80.dp),
@@ -454,9 +456,9 @@ private fun ConfigurationButton(
                     style = MaterialTheme.typography.headlineSmall
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodySmall,

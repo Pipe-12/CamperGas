@@ -625,7 +625,10 @@ class CamperGasBleService @Inject constructor(
                             }
                         },
                         onFailure = { error ->
-                            Log.e(TAG, "Error al guardar measurement de combustible: ${error.message}")
+                            Log.e(
+                                TAG,
+                                "Error al guardar measurement de combustible: ${error.message}"
+                            )
                         }
                     )
                 } catch (e: Exception) {

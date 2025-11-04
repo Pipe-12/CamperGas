@@ -41,7 +41,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+
 import androidx.navigation.NavController
 import com.example.campergas.R
 import com.example.campergas.domain.model.ThemeMode
@@ -105,7 +106,10 @@ fun SettingsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.nav_back))
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.nav_back)
+                )
             }
             Text(
                 text = stringResource(R.string.settings_title),
@@ -175,7 +179,7 @@ fun SettingsScreen(
 
                 if (uiState.notificationsEnabled) {
                     Spacer(modifier = Modifier.height(12.dp))
-                    
+
                     Text(
                         text = stringResource(R.string.settings_gas_threshold),
                         style = MaterialTheme.typography.bodyMedium,
@@ -210,7 +214,10 @@ fun SettingsScreen(
                     }
 
                     Text(
-                        text = stringResource(R.string.settings_gas_threshold_description, uiState.gasLevelThreshold.toInt()),
+                        text = stringResource(
+                            R.string.settings_gas_threshold_description,
+                            uiState.gasLevelThreshold.toInt()
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 4.dp)
@@ -373,10 +380,10 @@ fun SettingsScreen(
 
 /**
  * Theme selection card for the application.
- * 
+ *
  * Provides a user interface to select between different available theme modes:
  * light, dark, and system. Uses a dropdown menu for selection.
- * 
+ *
  * @param currentThemeMode Currently selected theme mode
  * @param onThemeModeSelected Callback invoked when user selects a new theme
  */
@@ -387,7 +394,7 @@ private fun ThemeSelectionCard(
 ) {
     // Estado para controlar si el menú desplegable está expandido
     var expanded by remember { mutableStateOf(false) }
-    
+
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -399,14 +406,14 @@ private fun ThemeSelectionCard(
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            
+
             Text(
                 text = stringResource(R.string.settings_theme_description),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
-            
+
             // Botón que muestra el tema actual y abre el menú desplegable
             Box {
                 Button(
@@ -431,7 +438,7 @@ private fun ThemeSelectionCard(
                         )
                     }
                 }
-                
+
                 // Menú desplegable con las opciones de tema
                 DropdownMenu(
                     expanded = expanded,
@@ -463,7 +470,7 @@ private fun ThemeSelectionCard(
                     )
                 }
             }
-            
+
             // Mostrar el estado actual del tema
             Text(
                 text = when (currentThemeMode) {

@@ -3,7 +3,6 @@ package com.example.campergas.domain.usecase
 import com.example.campergas.data.repository.ConsumptionRepository
 import com.example.campergas.domain.model.Consumption
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flowOf
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before

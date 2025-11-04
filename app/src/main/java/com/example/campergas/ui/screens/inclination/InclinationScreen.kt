@@ -71,7 +71,10 @@ fun InclinationScreen(
                 title = { Text(stringResource(R.string.inclination_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ble_back_button))
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.ble_back_button)
+                        )
                     }
                 }
             )

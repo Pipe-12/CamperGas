@@ -36,37 +36,38 @@ import dagger.hilt.android.AndroidEntryPoint
  */
 @AndroidEntryPoint
 class WidgetConfigActivity : ComponentActivity() {
-    
+
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
         // Configurar resultado como cancelado por defecto
         setResult(RESULT_CANCELED)
-        
+
         // Get el ID del widget from the intent
         appWidgetId = intent?.extras?.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
         ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
-        
+
         // If no valid ID, close
         if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish()
             return
         }
-        
+
         setContent {
             CamperGasTheme {
                 WidgetConfigScreen(
                     onConfirm = {
                         // Update widget and confirm configuration
-                        val appWidgetManager = AppWidgetManager.getInstance(this@WidgetConfigActivity)
-                        
+                        val appWidgetManager =
+                            AppWidgetManager.getInstance(this@WidgetConfigActivity)
+
                         // Determine widget type and update it
                         updateWidget(appWidgetManager)
-                        
+
                         // Configure successful result
                         val resultValue = Intent().apply {
                             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -81,7 +82,7 @@ class WidgetConfigActivity : ComponentActivity() {
             }
         }
     }
-    
+
     private fun updateWidget(appWidgetManager: AppWidgetManager) {
         // Try to update both widget types
         // In a real implementation, you could determine the specific type
@@ -130,23 +131,23 @@ fun WidgetConfigScreen(
                     text = stringResource(R.string.widget_config_title),
                     style = MaterialTheme.typography.headlineSmall
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Text(
                     text = stringResource(R.string.widget_config_ready_message),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
                     text = "• Tap the widget to open the application\n• Tap the refresh button to request new data\n• The widget updates automatically when there are changes",
                     style = MaterialTheme.typography.bodySmall
                 )
-                
+
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -156,7 +157,7 @@ fun WidgetConfigScreen(
                     ) {
                         Text("Cancelar")
                     }
-                    
+
                     Button(
                         onClick = onConfirm,
                         modifier = Modifier.weight(1f)

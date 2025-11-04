@@ -29,10 +29,11 @@ import javax.inject.Inject
 class BleConnectViewModel @Inject constructor(
     private val scanBleDevicesUseCase: ScanBleDevicesUseCase,
     private val connectBleDeviceUseCase: ConnectBleDeviceUseCase,
-    private val checkBleConnectionUseCase: CheckBleConnectionUseCase
+    checkBleConnectionUseCase: CheckBleConnectionUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BleConnectUiState())
+
     /** Flow of UI state for the BLE connection screen */
     val uiState: StateFlow<BleConnectUiState> = _uiState.asStateFlow()
 

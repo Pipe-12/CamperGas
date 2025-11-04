@@ -35,42 +35,50 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
         return EntryPointAccessors.fromApplication(context, WidgetEntryPoint::class.java)
     }
 
-    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
         // Ensure BLE service is running for periodic requests
         ensureBleServiceRunning(context)
-        
+
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
     }
-    
+
     override fun onEnabled(context: Context) {
         // This method is called when first widget of this type is added
         Log.d("GasCylinderWidget", "First widget added - starting service BLE")
         ensureBleServiceRunning(context)
     }
-    
+
     override fun onDisabled(context: Context) {
         // This method is called when last widget of this type is removed
         Log.d("GasCylinderWidget", "Last widget removed")
         // Verify if any active widget remains before stopping service
         checkAndStopServiceIfNoWidgets(context)
     }
-    
+
     private fun ensureBleServiceRunning(context: Context) {
         try {
-            val serviceStarted = com.example.campergas.service.BleForegroundService.startForWidgets(context)
+            val serviceStarted =
+                com.example.campergas.service.BleForegroundService.startForWidgets(context)
             if (serviceStarted) {
                 Log.d("GasCylinderWidget", "Service BLE iniciado for widgets")
             } else {
-                Log.w("GasCylinderWidget", "No se pudo iniciar servicio BLE - continuando sin servicio de fondo")
+                Log.w(
+                    "GasCylinderWidget",
+                    "No se pudo iniciar servicio BLE - continuando sin servicio de fondo"
+                )
             }
         } catch (e: Exception) {
             Log.e("GasCylinderWidget", "Error on start servicio BLE", e)
             // Don't rethrow - this prevents infinite loops
         }
     }
-    
+
     private fun checkAndStopServiceIfNoWidgets(context: Context) {
         scope.launch {
             try {
@@ -78,11 +86,12 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                 val gasWidgetManager = AppWidgetManager.getInstance(context)
                 val gasComponentName = ComponentName(context, GasCylinderWidgetProvider::class.java)
                 val gasWidgetIds = gasWidgetManager.getAppWidgetIds(gasComponentName)
-                
+
                 // Check if there are active stability widgets
-                val stabilityComponentName = ComponentName(context, VehicleStabilityWidgetProvider::class.java)
+                val stabilityComponentName =
+                    ComponentName(context, VehicleStabilityWidgetProvider::class.java)
                 val stabilityWidgetIds = gasWidgetManager.getAppWidgetIds(stabilityComponentName)
-                
+
                 // If there are no active widgets, stop the service
                 if (gasWidgetIds.isEmpty() && stabilityWidgetIds.isEmpty()) {
                     Log.d("GasCylinderWidget", "No active widgets - stopping BLE service")
@@ -94,14 +103,18 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
         }
     }
 
-    private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+    private fun updateAppWidget(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int
+    ) {
         scope.launch {
             try {
                 // Get repositories using EntryPoint
                 val entryPoint = getEntryPoint(context)
                 val gasCylinderRepository = entryPoint.gasCylinderRepository()
                 val bleRepository = entryPoint.bleRepository()
-                
+
                 // Get solo data actuales from sensor BLE
                 val currentFuelMeasurement = bleRepository.fuelMeasurementData.first()
                 val activeCylinder = gasCylinderRepository.getActiveCylinder().first()
@@ -113,17 +126,24 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                 // Configurar textos
                 if (activeCylinder != null && currentFuelMeasurement != null) {
                     views.setTextViewText(R.id.widget_cylinder_name, activeCylinder.name)
-                    views.setTextViewText(R.id.widget_fuel_percentage, currentFuelMeasurement.getFormattedPercentage())
-                    views.setTextViewText(R.id.widget_fuel_kg, currentFuelMeasurement.getFormattedFuelKilograms())
-                    
+                    views.setTextViewText(
+                        R.id.widget_fuel_percentage,
+                        currentFuelMeasurement.getFormattedPercentage()
+                    )
+                    views.setTextViewText(
+                        R.id.widget_fuel_kg,
+                        currentFuelMeasurement.getFormattedFuelKilograms()
+                    )
+
                     // Crear imagen of the cylinder
-                    val cylinderBitmap = createCylinderBitmap(currentFuelMeasurement.fuelPercentage / 100f)
+                    val cylinderBitmap =
+                        createCylinderBitmap(currentFuelMeasurement.fuelPercentage / 100f)
                     views.setImageViewBitmap(R.id.widget_cylinder_image, cylinderBitmap)
                 } else {
                     views.setTextViewText(R.id.widget_cylinder_name, "Sin cylinder activa")
                     views.setTextViewText(R.id.widget_fuel_percentage, "--")
                     views.setTextViewText(R.id.widget_fuel_kg, "--")
-                    
+
                     // Empty cylinder image
                     val cylinderBitmap = createCylinderBitmap(0f)
                     views.setImageViewBitmap(R.id.widget_cylinder_image, cylinderBitmap)
@@ -138,7 +158,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
 
                 // Updatesr widget
                 appWidgetManager.updateAppWidget(appWidgetId, views)
-                
+
             } catch (e: Exception) {
                 Log.e("GasCylinderWidget", "Error updating widget", e)
                 // Configurar vista de error
@@ -156,7 +176,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
         // Intent to open application
         val openAppIntent = Intent(context, MainActivity::class.java)
         val openAppPendingIntent = PendingIntent.getActivity(
-            context, 0, openAppIntent, 
+            context, 0, openAppIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         views.setOnClickPendingIntent(R.id.widget_container, openAppPendingIntent)
@@ -206,7 +226,7 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                 fillPercentage > 0.2f -> Color.parseColor("#FF9800") // Naranja
                 else -> Color.parseColor("#F44336") // Rojo
             }
-            
+
             paint.color = fillColor
             val fillRect = RectF(
                 startX + 4,

@@ -35,6 +35,7 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
+
     /** Flow of UI state for the settings screen */
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
@@ -58,6 +59,7 @@ class SettingsViewModel @Inject constructor(
             )
 
     private val _operationStatus = MutableStateFlow<String?>(null)
+
     /** Flow of BLE operation status messages for user feedback */
     val operationStatus: StateFlow<String?> = _operationStatus.asStateFlow()
 
@@ -67,7 +69,7 @@ class SettingsViewModel @Inject constructor(
 
     /**
      * Loads initial settings from user preferences.
-     * 
+     *
      * Combines multiple preference flows (theme, notifications, gas threshold)
      * into a single UI state that updates reactively.
      */
@@ -91,10 +93,10 @@ class SettingsViewModel @Inject constructor(
 
     /**
      * Changes the application theme mode.
-     * 
+     *
      * Saves the new theme mode to user preferences.
      * The change applies immediately across the entire application.
-     * 
+     *
      * @param themeMode New theme mode (LIGHT, DARK, or SYSTEM)
      */
     fun setThemeMode(themeMode: ThemeMode) {
@@ -105,7 +107,7 @@ class SettingsViewModel @Inject constructor(
 
     /**
      * Toggles the notification state (enabled/disabled).
-     * 
+     *
      * Inverts the current notification state and saves it to preferences.
      */
     fun toggleNotifications() {
@@ -116,7 +118,7 @@ class SettingsViewModel @Inject constructor(
 
     /**
      * Sets the gas level threshold for low fuel warnings.
-     * 
+     *
      * @param threshold Threshold percentage (0-100)
      */
     fun setGasLevelThreshold(threshold: Float) {
@@ -127,10 +129,10 @@ class SettingsViewModel @Inject constructor(
 
     /**
      * Configures the weight sensor reading interval.
-     * 
+     *
      * Converts the interval from minutes to seconds and applies it via the use case.
      * Displays status messages during the operation.
-     * 
+     *
      * @param intervalMinutes Interval in minutes (converted to seconds internally)
      */
     fun setWeightInterval(intervalMinutes: Int) {
@@ -155,10 +157,10 @@ class SettingsViewModel @Inject constructor(
 
     /**
      * Configures the inclination sensor reading interval.
-     * 
+     *
      * Applies the interval in seconds via the use case.
      * Displays status messages during the operation.
-     * 
+     *
      * @param intervalSeconds Interval in seconds
      */
     fun setInclinationInterval(intervalSeconds: Int) {
@@ -183,7 +185,7 @@ class SettingsViewModel @Inject constructor(
 
 /**
  * UI state for the settings screen.
- * 
+ *
  * @param themeMode Current theme mode (LIGHT, DARK, or SYSTEM)
  * @param notificationsEnabled Indicates if notifications are enabled
  * @param gasLevelThreshold Gas level threshold for warnings (percentage)

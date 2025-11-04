@@ -94,7 +94,10 @@ fun ConsumptionScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ble_back_button))
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.ble_back_button)
+                )
             }
             Text(
                 text = stringResource(R.string.consumption_title),
@@ -319,7 +322,10 @@ fun DateFiltersSection(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = if (startDate != null) {
-                            stringResource(R.string.consumption_from_date, formatDateOnly(startDate))
+                            stringResource(
+                                R.string.consumption_from_date,
+                                formatDateOnly(startDate)
+                            )
                         } else {
                             stringResource(R.string.consumption_start_date)
                         }
@@ -421,7 +427,7 @@ fun ConsumptionSummarySection(
                     value = lastMonthConsumption,
                     modifier = Modifier.weight(1f)
                 )
-                
+
                 if (hasCustomPeriod && startDate != null && endDate != null) {
                     SummaryItem(
                         title = "Selected period",
@@ -461,7 +467,7 @@ fun SummaryItem(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
-            
+
             if (subtitle != null) {
                 Text(
                     text = subtitle,
@@ -470,9 +476,9 @@ fun SummaryItem(
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             Text(
                 text = String.format(Locale.US, "%.2f kg", value),
                 style = MaterialTheme.typography.titleMedium,
@@ -506,9 +512,9 @@ fun ConsumptionChart(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             if (chartData.size < 2) {
                 Box(
                     modifier = Modifier
@@ -542,17 +548,17 @@ fun SimpleLineChart(
     val primaryColor = MaterialTheme.colorScheme.primary
     val surface = MaterialTheme.colorScheme.surface
     val onSurface = MaterialTheme.colorScheme.onSurface
-    
+
     Canvas(modifier = modifier) {
         if (data.size < 2) return@Canvas
-        
+
         val chartWidth = size.width
         val chartHeight = size.height
         val leftPadding = 100f // Space for Y-axis labels (outside chart background)
         val topPadding = 20f
         val rightPadding = 20f
         val bottomPadding = 50f // Space for X-axis labels (outside chart background)
-        
+
         // Draw chart background rectangle (the darker rectangle)
         drawRect(
             color = surface,
@@ -562,21 +568,21 @@ fun SimpleLineChart(
                 chartHeight - topPadding - bottomPadding
             )
         )
-        
+
         // Calculateste bounds
         val minValue = data.minOf { it.kilograms }
         val maxValue = data.maxOf { it.kilograms }
         val valueRange = max(maxValue - minValue, 0.1f) // Avoid division by zero
-        
+
         val minDate = data.minOf { it.date }
         val maxDate = data.maxOf { it.date }
         val dateRange = max(maxDate - minDate, 1L) // Avoid division by zero
-        
+
         // Draw grid lines (horizontal) and Y-axis labels
         val gridLines = 4
         for (i in 0..gridLines) {
             val y = topPadding + (i * (chartHeight - topPadding - bottomPadding) / gridLines)
-            
+
             // Draw horizontal grid line
             drawLine(
                 color = Color.Gray.copy(alpha = 0.3f),
@@ -584,7 +590,7 @@ fun SimpleLineChart(
                 end = Offset(chartWidth - rightPadding, y),
                 strokeWidth = 1f
             )
-            
+
             // Draw Y-axis labels (kg values)
             val kgValue = maxValue - (i * valueRange / gridLines)
             drawIntoCanvas { canvas ->
@@ -601,12 +607,12 @@ fun SimpleLineChart(
                 )
             }
         }
-        
+
         // Draw vertical grid lines and X-axis labels (dates)
         val xAxisLabels = 4 // Show 4 date labels
         for (i in 0..xAxisLabels) {
             val x = leftPadding + (i * (chartWidth - leftPadding - rightPadding) / xAxisLabels)
-            
+
             // Draw vertical grid line
             drawLine(
                 color = Color.Gray.copy(alpha = 0.3f),
@@ -614,7 +620,7 @@ fun SimpleLineChart(
                 end = Offset(x, chartHeight - bottomPadding),
                 strokeWidth = 1f
             )
-            
+
             // Draw X-axis labels (dates)
             if (data.isNotEmpty()) {
                 val dateIndex = if (data.size <= xAxisLabels) {
@@ -624,12 +630,12 @@ fun SimpleLineChart(
                     // If we have many data points, sample across the range
                     (i * (data.size - 1) / xAxisLabels)
                 }
-                
+
                 if (dateIndex >= 0 && dateIndex < data.size) {
                     val timestamp = data[dateIndex].date
                     val dateFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
                     val dateLabel = dateFormat.format(Date(timestamp))
-                    
+
                     drawIntoCanvas { canvas ->
                         val paint = android.graphics.Paint().apply {
                             color = onSurface.toArgb()
@@ -646,30 +652,32 @@ fun SimpleLineChart(
                 }
             }
         }
-        
+
         // Calculateste points
         val points = data.map { point ->
-            val x = leftPadding + ((point.date - minDate).toFloat() / dateRange) * (chartWidth - leftPadding - rightPadding)
-            val y = chartHeight - bottomPadding - ((point.kilograms - minValue) / valueRange) * (chartHeight - topPadding - bottomPadding)
+            val x =
+                leftPadding + ((point.date - minDate).toFloat() / dateRange) * (chartWidth - leftPadding - rightPadding)
+            val y =
+                chartHeight - bottomPadding - ((point.kilograms - minValue) / valueRange) * (chartHeight - topPadding - bottomPadding)
             Offset(x, y)
         }
-        
+
         // Draw line
         if (points.size > 1) {
             val path = Path()
             path.moveTo(points.first().x, points.first().y)
-            
+
             for (i in 1 until points.size) {
                 path.lineTo(points[i].x, points[i].y)
             }
-            
+
             drawPath(
                 path = path,
                 color = primaryColor,
                 style = Stroke(width = 3f, cap = StrokeCap.Round)
             )
         }
-        
+
         // Draw points
         points.forEach { point ->
             drawCircle(

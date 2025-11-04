@@ -6,7 +6,6 @@ import com.example.campergas.domain.model.Consumption
 import com.example.campergas.domain.model.FuelMeasurement
 import com.example.campergas.domain.model.Inclination
 import com.example.campergas.domain.model.VehicleConfig
-import com.example.campergas.domain.model.VehicleType
 import com.example.campergas.domain.usecase.ConnectBleDeviceUseCase
 import com.example.campergas.domain.usecase.GetConsumptionHistoryUseCase
 import com.example.campergas.domain.usecase.GetFuelDataUseCase

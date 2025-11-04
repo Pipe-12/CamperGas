@@ -47,7 +47,7 @@ class ConsumptionViewModel @Inject constructor(
                         isLoading = false,
                         error = null
                     )
-                    
+
                     // Update chart data for current period
                     updateChartData(consumptions)
                 }
@@ -107,33 +107,37 @@ class ConsumptionViewModel @Inject constructor(
             try {
                 // Load last day summary
                 getConsumptionHistoryUseCase.getLastDayConsumption().collect { dayConsumptions ->
-                    val dayTotal = getConsumptionHistoryUseCase.calculateTotalConsumption(dayConsumptions)
+                    val dayTotal =
+                        getConsumptionHistoryUseCase.calculateTotalConsumption(dayConsumptions)
                     _uiState.value = _uiState.value.copy(lastDayConsumption = dayTotal)
                 }
             } catch (_: Exception) {
                 // Silently handle summary loading errors
             }
         }
-        
+
         viewModelScope.launch {
             try {
                 // Load last week summary
                 getConsumptionHistoryUseCase.getLastWeekConsumption().collect { weekConsumptions ->
-                    val weekTotal = getConsumptionHistoryUseCase.calculateTotalConsumption(weekConsumptions)
+                    val weekTotal =
+                        getConsumptionHistoryUseCase.calculateTotalConsumption(weekConsumptions)
                     _uiState.value = _uiState.value.copy(lastWeekConsumption = weekTotal)
                 }
             } catch (_: Exception) {
                 // Silently handle summary loading errors
             }
         }
-        
+
         viewModelScope.launch {
             try {
                 // Load last month summary
-                getConsumptionHistoryUseCase.getLastMonthConsumption().collect { monthConsumptions ->
-                    val monthTotal = getConsumptionHistoryUseCase.calculateTotalConsumption(monthConsumptions)
-                    _uiState.value = _uiState.value.copy(lastMonthConsumption = monthTotal)
-                }
+                getConsumptionHistoryUseCase.getLastMonthConsumption()
+                    .collect { monthConsumptions ->
+                        val monthTotal =
+                            getConsumptionHistoryUseCase.calculateTotalConsumption(monthConsumptions)
+                        _uiState.value = _uiState.value.copy(lastMonthConsumption = monthTotal)
+                    }
             } catch (_: Exception) {
                 // Silently handle summary loading errors
             }
@@ -145,7 +149,8 @@ class ConsumptionViewModel @Inject constructor(
             viewModelScope.launch {
                 try {
                     getConsumptionHistoryUseCase(startDate, endDate).collect { consumptions ->
-                        val customTotal = getConsumptionHistoryUseCase.calculateTotalConsumption(consumptions)
+                        val customTotal =
+                            getConsumptionHistoryUseCase.calculateTotalConsumption(consumptions)
                         _uiState.value = _uiState.value.copy(customPeriodConsumption = customTotal)
                     }
                 } catch (_: Exception) {

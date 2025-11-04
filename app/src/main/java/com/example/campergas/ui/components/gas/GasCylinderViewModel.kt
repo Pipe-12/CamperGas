@@ -39,10 +39,12 @@ class GasCylinderViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _activeCylinder = MutableStateFlow<GasCylinder?>(null)
+
     /** Flow of the currently active gas cylinder, null if none active */
     val activeCylinder: StateFlow<GasCylinder?> = _activeCylinder
 
     private val _uiState = MutableStateFlow(GasCylinderUiState())
+
     /** Flow of UI state for cylinder operations */
     val uiState: StateFlow<GasCylinderUiState> = _uiState
 

@@ -100,21 +100,25 @@ class HomeViewModel @Inject constructor(
     private fun loadConsumptionSummaries() {
         viewModelScope.launch {
             try {
-                getConsumptionHistoryUseCase.getLastDayConsumption().collectLatest { dayConsumptions ->
-                    val dayTotal = getConsumptionHistoryUseCase.calculateTotalConsumption(dayConsumptions)
-                    _lastDayConsumption.value = dayTotal
-                }
+                getConsumptionHistoryUseCase.getLastDayConsumption()
+                    .collectLatest { dayConsumptions ->
+                        val dayTotal =
+                            getConsumptionHistoryUseCase.calculateTotalConsumption(dayConsumptions)
+                        _lastDayConsumption.value = dayTotal
+                    }
             } catch (e: Exception) {
                 // Silently handle summary loading errors
             }
         }
-        
+
         viewModelScope.launch {
             try {
-                getConsumptionHistoryUseCase.getLastWeekConsumption().collectLatest { weekConsumptions ->
-                    val weekTotal = getConsumptionHistoryUseCase.calculateTotalConsumption(weekConsumptions)
-                    _lastWeekConsumption.value = weekTotal
-                }
+                getConsumptionHistoryUseCase.getLastWeekConsumption()
+                    .collectLatest { weekConsumptions ->
+                        val weekTotal =
+                            getConsumptionHistoryUseCase.calculateTotalConsumption(weekConsumptions)
+                        _lastWeekConsumption.value = weekTotal
+                    }
             } catch (e: Exception) {
                 // Silently handle summary loading errors
             }

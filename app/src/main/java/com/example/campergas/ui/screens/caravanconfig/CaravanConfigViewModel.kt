@@ -30,6 +30,7 @@ class CaravanConfigViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CaravanConfigUiState())
+
     /** Flow of UI state for the vehicle configuration screen */
     val uiState: StateFlow<CaravanConfigUiState> = _uiState.asStateFlow()
 

@@ -79,14 +79,14 @@ fun CamperGasTheme(
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-    
+
     // Determine if we should use dark theme
     val isDarkTheme = when (themeMode) {
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
         ThemeMode.SYSTEM -> androidx.compose.foundation.isSystemInDarkTheme()
     }
-    
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (isDarkTheme) {
@@ -95,6 +95,7 @@ fun CamperGasTheme(
                 dynamicLightColorScheme(context)
             }
         }
+
         isDarkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

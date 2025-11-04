@@ -8,20 +8,20 @@ import javax.inject.Singleton
 
 /**
  * Repositorio para gestionar los datos de consumo de combustible.
- * 
+ *
  * Este repositorio actúa como una capa de abstracción sobre FuelMeasurementRepository,
  * transformando las mediciones de combustible (FuelMeasurement) al modelo de dominio
  * más simple de Consumption, que se enfoca específicamente en datos de consumo
  * para visualización y análisis.
- * 
+ *
  * Responsabilidades:
  * - Proveer acceso a registros de consumo en diferentes formatos (todos, por cilindro, por fechas)
  * - Convertir entre FuelMeasurement y Consumption
  * - Filtrar y ordenar datos de consumo
- * 
+ *
  * La conversión de FuelMeasurement a Consumption simplifica los datos,
  * extrayendo solo la información relevante para análisis de consumo.
- * 
+ *
  * @property fuelMeasurementRepository Repositorio fuente de mediciones de combustible
  * @author Felipe García Gómez
  */
@@ -32,10 +32,10 @@ class ConsumptionRepository @Inject constructor(
 
     /**
      * Obtiene todos los registros de consumo ordenados por fecha descendente.
-     * 
+     *
      * Recupera todas las mediciones de combustible y las convierte al modelo
      * Consumption para análisis y visualización de consumo histórico.
-     * 
+     *
      * @return Flow que emite la lista completa de registros de consumo
      */
     fun getAllConsumptions(): Flow<List<Consumption>> {
@@ -45,26 +45,11 @@ class ConsumptionRepository @Inject constructor(
     }
 
     /**
-     * Obtiene los registros de consumo de un cilindro específico.
-     * 
-     * Filtra las mediciones para mostrar solo aquellas del cilindro indicado,
-     * útil para analizar el patrón de consumo de un cilindro en particular.
-     * 
-     * @param cylinderId ID del cilindro a consultar
-     * @return Flow que emite la lista de registros de consumo del cilindro
-     */
-    fun getConsumptionsByCylinder(cylinderId: Long): Flow<List<Consumption>> {
-        return fuelMeasurementRepository.getMeasurementsByCylinder(cylinderId).map { measurements ->
-            measurements.map { Consumption.fromFuelMeasurement(it) }
-        }
-    }
-
-    /**
      * Obtiene los registros de consumo en un rango de fechas.
-     * 
+     *
      * Filtra las mediciones para mostrar solo aquellas dentro del período
      * especificado, útil para análisis de consumo por períodos.
-     * 
+     *
      * @param startDate Timestamp Unix del inicio del período
      * @param endDate Timestamp Unix del fin del período
      * @return Flow que emite la lista de registros en el rango de fechas
@@ -74,29 +59,6 @@ class ConsumptionRepository @Inject constructor(
             .map { measurements ->
                 measurements.map { Consumption.fromFuelMeasurement(it) }
             }
-    }
-
-    /**
-     * Obtiene los registros de consumo de un cilindro en un rango de fechas.
-     * 
-     * Combina filtros de cilindro y fecha para obtener un subconjunto muy
-     * específico de datos de consumo.
-     * 
-     * @param cylinderId ID del cilindro a consultar
-     * @param startDate Timestamp Unix del inicio del período
-     * @param endDate Timestamp Unix del fin del período
-     * @return Flow que emite la lista de registros filtrados por cilindro y fechas
-     */
-    fun getConsumptionsByCylinderAndDateRange(
-        cylinderId: Long,
-        startDate: Long,
-        endDate: Long
-    ): Flow<List<Consumption>> {
-        return fuelMeasurementRepository.getMeasurementsByCylinderAndTimeRange(
-            cylinderId, startDate, endDate
-        ).map { measurements ->
-            measurements.map { Consumption.fromFuelMeasurement(it) }
-        }
     }
 
 }

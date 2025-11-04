@@ -21,7 +21,6 @@ class BleRepository @Inject constructor(
 ) {
     // Scan
     val scanResults: StateFlow<List<BleDevice>> = bleDeviceScanner.scanResults
-    val isScanning: StateFlow<Boolean> = bleDeviceScanner.isScanning
 
     // Connection state
     val connectionState: StateFlow<Boolean> = camperGasBleService.connectionState
@@ -30,8 +29,6 @@ class BleRepository @Inject constructor(
     val fuelMeasurementData = camperGasBleService.fuelMeasurementData
     val fuelData = camperGasBleService.fuelData
     val inclinationData = camperGasBleService.inclinationData
-    val historyData = camperGasBleService.historyData
-    val isLoadingHistory = camperGasBleService.isLoadingHistory
 
     // Preferences
     val lastConnectedDeviceAddress: Flow<String> = preferencesDataStore.lastConnectedDeviceAddress
@@ -39,21 +36,6 @@ class BleRepository @Inject constructor(
     val inclinationReadInterval: Flow<Long> = preferencesDataStore.inclinationReadInterval
 
     fun isBluetoothEnabled(): Boolean = bleManager.isBluetoothEnabled()
-
-    /**
-     * Verifies if se tienen todos los permisos necesarios for operaciones BLE
-     */
-    fun hasAllBluetoothPermissions(): Boolean = bleManager.hasAllBluetoothPermissions()
-
-    /**
-     * Verifies if se tienen permisos for escanear devices BLE
-     */
-    fun hasBluetoothScanPermission(): Boolean = bleManager.hasBluetoothScanPermission()
-
-    /**
-     * Verifies if se tienen permisos for conectar devices BLE
-     */
-    fun hasBluetoothConnectPermission(): Boolean = bleManager.hasBluetoothConnectPermission()
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun startScan() = bleDeviceScanner.startScan()
@@ -67,8 +49,6 @@ class BleRepository @Inject constructor(
     fun disconnectSensor() = camperGasBleService.disconnect()
 
     fun isConnected(): Boolean = camperGasBleService.isConnected()
-
-    fun ensureOfflineDataReading() = camperGasBleService.ensureOfflineDataReading()
 
     /**
      * Solicita lectura of data of weight bajo demanda

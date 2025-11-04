@@ -86,7 +86,7 @@ class InclinationViewModel @Inject constructor(
         val rollRad = Math.toRadians(state.inclinationRoll.toDouble())
 
         // Calculate elevations based on configured distances
-        val rearWheelDistance = state.distanceBetweenRearWheels 
+        val rearWheelDistance = state.distanceBetweenRearWheels
 
         // For roll (side tilt)
         val rearLeftElevationRoll = rearWheelDistance * tan(rollRad)

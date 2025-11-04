@@ -77,7 +77,10 @@ fun CaravanConfigScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ble_back_button))
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.ble_back_button)
+                )
             }
             Text(
                 text = stringResource(R.string.caravan_config_title),

@@ -308,7 +308,11 @@ fun WeightScreen(
                                         )
                                     }
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(if (isRequestingData) stringResource(R.string.weight_requesting) else stringResource(R.string.weight_update_weight))
+                                    Text(
+                                        if (isRequestingData) stringResource(R.string.weight_requesting) else stringResource(
+                                            R.string.weight_update_weight
+                                        )
+                                    )
                                 }
                             }
 
@@ -414,7 +418,11 @@ fun WeightScreen(
                                 )
                             }
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(if (isRequestingData) stringResource(R.string.weight_requesting) else stringResource(R.string.weight_request_data))
+                            Text(
+                                if (isRequestingData) stringResource(R.string.weight_requesting) else stringResource(
+                                    R.string.weight_request_data
+                                )
+                            )
                         }
 
                         if (!viewModel.isConnected()) {

@@ -1,7 +1,6 @@
 package com.example.campergas.domain.usecase
 
 import com.example.campergas.data.repository.GasCylinderRepository
-import com.example.campergas.domain.model.GasCylinder
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

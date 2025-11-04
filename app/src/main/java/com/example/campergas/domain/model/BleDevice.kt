@@ -2,16 +2,16 @@ package com.example.campergas.domain.model
 
 /**
  * Modelo de dominio que representa un dispositivo Bluetooth Low Energy (BLE).
- * 
+ *
  * Esta clase de datos encapsula toda la información relevante de un dispositivo BLE
  * descubierto durante el escaneo, incluyendo su identificación, estado de conexión,
  * servicios disponibles y calidad de señal.
- * 
+ *
  * Proporciona propiedades calculadas para:
  * - Evaluar la calidad de la señal (excelente, buena, regular, débil)
  * - Verificar compatibilidad con sensores CamperGas
  * - Identificar el tipo de dispositivo basado en su nombre y servicios
- * 
+ *
  * @property name Nombre visible del dispositivo BLE
  * @property address Dirección MAC única del dispositivo
  * @property rssi Indicador de intensidad de señal recibida (en dBm, valores negativos)
@@ -32,7 +32,7 @@ data class BleDevice(
 ) {
     /**
      * Calidad de la señal interpretada en forma legible.
-     * 
+     *
      * Clasifica la intensidad de señal RSSI en cuatro categorías:
      * - "Excelente": RSSI >= -50 dBm (señal muy fuerte, dispositivo muy cerca)
      * - "Buena": RSSI >= -70 dBm (señal fuerte, dispositivo cerca)
@@ -49,29 +49,18 @@ data class BleDevice(
 
     /**
      * Verifica si este dispositivo es compatible con CamperGas.
-     * 
+     *
      * Un dispositivo es compatible si anuncia alguno de los UUIDs de servicio
      * definidos como compatibles con el sistema CamperGas.
-     * 
+     *
      * @return true si el dispositivo es compatible con CamperGas, false en caso contrario
      */
     val isCompatibleWithCamperGas: Boolean
         get() = CamperGasUuids.isCompatibleDevice(services)
 
     /**
-     * Indica si el dispositivo tiene el servicio principal de sensores CamperGas.
-     * 
-     * Verifica si entre los servicios anunciados se encuentra el servicio UUID
-     * específico del sensor CamperGas para mediciones de peso e inclinación.
-     * 
-     * @return true si tiene el servicio de sensor CamperGas, false en caso contrario
-     */
-    val hasCamperGasService: Boolean
-        get() = services.any { CamperGasUuids.isSensorService(it) }
-
-    /**
      * Obtiene el tipo de dispositivo basado en su nombre y compatibilidad.
-     * 
+     *
      * Clasifica el dispositivo analizando su nombre y servicios en las siguientes categorías:
      * - "Sensor CamperGas": Dispositivo con nombre que incluye "CamperGas"
      * - "Sensor de Peso": Dispositivo especializado en medición de peso
