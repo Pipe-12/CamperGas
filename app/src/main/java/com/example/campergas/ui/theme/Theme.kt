@@ -64,26 +64,39 @@ private val LightColorScheme = lightColorScheme(
 /**
  * Main theme composable for the CamperGas application.
  *
- * Applies Material 3 theming with dark mode and optional dynamic colors (Android 12+).
- * The application uses only dark theme for a consistent visual experience.
+ * Applies Material 3 theming with support for light, dark, and system theme modes.
+ * Supports optional dynamic colors on Android 12+.
  *
- * @param themeMode Theme mode (always DARK)
+ * @param themeMode Theme mode (LIGHT, DARK, or SYSTEM)
  * @param dynamicColor Whether to use dynamic colors on Android 12+, defaults to true
  * @param content The composable content to apply the theme to
  */
 @Composable
 fun CamperGasTheme(
-    themeMode: ThemeMode = ThemeMode.DARK,
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val context = LocalContext.current
+    
+    // Determine if we should use dark theme
+    val isDarkTheme = when (themeMode) {
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> androidx.compose.foundation.isSystemInDarkTheme()
+    }
+    
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            dynamicDarkColorScheme(context)
+            if (isDarkTheme) {
+                dynamicDarkColorScheme(context)
+            } else {
+                dynamicLightColorScheme(context)
+            }
         }
-        else -> DarkColorScheme
+        isDarkTheme -> DarkColorScheme
+        else -> LightColorScheme
     }
 
     MaterialTheme(

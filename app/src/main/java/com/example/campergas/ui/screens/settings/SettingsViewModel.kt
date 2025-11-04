@@ -69,12 +69,13 @@ class SettingsViewModel @Inject constructor(
     private fun loadSettings() {
         viewModelScope.launch {
             combine(
+                preferencesDataStore.themeMode,
                 preferencesDataStore.language,
                 preferencesDataStore.areNotificationsEnabled,
                 preferencesDataStore.gasLevelThreshold
-            ) { language, notificationsEnabled, gasLevelThreshold ->
+            ) { themeMode, language, notificationsEnabled, gasLevelThreshold ->
                 SettingsUiState(
-                    themeMode = ThemeMode.DARK,
+                    themeMode = themeMode,
                     language = language,
                     notificationsEnabled = notificationsEnabled,
                     gasLevelThreshold = gasLevelThreshold
@@ -82,6 +83,12 @@ class SettingsViewModel @Inject constructor(
             }.collect { settings ->
                 _uiState.value = settings
             }
+        }
+    }
+
+    fun setThemeMode(themeMode: ThemeMode) {
+        viewModelScope.launch {
+            preferencesDataStore.setThemeMode(themeMode)
         }
     }
 
@@ -145,7 +152,7 @@ class SettingsViewModel @Inject constructor(
 }
 
 data class SettingsUiState(
-    val themeMode: ThemeMode = ThemeMode.DARK,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val language: Language = Language.SYSTEM,
     val notificationsEnabled: Boolean = true,
     val gasLevelThreshold: Float = 15.0f,
