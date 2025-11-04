@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -29,6 +30,7 @@ class PreferencesDataStore @Inject constructor(
 ) {
     private val lastConnectedDeviceKey = stringPreferencesKey("last_connected_device")
     private val themeModeKey = stringPreferencesKey("theme_mode")
+    private val appLanguageKey = stringPreferencesKey("app_language")
     private val notificationsEnabledKey = booleanPreferencesKey("notifications_enabled")
     private val gasLevelThresholdKey = floatPreferencesKey("gas_level_threshold")
     private val weightReadIntervalKey = longPreferencesKey("weight_read_interval")
@@ -56,6 +58,21 @@ class PreferencesDataStore @Inject constructor(
                 ThemeMode.valueOf(themeModeString)
             } catch (e: IllegalArgumentException) {
                 ThemeMode.SYSTEM
+            }
+        }
+
+    /**
+     * Flow of the current application language.
+     *
+     * @return Flow emitting AppLanguage, defaults to SPANISH if not set
+     */
+    val appLanguage: Flow<AppLanguage> = context.dataStore.data
+        .map { preferences ->
+            val languageString = preferences[appLanguageKey] ?: AppLanguage.SPANISH.name
+            try {
+                AppLanguage.valueOf(languageString)
+            } catch (e: IllegalArgumentException) {
+                AppLanguage.SPANISH
             }
         }
 
@@ -118,6 +135,17 @@ class PreferencesDataStore @Inject constructor(
     suspend fun setThemeMode(themeMode: ThemeMode) {
         context.dataStore.edit { preferences ->
             preferences[themeModeKey] = themeMode.name
+        }
+    }
+
+    /**
+     * Sets the application language.
+     *
+     * @param language The language to set (SPANISH, ENGLISH, or CATALAN)
+     */
+    suspend fun setAppLanguage(language: AppLanguage) {
+        context.dataStore.edit { preferences ->
+            preferences[appLanguageKey] = language.name
         }
     }
 

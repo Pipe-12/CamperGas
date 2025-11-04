@@ -37,6 +37,11 @@
     <string name="theme_mode_dark">Oscuro</string>
     <string name="theme_mode_system">Sistema</string>
 
+    <!-- Language settings -->
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_description">Selecciona el idioma de la aplicación</string>
+    <string name="settings_language_current">Idioma actual: %s</string>
+
     <!-- Common -->
     <string name="save">Guardar</string>
     <string name="save_threshold">Guardar umbral</string>
