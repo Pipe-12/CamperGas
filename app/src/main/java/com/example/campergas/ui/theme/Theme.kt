@@ -57,7 +57,7 @@ private val LightColorScheme = lightColorScheme(
     onSecondaryContainer = CamperGreenDark,
     tertiaryContainer = Color(0xFFFFF3E0),
     onTertiaryContainer = CamperOrangeDark,
-    surfaceVariant = Color(0xFFEEEEE),
+    surfaceVariant = Color(0xFFEEEEEE),
     onSurfaceVariant = Color(0xFF5F5F5F)
 )
 
