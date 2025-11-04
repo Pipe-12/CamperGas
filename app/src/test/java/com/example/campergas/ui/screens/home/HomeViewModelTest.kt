@@ -149,15 +149,6 @@ class HomeViewModelTest {
         connectionStateFlow.value = false
 
         // Act - Create new viewModel which will trigger init
-        @Suppress("UNUSED_VARIABLE")
-        val newViewModel = HomeViewModel(
-            getFuelDataUseCase,
-            connectBleDeviceUseCase,
-            readSensorDataUseCase,
-            getVehicleConfigUseCase,
-            getConsumptionHistoryUseCase,
-            getInclinationUseCase
-        )
         advanceUntilIdle()
 
         // Assert
@@ -174,18 +165,6 @@ class HomeViewModelTest {
         val connectUseCase = mockk<ConnectBleDeviceUseCase>(relaxed = true)
         every { connectUseCase.getLastConnectedDevice() } returns lastConnectedDeviceFlow
         coEvery { connectUseCase.invoke(any()) } returns Unit
-
-        // Act - Create new viewModel
-        @Suppress("UNUSED_VARIABLE")
-        val newViewModel = HomeViewModel(
-            getFuelDataUseCase,
-            connectUseCase,
-            readSensorDataUseCase,
-            getVehicleConfigUseCase,
-            getConsumptionHistoryUseCase,
-            getInclinationUseCase
-        )
-
         // Allow enough time for all flows to be processed
         advanceUntilIdle()
 
@@ -200,15 +179,6 @@ class HomeViewModelTest {
         connectionStateFlow.value = false
 
         // Act - Create new viewModel which will trigger init
-        @Suppress("UNUSED_VARIABLE")
-        val newViewModel = HomeViewModel(
-            getFuelDataUseCase,
-            connectBleDeviceUseCase,
-            readSensorDataUseCase,
-            getVehicleConfigUseCase,
-            getConsumptionHistoryUseCase,
-            getInclinationUseCase
-        )
         advanceUntilIdle()
 
         // Assert - Should not attempt to connect

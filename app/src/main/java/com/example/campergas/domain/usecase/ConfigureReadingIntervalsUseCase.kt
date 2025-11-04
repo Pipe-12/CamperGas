@@ -75,27 +75,6 @@ class ConfigureReadingIntervalsUseCase @Inject constructor(
     }
 
     /**
-     * Configura ambos intervalos (peso e inclinación) simultáneamente.
-     *
-     * Establece los intervalos de lectura para peso e inclinación en una sola
-     * operación. Es más eficiente que llamar a setWeightReadInterval y
-     * setInclinationReadInterval por separado.
-     *
-     * Esta función debe llamarse desde una coroutine o función suspend.
-     *
-     * @param weightIntervalSeconds Intervalo en segundos entre lecturas de peso
-     * @param inclinationIntervalSeconds Intervalo en segundos entre lecturas de inclinación
-     */
-    suspend fun setReadingIntervals(weightIntervalSeconds: Int, inclinationIntervalSeconds: Int) {
-        val weightIntervalMs = weightIntervalSeconds * 1000L
-        val inclinationIntervalMs = inclinationIntervalSeconds * 1000L
-
-        bleRepository.saveWeightReadInterval(weightIntervalMs)
-        bleRepository.saveInclinationReadInterval(inclinationIntervalMs)
-        bleRepository.configureReadingIntervals(weightIntervalMs, inclinationIntervalMs)
-    }
-
-    /**
      * Obtiene el intervalo actual de lectura de peso en segundos.
      *
      * Retorna un Flow que emite el intervalo configurado en segundos y se

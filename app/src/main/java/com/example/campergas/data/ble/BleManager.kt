@@ -110,15 +110,4 @@ class BleManager @Inject constructor(
     }
 
 
-    /**
-     * Verifica si tenemos todos los permisos necesarios para operaciones BLE.
-     *
-     * Comprueba tanto el permiso de conexión como el permiso de escaneo,
-     * que son los dos permisos fundamentales para la funcionalidad BLE completa.
-     *
-     * @return true si tenemos todos los permisos BLE necesarios, false en caso contrario
-     */
-    fun hasAllBluetoothPermissions(): Boolean {
-        return hasBluetoothConnectPermission() && hasBluetoothScanPermission()
-    }
 }

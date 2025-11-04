@@ -260,7 +260,7 @@ class SaveFuelMeasurementUseCase @Inject constructor(
                 // Remove outlier measurement
                 fuelMeasurementRepository.deleteMeasurementById(outlier.id)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // If any error occurs in outlier detection, do not affect main flow
             // Solo registrar silenciosamente el error
         }

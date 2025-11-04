@@ -46,18 +46,6 @@ class FuelMeasurementRepository @Inject constructor(
     }
 
     /**
-     * Obtiene las mediciones de un cilindro específico.
-     *
-     * @param cylinderId ID del cilindro a consultar
-     * @return Flow que emite la lista de mediciones del cilindro
-     */
-    fun getMeasurementsByCylinder(cylinderId: Long): Flow<List<FuelMeasurement>> {
-        return fuelMeasurementDao.getMeasurementsByCylinder(cylinderId).map { entities ->
-            entities.map { it.toDomainModel() }
-        }
-    }
-
-    /**
      * Obtiene la medición en tiempo real más reciente.
      *
      * Solo devuelve mediciones marcadas como isHistorical = false.
@@ -79,30 +67,6 @@ class FuelMeasurementRepository @Inject constructor(
      */
     fun getMeasurementsByTimeRange(startTime: Long, endTime: Long): Flow<List<FuelMeasurement>> {
         return fuelMeasurementDao.getMeasurementsByTimeRange(startTime, endTime).map { entities ->
-            entities.map { it.toDomainModel() }
-        }
-    }
-
-    /**
-     * Obtiene mediciones de un cilindro en un rango de tiempo.
-     *
-     * Combina filtros de cilindro y tiempo para consultas específicas.
-     *
-     * @param cylinderId ID del cilindro a consultar
-     * @param startTime Timestamp Unix del inicio del período
-     * @param endTime Timestamp Unix del fin del período
-     * @return Flow que emite la lista de mediciones filtradas
-     */
-    fun getMeasurementsByCylinderAndTimeRange(
-        cylinderId: Long,
-        startTime: Long,
-        endTime: Long
-    ): Flow<List<FuelMeasurement>> {
-        return fuelMeasurementDao.getMeasurementsByCylinderAndTimeRange(
-            cylinderId,
-            startTime,
-            endTime
-        ).map { entities ->
             entities.map { it.toDomainModel() }
         }
     }

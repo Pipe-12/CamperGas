@@ -74,11 +74,9 @@ class CamperGasBleService @Inject constructor(
 
     // Historical data
     private val _historyData = MutableStateFlow<List<FuelMeasurement>>(emptyList())
-    val historyData: StateFlow<List<FuelMeasurement>> = _historyData
 
     // Historical data loading state
     private val _isLoadingHistory = MutableStateFlow(false)
-    val isLoadingHistory: StateFlow<Boolean> = _isLoadingHistory
 
     // Control for lectura continua of data offline
     private var isReadingOfflineData = false
@@ -1085,20 +1083,6 @@ class CamperGasBleService @Inject constructor(
     }
 
     fun isConnected(): Boolean = _connectionState.value
-
-    /**
-     * Forces verification and reading of offline data if there is active connection
-     */
-    fun ensureOfflineDataReading() {
-        if (isConnected() && !isReadingOfflineData) {
-            Log.d(TAG, "🔍 Verificando y forzando lectura of data offline...")
-            startAutomaticOfflineDataReading()
-        } else if (isReadingOfflineData) {
-            Log.d(TAG, "ℹ️ Lectura of data offline ya en progreso")
-        } else {
-            Log.w(TAG, "⚠️ No connection activa for leer data offline")
-        }
-    }
 
     /**
      * Calculates real timestamp of a measurement based on how many milliseconds have passed

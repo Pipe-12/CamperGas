@@ -106,7 +106,7 @@ class HomeViewModel @Inject constructor(
                             getConsumptionHistoryUseCase.calculateTotalConsumption(dayConsumptions)
                         _lastDayConsumption.value = dayTotal
                     }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Silently handle summary loading errors
             }
         }
@@ -119,7 +119,7 @@ class HomeViewModel @Inject constructor(
                             getConsumptionHistoryUseCase.calculateTotalConsumption(weekConsumptions)
                         _lastWeekConsumption.value = weekTotal
                     }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Silently handle summary loading errors
             }
         }

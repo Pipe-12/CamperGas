@@ -74,16 +74,4 @@ object CamperGasUuids {
         }
     }
 
-    /**
-     * Verifica si un UUID corresponde al servicio principal de sensores CamperGas.
-     *
-     * Compara el UUID proporcionado con el UUID del servicio principal del sensor,
-     * ignorando diferencias de mayúsculas/minúsculas para mayor robustez.
-     *
-     * @param uuid UUID del servicio a verificar
-     * @return true si es el servicio principal de CamperGas, false en caso contrario
-     */
-    fun isSensorService(uuid: String): Boolean {
-        return uuid.equals(SENSOR_SERVICE_UUID, ignoreCase = true)
-    }
 }
