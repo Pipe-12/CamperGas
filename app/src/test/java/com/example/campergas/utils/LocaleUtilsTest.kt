@@ -14,7 +14,6 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import java.util.Locale
 
 class LocaleUtilsTest {
@@ -53,7 +52,7 @@ class LocaleUtilsTest {
     }
     
     @Test
-    fun `setLocale creates context with correct locale for Spanish`() {
+    fun `setLocale always creates context with Spanish locale`() {
         // Given
         val language = Language.SPANISH
         every { context.createConfigurationContext(any()) } returns context
@@ -70,56 +69,7 @@ class LocaleUtilsTest {
     }
     
     @Test
-    fun `setLocale creates context with correct locale for English`() {
-        // Given
-        val language = Language.ENGLISH
-        every { context.createConfigurationContext(any()) } returns context
-        
-        // When
-        LocaleUtils.setLocale(context, language)
-        
-        // Then
-        val configSlot = slot<Configuration>()
-        verify { context.createConfigurationContext(capture(configSlot)) }
-        val capturedLocale = getLocaleFromConfig(configSlot.captured)
-        assertEquals("en", capturedLocale.language)
-    }
-    
-    @Test
-    fun `setLocale creates context with correct locale for Catalan`() {
-        // Given
-        val language = Language.CATALAN
-        every { context.createConfigurationContext(any()) } returns context
-        
-        // When
-        LocaleUtils.setLocale(context, language)
-        
-        // Then
-        val configSlot = slot<Configuration>()
-        verify { context.createConfigurationContext(capture(configSlot)) }
-        val capturedLocale = getLocaleFromConfig(configSlot.captured)
-        assertEquals("ca", capturedLocale.language)
-    }
-    
-    @Test
-    fun `setLocale creates context with system locale for SYSTEM language`() {
-        // Given
-        val language = Language.SYSTEM
-        every { context.createConfigurationContext(any()) } returns context
-        
-        // When
-        LocaleUtils.setLocale(context, language)
-        
-        // Then
-        val configSlot = slot<Configuration>()
-        verify { context.createConfigurationContext(capture(configSlot)) }
-        val capturedLocale = getLocaleFromConfig(configSlot.captured)
-        // Just verify a locale was set (could be any system locale)
-        assertTrue("Locale should be set", capturedLocale != null)
-    }
-    
-    @Test
-    fun `applyLocaleToActivity recreates activity for Spanish`() {
+    fun `applyLocaleToActivity recreates activity and sets Spanish locale`() {
         // Given
         val language = Language.SPANISH
         
@@ -147,10 +97,7 @@ class LocaleUtilsTest {
     }
     
     @Test
-    fun `getCurrentLanguageFromLocale returns correct language for Spanish locale`() {
-        // Given - Set default locale to Spanish
-        Locale.setDefault(Locale.forLanguageTag("es"))
-        
+    fun `getCurrentLanguageFromLocale always returns Spanish`() {
         // When
         val result = LocaleUtils.getCurrentLanguageFromLocale()
         
@@ -159,58 +106,14 @@ class LocaleUtilsTest {
     }
     
     @Test
-    fun `getCurrentLanguageFromLocale returns correct language for English locale`() {
-        // Given - Set default locale to English
+    fun `getCurrentLanguageFromLocale returns Spanish regardless of system locale`() {
+        // Given - Set default locale to something else
         Locale.setDefault(Locale.forLanguageTag("en"))
         
         // When
         val result = LocaleUtils.getCurrentLanguageFromLocale()
         
-        // Then
-        assertEquals(Language.ENGLISH, result)
-    }
-    
-    @Test
-    fun `getCurrentLanguageFromLocale returns correct language for Catalan locale`() {
-        // Given - Set default locale to Catalan
-        Locale.setDefault(Locale.forLanguageTag("ca"))
-        
-        // When
-        val result = LocaleUtils.getCurrentLanguageFromLocale()
-        
-        // Then
-        assertEquals(Language.CATALAN, result)
-    }
-    
-    @Test
-    fun `getCurrentLanguageFromLocale returns SYSTEM for unknown locale`() {
-        // Given - Set default locale to something not supported
-        Locale.setDefault(Locale.forLanguageTag("fr"))
-        
-        // When
-        val result = LocaleUtils.getCurrentLanguageFromLocale()
-        
-        // Then
-        assertEquals(Language.SYSTEM, result)
-    }
-    
-    @Test
-    fun `language persistence works correctly after activity recreation`() {
-        // Given - A specific language is set
-        val targetLanguage = Language.ENGLISH
-        LocaleUtils.resetLastAppliedLanguage()
-        
-        // When - Apply locale to activity
-        LocaleUtils.applyLocaleToActivity(activity, targetLanguage)
-        
-        // Then - Verify activity is recreated and locale is set correctly
-        verify(exactly = 1) { activity.recreate() }
-        assertEquals("en", Locale.getDefault().language)
-        
-        // When - Try to apply the same language again (simulating activity recreation)
-        LocaleUtils.applyLocaleToActivity(activity, targetLanguage)
-        
-        // Then - Activity should not be recreated again (prevents infinite loop)
-        verify(exactly = 1) { activity.recreate() } 
+        // Then - Still returns Spanish as it's the only supported language
+        assertEquals(Language.SPANISH, result)
     }
 }

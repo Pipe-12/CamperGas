@@ -59,12 +59,11 @@ class PreferencesDataStore @Inject constructor(
     /**
      * Flow of the selected application language.
      *
-     * @return Flow emitting Language, defaults to SYSTEM if not set
+     * @return Flow emitting Language, always returns SPANISH
      */
     val language: Flow<Language> = context.dataStore.data
-        .map { preferences ->
-            val languageCode = preferences[languageKey] ?: Language.SYSTEM.code
-            Language.entries.find { it.code == languageCode } ?: Language.SYSTEM
+        .map { _ ->
+            Language.SPANISH
         }
 
     /**
@@ -130,13 +129,12 @@ class PreferencesDataStore @Inject constructor(
 
     /**
      * Sets the application language.
+     * Note: Application only supports Spanish, this method is kept for API compatibility.
      *
-     * @param language The language to use
+     * @param language The language to use (always SPANISH)
      */
     suspend fun setLanguage(language: Language) {
-        context.dataStore.edit { preferences ->
-            preferences[languageKey] = language.code
-        }
+        // No-op: application only uses Spanish
     }
 
     /**

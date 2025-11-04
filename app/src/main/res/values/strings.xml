@@ -220,4 +220,10 @@
     <!-- Content Descriptions -->
     <string name="clear_filters_description">Limpiar filtros</string>
     <string name="start_date_label">Fecha inicio</string>
+    
+    <!-- Settings Screen - Additional -->
+    <string name="settings_apply_weight_interval">Aplicar Intervalo de Peso</string>
+    <string name="settings_apply_inclination_interval">Aplicar Intervalo de Inclinación</string>
+    <string name="settings_weight_interval_label">Intervalo (minutos)</string>
+    <string name="settings_inclination_interval_label">Intervalo (segundos)</string>
 </resources>

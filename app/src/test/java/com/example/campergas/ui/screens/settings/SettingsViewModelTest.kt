@@ -46,7 +46,7 @@ class SettingsViewModelTest {
 
     // Flows to simulate preferences
     private val themeModeFlow = MutableStateFlow(ThemeMode.DARK)
-    private val languageFlow = MutableStateFlow(Language.SYSTEM)
+    private val languageFlow = MutableStateFlow(Language.SPANISH)
     private val notificationsEnabledFlow = MutableStateFlow(true)
     private val gasLevelThresholdFlow = MutableStateFlow(15.0f)
     private val weightIntervalFlow = MutableStateFlow(60) // 60 seconds = 1 minute
@@ -105,7 +105,7 @@ class SettingsViewModelTest {
         // Assert
         val state = viewModel.uiState.value
         assertEquals(ThemeMode.DARK, state.themeMode)
-        assertEquals(Language.SYSTEM, state.language)
+        assertEquals(Language.SPANISH, state.language)
         assertTrue(state.notificationsEnabled)
         assertEquals(15.0f, state.gasLevelThreshold, 0.01f)
         assertFalse(state.isLoading)
@@ -123,15 +123,14 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `setLanguage updates preferences`() = runTest {
+    fun `setLanguage always uses Spanish`() = runTest {
         // Act
-        viewModel.setLanguage(Language.ENGLISH)
+        viewModel.setLanguage(Language.SPANISH)
         advanceUntilIdle()
 
-        // Assert
-        coVerify { preferencesDataStore.setLanguage(Language.ENGLISH) }
-        assertEquals(Language.ENGLISH, languageFlow.value)
-        assertEquals(Language.ENGLISH, viewModel.uiState.value.language)
+        // Assert - Language is always Spanish
+        coVerify { preferencesDataStore.setLanguage(Language.SPANISH) }
+        assertEquals(Language.SPANISH, viewModel.uiState.value.language)
     }
 
     @Test

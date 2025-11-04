@@ -36,7 +36,7 @@ import javax.inject.Inject
  * 
  * Esta actividad es el punto de entrada de la interfaz de usuario y gestiona:
  * - La configuración del tema (modo oscuro únicamente)
- * - La internacionalización (idioma del sistema o seleccionado)
+ * - La configuración de idioma (español únicamente)
  * - Los permisos de Bluetooth necesarios para la conexión BLE
  * - La navegación entre pantallas mediante Jetpack Compose Navigation
  * - El estilo edge-to-edge para las barras del sistema
@@ -70,30 +70,19 @@ class MainActivity : ComponentActivity() {
     private lateinit var bluetoothPermissionManager: BluetoothPermissionManager
 
     /**
-     * Adjunta el contexto base con la configuración de idioma aplicada.
+     * Adjunta el contexto base con la configuración de idioma en español.
      * 
-     * Este método se llama antes de onCreate y permite aplicar el idioma guardado
-     * en las preferencias del usuario al contexto de la actividad. Esto asegura
-     * que la aplicación muestre el idioma correcto incluso después de recreaciones
-     * de la actividad (como cambios de configuración o rotación de pantalla).
+     * Este método se llama antes de onCreate y establece el idioma español
+     * para la aplicación.
      * 
      * @param newBase El contexto base proporcionado por el sistema
      */
     override fun attachBaseContext(newBase: Context?) {
         val context = newBase ?: return super.attachBaseContext(newBase)
         
-        // Apply the saved locale setting to preserve user's language choice
-        // This ensures language persists across activity recreation (e.g., language changes)
+        // Set locale to Spanish
         try {
-            // Create temporary preferences data store to get saved language
-            val tempPreferences = PreferencesDataStore(context)
-            val savedLanguage = try {
-                runBlocking { tempPreferences.language.first() }
-            } catch (_: Exception) {
-                Language.SYSTEM // Fallback to system if loading fails
-            }
-            
-            val wrappedContext = LocaleUtils.setLocale(context, savedLanguage)
+            val wrappedContext = LocaleUtils.setLocale(context, Language.SPANISH)
             super.attachBaseContext(wrappedContext)
         } catch (_: Exception) {
             // Fallback to original context if locale setting fails
@@ -133,18 +122,6 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            val language by preferencesDataStore.language.collectAsState(initial = Language.SYSTEM)
-
-            // Apply locale changes when language preference changes
-            LaunchedEffect(language) {
-                // Only apply locale if it's different from current system locale
-                // This prevents recreation on initial load when no change is needed
-                val currentLanguage = LocaleUtils.getCurrentLanguageFromLocale()
-                if (language != Language.SYSTEM && language != currentLanguage) {
-                    LocaleUtils.applyLocaleToActivity(this@MainActivity, language)
-                }
-            }
-
             CamperGasTheme(themeMode = ThemeMode.DARK) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),

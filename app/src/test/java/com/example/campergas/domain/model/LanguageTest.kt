@@ -7,27 +7,15 @@ class LanguageTest {
 
     @Test
     fun `Language enum has correct values`() {
-        // Assert all languages exist with correct codes and display names
+        // Assert Spanish language exists with correct code and display name
         assertEquals("es", Language.SPANISH.code)
         assertEquals("Español", Language.SPANISH.displayName)
-
-        assertEquals("en", Language.ENGLISH.code)
-        assertEquals("English", Language.ENGLISH.displayName)
-
-        assertEquals("ca", Language.CATALAN.code)
-        assertEquals("Català", Language.CATALAN.displayName)
-
-        assertEquals("system", Language.SYSTEM.code)
-        assertEquals("Sistema", Language.SYSTEM.displayName)
     }
 
     @Test
-    fun `Language enum has all expected values`() {
+    fun `Language enum has only Spanish language`() {
         val expectedLanguages = setOf(
-            Language.SPANISH,
-            Language.ENGLISH,
-            Language.CATALAN,
-            Language.SYSTEM
+            Language.SPANISH
         )
         
         val actualLanguages = Language.entries.toSet()
@@ -36,6 +24,6 @@ class LanguageTest {
 
     @Test
     fun `Language enum entries count is correct`() {
-        assertEquals(4, Language.entries.size)
+        assertEquals(1, Language.entries.size)
     }
 }

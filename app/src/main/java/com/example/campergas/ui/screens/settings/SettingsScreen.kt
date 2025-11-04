@@ -139,67 +139,6 @@ fun SettingsScreen(
             }
         }
 
-        // Language configuration
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.settings_language),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                var expanded by remember { mutableStateOf(false) }
-
-                Box {
-                    OutlinedTextField(
-                        value = when (uiState.language) {
-                            Language.SPANISH -> stringResource(R.string.language_spanish)
-                            Language.ENGLISH -> stringResource(R.string.language_english)
-                            Language.CATALAN -> stringResource(R.string.language_catalan)
-                            Language.SYSTEM -> stringResource(R.string.language_system)
-                        },
-                        onValueChange = { },
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.settings_language_description)) },
-                        trailingIcon = {
-                            IconButton(onClick = { expanded = !expanded }) {
-                                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        Language.entries.forEach { language ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        when (language) {
-                                            Language.SPANISH -> stringResource(R.string.language_spanish)
-                                            Language.ENGLISH -> stringResource(R.string.language_english)
-                                            Language.CATALAN -> stringResource(R.string.language_catalan)
-                                            Language.SYSTEM -> stringResource(R.string.language_system)
-                                        }
-                                    )
-                                },
-                                onClick = {
-                                    viewModel.setLanguage(language)
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
         // Notifications configuration
         Card(
             modifier = Modifier.fillMaxWidth()
@@ -296,7 +235,7 @@ fun SettingsScreen(
                     onValueChange = { newValue ->
                         weightIntervalText = newValue
                     },
-                    label = { Text("Intervalo (minutos)") },
+                    label = { Text(stringResource(R.string.settings_weight_interval_label)) },
                     suffix = { Text(stringResource(R.string.unit_minutes)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
@@ -315,7 +254,7 @@ fun SettingsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = weightIntervalText.toIntOrNull()?.let { it in 1..60 } == true
                 ) {
-                    Text("Aplicar Intervalo de Peso")
+                    Text(stringResource(R.string.settings_apply_weight_interval))
                 }
 
                 Text(
@@ -354,7 +293,7 @@ fun SettingsScreen(
                     onValueChange = { newValue ->
                         inclinationIntervalText = newValue
                     },
-                    label = { Text("Intervalo (segundos)") },
+                    label = { Text(stringResource(R.string.settings_inclination_interval_label)) },
                     suffix = { Text(stringResource(R.string.unit_seconds)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
@@ -373,7 +312,7 @@ fun SettingsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = inclinationIntervalText.toIntOrNull()?.let { it in 1..300 } == true
                 ) {
-                    Text("Apply Inclination Interval")
+                    Text(stringResource(R.string.settings_apply_inclination_interval))
                 }
 
                 Text(

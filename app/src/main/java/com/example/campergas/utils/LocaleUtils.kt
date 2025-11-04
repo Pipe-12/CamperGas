@@ -11,12 +11,8 @@ object LocaleUtils {
     private var lastAppliedLanguage: Language? = null
 
     fun setLocale(context: Context, language: Language): Context {
-        val locale = when (language) {
-            Language.SPANISH -> Locale.forLanguageTag("es")
-            Language.ENGLISH -> Locale.forLanguageTag("en")
-            Language.CATALAN -> Locale.forLanguageTag("ca")
-            Language.SYSTEM -> Locale.getDefault()
-        }
+        // Always use Spanish locale
+        val locale = Locale.forLanguageTag("es")
 
         // Set the default locale globally
         Locale.setDefault(locale)
@@ -37,12 +33,8 @@ object LocaleUtils {
             return
         }
 
-        val locale = when (language) {
-            Language.SPANISH -> Locale.forLanguageTag("es")
-            Language.ENGLISH -> Locale.forLanguageTag("en")
-            Language.CATALAN -> Locale.forLanguageTag("ca")
-            Language.SYSTEM -> Locale.getDefault()
-        }
+        // Always use Spanish locale
+        val locale = Locale.forLanguageTag("es")
 
         // Set the default locale globally
         Locale.setDefault(locale)
@@ -63,12 +55,7 @@ object LocaleUtils {
     }
 
     fun getCurrentLanguageFromLocale(): Language {
-        val currentLocale = Locale.getDefault()
-        return when (currentLocale.language) {
-            "es" -> Language.SPANISH
-            "en" -> Language.ENGLISH
-            "ca" -> Language.CATALAN
-            else -> Language.SYSTEM
-        }
+        // Always return Spanish
+        return Language.SPANISH
     }
 }
