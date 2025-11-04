@@ -3,34 +3,34 @@ package com.example.campergas.domain.model
 import java.util.Locale
 
 /**
- * Idioma de la aplicación.
+ * Application language.
  *
- * La aplicación soporta múltiples idiomas que afectan a todos los textos
- * de la interfaz de usuario y mensajes del sistema.
+ * The application supports multiple languages that affect all user interface
+ * texts and system messages.
  *
- * Idiomas disponibles:
- * - SPANISH: Español (castellano)
- * - ENGLISH: Inglés
- * - CATALAN: Catalán
+ * Available languages:
+ * - SPANISH: Spanish (Castilian)
+ * - ENGLISH: English
+ * - CATALAN: Catalan
  *
  * @author Felipe García Gómez
  */
 enum class AppLanguage(val locale: Locale, val displayName: String) {
-    /** Idioma español (castellano) */
+    /** Spanish language (Castilian) */
     SPANISH(Locale.forLanguageTag("es"), "Español"),
 
-    /** Idioma inglés */
+    /** English language */
     ENGLISH(Locale.forLanguageTag("en"), "English"),
 
-    /** Idioma catalán */
+    /** Catalan language */
     CATALAN(Locale.forLanguageTag("ca"), "Català");
 
     companion object {
         /**
-         * Obtiene el idioma desde un código de idioma.
+         * Gets the language from a language code.
          *
-         * @param languageCode Código del idioma (ej: "es", "en", "ca")
-         * @return AppLanguage correspondiente o SPANISH por defecto
+         * @param languageCode Language code (e.g.: "es", "en", "ca")
+         * @return Corresponding AppLanguage or SPANISH by default
          */
         fun fromLanguageCode(languageCode: String): AppLanguage {
             return entries.find { it.locale.language == languageCode } ?: SPANISH

@@ -216,7 +216,7 @@ class MainActivity : ComponentActivity() {
 
         @Suppress("DEPRECATION")
         resources.updateConfiguration(configuration, resources.displayMetrics)
-        
+
         // Recreate activity to apply changes
         recreate()
     }

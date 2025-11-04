@@ -143,7 +143,7 @@ fun SettingsScreen(
             }
         }
 
-        // Configuración de tema de la aplicación
+        // Application theme configuration
         ThemeSelectionCard(
             currentThemeMode = uiState.themeMode,
             onThemeModeSelected = { themeMode ->
@@ -151,7 +151,7 @@ fun SettingsScreen(
             }
         )
 
-        // Configuración de idioma de la aplicación
+        // Application language configuration
         LanguageSelectionCard(
             currentLanguage = uiState.appLanguage,
             onLanguageSelected = { language ->
@@ -509,7 +509,7 @@ private fun LanguageSelectionCard(
     currentLanguage: AppLanguage,
     onLanguageSelected: (AppLanguage) -> Unit
 ) {
-    // Estado para controlar si el menú desplegable está expandido
+    // State to control if the dropdown menu is expanded
     var expanded by remember { mutableStateOf(false) }
 
     Card(
@@ -531,7 +531,7 @@ private fun LanguageSelectionCard(
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
-            // Botón que muestra el idioma actual y abre el menú desplegable
+            // Button that shows the current language and opens the dropdown menu
             Box {
                 Button(
                     onClick = { expanded = true },
@@ -550,12 +550,12 @@ private fun LanguageSelectionCard(
                     }
                 }
 
-                // Menú desplegable con las opciones de idioma
+                // Dropdown menu with language options
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    // Opción de español
+                    // Spanish option
                     DropdownMenuItem(
                         text = { Text(AppLanguage.SPANISH.displayName) },
                         onClick = {
@@ -563,7 +563,7 @@ private fun LanguageSelectionCard(
                             expanded = false
                         }
                     )
-                    // Opción de inglés
+                    // English option
                     DropdownMenuItem(
                         text = { Text(AppLanguage.ENGLISH.displayName) },
                         onClick = {
@@ -571,7 +571,7 @@ private fun LanguageSelectionCard(
                             expanded = false
                         }
                     )
-                    // Opción de catalán
+                    // Catalan option
                     DropdownMenuItem(
                         text = { Text(AppLanguage.CATALAN.displayName) },
                         onClick = {
@@ -582,7 +582,7 @@ private fun LanguageSelectionCard(
                 }
             }
 
-            // Mostrar el estado actual del idioma
+            // Show the current language status
             Text(
                 text = stringResource(R.string.settings_language_current, currentLanguage.displayName),
                 style = MaterialTheme.typography.bodySmall,

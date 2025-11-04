@@ -104,15 +104,15 @@ class SettingsViewModelTest {
     fun `initial state has default values from preferences`() = runTest {
         // Assert
         val state = viewModel.uiState.value
-        assertEquals(ThemeMode.DARK, state.themeMode) // El mock devuelve DARK
-        assertEquals(AppLanguage.SPANISH, state.appLanguage) // El mock devuelve SPANISH
+        assertEquals(ThemeMode.DARK, state.themeMode) // The mock returns DARK
+        assertEquals(AppLanguage.SPANISH, state.appLanguage) // The mock returns SPANISH
         assertTrue(state.notificationsEnabled)
         assertEquals(15.0f, state.gasLevelThreshold, 0.01f)
         assertFalse(state.isLoading)
         assertNull(state.error)
 
-        // Verificar intervalos de peso e inclinación
-        assertEquals(1, viewModel.weightInterval.value) // 60s convertido a 1 min
+        // Verify weight and inclination intervals
+        assertEquals(1, viewModel.weightInterval.value) // 60s converted to 1 min
         assertEquals(15, viewModel.inclinationInterval.value)
     }
 
