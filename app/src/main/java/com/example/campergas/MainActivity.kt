@@ -96,7 +96,9 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            // Cargar el tema guardado desde las preferencias
+            // Cargar el tema guardado desde las preferencias de forma reactiva
+            // Usamos collectAsState para que el tema se actualice automáticamente cuando cambia
+            // El valor inicial es SYSTEM para evitar parpadeos en el primer frame
             val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
             
             // Determinar si se debe usar el tema oscuro para configurar las barras del sistema
