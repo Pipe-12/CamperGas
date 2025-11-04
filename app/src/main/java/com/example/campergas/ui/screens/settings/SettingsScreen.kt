@@ -47,16 +47,16 @@ import com.example.campergas.R
 import com.example.campergas.domain.model.ThemeMode
 
 /**
- * Pantalla de configuración de la aplicación.
+ * Settings screen for application configuration.
  *
- * Proporciona interfaz para gestionar:
- * - Modo de tema (claro, oscuro, sistema)
- * - Preferencias de notificaciones
- * - Intervalos de lectura de sensores BLE
- * - Umbral de combustible bajo
+ * Provides UI for managing:
+ * - Theme mode (light, dark, system)
+ * - Notification preferences
+ * - BLE sensor reading intervals
+ * - Low fuel threshold
  *
- * @param navController Controlador de navegación para la navegación entre pantallas
- * @param viewModel ViewModel que gestiona el estado de configuración y la persistencia
+ * @param navController Navigation controller for screen navigation
+ * @param viewModel ViewModel managing settings state and persistence
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -372,13 +372,13 @@ fun SettingsScreen(
 }
 
 /**
- * Tarjeta de selección de tema de la aplicación.
+ * Theme selection card for the application.
  * 
- * Proporciona una interfaz de usuario para seleccionar entre los diferentes modos de tema
- * disponibles: claro, oscuro y sistema. Utiliza un menú desplegable para la selección.
+ * Provides a user interface to select between different available theme modes:
+ * light, dark, and system. Uses a dropdown menu for selection.
  * 
- * @param currentThemeMode Modo de tema actualmente seleccionado
- * @param onThemeModeSelected Callback que se invoca cuando el usuario selecciona un nuevo tema
+ * @param currentThemeMode Currently selected theme mode
+ * @param onThemeModeSelected Callback invoked when user selects a new theme
  */
 @Composable
 private fun ThemeSelectionCard(
