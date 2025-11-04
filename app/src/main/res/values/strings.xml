@@ -11,8 +11,6 @@
     <string name="settings_appearance">Apariencia</string>
     <string name="settings_dark_mode">Modo oscuro</string>
     <string name="settings_use_system_config">Usar configuración del sistema</string>
-    <string name="settings_language">Idioma</string>
-    <string name="settings_language_description">Selecciona el idioma de la aplicación</string>
     <string name="settings_notifications">Notificaciones</string>
     <string name="settings_enable_notifications">Activar notificaciones</string>
     <string name="settings_gas_threshold">Umbral de alerta de gas</string>
@@ -33,12 +31,6 @@
     <string name="theme_system">Siguiendo configuración del sistema</string>
     <string name="theme_light">Modo claro activado</string>
     <string name="theme_dark">Modo oscuro activado</string>
-    
-    <!-- Languages -->
-    <string name="language_spanish">Español</string>
-    <string name="language_english">English</string>
-    <string name="language_catalan">Català</string>
-    <string name="language_system">Sistema</string>
     
     <!-- Common -->
     <string name="save">Guardar</string>
