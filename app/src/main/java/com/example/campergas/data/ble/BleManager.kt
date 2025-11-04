@@ -82,32 +82,5 @@ class BleManager @Inject constructor(
         }
     }
 
-    /**
-     * Verifica si tenemos los permisos necesarios para escanear dispositivos BLE.
-     *
-     * En Android 12+ (API 31+), requiere el permiso BLUETOOTH_SCAN.
-     * En versiones anteriores, requiere los permisos BLUETOOTH_ADMIN y
-     * ACCESS_FINE_LOCATION (requerido para BLE en versiones antiguas).
-     *
-     * @return true si tenemos los permisos necesarios, false en caso contrario
-     */
-    fun hasBluetoothScanPermission(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.BLUETOOTH_SCAN
-            ) == PackageManager.PERMISSION_GRANTED
-        } else {
-            ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.BLUETOOTH_ADMIN
-            ) == PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(
-                        context,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-        }
-    }
-
 
 }

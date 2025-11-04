@@ -345,18 +345,6 @@ class CamperGasBleService @Inject constructor(
     fun getInclinationReadInterval(): Long = inclinationReadInterval
 
     /**
-     * Restarts periodic reading (useful when intervals change)
-     */
-    fun restartPeriodicDataReading() {
-        if (isConnected()) {
-            Log.d(TAG, "Restarting periodic reading by external request...")
-            restartPeriodicReading()
-        } else {
-            Log.w(TAG, "Cannot restart periodic reading: no active connection")
-        }
-    }
-
-    /**
      * Starts periodic real-time data reading
      */
     private fun startPeriodicDataReading() {
