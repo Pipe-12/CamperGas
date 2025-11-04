@@ -7,7 +7,6 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.campergas.domain.model.Language
 import com.example.campergas.domain.model.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +19,7 @@ private val Context.dataStore by preferencesDataStore(name = "settings")
 /**
  * DataStore-based preferences manager for application settings.
  *
- * Provides type-safe access to user preferences including theme mode, language,
+ * Provides type-safe access to user preferences including theme mode,
  * BLE device connection info, notification settings, and sensor read intervals.
  * All preferences are exposed as Flows for reactive UI updates.
  */
@@ -30,7 +29,6 @@ class PreferencesDataStore @Inject constructor(
 ) {
     private val lastConnectedDeviceKey = stringPreferencesKey("last_connected_device")
     private val themeModeKey = stringPreferencesKey("theme_mode")
-    private val languageKey = stringPreferencesKey("language")
     private val notificationsEnabledKey = booleanPreferencesKey("notifications_enabled")
     private val gasLevelThresholdKey = floatPreferencesKey("gas_level_threshold")
     private val weightReadIntervalKey = longPreferencesKey("weight_read_interval")
@@ -59,17 +57,6 @@ class PreferencesDataStore @Inject constructor(
             } catch (e: IllegalArgumentException) {
                 ThemeMode.SYSTEM
             }
-        }
-
-    /**
-     * Flow of the selected application language.
-     *
-     * @return Flow emitting Language, defaults to SYSTEM if not set
-     */
-    val language: Flow<Language> = context.dataStore.data
-        .map { preferences ->
-            val languageCode = preferences[languageKey] ?: Language.SYSTEM.code
-            Language.entries.find { it.code == languageCode } ?: Language.SYSTEM
         }
 
     /**
@@ -131,17 +118,6 @@ class PreferencesDataStore @Inject constructor(
     suspend fun setThemeMode(themeMode: ThemeMode) {
         context.dataStore.edit { preferences ->
             preferences[themeModeKey] = themeMode.name
-        }
-    }
-
-    /**
-     * Sets the application language.
-     *
-     * @param language The language to use
-     */
-    suspend fun setLanguage(language: Language) {
-        context.dataStore.edit { preferences ->
-            preferences[languageKey] = language.code
         }
     }
 

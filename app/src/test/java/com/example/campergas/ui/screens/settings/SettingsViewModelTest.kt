@@ -3,7 +3,6 @@ package com.example.campergas.ui.screens.settings
 import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.campergas.data.local.preferences.PreferencesDataStore
-import com.example.campergas.domain.model.Language
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
 import io.mockk.clearAllMocks
@@ -46,7 +45,6 @@ class SettingsViewModelTest {
 
     // Flows to simulate preferences
     private val themeModeFlow = MutableStateFlow(ThemeMode.DARK)
-    private val languageFlow = MutableStateFlow(Language.SYSTEM)
     private val notificationsEnabledFlow = MutableStateFlow(true)
     private val gasLevelThresholdFlow = MutableStateFlow(15.0f)
     private val weightIntervalFlow = MutableStateFlow(60) // 60 seconds = 1 minute
@@ -62,16 +60,11 @@ class SettingsViewModelTest {
 
         // Setup mock responses
         every { preferencesDataStore.themeMode } returns themeModeFlow
-        every { preferencesDataStore.language } returns languageFlow
         every { preferencesDataStore.areNotificationsEnabled } returns notificationsEnabledFlow
         every { preferencesDataStore.gasLevelThreshold } returns gasLevelThresholdFlow
 
         coEvery { preferencesDataStore.setThemeMode(any()) } coAnswers {
             themeModeFlow.value = firstArg()
-        }
-
-        coEvery { preferencesDataStore.setLanguage(any()) } coAnswers {
-            languageFlow.value = firstArg()
         }
 
         coEvery { preferencesDataStore.setNotificationsEnabled(any()) } coAnswers {
@@ -105,7 +98,6 @@ class SettingsViewModelTest {
         // Assert
         val state = viewModel.uiState.value
         assertEquals(ThemeMode.DARK, state.themeMode)
-        assertEquals(Language.SYSTEM, state.language)
         assertTrue(state.notificationsEnabled)
         assertEquals(15.0f, state.gasLevelThreshold, 0.01f)
         assertFalse(state.isLoading)
@@ -135,18 +127,6 @@ class SettingsViewModelTest {
         coVerify { preferencesDataStore.setThemeMode(ThemeMode.SYSTEM) }
         assertEquals(ThemeMode.SYSTEM, themeModeFlow.value)
         assertEquals(ThemeMode.SYSTEM, viewModel.uiState.value.themeMode)
-    }
-
-    @Test
-    fun `setLanguage updates preferences`() = runTest {
-        // Act
-        viewModel.setLanguage(Language.ENGLISH)
-        advanceUntilIdle()
-
-        // Assert
-        coVerify { preferencesDataStore.setLanguage(Language.ENGLISH) }
-        assertEquals(Language.ENGLISH, languageFlow.value)
-        assertEquals(Language.ENGLISH, viewModel.uiState.value.language)
     }
 
     @Test
