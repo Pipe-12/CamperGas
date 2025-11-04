@@ -50,13 +50,13 @@
         android:name=".CamperGasApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CamperGas"
-        android:enableOnBackInvokedCallback="true">
+        android:theme="@style/Theme.CamperGas">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -86,27 +86,27 @@
         </activity>
 
         <!-- Gas Cylinder Widget -->
-        <receiver 
+        <receiver
             android:name=".widget.GasCylinderWidgetProvider"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.example.campergas.widget.REQUEST_DATA" />
             </intent-filter>
-            <meta-data 
+            <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/gas_cylinder_widget_info" />
         </receiver>
 
         <!-- Vehicle Stability Widget -->
-        <receiver 
+        <receiver
             android:name=".widget.VehicleStabilityWidgetProvider"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.example.campergas.widget.REQUEST_INCLINATION_DATA" />
             </intent-filter>
-            <meta-data 
+            <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/vehicle_stability_widget_info" />
         </receiver>

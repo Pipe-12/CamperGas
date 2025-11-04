@@ -65,8 +65,16 @@ class GetConsumptionHistoryUseCaseTest {
         // Arrange - Refill scenario: 5kg -> 15kg (cylinder was refilled)
         // This currently produces negative consumption but should not
         val consumptions = listOf(
-            createTestConsumption(id = 1, fuelKilograms = 5f, date = 1000L),  // Older measurement (low fuel)
-            createTestConsumption(id = 2, fuelKilograms = 15f, date = 2000L)  // Newer measurement (refilled)
+            createTestConsumption(
+                id = 1,
+                fuelKilograms = 5f,
+                date = 1000L
+            ),  // Older measurement (low fuel)
+            createTestConsumption(
+                id = 2,
+                fuelKilograms = 15f,
+                date = 2000L
+            )  // Newer measurement (refilled)
         )
 
         // Act
@@ -112,7 +120,10 @@ class GetConsumptionHistoryUseCaseTest {
         val result = useCase.calculateTotalConsumption(consumptions)
 
         // Assert - Total should be 2kg (only from cylinder 1), not -8kg
-        assertTrue("Total consumption should not be negative due to refill, but was: $result", result >= 0f)
+        assertTrue(
+            "Total consumption should not be negative due to refill, but was: $result",
+            result >= 0f
+        )
         assertEquals(2f, result, 0.01f) // Only cylinder 1's consumption should count
     }
 
@@ -122,10 +133,18 @@ class GetConsumptionHistoryUseCaseTest {
         val consumptions = listOf(
             // Day 1: Normal consumption (10kg -> 8kg = 2kg consumed)
             createTestConsumption(id = 1, fuelKilograms = 10f, date = 86400000L), // Day 1
-            createTestConsumption(id = 2, fuelKilograms = 8f, date = 86400000L + 1000), // Day 1 (slightly later)
+            createTestConsumption(
+                id = 2,
+                fuelKilograms = 8f,
+                date = 86400000L + 1000
+            ), // Day 1 (slightly later)
             // Day 2: Refill scenario (5kg -> 15kg = should be 0kg, not -10kg)
             createTestConsumption(id = 3, fuelKilograms = 5f, date = 172800000L), // Day 2
-            createTestConsumption(id = 4, fuelKilograms = 15f, date = 172800000L + 1000) // Day 2 (slightly later)
+            createTestConsumption(
+                id = 4,
+                fuelKilograms = 15f,
+                date = 172800000L + 1000
+            ) // Day 2 (slightly later)
         )
 
         // Act
@@ -134,8 +153,10 @@ class GetConsumptionHistoryUseCaseTest {
         // Assert
         assertEquals(2, chartData.size)
         chartData.forEach { dataPoint ->
-            assertTrue("Chart data should not contain negative consumption values, but found: ${dataPoint.kilograms}", 
-                      dataPoint.kilograms >= 0f)
+            assertTrue(
+                "Chart data should not contain negative consumption values, but found: ${dataPoint.kilograms}",
+                dataPoint.kilograms >= 0f
+            )
         }
     }
 
@@ -145,15 +166,43 @@ class GetConsumptionHistoryUseCaseTest {
         val consumptions = listOf(
             // Week 1: Start with full cylinder
             createTestConsumption(id = 1, fuelKilograms = 15f, date = 0L),
-            createTestConsumption(id = 2, fuelKilograms = 12f, date = 86400000L), // Day 1: 3kg consumed
-            createTestConsumption(id = 3, fuelKilograms = 9f, date = 172800000L),  // Day 2: 3kg consumed
-            createTestConsumption(id = 4, fuelKilograms = 6f, date = 259200000L),  // Day 3: 3kg consumed
-            createTestConsumption(id = 5, fuelKilograms = 3f, date = 345600000L),  // Day 4: 3kg consumed
-            
+            createTestConsumption(
+                id = 2,
+                fuelKilograms = 12f,
+                date = 86400000L
+            ), // Day 1: 3kg consumed
+            createTestConsumption(
+                id = 3,
+                fuelKilograms = 9f,
+                date = 172800000L
+            ),  // Day 2: 3kg consumed
+            createTestConsumption(
+                id = 4,
+                fuelKilograms = 6f,
+                date = 259200000L
+            ),  // Day 3: 3kg consumed
+            createTestConsumption(
+                id = 5,
+                fuelKilograms = 3f,
+                date = 345600000L
+            ),  // Day 4: 3kg consumed
+
             // Week 2: Refill the cylinder
-            createTestConsumption(id = 6, fuelKilograms = 15f, date = 432000000L), // Day 5: REFILL (should not count as negative)
-            createTestConsumption(id = 7, fuelKilograms = 13f, date = 518400000L), // Day 6: 2kg consumed
-            createTestConsumption(id = 8, fuelKilograms = 11f, date = 604800000L), // Day 7: 2kg consumed
+            createTestConsumption(
+                id = 6,
+                fuelKilograms = 15f,
+                date = 432000000L
+            ), // Day 5: REFILL (should not count as negative)
+            createTestConsumption(
+                id = 7,
+                fuelKilograms = 13f,
+                date = 518400000L
+            ), // Day 6: 2kg consumed
+            createTestConsumption(
+                id = 8,
+                fuelKilograms = 11f,
+                date = 604800000L
+            ), // Day 7: 2kg consumed
         )
 
         // Act
@@ -164,13 +213,15 @@ class GetConsumptionHistoryUseCaseTest {
         // Total consumption calculated as oldest (15kg) - newest (11kg) = 4kg
         // This shows net consumption over the entire period, ignoring the refill
         assertEquals(4f, totalConsumption, 0.01f)
-        
+
         // Chart data should have no negative values
         chartData.forEach { dataPoint ->
-            assertTrue("Chart data should not contain negative values: ${dataPoint.kilograms}", 
-                      dataPoint.kilograms >= 0f)
+            assertTrue(
+                "Chart data should not contain negative values: ${dataPoint.kilograms}",
+                dataPoint.kilograms >= 0f
+            )
         }
-        
+
         // Should have appropriate number of chart points (days with data)
         assertTrue("Should have chart data for multiple days", chartData.size >= 5)
     }

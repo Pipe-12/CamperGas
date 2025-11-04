@@ -11,8 +11,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <TextView
             android:layout_width="0dp"
@@ -38,8 +38,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <!-- Imagen de la bombona -->
         <ImageView
@@ -61,32 +61,32 @@
                 android:id="@+id/widget_cylinder_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:text="Sin bombona activa"
                 android:textColor="@color/widget_text_primary"
                 android:textSize="12sp"
-                android:textStyle="bold"
-                android:gravity="center" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/widget_fuel_percentage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
                 android:text="--"
                 android:textColor="@color/widget_text_accent"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:layout_marginTop="4dp" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/widget_fuel_kg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:gravity="center"
                 android:text="--"
                 android:textColor="@color/widget_text_secondary"
-                android:textSize="11sp"
-                android:gravity="center"
-                android:layout_marginTop="2dp" />
+                android:textSize="11sp" />
 
         </LinearLayout>
 

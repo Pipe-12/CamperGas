@@ -4,7 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.util.*
+import java.util.Calendar
 
 class FuelMeasurementTest {
 
@@ -77,7 +77,7 @@ class FuelMeasurementTest {
         val calendar = Calendar.getInstance()
         calendar.set(2023, 11, 25, 14, 30, 45) // December 25, 2023, 14:30:45
         val timestamp = calendar.timeInMillis
-        
+
         val measurement = FuelMeasurement(
             id = 1L,
             cylinderId = 1L,

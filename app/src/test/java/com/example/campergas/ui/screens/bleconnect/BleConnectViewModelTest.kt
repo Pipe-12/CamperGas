@@ -62,7 +62,11 @@ class BleConnectViewModelTest {
         every { scanBleDevicesUseCase.stopScan() } returns Unit
         every { scanBleDevicesUseCase.toggleCompatibleDevicesFilter() } returns Unit
 
-        viewModel = BleConnectViewModel(scanBleDevicesUseCase, connectBleDeviceUseCase, checkBleConnectionUseCase)
+        viewModel = BleConnectViewModel(
+            scanBleDevicesUseCase,
+            connectBleDeviceUseCase,
+            checkBleConnectionUseCase
+        )
     }
 
     @After
@@ -266,7 +270,11 @@ class BleConnectViewModelTest {
         every { checkBleConnectionUseCase() } returns connectionStateFlow
 
         // Create new viewModel to trigger init block with the flow
-        val newViewModel = BleConnectViewModel(scanBleDevicesUseCase, connectBleDeviceUseCase, checkBleConnectionUseCase)
+        val newViewModel = BleConnectViewModel(
+            scanBleDevicesUseCase,
+            connectBleDeviceUseCase,
+            checkBleConnectionUseCase
+        )
 
         // Act - simulate connection state change
         connectionStateFlow.value = true

@@ -42,9 +42,9 @@ class AddGasCylinderUseCaseTest {
             repository.insertCylinder(
                 match { cylinder ->
                     cylinder.name == name.trim() &&
-                    cylinder.tare == tare &&
-                    cylinder.capacity == capacity &&
-                    cylinder.isActive == setAsActive
+                            cylinder.tare == tare &&
+                            cylinder.capacity == capacity &&
+                            cylinder.isActive == setAsActive
                 }
             )
         }

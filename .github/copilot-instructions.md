@@ -1,18 +1,23 @@
 # CamperGas Android Application
 
-CamperGas is an Android application built with Kotlin and Jetpack Compose for managing gas cylinders in campers/RVs. The app connects to BLE (Bluetooth Low Energy) sensors to monitor gas consumption and cylinder inclination in real-time.
+CamperGas is an Android application built with Kotlin and Jetpack Compose for managing gas cylinders
+in campers/RVs. The app connects to BLE (Bluetooth Low Energy) sensors to monitor gas consumption
+and cylinder inclination in real-time.
 
-**Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.**
+**Always reference these instructions first and fallback to search or bash commands only when you
+encounter unexpected information that does not match the info here.**
 
 ## Quick Start Commands
 
 **Essential setup (run once):**
+
 ```bash
 # Verify Java 17 and setup Android SDK (see Environment Setup section)
 chmod +x ./gradlew
 ```
 
 **Daily development workflow:**
+
 ```bash
 # Build (NEVER CANCEL - 4-6 min first time, 15-30s incremental)
 ./gradlew assembleDebug
@@ -29,6 +34,7 @@ chmod +x ./gradlew
 ## Critical Environment Setup Requirements
 
 ### Android SDK Installation (MANDATORY)
+
 **You MUST install Android SDK before any Gradle commands will work:**
 
 ```bash
@@ -53,7 +59,9 @@ sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 ## Working Effectively
 
 ### Prerequisites Check
+
 Always verify your environment setup:
+
 ```bash
 java -version  # Must be Java 17
 echo $ANDROID_HOME  # Must point to Android SDK
@@ -61,6 +69,7 @@ echo $PATH | grep android  # Must include Android tools
 ```
 
 ### Build Commands (VALIDATED - Based on CI)
+
 ```bash
 # Bootstrap - Make gradlew executable
 chmod +x ./gradlew
@@ -86,6 +95,7 @@ chmod +x ./gradlew
 ```
 
 ### Testing Commands
+
 ```bash
 # Run all unit tests (196 tests across all test classes)
 ./gradlew testDebugUnitTest
@@ -107,10 +117,14 @@ chmod +x ./gradlew
 ```
 
 ### Test Coverage Status
+
 **Current test implementation:**
-- ✅ ViewModel tests for all screens (BLE, Consumption, Inclination, Settings, Home, Weight, CaravanConfig)
+
+- ✅ ViewModel tests for all screens (BLE, Consumption, Inclination, Settings, Home, Weight,
+  CaravanConfig)
 - ✅ Domain model tests (GasCylinderTest, FuelMeasurementTest)
-- ✅ Use case tests (AddGasCylinderUseCaseTest, GetActiveCylinderUseCaseTest, SaveFuelMeasurementUseCaseTest)
+- ✅ Use case tests (AddGasCylinderUseCaseTest, GetActiveCylinderUseCaseTest,
+  SaveFuelMeasurementUseCaseTest)
 - ✅ UI component tests (GasCylinderViewModelTest)
 - ✅ Basic instrumented test (ExampleInstrumentedTest)
 - **Total: 196 tests running successfully**
@@ -120,6 +134,7 @@ chmod +x ./gradlew
 ## Application Architecture
 
 ### Technology Stack
+
 - **Language**: Kotlin 2.0.21
 - **UI Framework**: Jetpack Compose (BOM 2025.08.00)
 - **Architecture**: Clean Architecture (Domain/Data/Presentation layers)
@@ -130,6 +145,7 @@ chmod +x ./gradlew
 - **Build**: Gradle 8.11.1, Android Gradle Plugin 8.10.1
 
 ### Key Project Structure
+
 ```
 app/src/main/java/com/example/campergas/
 ├── CamperGasApplication.kt          # Hilt application class
@@ -155,8 +171,9 @@ app/src/main/java/com/example/campergas/
 ```
 
 ### Key Features
+
 - **Gas Cylinder Management**: Add, configure, and monitor multiple gas cylinders
-- **BLE Sensor Integration**: Real-time connection to weight and inclination sensors  
+- **BLE Sensor Integration**: Real-time connection to weight and inclination sensors
 - **Consumption Tracking**: Monitor gas usage over time with historical data
 - **Vehicle Configuration**: Configure caravan/RV geometry for accurate calculations
 - **Settings Management**: Theme selection, notification preferences, sensor intervals
@@ -164,6 +181,7 @@ app/src/main/java/com/example/campergas/
 ## Validation Requirements
 
 ### Manual Validation After Changes
+
 **Always perform these validation steps after making changes:**
 
 1. **Build Validation**: Always run `./gradlew assembleDebug` to ensure the app compiles
@@ -172,62 +190,70 @@ app/src/main/java/com/example/campergas/
 4. **UI Testing**: If changing UI components, manually verify Compose previews compile
 
 ### Application Testing Scenarios
+
 **For functional changes, test these core workflows:**
 
-1. **BLE Connection Flow**: 
-   - Navigate to BLE Connect screen
-   - Verify permission dialogs display correctly
-   - Test device scanning UI (will show empty if no BLE devices available)
+1. **BLE Connection Flow**:
+    - Navigate to BLE Connect screen
+    - Verify permission dialogs display correctly
+    - Test device scanning UI (will show empty if no BLE devices available)
 
 2. **Gas Cylinder Management**:
-   - Add new cylinder with name, tare weight, capacity
-   - Set cylinder as active
-   - Verify data persistence between app restarts
+    - Add new cylinder with name, tare weight, capacity
+    - Set cylinder as active
+    - Verify data persistence between app restarts
 
 3. **Settings Management**:
-   - Change theme (Light/Dark/System)
-   - Modify sensor reading intervals
-   - Toggle notification preferences
+    - Change theme (Light/Dark/System)
+    - Modify sensor reading intervals
+    - Toggle notification preferences
 
-**Note**: Full BLE functionality testing requires physical BLE hardware and cannot be fully validated in development environment.
+**Note**: Full BLE functionality testing requires physical BLE hardware and cannot be fully
+validated in development environment.
 
 ## Frequently Visited Files
 
 ### Critical Configuration Files
+
 - `gradle/libs.versions.toml` - Dependency versions (update carefully)
 - `app/build.gradle.kts` - Main build configuration
 - `app/src/main/AndroidManifest.xml` - App permissions and configuration
 
-### Core Application Files  
+### Core Application Files
+
 - `CamperGasApplication.kt` - Hilt application entry point
 - `MainActivity.kt` - Main Compose activity with navigation setup
 - `ui/navigation/NavGraph.kt` - Navigation configuration
 - `ui/theme/` - Compose theming and colors
 
 ### Key Business Logic
+
 - `domain/model/GasCylinder.kt` - Core gas cylinder model with calculations
 - `domain/model/CamperGasUuids.kt` - BLE hardware compatibility definitions
 - `data/repository/BleRepository.kt` - BLE sensor communication interface
 - `data/repository/GasCylinderRepository.kt` - Gas cylinder data management
 
 ### Important ViewModels
+
 - `ui/screens/settings/SettingsViewModel.kt` - App settings management
 - `ui/screens/bleconnect/BleConnectViewModel.kt` - BLE device connection
 - `ui/screens/consumption/ConsumptionViewModel.kt` - Gas consumption tracking
 
 ### Testing Entry Points
+
 - `CamperGasTestSuite.kt` - Main test suite (many tests commented out)
 - `ui/screens/settings/SettingsViewModelTest.kt` - Example of working ViewModel test
 
-
 ### Adding New Features
+
 1. **Domain First**: Create models and use cases in `domain/` package
-2. **Data Layer**: Implement repository interfaces in `data/` package  
+2. **Data Layer**: Implement repository interfaces in `data/` package
 3. **UI Layer**: Create screens and view models in `ui/` package
 4. **Testing**: Add unit tests for business logic in `src/test/`
 5. **Integration**: Wire up with Hilt dependency injection
 
 ### BLE Development
+
 - **Core BLE Implementation**: `data/ble/` package contains all BLE logic
 - **Main Service**: `CamperGasBleService` handles weight and inclination sensor communication
 - **Device Scanning**: `BleDeviceScanner` manages device discovery
@@ -236,14 +262,17 @@ app/src/main/java/com/example/campergas/
 - **Permissions**: `BluetoothPermissionManager` handles complex Android BLE permissions
 - **Sensor UUIDs**: Defined in `CamperGasUuids.kt` for specific hardware compatibility
 
-**BLE Testing Limitations**: Full BLE functionality requires physical hardware with specific UUIDs. UI and permission flows can be tested without hardware.
+**BLE Testing Limitations**: Full BLE functionality requires physical hardware with specific UUIDs.
+UI and permission flows can be tested without hardware.
 
 ### Database Changes
+
 - Room entities in `data/local/` packages
 - Always create migration scripts for schema changes
 - Test migrations with `@Database` annotation updates
 
 ### UI Development
+
 - Use Compose previews for rapid UI development
 - Follow Material 3 design system
 - Implement proper state management with ViewModels
@@ -252,32 +281,38 @@ app/src/main/java/com/example/campergas/
 ## Build Times and Expectations
 
 ### Typical Build Times (First Run)
+
 - **Clean Build**: 2-3 minutes (includes dependency download)
 - **Incremental Build**: 15-30 seconds
-- **Unit Tests**: 30-60 seconds  
+- **Unit Tests**: 30-60 seconds
 - **Lint Check**: 1 minute
 - **Full CI Pipeline**: 5-8 minutes
 
 ### Subsequent Builds (Gradle Daemon Active)
+
 - **Incremental Build**: 10-20 seconds
 - **Unit Tests**: 20-40 seconds
 - **Lint Check**: 30-45 seconds
 
-**CRITICAL**: Always set timeouts of 10+ minutes for full builds and 5+ minutes for test runs to prevent premature cancellation.
+**CRITICAL**: Always set timeouts of 10+ minutes for full builds and 5+ minutes for test runs to
+prevent premature cancellation.
 
 ## Troubleshooting
 
 ### Build Failures
+
 - **Plugin Resolution Errors**: Ensure Android SDK is properly installed
 - **Memory Issues**: Increase Gradle heap size: `./gradlew -Xmx4g build`
 - **Permission Errors**: Ensure `gradlew` has execute permissions: `chmod +x gradlew`
 
-### Test Failures  
+### Test Failures
+
 - **MockK Issues**: Clear MockK state between tests with `clearAllMocks()`
 - **Coroutine Tests**: Use `UnconfinedTestDispatcher` for immediate execution
 - **Room Tests**: Use in-memory database for fast, isolated tests
 
 ### BLE Development
+
 - **Permissions**: BLE requires location and Bluetooth permissions
 - **Android Version**: Different permission models for Android 12+ vs older versions
 - **Hardware**: Physical device or emulator with BLE support required for full testing
@@ -285,16 +320,18 @@ app/src/main/java/com/example/campergas/
 ## CI/CD Integration
 
 The project uses GitHub Actions (`.github/workflows/android-ci.yml`) with these validated steps:
+
 1. **Setup**: JDK 17 (Temurin distribution)
 2. **Permissions**: `chmod +x gradlew`
 3. **Build**: `./gradlew assembleDebug`
-4. **Test**: `./gradlew testDebugUnitTest`  
+4. **Test**: `./gradlew testDebugUnitTest`
 5. **Lint**: `./gradlew lintDebug`
 6. **Artifacts**: Upload APK and reports
 
 ## Comprehensive Validation Checklist
 
 ### Before Making Any Changes
+
 1. **Environment Verification**:
    ```bash
    java -version  # Verify Java 17
@@ -310,6 +347,7 @@ The project uses GitHub Actions (`.github/workflows/android-ci.yml`) with these 
    ```
 
 ### After Making Changes
+
 1. **Build Validation**:
    ```bash
    ./gradlew clean assembleDebug  # Clean build (NEVER CANCEL - 2-3 min)
@@ -332,6 +370,7 @@ The project uses GitHub Actions (`.github/workflows/android-ci.yml`) with these 
    ```
 
 ### Manual Feature Testing
+
 **After UI changes, verify these user scenarios:**
 
 1. **App Launch**: App starts without crashes, permissions dialog appears
@@ -341,8 +380,10 @@ The project uses GitHub Actions (`.github/workflows/android-ci.yml`) with these 
 5. **BLE Screen**: Permission requests work, scanning UI displays correctly
 
 ### Performance Verification
+
 - **Memory Usage**: Monitor for memory leaks in long-running operations
 - **Battery**: BLE operations should handle background/foreground transitions
 - **UI Responsiveness**: Compose UIs should render without stuttering
 
-**CRITICAL REMINDER**: Always allow builds and tests to complete fully. This project's build process is reliable but takes time. Canceling prematurely will lead to incomplete validation.
+**CRITICAL REMINDER**: Always allow builds and tests to complete fully. This project's build process
+is reliable but takes time. Canceling prematurely will lead to incomplete validation.
