@@ -139,6 +139,65 @@ fun SettingsScreen(
             }
         }
 
+        // Theme configuration
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.settings_theme),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                var themeExpanded by remember { mutableStateOf(false) }
+
+                Box {
+                    OutlinedTextField(
+                        value = when (uiState.themeMode) {
+                            ThemeMode.LIGHT -> stringResource(R.string.theme_mode_light)
+                            ThemeMode.DARK -> stringResource(R.string.theme_mode_dark)
+                            ThemeMode.SYSTEM -> stringResource(R.string.theme_mode_system)
+                        },
+                        onValueChange = { },
+                        readOnly = true,
+                        label = { Text(stringResource(R.string.settings_theme_description)) },
+                        trailingIcon = {
+                            IconButton(onClick = { themeExpanded = !themeExpanded }) {
+                                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    DropdownMenu(
+                        expanded = themeExpanded,
+                        onDismissRequest = { themeExpanded = false }
+                    ) {
+                        ThemeMode.entries.forEach { theme ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        when (theme) {
+                                            ThemeMode.LIGHT -> stringResource(R.string.theme_mode_light)
+                                            ThemeMode.DARK -> stringResource(R.string.theme_mode_dark)
+                                            ThemeMode.SYSTEM -> stringResource(R.string.theme_mode_system)
+                                        }
+                                    )
+                                },
+                                onClick = {
+                                    viewModel.setThemeMode(theme)
+                                    themeExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
         // Language configuration
         Card(
             modifier = Modifier.fillMaxWidth()

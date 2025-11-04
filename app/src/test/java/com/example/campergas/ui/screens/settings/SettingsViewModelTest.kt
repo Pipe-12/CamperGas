@@ -117,9 +117,24 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `themeMode is always DARK`() = runTest {
-        // Assert - theme mode is always DARK
-        assertEquals(ThemeMode.DARK, viewModel.uiState.value.themeMode)
+    fun `setThemeMode updates preferences`() = runTest {
+        // Act - Set to LIGHT
+        viewModel.setThemeMode(ThemeMode.LIGHT)
+        advanceUntilIdle()
+
+        // Assert
+        coVerify { preferencesDataStore.setThemeMode(ThemeMode.LIGHT) }
+        assertEquals(ThemeMode.LIGHT, themeModeFlow.value)
+        assertEquals(ThemeMode.LIGHT, viewModel.uiState.value.themeMode)
+
+        // Act - Set to SYSTEM
+        viewModel.setThemeMode(ThemeMode.SYSTEM)
+        advanceUntilIdle()
+
+        // Assert
+        coVerify { preferencesDataStore.setThemeMode(ThemeMode.SYSTEM) }
+        assertEquals(ThemeMode.SYSTEM, themeModeFlow.value)
+        assertEquals(ThemeMode.SYSTEM, viewModel.uiState.value.themeMode)
     }
 
     @Test

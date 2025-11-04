@@ -33,6 +33,11 @@
     <string name="theme_system">Seguint configuració del sistema</string>
     <string name="theme_light">Mode clar activat</string>
     <string name="theme_dark">Mode fosc activat</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_description">Selecciona el tema de l\'aplicació</string>
+    <string name="theme_mode_light">Clar</string>
+    <string name="theme_mode_dark">Fosc</string>
+    <string name="theme_mode_system">Sistema</string>
     
     <!-- Languages -->
     <string name="language_spanish">Español</string>

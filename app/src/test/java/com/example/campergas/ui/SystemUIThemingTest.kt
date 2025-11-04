@@ -8,79 +8,97 @@ import org.junit.Assert.*
  * Tests for system UI theming behavior to ensure proper handling
  * of status bar and navigation bar colors.
  * 
- * Note: Application uses only dark mode theme.
+ * Note: Application supports light, dark, and system theme modes.
  */
 class SystemUIThemingTest {
 
     @Test
-    fun `test theme mode is always dark`() {
-        // Test that ThemeMode only has DARK value
-        assertTrue("Dark theme mode should indicate dark styling", ThemeMode.DARK == ThemeMode.DARK)
-    }
-
-    @Test
-    fun `test theme mode enum has only dark mode`() {
-        // Verify only DARK theme mode exists (LIGHT removed per issue requirements)
-        val expectedModes = setOf(ThemeMode.DARK)
+    fun `test theme mode enum has all modes`() {
+        // Verify all theme modes exist
+        val expectedModes = setOf(ThemeMode.LIGHT, ThemeMode.DARK, ThemeMode.SYSTEM)
         val actualModes = ThemeMode.entries.toSet()
         
-        assertEquals("Only DARK theme mode should be available", expectedModes, actualModes)
+        assertEquals("LIGHT, DARK, and SYSTEM theme modes should be available", expectedModes, actualModes)
     }
 
     @Test
-    fun `test system UI uses dark colors`() {
+    fun `test system UI uses appropriate colors for theme`() {
         // Test the logic for determining system UI colors based on theme
         
         fun getSystemUIColorForTheme(isDarkTheme: Boolean): Int {
-            return android.graphics.Color.TRANSPARENT // Dark theme uses transparent with dark content
+            return android.graphics.Color.TRANSPARENT // Uses transparent for edge-to-edge design
         }
         
-        // Dark theme should use transparent colors for modern edge-to-edge design
+        // Both themes should use transparent colors for modern edge-to-edge design
         val darkThemeColor = getSystemUIColorForTheme(true)
+        val lightThemeColor = getSystemUIColorForTheme(false)
         
         assertEquals("Dark theme should use transparent color", android.graphics.Color.TRANSPARENT, darkThemeColor)
+        assertEquals("Light theme should use transparent color", android.graphics.Color.TRANSPARENT, lightThemeColor)
     }
 
     @Test
-    fun `test theme is always dark during activity recreation`() {
+    fun `test theme is preserved during activity recreation`() {
         // Test the logic for preserving theme state during activity recreation
-        // Application always uses dark theme
         
-        fun determineSystemBarsTheme(savedThemeMode: ThemeMode): Boolean {
-            return true // Always dark
+        fun determineSystemBarsTheme(savedThemeMode: ThemeMode, systemIsDark: Boolean): Boolean {
+            return when (savedThemeMode) {
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+                ThemeMode.SYSTEM -> systemIsDark
+            }
         }
         
-        // Theme should always result in dark system bars
-        assertTrue("DARK mode should always result in dark system bars", 
-            determineSystemBarsTheme(ThemeMode.DARK))
+        // Test each theme mode
+        assertTrue("DARK mode should result in dark system bars", 
+            determineSystemBarsTheme(ThemeMode.DARK, false))
+        assertFalse("LIGHT mode should result in light system bars", 
+            determineSystemBarsTheme(ThemeMode.LIGHT, true))
+        assertTrue("SYSTEM mode should follow system when dark", 
+            determineSystemBarsTheme(ThemeMode.SYSTEM, true))
+        assertFalse("SYSTEM mode should follow system when light", 
+            determineSystemBarsTheme(ThemeMode.SYSTEM, false))
     }
     
     @Test
-    fun `test language change preserves dark theme`() {
-        // Test that dark theme is maintained during language changes
+    fun `test language change preserves theme`() {
+        // Test that theme is maintained during language changes
         
-        fun shouldUseDarkSystemBars(themeMode: ThemeMode): Boolean {
-            return true // Always dark
+        fun shouldUseDarkSystemBars(themeMode: ThemeMode, systemIsDark: Boolean): Boolean {
+            return when (themeMode) {
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+                ThemeMode.SYSTEM -> systemIsDark
+            }
         }
         
-        // Dark theme should be preserved during language changes
+        // Theme should be preserved during language changes
         assertTrue("Dark theme should be preserved during language change", 
-            shouldUseDarkSystemBars(ThemeMode.DARK))
+            shouldUseDarkSystemBars(ThemeMode.DARK, false))
+        assertFalse("Light theme should be preserved during language change", 
+            shouldUseDarkSystemBars(ThemeMode.LIGHT, true))
     }
 
     @Test
-    fun `test app always uses dark theme`() {
-        // Test that app always uses dark theme regardless of system configuration
+    fun `test app respects selected theme`() {
+        // Test that app respects user's theme selection
         
         fun getAppTheme(userSelectedTheme: ThemeMode, systemIsDark: Boolean): Boolean {
-            // App always uses dark theme
-            return true
+            return when (userSelectedTheme) {
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+                ThemeMode.SYSTEM -> systemIsDark
+            }
         }
         
-        // App should always use DARK theme, regardless of system
-        assertTrue("App should always use dark theme, even if system is light",
+        // App should respect user's theme selection
+        assertTrue("App should use dark theme when DARK is selected",
             getAppTheme(ThemeMode.DARK, false))
-        assertTrue("App should always use dark theme, even if system is dark", 
-            getAppTheme(ThemeMode.DARK, true))
+        assertFalse("App should use light theme when LIGHT is selected", 
+            getAppTheme(ThemeMode.LIGHT, true))
+        assertTrue("App should follow system when SYSTEM is selected and system is dark",
+            getAppTheme(ThemeMode.SYSTEM, true))
+        assertFalse("App should follow system when SYSTEM is selected and system is light",
+            getAppTheme(ThemeMode.SYSTEM, false))
     }
 }
