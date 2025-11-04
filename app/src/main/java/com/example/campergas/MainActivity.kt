@@ -1,6 +1,5 @@
 package com.example.campergas
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,16 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
 import com.example.campergas.data.local.preferences.PreferencesDataStore
-import com.example.campergas.domain.model.Language
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.ui.components.PermissionDialog
 import com.example.campergas.ui.navigation.NavGraph
 import com.example.campergas.ui.theme.CamperGasTheme
 import com.example.campergas.utils.BluetoothPermissionManager
-import com.example.campergas.utils.LocaleUtils
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 /**
@@ -36,10 +30,11 @@ import javax.inject.Inject
  * 
  * Esta actividad es el punto de entrada de la interfaz de usuario y gestiona:
  * - La configuración del tema (modo oscuro únicamente)
- * - La configuración de idioma (español únicamente)
  * - Los permisos de Bluetooth necesarios para la conexión BLE
  * - La navegación entre pantallas mediante Jetpack Compose Navigation
  * - El estilo edge-to-edge para las barras del sistema
+ * 
+ * La aplicación está configurada exclusivamente en español.
  * 
  * Utiliza Jetpack Compose para toda la UI y Hilt para la inyección de dependencias.
  * 
@@ -52,9 +47,9 @@ class MainActivity : ComponentActivity() {
      * Almacén de preferencias del usuario.
      * 
      * Proporciona acceso a las configuraciones guardadas como:
-     * - Idioma seleccionado
      * - Estado de notificaciones
      * - Umbrales de nivel de gas
+     * - Intervalos de lectura de sensores
      */
     @Inject
     lateinit var preferencesDataStore: PreferencesDataStore
@@ -70,36 +65,14 @@ class MainActivity : ComponentActivity() {
     private lateinit var bluetoothPermissionManager: BluetoothPermissionManager
 
     /**
-     * Adjunta el contexto base con la configuración de idioma en español.
-     * 
-     * Este método se llama antes de onCreate y establece el idioma español
-     * para la aplicación.
-     * 
-     * @param newBase El contexto base proporcionado por el sistema
-     */
-    override fun attachBaseContext(newBase: Context?) {
-        val context = newBase ?: return super.attachBaseContext(newBase)
-        
-        // Set locale to Spanish
-        try {
-            val wrappedContext = LocaleUtils.setLocale(context, Language.SPANISH)
-            super.attachBaseContext(wrappedContext)
-        } catch (_: Exception) {
-            // Fallback to original context if locale setting fails
-            super.attachBaseContext(newBase)
-        }
-    }
-
-    /**
      * Inicializa la actividad y configura la interfaz de usuario.
      * 
      * Este método realiza las siguientes operaciones:
-     * 1. Carga las preferencias del usuario (idioma)
-     * 2. Configura las barras del sistema en modo edge-to-edge con tema oscuro
-     * 3. Inicializa el gestor de permisos de Bluetooth
-     * 4. Configura el contenido con Jetpack Compose
-     * 5. Establece el sistema de navegación
-     * 6. Muestra el diálogo de permisos si es necesario
+     * 1. Configura las barras del sistema en modo edge-to-edge con tema oscuro
+     * 2. Inicializa el gestor de permisos de Bluetooth
+     * 3. Configura el contenido con Jetpack Compose
+     * 4. Establece el sistema de navegación
+     * 5. Muestra el diálogo de permisos si es necesario
      * 
      * @param savedInstanceState Estado guardado de la actividad si fue destruida previamente
      */

@@ -7,7 +7,6 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.campergas.domain.model.Language
 import com.example.campergas.domain.model.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +19,7 @@ private val Context.dataStore by preferencesDataStore(name = "settings")
 /**
  * DataStore-based preferences manager for application settings.
  *
- * Provides type-safe access to user preferences including theme mode, language,
+ * Provides type-safe access to user preferences including theme mode,
  * BLE device connection info, notification settings, and sensor read intervals.
  * All preferences are exposed as Flows for reactive UI updates.
  */
@@ -30,7 +29,6 @@ class PreferencesDataStore @Inject constructor(
 ) {
     private val lastConnectedDeviceKey = stringPreferencesKey("last_connected_device")
     private val themeModeKey = stringPreferencesKey("theme_mode")
-    private val languageKey = stringPreferencesKey("language")
     private val notificationsEnabledKey = booleanPreferencesKey("notifications_enabled")
     private val gasLevelThresholdKey = floatPreferencesKey("gas_level_threshold")
     private val weightReadIntervalKey = longPreferencesKey("weight_read_interval")
@@ -54,16 +52,6 @@ class PreferencesDataStore @Inject constructor(
     val themeMode: Flow<ThemeMode> = context.dataStore.data
         .map { _ ->
             ThemeMode.DARK
-        }
-
-    /**
-     * Flow of the selected application language.
-     *
-     * @return Flow emitting Language, always returns SPANISH
-     */
-    val language: Flow<Language> = context.dataStore.data
-        .map { _ ->
-            Language.SPANISH
         }
 
     /**
@@ -125,16 +113,6 @@ class PreferencesDataStore @Inject constructor(
      */
     suspend fun setThemeMode(themeMode: ThemeMode) {
         // No-op: application always uses dark mode
-    }
-
-    /**
-     * Sets the application language.
-     * Note: Application only supports Spanish, this method is kept for API compatibility.
-     *
-     * @param language The language to use (always SPANISH)
-     */
-    suspend fun setLanguage(language: Language) {
-        // No-op: application only uses Spanish
     }
 
     /**

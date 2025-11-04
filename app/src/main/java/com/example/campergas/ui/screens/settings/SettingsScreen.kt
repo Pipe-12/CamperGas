@@ -44,8 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.campergas.R
-import com.example.campergas.domain.model.Language
-import com.example.campergas.domain.model.ThemeMode
 
 /**
  * Settings screen for application configuration.

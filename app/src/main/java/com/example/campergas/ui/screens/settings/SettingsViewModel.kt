@@ -3,7 +3,6 @@ package com.example.campergas.ui.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.data.local.preferences.PreferencesDataStore
-import com.example.campergas.domain.model.Language
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +20,6 @@ import javax.inject.Inject
  * ViewModel for application settings management.
  *
  * Manages user preferences including:
- * - Application language
  * - Notification settings
  * - BLE sensor reading intervals
  * - Low fuel warning threshold
@@ -69,25 +67,17 @@ class SettingsViewModel @Inject constructor(
     private fun loadSettings() {
         viewModelScope.launch {
             combine(
-                preferencesDataStore.language,
                 preferencesDataStore.areNotificationsEnabled,
                 preferencesDataStore.gasLevelThreshold
-            ) { language, notificationsEnabled, gasLevelThreshold ->
+            ) { notificationsEnabled, gasLevelThreshold ->
                 SettingsUiState(
                     themeMode = ThemeMode.DARK,
-                    language = language,
                     notificationsEnabled = notificationsEnabled,
                     gasLevelThreshold = gasLevelThreshold
                 )
             }.collect { settings ->
                 _uiState.value = settings
             }
-        }
-    }
-
-    fun setLanguage(language: Language) {
-        viewModelScope.launch {
-            preferencesDataStore.setLanguage(language)
         }
     }
 
@@ -146,7 +136,6 @@ class SettingsViewModel @Inject constructor(
 
 data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.DARK,
-    val language: Language = Language.SPANISH,
     val notificationsEnabled: Boolean = true,
     val gasLevelThreshold: Float = 15.0f,
     val isLoading: Boolean = false,
