@@ -17,15 +17,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * ViewModel for application settings management.
+ * ViewModel para la gestión de configuración de la aplicación.
  *
- * Manages user preferences including:
- * - Notification settings
- * - BLE sensor reading intervals
- * - Low fuel warning threshold
+ * Gestiona las preferencias del usuario incluyendo:
+ * - Modo de tema (claro, oscuro, sistema)
+ * - Configuración de notificaciones
+ * - Intervalos de lectura de sensores BLE
+ * - Umbral de advertencia de combustible bajo
  *
- * Provides reactive state flows for settings values and handles
- * persistence through PreferencesDataStore.
+ * Proporciona flujos de estado reactivos para los valores de configuración
+ * y maneja la persistencia a través de PreferencesDataStore.
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -34,44 +35,51 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
-    /** Flow of UI state for the settings screen */
+    /** Flujo del estado de UI para la pantalla de configuración */
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
-    /** Flow of weight sensor reading interval in minutes */
+    /** Flujo del intervalo de lectura del sensor de peso en minutos */
     val weightInterval: StateFlow<Int> =
         configureReadingIntervalsUseCase.getWeightReadIntervalSeconds()
-            .map { it / 60 } // Convert seconds to minutes
+            .map { it / 60 } // Convertir segundos a minutos
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = 1 // 1 minuto por defecto
             )
 
-    /** Flow of inclination sensor reading interval in seconds */
+    /** Flujo del intervalo de lectura del sensor de inclinación en segundos */
     val inclinationInterval: StateFlow<Int> =
         configureReadingIntervalsUseCase.getInclinationReadIntervalSeconds()
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = 15  //1 segundo por defecto
+                initialValue = 15  // 15 segundos por defecto
             )
 
     private val _operationStatus = MutableStateFlow<String?>(null)
-    /** Flow of BLE operation status messages for user feedback */
+    /** Flujo de mensajes de estado de operaciones BLE para retroalimentación al usuario */
     val operationStatus: StateFlow<String?> = _operationStatus.asStateFlow()
 
     init {
         loadSettings()
     }
 
+    /**
+     * Carga la configuración inicial desde las preferencias del usuario.
+     * 
+     * Combina múltiples flujos de preferencias (tema, notificaciones, umbral de gas)
+     * en un único estado de UI que se actualiza reactivamente.
+     */
     private fun loadSettings() {
         viewModelScope.launch {
             combine(
+                preferencesDataStore.themeMode,
                 preferencesDataStore.areNotificationsEnabled,
                 preferencesDataStore.gasLevelThreshold
-            ) { notificationsEnabled, gasLevelThreshold ->
+            ) { themeMode, notificationsEnabled, gasLevelThreshold ->
                 SettingsUiState(
-                    themeMode = ThemeMode.DARK,
+                    themeMode = themeMode,
                     notificationsEnabled = notificationsEnabled,
                     gasLevelThreshold = gasLevelThreshold
                 )
@@ -81,19 +89,50 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Cambia el modo de tema de la aplicación.
+     * 
+     * Guarda el nuevo modo de tema en las preferencias del usuario.
+     * El cambio se aplica inmediatamente en toda la aplicación.
+     * 
+     * @param themeMode Nuevo modo de tema (LIGHT, DARK o SYSTEM)
+     */
+    fun setThemeMode(themeMode: ThemeMode) {
+        viewModelScope.launch {
+            preferencesDataStore.setThemeMode(themeMode)
+        }
+    }
+
+    /**
+     * Alterna el estado de las notificaciones (activadas/desactivadas).
+     * 
+     * Invierte el estado actual de las notificaciones y lo guarda en las preferencias.
+     */
     fun toggleNotifications() {
         viewModelScope.launch {
             preferencesDataStore.setNotificationsEnabled(!_uiState.value.notificationsEnabled)
         }
     }
 
+    /**
+     * Establece el umbral de nivel de gas para las advertencias de bajo combustible.
+     * 
+     * @param threshold Umbral en porcentaje (0-100)
+     */
     fun setGasLevelThreshold(threshold: Float) {
         viewModelScope.launch {
             preferencesDataStore.setGasLevelThreshold(threshold)
         }
     }
 
-    // Methods to configure BLE reading intervals
+    /**
+     * Configura el intervalo de lectura del sensor de peso.
+     * 
+     * Convierte el intervalo de minutos a segundos y lo aplica mediante el caso de uso.
+     * Muestra mensajes de estado durante la operación.
+     * 
+     * @param intervalMinutes Intervalo en minutos (se convierte a segundos internamente)
+     */
     fun setWeightInterval(intervalMinutes: Int) {
         viewModelScope.launch {
             try {
@@ -114,6 +153,14 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Configura el intervalo de lectura del sensor de inclinación.
+     * 
+     * Aplica el intervalo en segundos mediante el caso de uso.
+     * Muestra mensajes de estado durante la operación.
+     * 
+     * @param intervalSeconds Intervalo en segundos
+     */
     fun setInclinationInterval(intervalSeconds: Int) {
         viewModelScope.launch {
             try {
@@ -134,8 +181,17 @@ class SettingsViewModel @Inject constructor(
     }
 }
 
+/**
+ * Estado de UI para la pantalla de configuración.
+ * 
+ * @param themeMode Modo de tema actual (LIGHT, DARK o SYSTEM)
+ * @param notificationsEnabled Indica si las notificaciones están activadas
+ * @param gasLevelThreshold Umbral de nivel de gas para advertencias (porcentaje)
+ * @param isLoading Indica si hay una operación en curso
+ * @param error Mensaje de error si hay alguno
+ */
 data class SettingsUiState(
-    val themeMode: ThemeMode = ThemeMode.DARK,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val notificationsEnabled: Boolean = true,
     val gasLevelThreshold: Float = 15.0f,
     val isLoading: Boolean = false,

@@ -9,13 +9,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.ui.components.PermissionDialog
@@ -29,7 +33,7 @@ import javax.inject.Inject
  * Actividad principal de la aplicación CamperGas.
  * 
  * Esta actividad es el punto de entrada de la interfaz de usuario y gestiona:
- * - La configuración del tema (modo oscuro únicamente)
+ * - La configuración del tema (claro, oscuro o del sistema)
  * - Los permisos de Bluetooth necesarios para la conexión BLE
  * - La navegación entre pantallas mediante Jetpack Compose Navigation
  * - El estilo edge-to-edge para las barras del sistema
@@ -68,51 +72,64 @@ class MainActivity : ComponentActivity() {
      * Inicializa la actividad y configura la interfaz de usuario.
      * 
      * Este método realiza las siguientes operaciones:
-     * 1. Configura las barras del sistema en modo edge-to-edge con tema oscuro
-     * 2. Inicializa el gestor de permisos de Bluetooth
-     * 3. Configura el contenido con Jetpack Compose
-     * 4. Establece el sistema de navegación
-     * 5. Muestra el diálogo de permisos si es necesario
+     * 1. Carga el tema guardado desde las preferencias del usuario
+     * 2. Configura las barras del sistema en modo edge-to-edge según el tema
+     * 3. Inicializa el gestor de permisos de Bluetooth
+     * 4. Configura el contenido con Jetpack Compose aplicando el tema seleccionado
+     * 5. Establece el sistema de navegación
+     * 6. Muestra el diálogo de permisos si es necesario
      * 
      * @param savedInstanceState Estado guardado de la actividad si fue destruida previamente
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Configure initial edge-to-edge styling with dark theme
-        // The application uses only dark mode
-        configureSystemBars(true)
-
-        // Configure permissions manager
+        // Configurar el gestor de permisos de Bluetooth
         bluetoothPermissionManager = BluetoothPermissionManager(
             activity = this,
             onPermissionsGranted = {
-                // Permissions granted, the app can use BLE
+                // Permisos concedidos, la aplicación puede usar BLE
             },
             onPermissionsDenied = { deniedPermissions ->
-                // Handle denied permissions
+                // Manejar permisos denegados
             }
         )
 
         setContent {
-            CamperGasTheme(themeMode = ThemeMode.DARK) {
+            // Cargar el tema guardado desde las preferencias
+            val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+            
+            // Determinar si se debe usar el tema oscuro para configurar las barras del sistema
+            val isDarkTheme = when (themeMode) {
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+                ThemeMode.SYSTEM -> androidx.compose.foundation.isSystemInDarkTheme()
+            }
+            
+            // Configurar las barras del sistema según el tema actual
+            LaunchedEffect(isDarkTheme) {
+                configureSystemBars(isDarkTheme)
+            }
+            
+            // Aplicar el tema de la aplicación
+            CamperGasTheme(themeMode = themeMode) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
 
-                    // State to control whether to show permissions dialog
+                    // Estado para controlar si mostrar el diálogo de permisos
                     var showPermissionDialog by remember { mutableStateOf(false) }
 
-                    // Verify permissions on start
+                    // Verificar permisos al inicio
                     LaunchedEffect(Unit) {
                         if (!bluetoothPermissionManager.hasAllPermissions()) {
                             showPermissionDialog = true
                         }
                     }
 
-                    // Show permissions dialog if necessary
+                    // Mostrar diálogo de permisos si es necesario
                     if (showPermissionDialog) {
                         PermissionDialog(
                             title = stringResource(R.string.permissions_needed_title),
@@ -134,18 +151,32 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Configura el estilo de las barras del sistema con tema oscuro.
+     * Configura el estilo de las barras del sistema según el tema actual.
      * 
      * Este método aplica el estilo apropiado a la barra de estado y la barra de navegación
-     * para el tema oscuro. Utiliza colores transparentes para permitir que el contenido 
-     * se extienda hasta los bordes de la pantalla (edge-to-edge).
+     * basándose en el tema seleccionado (claro u oscuro). Utiliza colores transparentes 
+     * para permitir que el contenido se extienda hasta los bordes de la pantalla (edge-to-edge).
      * 
-     * @param isDarkTheme siempre true ya que la aplicación usa solo tema oscuro
+     * @param isDarkTheme true para aplicar tema oscuro, false para tema claro
      */
     private fun configureSystemBars(isDarkTheme: Boolean) {
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+            statusBarStyle = if (isDarkTheme) {
+                SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+            } else {
+                SystemBarStyle.light(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT
+                )
+            },
+            navigationBarStyle = if (isDarkTheme) {
+                SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+            } else {
+                SystemBarStyle.light(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT
+                )
+            }
         )
     }
 }
