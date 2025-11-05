@@ -41,6 +41,10 @@
     <string name="settings_language">Language</string>
     <string name="settings_language_description">Select the application language</string>
     <string name="settings_language_current">Current language: %s</string>
+    <string name="language_system">System</string>
+    <string name="language_spanish">Spanish</string>
+    <string name="language_english">English</string>
+    <string name="language_catalan">Catalan</string>
 
     <!-- Common -->
     <string name="save">Save</string>

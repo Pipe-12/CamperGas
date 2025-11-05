@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -29,6 +30,7 @@ class PreferencesDataStore @Inject constructor(
 ) {
     private val lastConnectedDeviceKey = stringPreferencesKey("last_connected_device")
     private val themeModeKey = stringPreferencesKey("theme_mode")
+    private val appLanguageKey = stringPreferencesKey("app_language")
     private val notificationsEnabledKey = booleanPreferencesKey("notifications_enabled")
     private val gasLevelThresholdKey = floatPreferencesKey("gas_level_threshold")
     private val weightReadIntervalKey = longPreferencesKey("weight_read_interval")
@@ -57,6 +59,17 @@ class PreferencesDataStore @Inject constructor(
             } catch (e: IllegalArgumentException) {
                 ThemeMode.SYSTEM
             }
+        }
+
+    /**
+     * Flow of the application language.
+     *
+     * @return Flow emitting AppLanguage, defaults to SYSTEM if not set
+     */
+    val appLanguage: Flow<AppLanguage> = context.dataStore.data
+        .map { preferences ->
+            val stored = preferences[appLanguageKey]
+            AppLanguage.fromStored(stored)
         }
 
     /**
@@ -118,6 +131,18 @@ class PreferencesDataStore @Inject constructor(
     suspend fun setThemeMode(themeMode: ThemeMode) {
         context.dataStore.edit { preferences ->
             preferences[themeModeKey] = themeMode.name
+        }
+    }
+
+    /**
+     * Sets the application language.
+     *
+     * @param language AppLanguage to set (SYSTEM, ES, EN, CA)
+     */
+    suspend fun setAppLanguage(language: AppLanguage) {
+        context.dataStore.edit { preferences ->
+            // Persist empty for SYSTEM to align with AppCompatDelegate empty locales
+            preferences[appLanguageKey] = if (language == AppLanguage.SYSTEM) "system" else language.tag
         }
     }
 

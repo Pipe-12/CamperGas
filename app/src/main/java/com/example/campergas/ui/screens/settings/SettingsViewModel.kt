@@ -1,8 +1,11 @@
 package com.example.campergas.ui.screens.settings
 
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.data.local.preferences.PreferencesDataStore
+import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -78,12 +81,14 @@ class SettingsViewModel @Inject constructor(
             combine(
                 preferencesDataStore.themeMode,
                 preferencesDataStore.areNotificationsEnabled,
-                preferencesDataStore.gasLevelThreshold
-            ) { themeMode, notificationsEnabled, gasLevelThreshold ->
+                preferencesDataStore.gasLevelThreshold,
+                preferencesDataStore.appLanguage
+            ) { themeMode, notificationsEnabled, gasLevelThreshold, appLanguage ->
                 SettingsUiState(
                     themeMode = themeMode,
                     notificationsEnabled = notificationsEnabled,
-                    gasLevelThreshold = gasLevelThreshold
+                    gasLevelThreshold = gasLevelThreshold,
+                    appLanguage = appLanguage
                 )
             }.collect { settings ->
                 _uiState.value = settings
@@ -181,6 +186,26 @@ class SettingsViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Changes the application language using per-app language APIs.
+     *
+     * Persists the new language and applies it immediately using AppCompatDelegate
+     * so that all resources are refreshed across the app.
+     */
+    fun setAppLanguage(language: AppLanguage) {
+        viewModelScope.launch {
+            preferencesDataStore.setAppLanguage(language)
+
+            // Apply locales at application level
+            val locales = if (language == AppLanguage.SYSTEM) {
+                LocaleListCompat.getEmptyLocaleList()
+            } else {
+                LocaleListCompat.forLanguageTags(language.tag)
+            }
+            AppCompatDelegate.setApplicationLocales(locales)
+        }
+    }
 }
 
 /**
@@ -196,6 +221,7 @@ data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val notificationsEnabled: Boolean = true,
     val gasLevelThreshold: Float = 15.0f,
+    val appLanguage: AppLanguage = AppLanguage.SYSTEM,
     val isLoading: Boolean = false,
     val error: String? = null
 )

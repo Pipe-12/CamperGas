@@ -110,4 +110,7 @@ dependencies {
     // DataStore Preferences
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.core)
+
+    // AppCompat for per-app language support via AppCompatDelegate
+    implementation(libs.androidx.appcompat)
 }
