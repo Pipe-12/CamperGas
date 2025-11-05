@@ -9,6 +9,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import java.util.Locale
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +32,10 @@ import com.example.campergas.ui.navigation.NavGraph
 import com.example.campergas.ui.theme.CamperGasTheme
 import com.example.campergas.utils.BluetoothPermissionManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
+
+private val Context.dataStore by preferencesDataStore(name = "settings")
 
 /**
  * Main activity for the CamperGas application.
@@ -49,6 +54,14 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    companion object {
+        /**
+         * Flag to track if we're in the process of recreating due to language change.
+         * This prevents infinite recreation loops.
+         */
+        private var isRecreatingForLanguageChange = false
+    }
 
     /**
      * User preferences data store.
@@ -70,6 +83,64 @@ class MainActivity : ComponentActivity() {
      * - Location access (required for BLE on Android)
      */
     private lateinit var bluetoothPermissionManager: BluetoothPermissionManager
+
+    /**
+     * Attaches the base context with the correct locale configuration.
+     *
+     * This method is called before onCreate and allows us to apply the locale
+     * configuration before the activity is fully created.
+     *
+     * @param newBase The new base context
+     */
+    override fun attachBaseContext(newBase: Context) {
+        val context = updateLocale(newBase)
+        super.attachBaseContext(context)
+    }
+
+    /**
+     * Updates the locale configuration for the given context.
+     *
+     * Reads the saved language preference and applies it to the context's
+     * configuration. Uses runBlocking to read from DataStore synchronously.
+     *
+     * @param context The context to update
+     * @return The updated context with the correct locale
+     */
+    private fun updateLocale(context: Context): Context {
+        // DataStore uses Protocol Buffers, so we need to access it properly
+        val dataStore = context.dataStore
+        var language = AppLanguage.SPANISH
+        
+        // Read the language preference synchronously
+        kotlinx.coroutines.runBlocking {
+            try {
+                val prefs = dataStore.data.first()
+                val languageString = prefs[stringPreferencesKey("app_language")] ?: AppLanguage.SPANISH.name
+                language = try {
+                    AppLanguage.valueOf(languageString)
+                } catch (e: IllegalArgumentException) {
+                    AppLanguage.SPANISH
+                }
+            } catch (e: Exception) {
+                // If there's any error reading preferences, use default
+                language = AppLanguage.SPANISH
+            }
+        }
+
+        val locale = language.locale
+        Locale.setDefault(locale)
+
+        val configuration = Configuration(context.resources.configuration)
+        configuration.setLocale(locale)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val localeList = LocaleList(locale)
+            LocaleList.setDefault(localeList)
+            configuration.setLocales(localeList)
+        }
+
+        return context.createConfigurationContext(configuration)
+    }
 
     /**
      * Initializes the activity and configures the user interface.
@@ -107,9 +178,23 @@ class MainActivity : ComponentActivity() {
             // Cargar el idioma guardado desde las preferencias de forma reactiva
             val appLanguage by preferencesDataStore.appLanguage.collectAsState(initial = AppLanguage.SPANISH)
 
-            // Aplicar el idioma cuando cambia
+            // Observar cambios en el idioma y recrear la actividad si cambia
+            // Usamos una variable de estado para trackear el idioma anterior y evitar
+            // recreaciones en el primer frame (cuando se carga el valor inicial)
+            var previousLanguage by remember { mutableStateOf<AppLanguage?>(null) }
+            
             LaunchedEffect(appLanguage) {
-                applyLanguage(appLanguage)
+                if (previousLanguage != null && previousLanguage != appLanguage && !isRecreatingForLanguageChange) {
+                    // Solo recrear si el idioma cambió después de la inicialización
+                    // y no estamos ya en medio de una recreación
+                    isRecreatingForLanguageChange = true
+                    recreate()
+                } else if (previousLanguage == null) {
+                    // Primera carga, solo guardamos el idioma actual
+                    previousLanguage = appLanguage
+                    // Reset flag on first load to ensure future changes work
+                    isRecreatingForLanguageChange = false
+                }
             }
 
             // Determinar si se debe usar el tema oscuro para configurar las barras del sistema
@@ -193,31 +278,4 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    /**
-     * Applies the selected language to the application.
-     *
-     * Updates the app's locale configuration to use the specified language.
-     * This method updates the configuration and resources to apply the locale change.
-     *
-     * @param language The language to apply (SPANISH, ENGLISH, or CATALAN)
-     */
-    private fun applyLanguage(language: AppLanguage) {
-        val locale = language.locale
-        Locale.setDefault(locale)
-
-        val configuration = Configuration(resources.configuration)
-        configuration.setLocale(locale)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val localeList = LocaleList(locale)
-            LocaleList.setDefault(localeList)
-            configuration.setLocales(localeList)
-        }
-
-        @Suppress("DEPRECATION")
-        resources.updateConfiguration(configuration, resources.displayMetrics)
-
-        // Recreate activity to apply changes
-        recreate()
-    }
 }
