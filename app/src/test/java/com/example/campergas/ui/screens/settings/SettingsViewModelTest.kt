@@ -117,11 +117,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `setAppLanguage updates preferences and applies locales`() = runTest {
-        // Arrange: mock static AppCompatDelegate.setApplicationLocales
-        mockkStatic(androidx.appcompat.app.AppCompatDelegate::class)
-        every { androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(any()) } returns Unit
-
+    fun `setAppLanguage updates preferences`() = runTest {
         // Act
         viewModel.setAppLanguage(AppLanguage.EN)
         advanceUntilIdle()
@@ -136,9 +132,6 @@ class SettingsViewModelTest {
 
         coVerify { preferencesDataStore.setAppLanguage(AppLanguage.SYSTEM) }
         assertEquals(AppLanguage.SYSTEM, viewModel.uiState.value.appLanguage)
-
-        // Cleanup
-        unmockkStatic(androidx.appcompat.app.AppCompatDelegate::class)
     }
 
     @Test
