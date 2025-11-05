@@ -1,14 +1,10 @@
 package com.example.campergas
 
-import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
-import android.os.LocaleList
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import java.util.Locale
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,26 +16,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.compose.rememberNavController
 import com.example.campergas.data.local.preferences.PreferencesDataStore
-import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.ui.components.PermissionDialog
 import com.example.campergas.ui.navigation.NavGraph
 import com.example.campergas.ui.theme.CamperGasTheme
 import com.example.campergas.utils.BluetoothPermissionManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
-
-// Extension property for DataStore access in attachBaseContext
-// This uses the same DataStore name ("settings") as PreferencesDataStore for consistency.
-// Note: DataStore with the same name shares the same underlying storage, so this does not
-// create a duplicate instance - both references access the same preference file.
-private val Context.dataStore by preferencesDataStore(name = "settings")
 
 /**
  * Main activity for the CamperGas application.
@@ -50,7 +35,7 @@ private val Context.dataStore by preferencesDataStore(name = "settings")
  * - Navigation between screens using Jetpack Compose Navigation
  * - Edge-to-edge styling for system bars
  *
- * The application is configured exclusively in Spanish.
+ * The application language is determined by the system settings.
  *
  * Uses Jetpack Compose for all UI and Hilt for dependency injection.
  *
@@ -58,16 +43,6 @@ private val Context.dataStore by preferencesDataStore(name = "settings")
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    companion object {
-        /**
-         * Flag to track if we're in the process of recreating due to language change.
-         * This prevents infinite recreation loops.
-         * Volatile ensures visibility across threads.
-         */
-        @Volatile
-        private var isRecreatingForLanguageChange = false
-    }
 
     /**
      * User preferences data store.
@@ -89,65 +64,6 @@ class MainActivity : ComponentActivity() {
      * - Location access (required for BLE on Android)
      */
     private lateinit var bluetoothPermissionManager: BluetoothPermissionManager
-
-    /**
-     * Attaches the base context with the correct locale configuration.
-     *
-     * This method is called before onCreate and allows us to apply the locale
-     * configuration before the activity is fully created.
-     *
-     * @param newBase The new base context
-     */
-    override fun attachBaseContext(newBase: Context) {
-        val context = updateLocale(newBase)
-        super.attachBaseContext(context)
-    }
-
-    /**
-     * Updates the locale configuration for the given context.
-     *
-     * Reads the saved language preference and applies it to the context's
-     * configuration. Uses runBlocking to read from DataStore.
-     * This is called during attachBaseContext which happens before dependency
-     * injection, so we need to access DataStore directly.
-     *
-     * @param context The context to update
-     * @return The updated context with the correct locale
-     */
-    private fun updateLocale(context: Context): Context {
-        var language = AppLanguage.SPANISH
-        
-        // Read the language preference from DataStore
-        // We use runBlocking here because attachBaseContext requires synchronous execution.
-        // DataStore reads are typically fast (< 10ms) so ANR risk is minimal.
-        // The key "app_language" matches the key used in PreferencesDataStore.appLanguageKey.
-        runBlocking {
-            try {
-                val dataStore = context.dataStore
-                val prefs = dataStore.data.first()
-                // Using the same key as PreferencesDataStore for consistency
-                val languageString = prefs[stringPreferencesKey("app_language")] ?: AppLanguage.SPANISH.name
-                language = try {
-                    AppLanguage.valueOf(languageString)
-                } catch (e: IllegalArgumentException) {
-                    AppLanguage.SPANISH
-                }
-            } catch (e: Exception) {
-                // If there's any error reading preferences, use default
-                language = AppLanguage.SPANISH
-            }
-        }
-
-        val locale = language.locale
-        Locale.setDefault(locale)
-
-        val configuration = Configuration(context.resources.configuration)
-        val localeList = LocaleList(locale)
-        LocaleList.setDefault(localeList)
-        configuration.setLocales(localeList)
-
-        return context.createConfigurationContext(configuration)
-    }
 
     /**
      * Initializes the activity and configures the user interface.
@@ -181,28 +97,6 @@ class MainActivity : ComponentActivity() {
             // Usamos collectAsState para que el tema se actualice automáticamente cuando cambia
             // El valor inicial es SYSTEM para evitar parpadeos en el primer frame
             val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
-
-            // Cargar el idioma guardado desde las preferencias de forma reactiva
-            val appLanguage by preferencesDataStore.appLanguage.collectAsState(initial = AppLanguage.SPANISH)
-
-            // Observar cambios en el idioma y recrear la actividad si cambia
-            // Usamos una variable de estado para trackear el idioma anterior y evitar
-            // recreaciones en el primer frame (cuando se carga el valor inicial)
-            var previousLanguage by remember { mutableStateOf<AppLanguage?>(null) }
-            
-            LaunchedEffect(appLanguage) {
-                if (previousLanguage != null && previousLanguage != appLanguage && !isRecreatingForLanguageChange) {
-                    // Solo recrear si el idioma cambió después de la inicialización
-                    // y no estamos ya en medio de una recreación
-                    isRecreatingForLanguageChange = true
-                    recreate()
-                } else if (previousLanguage == null) {
-                    // Primera carga, solo guardamos el idioma actual
-                    previousLanguage = appLanguage
-                    // Reset flag on first load to ensure future changes work
-                    isRecreatingForLanguageChange = false
-                }
-            }
 
             // Determinar si se debe usar el tema oscuro para configurar las barras del sistema
             val isDarkTheme = when (themeMode) {

@@ -3,7 +3,6 @@ package com.example.campergas.ui.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.data.local.preferences.PreferencesDataStore
-import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -71,20 +70,18 @@ class SettingsViewModel @Inject constructor(
     /**
      * Loads initial settings from user preferences.
      *
-     * Combines multiple preference flows (theme, language, notifications, gas threshold)
+     * Combines multiple preference flows (theme, notifications, gas threshold)
      * into a single UI state that updates reactively.
      */
     private fun loadSettings() {
         viewModelScope.launch {
             combine(
                 preferencesDataStore.themeMode,
-                preferencesDataStore.appLanguage,
                 preferencesDataStore.areNotificationsEnabled,
                 preferencesDataStore.gasLevelThreshold
-            ) { themeMode, appLanguage, notificationsEnabled, gasLevelThreshold ->
+            ) { themeMode, notificationsEnabled, gasLevelThreshold ->
                 SettingsUiState(
                     themeMode = themeMode,
-                    appLanguage = appLanguage,
                     notificationsEnabled = notificationsEnabled,
                     gasLevelThreshold = gasLevelThreshold
                 )
@@ -105,20 +102,6 @@ class SettingsViewModel @Inject constructor(
     fun setThemeMode(themeMode: ThemeMode) {
         viewModelScope.launch {
             preferencesDataStore.setThemeMode(themeMode)
-        }
-    }
-
-    /**
-     * Changes the application language.
-     *
-     * Saves the new language to user preferences.
-     * The change applies immediately across the entire application.
-     *
-     * @param language New language (SPANISH, ENGLISH, or CATALAN)
-     */
-    fun setAppLanguage(language: AppLanguage) {
-        viewModelScope.launch {
-            preferencesDataStore.setAppLanguage(language)
         }
     }
 
@@ -204,7 +187,6 @@ class SettingsViewModel @Inject constructor(
  * UI state for the settings screen.
  *
  * @param themeMode Current theme mode (LIGHT, DARK, or SYSTEM)
- * @param appLanguage Current application language (SPANISH, ENGLISH, or CATALAN)
  * @param notificationsEnabled Indicates if notifications are enabled
  * @param gasLevelThreshold Gas level threshold for warnings (percentage)
  * @param isLoading Indicates if an operation is in progress
@@ -212,7 +194,6 @@ class SettingsViewModel @Inject constructor(
  */
 data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val appLanguage: AppLanguage = AppLanguage.SPANISH,
     val notificationsEnabled: Boolean = true,
     val gasLevelThreshold: Float = 15.0f,
     val isLoading: Boolean = false,

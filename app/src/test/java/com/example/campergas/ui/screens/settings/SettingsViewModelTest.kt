@@ -3,7 +3,6 @@ package com.example.campergas.ui.screens.settings
 import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.campergas.data.local.preferences.PreferencesDataStore
-import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
 import io.mockk.clearAllMocks
@@ -46,7 +45,6 @@ class SettingsViewModelTest {
 
     // Flows to simulate preferences
     private val themeModeFlow = MutableStateFlow(ThemeMode.DARK)
-    private val appLanguageFlow = MutableStateFlow(AppLanguage.SPANISH)
     private val notificationsEnabledFlow = MutableStateFlow(true)
     private val gasLevelThresholdFlow = MutableStateFlow(15.0f)
     private val weightIntervalFlow = MutableStateFlow(60) // 60 seconds = 1 minute
@@ -62,16 +60,11 @@ class SettingsViewModelTest {
 
         // Setup mock responses
         every { preferencesDataStore.themeMode } returns themeModeFlow
-        every { preferencesDataStore.appLanguage } returns appLanguageFlow
         every { preferencesDataStore.areNotificationsEnabled } returns notificationsEnabledFlow
         every { preferencesDataStore.gasLevelThreshold } returns gasLevelThresholdFlow
 
         coEvery { preferencesDataStore.setThemeMode(any()) } coAnswers {
             themeModeFlow.value = firstArg()
-        }
-
-        coEvery { preferencesDataStore.setAppLanguage(any()) } coAnswers {
-            appLanguageFlow.value = firstArg()
         }
 
         coEvery { preferencesDataStore.setNotificationsEnabled(any()) } coAnswers {
@@ -105,7 +98,6 @@ class SettingsViewModelTest {
         // Assert
         val state = viewModel.uiState.value
         assertEquals(ThemeMode.DARK, state.themeMode) // The mock returns DARK
-        assertEquals(AppLanguage.SPANISH, state.appLanguage) // The mock returns SPANISH
         assertTrue(state.notificationsEnabled)
         assertEquals(15.0f, state.gasLevelThreshold, 0.01f)
         assertFalse(state.isLoading)
@@ -234,35 +226,5 @@ class SettingsViewModelTest {
         // Verify message is cleared after delay
         advanceTimeBy(2100)
         assertNull(viewModel.operationStatus.value)
-    }
-
-    @Test
-    fun `setAppLanguage updates preferences`() = runTest {
-        // Act - Set to ENGLISH
-        viewModel.setAppLanguage(AppLanguage.ENGLISH)
-        advanceUntilIdle()
-
-        // Assert
-        coVerify { preferencesDataStore.setAppLanguage(AppLanguage.ENGLISH) }
-        assertEquals(AppLanguage.ENGLISH, appLanguageFlow.value)
-        assertEquals(AppLanguage.ENGLISH, viewModel.uiState.value.appLanguage)
-
-        // Act - Set to CATALAN
-        viewModel.setAppLanguage(AppLanguage.CATALAN)
-        advanceUntilIdle()
-
-        // Assert
-        coVerify { preferencesDataStore.setAppLanguage(AppLanguage.CATALAN) }
-        assertEquals(AppLanguage.CATALAN, appLanguageFlow.value)
-        assertEquals(AppLanguage.CATALAN, viewModel.uiState.value.appLanguage)
-
-        // Act - Set back to SPANISH
-        viewModel.setAppLanguage(AppLanguage.SPANISH)
-        advanceUntilIdle()
-
-        // Assert
-        coVerify { preferencesDataStore.setAppLanguage(AppLanguage.SPANISH) }
-        assertEquals(AppLanguage.SPANISH, appLanguageFlow.value)
-        assertEquals(AppLanguage.SPANISH, viewModel.uiState.value.appLanguage)
     }
 }
