@@ -8,8 +8,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import java.util.Locale
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.compose.rememberNavController
 import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.domain.model.AppLanguage
@@ -32,8 +32,11 @@ import com.example.campergas.ui.theme.CamperGasTheme
 import com.example.campergas.utils.BluetoothPermissionManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
+// Extension property for DataStore access in attachBaseContext
+// This uses the same DataStore name as PreferencesDataStore for consistency
 private val Context.dataStore by preferencesDataStore(name = "settings")
 
 /**
@@ -58,7 +61,9 @@ class MainActivity : ComponentActivity() {
         /**
          * Flag to track if we're in the process of recreating due to language change.
          * This prevents infinite recreation loops.
+         * Volatile ensures visibility across threads.
          */
+        @Volatile
         private var isRecreatingForLanguageChange = false
     }
 
@@ -100,19 +105,22 @@ class MainActivity : ComponentActivity() {
      * Updates the locale configuration for the given context.
      *
      * Reads the saved language preference and applies it to the context's
-     * configuration. Uses runBlocking to read from DataStore synchronously.
+     * configuration. Uses runBlocking to read from DataStore.
+     * This is called during attachBaseContext which happens before dependency
+     * injection, so we need to access DataStore directly.
      *
      * @param context The context to update
      * @return The updated context with the correct locale
      */
     private fun updateLocale(context: Context): Context {
-        // DataStore uses Protocol Buffers, so we need to access it properly
-        val dataStore = context.dataStore
         var language = AppLanguage.SPANISH
         
-        // Read the language preference synchronously
-        kotlinx.coroutines.runBlocking {
+        // Read the language preference from DataStore
+        // We use runBlocking here because attachBaseContext requires synchronous execution
+        // DataStore reads are typically fast (< 10ms) so ANR risk is minimal
+        runBlocking {
             try {
+                val dataStore = context.dataStore
                 val prefs = dataStore.data.first()
                 val languageString = prefs[stringPreferencesKey("app_language")] ?: AppLanguage.SPANISH.name
                 language = try {
