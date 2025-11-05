@@ -45,6 +45,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 import androidx.navigation.NavController
 import com.example.campergas.R
+import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 
 /**
@@ -142,11 +143,19 @@ fun SettingsScreen(
             }
         }
 
-        // Configuración de tema de la aplicación
+        // Application theme configuration
         ThemeSelectionCard(
             currentThemeMode = uiState.themeMode,
             onThemeModeSelected = { themeMode ->
                 viewModel.setThemeMode(themeMode)
+            }
+        )
+
+        // Application language configuration
+        LanguageSelectionCard(
+            currentLanguage = uiState.appLanguage,
+            onLanguageSelected = { language ->
+                viewModel.setAppLanguage(language)
             }
         )
 
@@ -478,6 +487,104 @@ private fun ThemeSelectionCard(
                     ThemeMode.DARK -> stringResource(R.string.theme_dark)
                     ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
                 },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+    }
+}
+
+/**
+ * Language selection card for the application.
+ *
+ * Provides a user interface to select between different available languages:
+ * Spanish, English, and Catalan. Uses a dropdown menu for selection.
+ *
+ * @param currentLanguage Currently selected language
+ * @param onLanguageSelected Callback invoked when user selects a new language
+ */
+@Composable
+private fun LanguageSelectionCard(
+    currentLanguage: AppLanguage,
+    onLanguageSelected: (AppLanguage) -> Unit
+) {
+    // State to control if the dropdown menu is expanded
+    var expanded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.settings_language),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = stringResource(R.string.settings_language_description),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            // Button that shows the current language and opens the dropdown menu
+            Box {
+                Button(
+                    onClick = { expanded = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = currentLanguage.displayName)
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null
+                        )
+                    }
+                }
+
+                // Dropdown menu with language options
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    // Spanish option
+                    DropdownMenuItem(
+                        text = { Text(AppLanguage.SPANISH.displayName) },
+                        onClick = {
+                            onLanguageSelected(AppLanguage.SPANISH)
+                            expanded = false
+                        }
+                    )
+                    // English option
+                    DropdownMenuItem(
+                        text = { Text(AppLanguage.ENGLISH.displayName) },
+                        onClick = {
+                            onLanguageSelected(AppLanguage.ENGLISH)
+                            expanded = false
+                        }
+                    )
+                    // Catalan option
+                    DropdownMenuItem(
+                        text = { Text(AppLanguage.CATALAN.displayName) },
+                        onClick = {
+                            onLanguageSelected(AppLanguage.CATALAN)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+
+            // Show the current language status
+            Text(
+                text = stringResource(R.string.settings_language_current, currentLanguage.displayName),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp)

@@ -1,10 +1,15 @@
 package com.example.campergas
 
+import android.content.Context
+import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
+import android.os.LocaleList
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import java.util.Locale
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -18,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
 import com.example.campergas.data.local.preferences.PreferencesDataStore
+import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.ui.components.PermissionDialog
 import com.example.campergas.ui.navigation.NavGraph
@@ -98,6 +104,14 @@ class MainActivity : ComponentActivity() {
             // El valor inicial es SYSTEM para evitar parpadeos en el primer frame
             val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
 
+            // Cargar el idioma guardado desde las preferencias de forma reactiva
+            val appLanguage by preferencesDataStore.appLanguage.collectAsState(initial = AppLanguage.SPANISH)
+
+            // Aplicar el idioma cuando cambia
+            LaunchedEffect(appLanguage) {
+                applyLanguage(appLanguage)
+            }
+
             // Determinar si se debe usar el tema oscuro para configurar las barras del sistema
             val isDarkTheme = when (themeMode) {
                 ThemeMode.LIGHT -> false
@@ -177,5 +191,33 @@ class MainActivity : ComponentActivity() {
                 )
             }
         )
+    }
+
+    /**
+     * Applies the selected language to the application.
+     *
+     * Updates the app's locale configuration to use the specified language.
+     * This method updates the configuration and resources to apply the locale change.
+     *
+     * @param language The language to apply (SPANISH, ENGLISH, or CATALAN)
+     */
+    private fun applyLanguage(language: AppLanguage) {
+        val locale = language.locale
+        Locale.setDefault(locale)
+
+        val configuration = Configuration(resources.configuration)
+        configuration.setLocale(locale)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val localeList = LocaleList(locale)
+            LocaleList.setDefault(localeList)
+            configuration.setLocales(localeList)
+        }
+
+        @Suppress("DEPRECATION")
+        resources.updateConfiguration(configuration, resources.displayMetrics)
+
+        // Recreate activity to apply changes
+        recreate()
     }
 }
