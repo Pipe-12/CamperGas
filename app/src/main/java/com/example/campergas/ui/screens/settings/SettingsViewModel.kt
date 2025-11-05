@@ -1,7 +1,5 @@
 package com.example.campergas.ui.screens.settings
 
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.data.local.preferences.PreferencesDataStore
@@ -188,22 +186,16 @@ class SettingsViewModel @Inject constructor(
     }
 
     /**
-     * Changes the application language using per-app language APIs.
+     * Changes the application language.
      *
-     * Persists the new language and applies it immediately using AppCompatDelegate
-     * so that all resources are refreshed across the app.
+     * Persists the new language preference. The actual locale change is applied
+     * by MainActivity's LaunchedEffect when the preference flow emits the new value.
+     *
+     * @param language The language to set (SYSTEM, ES, EN, or CA)
      */
     fun setAppLanguage(language: AppLanguage) {
         viewModelScope.launch {
             preferencesDataStore.setAppLanguage(language)
-
-            // Apply locales at application level
-            val locales = if (language == AppLanguage.SYSTEM) {
-                LocaleListCompat.getEmptyLocaleList()
-            } else {
-                LocaleListCompat.forLanguageTags(language.tag)
-            }
-            AppCompatDelegate.setApplicationLocales(locales)
         }
     }
 }
