@@ -3,7 +3,6 @@ package com.example.campergas.ui.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campergas.data.local.preferences.PreferencesDataStore
-import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -79,14 +78,12 @@ class SettingsViewModel @Inject constructor(
             combine(
                 preferencesDataStore.themeMode,
                 preferencesDataStore.areNotificationsEnabled,
-                preferencesDataStore.gasLevelThreshold,
-                preferencesDataStore.appLanguage
-            ) { themeMode, notificationsEnabled, gasLevelThreshold, appLanguage ->
+                preferencesDataStore.gasLevelThreshold
+            ) { themeMode, notificationsEnabled, gasLevelThreshold ->
                 SettingsUiState(
                     themeMode = themeMode,
                     notificationsEnabled = notificationsEnabled,
-                    gasLevelThreshold = gasLevelThreshold,
-                    appLanguage = appLanguage
+                    gasLevelThreshold = gasLevelThreshold
                 )
             }.collect { settings ->
                 _uiState.value = settings
@@ -185,19 +182,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Changes the application language.
-     *
-     * Persists the new language preference. The actual locale change is applied
-     * by MainActivity's LaunchedEffect when the preference flow emits the new value.
-     *
-     * @param language The language to set (SYSTEM, ES, EN, or CA)
-     */
-    fun setAppLanguage(language: AppLanguage) {
-        viewModelScope.launch {
-            preferencesDataStore.setAppLanguage(language)
-        }
-    }
+
 }
 
 /**
@@ -213,7 +198,6 @@ data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val notificationsEnabled: Boolean = true,
     val gasLevelThreshold: Float = 15.0f,
-    val appLanguage: AppLanguage = AppLanguage.SYSTEM,
     val isLoading: Boolean = false,
     val error: String? = null
 )

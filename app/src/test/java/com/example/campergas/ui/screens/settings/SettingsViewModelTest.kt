@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.domain.model.ThemeMode
-import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -50,7 +49,6 @@ class SettingsViewModelTest {
     private val gasLevelThresholdFlow = MutableStateFlow(15.0f)
     private val weightIntervalFlow = MutableStateFlow(60) // 60 seconds = 1 minute
     private val inclinationIntervalFlow = MutableStateFlow(15) // 15 seconds
-    private val appLanguageFlow = MutableStateFlow(AppLanguage.SYSTEM)
 
     @Before
     fun setUp() {
@@ -64,7 +62,6 @@ class SettingsViewModelTest {
         every { preferencesDataStore.themeMode } returns themeModeFlow
         every { preferencesDataStore.areNotificationsEnabled } returns notificationsEnabledFlow
     every { preferencesDataStore.gasLevelThreshold } returns gasLevelThresholdFlow
-    every { preferencesDataStore.appLanguage } returns appLanguageFlow
 
         coEvery { preferencesDataStore.setThemeMode(any()) } coAnswers {
             themeModeFlow.value = firstArg()
@@ -76,10 +73,6 @@ class SettingsViewModelTest {
 
         coEvery { preferencesDataStore.setGasLevelThreshold(any()) } coAnswers {
             gasLevelThresholdFlow.value = firstArg()
-        }
-
-        coEvery { preferencesDataStore.setAppLanguage(any()) } coAnswers {
-            appLanguageFlow.value = firstArg()
         }
 
         every { configureReadingIntervalsUseCase.getWeightReadIntervalSeconds() } returns weightIntervalFlow
@@ -107,7 +100,6 @@ class SettingsViewModelTest {
         assertEquals(ThemeMode.DARK, state.themeMode) // The mock returns DARK
         assertTrue(state.notificationsEnabled)
         assertEquals(15.0f, state.gasLevelThreshold, 0.01f)
-        assertEquals(AppLanguage.SYSTEM, state.appLanguage)
         assertFalse(state.isLoading)
         assertNull(state.error)
 
@@ -116,23 +108,7 @@ class SettingsViewModelTest {
         assertEquals(15, viewModel.inclinationInterval.value)
     }
 
-    @Test
-    fun `setAppLanguage updates preferences`() = runTest {
-        // Act
-        viewModel.setAppLanguage(AppLanguage.EN)
-        advanceUntilIdle()
 
-        // Assert
-        coVerify { preferencesDataStore.setAppLanguage(AppLanguage.EN) }
-        assertEquals(AppLanguage.EN, viewModel.uiState.value.appLanguage)
-
-        // Act back to system
-        viewModel.setAppLanguage(AppLanguage.SYSTEM)
-        advanceUntilIdle()
-
-        coVerify { preferencesDataStore.setAppLanguage(AppLanguage.SYSTEM) }
-        assertEquals(AppLanguage.SYSTEM, viewModel.uiState.value.appLanguage)
-    }
 
     @Test
     fun `setThemeMode updates preferences`() = runTest {

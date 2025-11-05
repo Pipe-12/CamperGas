@@ -37,14 +37,7 @@
     <string name="theme_mode_dark">Oscuro</string>
     <string name="theme_mode_system">Sistema</string>
 
-    <!-- Language settings -->
-    <string name="settings_language">Idioma</string>
-    <string name="settings_language_description">Selecciona el idioma de la aplicación</string>
-    <string name="settings_language_current">Idioma actual: %s</string>
-    <string name="language_system">Sistema</string>
-    <string name="language_spanish">Español</string>
-    <string name="language_english">Inglés</string>
-    <string name="language_catalan">Catalán</string>
+
 
     <!-- Common -->
     <string name="save">Guardar</string>
