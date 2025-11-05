@@ -36,7 +36,9 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 // Extension property for DataStore access in attachBaseContext
-// This uses the same DataStore name as PreferencesDataStore for consistency
+// This uses the same DataStore name ("settings") as PreferencesDataStore for consistency.
+// Note: DataStore with the same name shares the same underlying storage, so this does not
+// create a duplicate instance - both references access the same preference file.
 private val Context.dataStore by preferencesDataStore(name = "settings")
 
 /**
@@ -116,12 +118,14 @@ class MainActivity : ComponentActivity() {
         var language = AppLanguage.SPANISH
         
         // Read the language preference from DataStore
-        // We use runBlocking here because attachBaseContext requires synchronous execution
-        // DataStore reads are typically fast (< 10ms) so ANR risk is minimal
+        // We use runBlocking here because attachBaseContext requires synchronous execution.
+        // DataStore reads are typically fast (< 10ms) so ANR risk is minimal.
+        // The key "app_language" matches the key used in PreferencesDataStore.appLanguageKey.
         runBlocking {
             try {
                 val dataStore = context.dataStore
                 val prefs = dataStore.data.first()
+                // Using the same key as PreferencesDataStore for consistency
                 val languageString = prefs[stringPreferencesKey("app_language")] ?: AppLanguage.SPANISH.name
                 language = try {
                     AppLanguage.valueOf(languageString)
