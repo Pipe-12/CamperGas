@@ -2,7 +2,6 @@ package com.example.campergas
 
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.os.LocaleList
 import androidx.activity.ComponentActivity
@@ -131,13 +130,9 @@ class MainActivity : ComponentActivity() {
         Locale.setDefault(locale)
 
         val configuration = Configuration(context.resources.configuration)
-        configuration.setLocale(locale)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val localeList = LocaleList(locale)
-            LocaleList.setDefault(localeList)
-            configuration.setLocales(localeList)
-        }
+        val localeList = LocaleList(locale)
+        LocaleList.setDefault(localeList)
+        configuration.setLocales(localeList)
 
         return context.createConfigurationContext(configuration)
     }
