@@ -25,6 +25,7 @@ import com.example.campergas.ui.navigation.NavGraph
 import com.example.campergas.ui.theme.CamperGasTheme
 import com.example.campergas.utils.BluetoothPermissionManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 /**
@@ -96,12 +97,29 @@ class MainActivity : ComponentActivity() {
             // Usamos collectAsState para que el tema se actualice automáticamente cuando cambia
             // El valor inicial es SYSTEM para evitar parpadeos en el primer frame
             val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+            
+            // Determinar el tema actual del sistema
+            val systemIsDark = androidx.compose.foundation.isSystemInDarkTheme()
+
+            // Convertir SYSTEM al tema actual del sistema en el primer inicio
+            // LaunchedEffect(Unit) garantiza que solo se ejecute una vez por sesión de la app
+            // Nota: Esta migración ocurre de forma asíncrona. Mientras tanto, el tema SYSTEM
+            // se maneja correctamente en la UI usando el valor systemIsDark.
+            LaunchedEffect(Unit) {
+                // Obtener el tema actual de las preferencias
+                val currentTheme = preferencesDataStore.themeMode.first()
+                if (currentTheme == ThemeMode.SYSTEM) {
+                    // Si el tema es SYSTEM, convertirlo al tema actual del sistema
+                    val newTheme = if (systemIsDark) ThemeMode.DARK else ThemeMode.LIGHT
+                    preferencesDataStore.setThemeMode(newTheme)
+                }
+            }
 
             // Determinar si se debe usar el tema oscuro para configurar las barras del sistema
             val isDarkTheme = when (themeMode) {
                 ThemeMode.LIGHT -> false
                 ThemeMode.DARK -> true
-                ThemeMode.SYSTEM -> androidx.compose.foundation.isSystemInDarkTheme()
+                ThemeMode.SYSTEM -> systemIsDark
             }
 
             // Configurar las barras del sistema según el tema actual
