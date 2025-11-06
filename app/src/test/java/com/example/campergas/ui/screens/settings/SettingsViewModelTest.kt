@@ -251,4 +251,47 @@ class SettingsViewModelTest {
         advanceTimeBy(2100)
         assertNull(viewModel.operationStatus.value)
     }
+
+    @Test
+    fun `setAppLanguage updates preferences`() = runTest {
+        // Act - Set to English
+        viewModel.setAppLanguage(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+
+        // Assert
+        coVerify { preferencesDataStore.setAppLanguage(AppLanguage.ENGLISH) }
+        assertEquals(AppLanguage.ENGLISH, appLanguageFlow.value)
+        assertEquals(AppLanguage.ENGLISH, viewModel.uiState.value.language)
+
+        // Act - Set to Spanish
+        viewModel.setAppLanguage(AppLanguage.SPANISH)
+        advanceUntilIdle()
+
+        // Assert
+        coVerify { preferencesDataStore.setAppLanguage(AppLanguage.SPANISH) }
+        assertEquals(AppLanguage.SPANISH, appLanguageFlow.value)
+        assertEquals(AppLanguage.SPANISH, viewModel.uiState.value.language)
+
+        // Act - Set to Catalan
+        viewModel.setAppLanguage(AppLanguage.CATALAN)
+        advanceUntilIdle()
+
+        // Assert
+        coVerify { preferencesDataStore.setAppLanguage(AppLanguage.CATALAN) }
+        assertEquals(AppLanguage.CATALAN, appLanguageFlow.value)
+        assertEquals(AppLanguage.CATALAN, viewModel.uiState.value.language)
+    }
+
+    @Test
+    fun `initial language state is loaded from preferences`() = runTest {
+        // Assert - Initial state should have SYSTEM language
+        assertEquals(AppLanguage.SYSTEM, viewModel.uiState.value.language)
+
+        // Change the flow value
+        appLanguageFlow.value = AppLanguage.ENGLISH
+        advanceUntilIdle()
+
+        // Assert - UI state should update to English
+        assertEquals(AppLanguage.ENGLISH, viewModel.uiState.value.language)
+    }
 }
