@@ -3,6 +3,7 @@ package com.example.campergas.ui.screens.settings
 import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.campergas.data.local.preferences.PreferencesDataStore
+import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
 import io.mockk.clearAllMocks
@@ -47,6 +48,7 @@ class SettingsViewModelTest {
     private val themeModeFlow = MutableStateFlow(ThemeMode.DARK)
     private val notificationsEnabledFlow = MutableStateFlow(true)
     private val gasLevelThresholdFlow = MutableStateFlow(15.0f)
+    private val appLanguageFlow = MutableStateFlow(AppLanguage.SYSTEM)
     private val weightIntervalFlow = MutableStateFlow(60) // 60 seconds = 1 minute
     private val inclinationIntervalFlow = MutableStateFlow(15) // 15 seconds
 
@@ -62,6 +64,7 @@ class SettingsViewModelTest {
         every { preferencesDataStore.themeMode } returns themeModeFlow
         every { preferencesDataStore.areNotificationsEnabled } returns notificationsEnabledFlow
     every { preferencesDataStore.gasLevelThreshold } returns gasLevelThresholdFlow
+        every { preferencesDataStore.appLanguage } returns appLanguageFlow
 
         coEvery { preferencesDataStore.setThemeMode(any()) } coAnswers {
             themeModeFlow.value = firstArg()
@@ -73,6 +76,10 @@ class SettingsViewModelTest {
 
         coEvery { preferencesDataStore.setGasLevelThreshold(any()) } coAnswers {
             gasLevelThresholdFlow.value = firstArg()
+        }
+
+        coEvery { preferencesDataStore.setAppLanguage(any()) } coAnswers {
+            appLanguageFlow.value = firstArg()
         }
 
         every { configureReadingIntervalsUseCase.getWeightReadIntervalSeconds() } returns weightIntervalFlow

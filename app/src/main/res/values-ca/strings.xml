@@ -37,6 +37,14 @@
     <string name="theme_mode_dark">Fosc</string>
     <string name="theme_mode_system">Sistema</string>
 
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_description">Selecciona l\'idioma de l\'aplicació</string>
+    <string name="settings_language_hint">Els textos s\'actualitzen al moment</string>
+    <string name="language_option_system">Utilitza l\'idioma del sistema</string>
+    <string name="language_option_spanish">Espanyol</string>
+    <string name="language_option_english">Anglès</string>
+    <string name="language_option_catalan">Català</string>
+
 
 
     <!-- Common -->

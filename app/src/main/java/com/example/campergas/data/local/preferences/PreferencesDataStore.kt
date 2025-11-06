@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -33,6 +34,7 @@ class PreferencesDataStore @Inject constructor(
     private val gasLevelThresholdKey = floatPreferencesKey("gas_level_threshold")
     private val weightReadIntervalKey = longPreferencesKey("weight_read_interval")
     private val inclinationReadIntervalKey = longPreferencesKey("inclination_read_interval")
+    private val languageKey = stringPreferencesKey("app_language")
 
     /**
      * Flow of the last connected BLE device address.
@@ -79,6 +81,16 @@ class PreferencesDataStore @Inject constructor(
     val gasLevelThreshold: Flow<Float> = context.dataStore.data
         .map { preferences ->
             preferences[gasLevelThresholdKey] ?: 15.0f // 15% por defecto
+        }
+
+    /**
+     * Flow of the application language preference.
+     *
+     * @return Flow emitting the selected [AppLanguage], defaults to system language
+     */
+    val appLanguage: Flow<AppLanguage> = context.dataStore.data
+        .map { preferences ->
+            AppLanguage.fromLanguageTag(preferences[languageKey])
         }
 
     /**
@@ -144,6 +156,17 @@ class PreferencesDataStore @Inject constructor(
     suspend fun setGasLevelThreshold(threshold: Float) {
         context.dataStore.edit { preferences ->
             preferences[gasLevelThresholdKey] = threshold
+        }
+    }
+
+    /**
+     * Sets the application language preference.
+     *
+     * @param language Language selected by the user
+     */
+    suspend fun setAppLanguage(language: AppLanguage) {
+        context.dataStore.edit { preferences ->
+            preferences[languageKey] = language.languageTag
         }
     }
 

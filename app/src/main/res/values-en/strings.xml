@@ -37,6 +37,14 @@
     <string name="theme_mode_dark">Dark</string>
     <string name="theme_mode_system">System</string>
 
+    <string name="settings_language">Language</string>
+    <string name="settings_language_description">Choose the application language</string>
+    <string name="settings_language_hint">Text updates instantly</string>
+    <string name="language_option_system">Use system language</string>
+    <string name="language_option_spanish">Spanish</string>
+    <string name="language_option_english">English</string>
+    <string name="language_option_catalan">Catalan</string>
+
 
 
     <!-- Common -->
