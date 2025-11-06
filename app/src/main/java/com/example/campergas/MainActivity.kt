@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
 import com.example.campergas.data.local.preferences.PreferencesDataStore
-import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.ui.components.PermissionDialog
 import com.example.campergas.ui.navigation.NavGraph
@@ -36,8 +35,6 @@ import javax.inject.Inject
  * - Bluetooth permissions required for BLE connection
  * - Navigation between screens using Jetpack Compose Navigation
  * - Edge-to-edge styling for system bars
- *
- * The application language is determined by the system settings.
  *
  * Uses Jetpack Compose for all UI and Hilt for dependency injection.
  *
@@ -99,7 +96,6 @@ class MainActivity : ComponentActivity() {
             // Usamos collectAsState para que el tema se actualice automáticamente cuando cambia
             // El valor inicial es SYSTEM para evitar parpadeos en el primer frame
             val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
-            val appLanguage by preferencesDataStore.appLanguage.collectAsState(initial = AppLanguage.SYSTEM)
 
             // Determinar si se debe usar el tema oscuro para configurar las barras del sistema
             val isDarkTheme = when (themeMode) {
@@ -111,16 +107,6 @@ class MainActivity : ComponentActivity() {
             // Configurar las barras del sistema según el tema actual
             LaunchedEffect(isDarkTheme) {
                 configureSystemBars(isDarkTheme)
-            }
-
-            // Aplicar el idioma de la aplicación al iniciar o cuando cambie
-            LaunchedEffect(appLanguage) {
-                val locales = if (appLanguage == AppLanguage.SYSTEM) {
-                    androidx.core.os.LocaleListCompat.getEmptyLocaleList()
-                } else {
-                    androidx.core.os.LocaleListCompat.forLanguageTags(appLanguage.tag)
-                }
-                AppCompatDelegate.setApplicationLocales(locales)
             }
 
             // Aplicar el tema de la aplicación

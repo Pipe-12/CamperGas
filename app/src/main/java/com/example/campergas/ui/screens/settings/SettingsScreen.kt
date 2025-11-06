@@ -45,7 +45,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 import androidx.navigation.NavController
 import com.example.campergas.R
-import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 
 /**
@@ -148,14 +147,6 @@ fun SettingsScreen(
             currentThemeMode = uiState.themeMode,
             onThemeModeSelected = { themeMode ->
                 viewModel.setThemeMode(themeMode)
-            }
-        )
-
-        // Language configuration
-        LanguageSelectionCard(
-            currentLanguage = uiState.appLanguage,
-            onLanguageSelected = { language ->
-                viewModel.setAppLanguage(language)
             }
         )
 
@@ -495,111 +486,3 @@ private fun ThemeSelectionCard(
     }
 }
 
-/**
- * Language selection card for the application.
- *
- * Provides a dropdown to switch app language using per-app language API.
- */
-@Composable
-private fun LanguageSelectionCard(
-    currentLanguage: AppLanguage,
-    onLanguageSelected: (AppLanguage) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.settings_language),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            Text(
-                text = stringResource(R.string.settings_language_description),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-
-            Box {
-                Button(
-                    onClick = { expanded = true },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = when (currentLanguage) {
-                                AppLanguage.SYSTEM -> stringResource(R.string.language_system)
-                                AppLanguage.ES -> stringResource(R.string.language_spanish)
-                                AppLanguage.EN -> stringResource(R.string.language_english)
-                                AppLanguage.CA -> stringResource(R.string.language_catalan)
-                            }
-                        )
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = null
-                        )
-                    }
-                }
-
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.language_system)) },
-                        onClick = {
-                            onLanguageSelected(AppLanguage.SYSTEM)
-                            expanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.language_spanish)) },
-                        onClick = {
-                            onLanguageSelected(AppLanguage.ES)
-                            expanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.language_english)) },
-                        onClick = {
-                            onLanguageSelected(AppLanguage.EN)
-                            expanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.language_catalan)) },
-                        onClick = {
-                            onLanguageSelected(AppLanguage.CA)
-                            expanded = false
-                        }
-                    )
-                }
-            }
-
-            Text(
-                text = stringResource(
-                    R.string.settings_language_current,
-                    when (currentLanguage) {
-                        AppLanguage.SYSTEM -> stringResource(R.string.language_system)
-                        AppLanguage.ES -> stringResource(R.string.language_spanish)
-                        AppLanguage.EN -> stringResource(R.string.language_english)
-                        AppLanguage.CA -> stringResource(R.string.language_catalan)
-                    }
-                ),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-        }
-    }
-}
