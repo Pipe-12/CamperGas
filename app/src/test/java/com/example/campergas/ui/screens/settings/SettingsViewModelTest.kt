@@ -132,6 +132,21 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun `setThemeMode supports SYSTEM for backward compatibility`() = runTest {
+        // Although UI doesn't offer SYSTEM option, ViewModel should still support it
+        // for backward compatibility with existing stored preferences
+        
+        // Act - Set to SYSTEM
+        viewModel.setThemeMode(ThemeMode.SYSTEM)
+        advanceUntilIdle()
+
+        // Assert
+        coVerify { preferencesDataStore.setThemeMode(ThemeMode.SYSTEM) }
+        assertEquals(ThemeMode.SYSTEM, themeModeFlow.value)
+        assertEquals(ThemeMode.SYSTEM, viewModel.uiState.value.themeMode)
+    }
+
+    @Test
     fun `toggleNotifications inverts notification state`() = runTest {
         // Act - Toggle from true to false
         viewModel.toggleNotifications()
