@@ -103,6 +103,8 @@ class MainActivity : ComponentActivity() {
 
             // Convertir SYSTEM al tema actual del sistema en el primer inicio
             // LaunchedEffect(Unit) garantiza que solo se ejecute una vez por sesión de la app
+            // Nota: Esta migración ocurre de forma asíncrona. Mientras tanto, el tema SYSTEM
+            // se maneja correctamente en la UI usando el valor systemIsDark.
             LaunchedEffect(Unit) {
                 // Obtener el tema actual de las preferencias
                 val currentTheme = preferencesDataStore.themeMode.first()
