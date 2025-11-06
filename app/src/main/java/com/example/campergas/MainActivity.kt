@@ -25,6 +25,7 @@ import com.example.campergas.ui.navigation.NavGraph
 import com.example.campergas.ui.theme.CamperGasTheme
 import com.example.campergas.utils.BluetoothPermissionManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 /**
@@ -101,8 +102,11 @@ class MainActivity : ComponentActivity() {
             val systemIsDark = androidx.compose.foundation.isSystemInDarkTheme()
 
             // Convertir SYSTEM al tema actual del sistema en el primer inicio
-            LaunchedEffect(themeMode) {
-                if (themeMode == ThemeMode.SYSTEM) {
+            // LaunchedEffect(Unit) garantiza que solo se ejecute una vez por sesión de la app
+            LaunchedEffect(Unit) {
+                // Obtener el tema actual de las preferencias
+                val currentTheme = preferencesDataStore.themeMode.first()
+                if (currentTheme == ThemeMode.SYSTEM) {
                     // Si el tema es SYSTEM, convertirlo al tema actual del sistema
                     val newTheme = if (systemIsDark) ThemeMode.DARK else ThemeMode.LIGHT
                     preferencesDataStore.setThemeMode(newTheme)
