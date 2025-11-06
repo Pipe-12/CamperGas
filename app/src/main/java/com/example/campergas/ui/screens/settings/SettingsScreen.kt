@@ -45,6 +45,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 import androidx.navigation.NavController
 import com.example.campergas.R
+import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 
 /**
@@ -141,6 +142,14 @@ fun SettingsScreen(
                 }
             }
         }
+
+        // Application language configuration
+        LanguageSelectionCard(
+            currentLanguage = uiState.language,
+            onLanguageSelected = { language ->
+                viewModel.setAppLanguage(language)
+            }
+        )
 
         // Application theme configuration
         ThemeSelectionCard(
@@ -388,6 +397,76 @@ fun SettingsScreen(
  * @param onThemeModeSelected Callback invoked when user selects a new theme
  */
 @Composable
+private fun LanguageSelectionCard(
+    currentLanguage: AppLanguage,
+    onLanguageSelected: (AppLanguage) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.settings_language),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = stringResource(R.string.settings_language_description),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            Box {
+                Button(
+                    onClick = { expanded = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(languageLabel(currentLanguage))
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null
+                        )
+                    }
+                }
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    AppLanguage.entries.forEach { language ->
+                        DropdownMenuItem(
+                            text = { Text(languageLabel(language)) },
+                            onClick = {
+                                onLanguageSelected(language)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Text(
+                text = stringResource(R.string.settings_language_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+    }
+}
+
+@Composable
 private fun ThemeSelectionCard(
     currentThemeMode: ThemeMode,
     onThemeModeSelected: (ThemeMode) -> Unit
@@ -488,6 +567,16 @@ private fun ThemeSelectionCard(
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
+    }
+}
+
+@Composable
+private fun languageLabel(language: AppLanguage): String {
+    return when (language) {
+        AppLanguage.SYSTEM -> stringResource(R.string.language_option_system)
+        AppLanguage.SPANISH -> stringResource(R.string.language_option_spanish)
+        AppLanguage.ENGLISH -> stringResource(R.string.language_option_english)
+        AppLanguage.CATALAN -> stringResource(R.string.language_option_catalan)
     }
 }
 
