@@ -394,6 +394,9 @@ private fun ThemeSelectionCard(
 ) {
     // Estado para controlar si el menú desplegable está expandido
     var expanded by remember { mutableStateOf(false) }
+    
+    // Determinar el tema del sistema actual
+    val systemIsDark = androidx.compose.foundation.isSystemInDarkTheme()
 
     Card(
         modifier = Modifier.fillMaxWidth()
@@ -429,7 +432,12 @@ private fun ThemeSelectionCard(
                             text = when (currentThemeMode) {
                                 ThemeMode.LIGHT -> stringResource(R.string.theme_mode_light)
                                 ThemeMode.DARK -> stringResource(R.string.theme_mode_dark)
-                                ThemeMode.SYSTEM -> stringResource(R.string.theme_mode_system)
+                                // Si por alguna razón es SYSTEM, mostrar el tema actual del sistema
+                                ThemeMode.SYSTEM -> if (systemIsDark) {
+                                    stringResource(R.string.theme_mode_dark)
+                                } else {
+                                    stringResource(R.string.theme_mode_light)
+                                }
                             }
                         )
                         Icon(
@@ -460,14 +468,6 @@ private fun ThemeSelectionCard(
                             expanded = false
                         }
                     )
-                    // Opción de tema del sistema
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.theme_mode_system)) },
-                        onClick = {
-                            onThemeModeSelected(ThemeMode.SYSTEM)
-                            expanded = false
-                        }
-                    )
                 }
             }
 
@@ -476,7 +476,12 @@ private fun ThemeSelectionCard(
                 text = when (currentThemeMode) {
                     ThemeMode.LIGHT -> stringResource(R.string.theme_light)
                     ThemeMode.DARK -> stringResource(R.string.theme_dark)
-                    ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
+                    // Si por alguna razón es SYSTEM, mostrar el tema actual del sistema
+                    ThemeMode.SYSTEM -> if (systemIsDark) {
+                        stringResource(R.string.theme_dark)
+                    } else {
+                        stringResource(R.string.theme_light)
+                    }
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

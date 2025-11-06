@@ -121,14 +121,14 @@ class SettingsViewModelTest {
         assertEquals(ThemeMode.LIGHT, themeModeFlow.value)
         assertEquals(ThemeMode.LIGHT, viewModel.uiState.value.themeMode)
 
-        // Act - Set to SYSTEM
-        viewModel.setThemeMode(ThemeMode.SYSTEM)
+        // Act - Set to DARK
+        viewModel.setThemeMode(ThemeMode.DARK)
         advanceUntilIdle()
 
         // Assert
-        coVerify { preferencesDataStore.setThemeMode(ThemeMode.SYSTEM) }
-        assertEquals(ThemeMode.SYSTEM, themeModeFlow.value)
-        assertEquals(ThemeMode.SYSTEM, viewModel.uiState.value.themeMode)
+        coVerify { preferencesDataStore.setThemeMode(ThemeMode.DARK) }
+        assertEquals(ThemeMode.DARK, themeModeFlow.value)
+        assertEquals(ThemeMode.DARK, viewModel.uiState.value.themeMode)
     }
 
     @Test
