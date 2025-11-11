@@ -40,7 +40,12 @@ enum class AppLanguage(val languageTag: String) {
                 return SYSTEM
             }
 
-            return entries.firstOrNull { it.languageTag.equals(tag, ignoreCase = true) } ?: SYSTEM
+            val normalizedTag = tag.lowercase()
+            val languageCode = normalizedTag.substringBefore('-')
+
+            return entries.firstOrNull {
+                it != SYSTEM && it.languageTag.equals(languageCode, ignoreCase = true)
+            } ?: SYSTEM
         }
     }
 }

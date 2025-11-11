@@ -133,11 +133,16 @@ class SettingsViewModel @Inject constructor(
     /**
      * Updates the application language preference.
      *
+     * After saving the preference, applies the locale change immediately to restart the app
+     * with the new language.
+     *
      * @param language New [AppLanguage] selected by the user
      */
     fun setAppLanguage(language: AppLanguage) {
         viewModelScope.launch {
             preferencesDataStore.setAppLanguage(language)
+            // Aplicar el cambio de idioma inmediatamente
+            androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(language.toLocaleList())
         }
     }
 

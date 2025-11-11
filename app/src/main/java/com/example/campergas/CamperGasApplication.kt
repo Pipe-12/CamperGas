@@ -1,8 +1,11 @@
 package com.example.campergas
 
 import android.app.Application
+import androidx.appcompat.app.AppCompatDelegate
+import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.widget.WidgetUpdateManager
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 /**
@@ -16,6 +19,7 @@ import javax.inject.Inject
  * - Inicializar el contenedor de inyección de dependencias Hilt
  * - Mantener referencia al gestor de actualización de widgets
  * - Proporcionar el contexto de la aplicación a través de todo el ciclo de vida
+ * - Configurar el idioma de la aplicación antes de crear las actividades
  *
  * @author Felipe García Gómez
  */
@@ -31,5 +35,22 @@ class CamperGasApplication : Application() {
      */
     @Inject
     lateinit var widgetUpdateManager: WidgetUpdateManager
+
+    /**
+     * DataStore de preferencias para acceso a configuraciones del usuario.
+     */
+    @Inject
+    lateinit var preferencesDataStore: PreferencesDataStore
+
+    override fun onCreate() {
+        super.onCreate()
+
+        // Configurar el idioma de la aplicación una sola vez al inicio
+        // Esto previene bucles de recreación de actividades
+        kotlinx.coroutines.runBlocking {
+            val appLanguage = preferencesDataStore.appLanguage.first()
+            AppCompatDelegate.setApplicationLocales(appLanguage.toLocaleList())
+        }
+    }
 
 }

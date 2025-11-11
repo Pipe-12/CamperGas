@@ -1,11 +1,10 @@
 package com.example.campergas
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -19,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
 import com.example.campergas.data.local.preferences.PreferencesDataStore
-import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.ui.components.PermissionDialog
 import com.example.campergas.ui.navigation.NavGraph
@@ -98,11 +96,6 @@ class MainActivity : AppCompatActivity() {
             // Usamos collectAsState para que el tema se actualice automáticamente cuando cambia
             // El valor inicial es SYSTEM para evitar parpadeos en el primer frame
             val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
-            val appLanguage by preferencesDataStore.appLanguage.collectAsState(initial = AppLanguage.SYSTEM)
-            
-            LaunchedEffect(appLanguage) {
-                AppCompatDelegate.setApplicationLocales(appLanguage.toLocaleList())
-            }
 
             // Determinar el tema actual del sistema
             val systemIsDark = androidx.compose.foundation.isSystemInDarkTheme()
