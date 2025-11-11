@@ -23,12 +23,14 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.campergas.domain.model.VehicleType
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import com.example.campergas.R
 
 /**
  * Vehicle inclination visualization component.

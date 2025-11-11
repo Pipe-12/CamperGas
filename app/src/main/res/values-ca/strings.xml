@@ -17,10 +17,10 @@
     <string name="settings_gas_threshold_description">S\'enviarà una notificació quan el gas baixi del %d%%</string>
     <string name="settings_weight_reading">Lectura de pes</string>
     <string name="settings_weight_interval_description">Interval entre lectures de pes del sensor</string>
-    <string name="settings_weight_range">Interval vàlid: 1-60 minuts</string>
+    <string name="settings_weight_range">Interval vàlid: 1–60 minuts</string>
     <string name="settings_inclination_reading">Lectura d\'inclinació</string>
     <string name="settings_inclination_interval_description">Interval entre lectures d\'inclinació del sensor</string>
-    <string name="settings_inclination_range">Interval vàlid: 1-300 segons</string>
+    <string name="settings_inclination_range">Interval vàlid: 1–300 segons</string>
     <string name="settings_information">Informació</string>
     <string name="settings_info_short_intervals">• Els intervals més curts proporcionen dades més freqüents però poden consumir més bateria</string>
     <string name="settings_info_long_intervals">• Els intervals més llargs estalvien bateria però proporcionen dades menys freqüents</string>
@@ -62,12 +62,12 @@
     <string name="permissions_needed_title">Permisos necessaris</string>
     <string name="permissions_needed_message">CamperGas necessita permisos de Bluetooth i ubicació per funcionar correctament.</string>
     <string name="bluetooth_disabled_title">Bluetooth desactivat</string>
-    <string name="bluetooth_disabled_message">Per usar CamperGas cal activar el Bluetooth. Vols activar-lo ara?</string>
+    <string name="bluetooth_disabled_message">Per utilitzar CamperGas cal activar el Bluetooth. Vols activar-lo ara?</string>
     <string name="bluetooth_disabled_enable">Activa el Bluetooth</string>
 
     <!-- BLE Connect Screen -->
     <string name="ble_connection_title">Connexió Bluetooth</string>
-    <string name="ble_back_button">Tornar</string>
+    <string name="ble_back_button">Torna</string>
     <string name="ble_only_compatible_devices">Només dispositius CamperGas</string>
     <string name="ble_searching_devices">Cercant dispositius BLE…</string>
     <string name="ble_error_title">Error</string>
@@ -78,7 +78,7 @@
     <string name="ble_rssi_format">RSSI: %d dBm</string>
     <string name="ble_services_available">Serveis: %d disponibles</string>
     <string name="ble_not_compatible">No compatible amb CamperGas</string>
-    <string name="ble_search_button">Cercar</string>
+    <string name="ble_search_button">Cerca</string>
     <string name="ble_stop_button">Atura</string>
     <string name="ble_close_button">Tanca</string>
     <string name="ble_disconnect_button">Desconnecta</string>
@@ -128,19 +128,19 @@
     <string name="inclination_config_required">Configuració necessària</string>
     <string name="inclination_config_message">Per mostrar les estimacions d\'elevació de rodes, configura les dimensions del vehicle a la secció de configuració.</string>
     <string name="inclination_sensor_info">Informació del sensor</string>
-    <string name="inclination_last_update">Darrera actualització: %s</string>
+    <string name="inclination_last_update">Última actualització: %s</string>
     <string name="inclination_pitch_leveled">Nivellat</string>
     <string name="inclination_pitch_unleveled">Desnivellat</string>
     <string name="inclination_pitch_status">Estat Pitch: %s</string>
     <string name="inclination_roll_status">Estat Roll: %s</string>
     <string name="inclination_sensor_not_connected">Sensor no connectat</string>
     <string name="inclination_info_title">Informació</string>
-    <string name="inclination_info_text">• Tolerància de nivellació: ±2°\n• Pitch: Inclinació frontal/darrera (capcineig)\n• Roll: Inclinació lateral (balanceig)\n• Pitch + = front amunt\n• Roll + = dreta amunt</string>
+    <string name="inclination_info_text">• Tolerància de nivellació: ±2°\n• Pitch: Inclinació frontal/posterior (capcineig)\n• Roll: Inclinació lateral (balanceig)\n• Pitch + = front cap amunt\n• Roll + = dreta cap amunt</string>
 
     <!-- Weight Screen -->
     <string name="weight_title">Monitoratge de combustible</string>
     <string name="weight_fuel_monitor">Monitor de combustible</string>
-    <string name="weight_last_measurement">Darrera mesura: %s</string>
+    <string name="weight_last_measurement">Última mesura: %s</string>
     <string name="weight_sensor_not_connected">Sensor no connectat</string>
     <string name="weight_wait_between_requests">Espera 2 segons entre peticions</string>
     <string name="weight_requesting">Sol·licitant…</string>
@@ -182,7 +182,7 @@
 
     <!-- Widget Configuration -->
     <string name="widget_config_title">Configuració del widget</string>
-    <string name="widget_config_ready_message">El teu widget de CamperGas està a punt per usar-se.</string>
+    <string name="widget_config_ready_message">El teu widget de CamperGas està a punt per utilitzar-se.</string>
     <string name="widget_config_usage_info">• Toca el widget per obrir l\'aplicació\n• Toca el botó d\'actualitzar per sol·licitar dades noves\n• El widget s\'actualitza automàticament quan hi ha canvis</string>
 
     <!-- Bluetooth Permission Error Messages -->
@@ -204,7 +204,7 @@
     <string name="connection_status_disconnected">❌ Desconnectat</string>
 
     <!-- Navigation -->
-    <string name="nav_back">Tornar</string>
+    <string name="nav_back">Torna</string>
 
     <!-- Units -->
     <string name="unit_minutes">min</string>
@@ -245,7 +245,7 @@
     <!-- Inclination Screen - Additional -->
     <string name="inclination_waiting_data">Esperant dades del sensor…</string>
     <string name="inclination_requesting_button">Sol·licitant…</string>
-    <string name="inclination_request_button">Sol·licitar dades</string>
+    <string name="inclination_request_button">Sol·licita dades</string>
     <string name="inclination_vehicle_leveled_status">VEHICLE NIVELLAT</string>
     <string name="inclination_vehicle_unleveled_status">VEHICLE NO NIVELLAT</string>
     <string name="inclination_visualization_icon_title">Visualització del nivellat</string>
@@ -261,20 +261,19 @@
     <string name="inclination_roll_status_format">Estat Roll: %s</string>
     <string name="inclination_sensor_not_connected_emoji">Sensor no connectat</string>
     <string name="inclination_info_icon_title">Informació</string>
-    <string name="inclination_info_details">• Tolerància de nivellació: ±2°\n• Pitch: Inclinació frontal/posterior (capcineig)\n• Roll: Inclinació lateral (alabeig)\n• Pitch + = front cap amunt\n• Roll + = dreta cap amunt</string>
+    <string name="inclination_info_details">• Tolerància de nivellació: ±2°\n• Pitch: Inclinació frontal/posterior (capcineig)\n• Roll: Inclinació lateral (balanceig)\n• Pitch + = front cap amunt\n• Roll + = dreta cap amunt</string>
 
     <!-- Weight Screen - Additional -->
     <string name="weight_percentage_format">%d%%</string>
-    <string name="weight_back_description">Tornar</string>
+    <string name="weight_back_description">Torna</string>
     <string name="weight_measured_weight_format">Pes mesurat: %s</string>
     <string name="weight_last_measurement_format">Última mesura: %s</string>
     <string name="weight_sensor_not_connected_emoji">Sensor no connectat</string>
     <string name="weight_current_cylinder_title">Bombona actual</string>
     <string name="weight_cylinder_name_format">Nom: %s</string>
     <string name="weight_cylinder_capacity_format">Capacitat: %.1f kg</string>
-    <string name="weight_cylinder_tare_format">Pes buida: %.1f kg</string>
+    <string name="weight_cylinder_tare_format">Pes en buit: %.1f kg</string>
     <string name="weight_no_cylinder_configured_emoji">No hi ha bombona configurada</string>
-    <string name="weight_waiting_sensor_data">Esperant dades del sensor…</string>
     <string name="weight_make_sure_connected">Assegura\'t que el sensor estigui connectat</string>
 
     <!-- BLE Connect Screen - Additional -->
@@ -282,24 +281,24 @@
     <string name="ble_rssi_display_format">RSSI: %d dBm</string>
     <string name="ble_services_format">Serveis: %d disponibles</string>
     <string name="ble_not_compatible_text">No compatible amb CamperGas</string>
-    <string name="ble_disconnect_text">Desconnectar</string>
+    <string name="ble_disconnect_text">Desconnecta</string>
 
     <!-- Add Gas Cylinder Dialog - Additional -->
     <string name="add_cylinder_name_label_mixed">Nom de la bombona</string>
-    <string name="add_cylinder_name_placeholder_mixed">Ex: Bombona principal</string>
-    <string name="add_cylinder_name_error_mixed">El nom és necessari</string>
+    <string name="add_cylinder_name_placeholder_mixed">P. ex.: Bombona principal</string>
+    <string name="add_cylinder_name_error_mixed">El nom és obligatori</string>
     <string name="add_cylinder_tare_label_mixed">Pes de la bombona buida (kg)</string>
-    <string name="add_cylinder_tare_placeholder_mixed">Ex: 15.5</string>
+    <string name="add_cylinder_tare_placeholder_mixed">P. ex.: 15.5</string>
     <string name="add_cylinder_tare_error_mixed">Introdueix un pes vàlid</string>
     <string name="add_cylinder_capacity_label_mixed">Capacitat de gas (kg)</string>
-    <string name="add_cylinder_capacity_placeholder_mixed">Ex: 13.0</string>
+    <string name="add_cylinder_capacity_placeholder_mixed">P. ex.: 13.0</string>
     <string name="add_cylinder_capacity_error_mixed">Introdueix una capacitat vàlida</string>
-    <string name="add_cylinder_set_active_mixed">Establir com a bombona activa</string>
-    <string name="add_cylinder_add_button_mixed">Afegir</string>
-    <string name="add_cylinder_cancel_button_mixed">Cancel·lar</string>
+    <string name="add_cylinder_set_active_mixed">Defineix com a bombona activa</string>
+    <string name="add_cylinder_add_button_mixed">Afegeix</string>
+    <string name="add_cylinder_cancel_button_mixed">Cancel·la</string>
 
     <!-- GasCylinderViewModel Messages -->
-    <string name="cylinder_no_active_warning">No hi ha bombona activa - Les mesures no es desaran</string>
+    <string name="cylinder_no_active_warning">No hi ha bombona activa — Les mesures no es desaran</string>
     <string name="cylinder_added_success">Bombona afegida correctament</string>
     <string name="cylinder_error_format">Error: %s</string>
     <string name="cylinder_error_adding">Error en afegir la bombona</string>
@@ -312,9 +311,9 @@
     <string name="wheel_elevation_format">%.1f cm</string>
 
     <!-- VehicleInclinationView -->
-    <string name="vehicle_inclination_side_view">Vista lateral - Nivell vertical (Pitch)</string>
+    <string name="vehicle_inclination_side_view">Vista lateral — Nivell vertical (Pitch)</string>
     <string name="vehicle_inclination_compact">Inclinació</string>
-    <string name="vehicle_inclination_rear_view">Vista posterior - Nivell horitzontal (Roll)</string>
+    <string name="vehicle_inclination_rear_view">Vista posterior — Nivell horitzontal (Roll)</string>
     <string name="vehicle_inclination_angle_format">%.1f°</string>
 
     <!-- Home Screen - Additional -->

@@ -28,8 +28,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.ui.res.stringResource
-import com.example.campergas.R
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -150,17 +148,17 @@ fun ConsumptionScreen(
     // Date Pickers
     if (showStartDatePicker) {
         DatePickerDialog(
-            onDismissRequest = { showStartDatePicker = false },
+            onDismissRequest = { },
             confirmButton = {
                 TextButton(
-                    onClick = { showStartDatePicker = false }
+                    onClick = { }
                 ) {
                     Text(stringResource(R.string.consumption_accept))
                 }
             },
             dismissButton = {
                 TextButton(
-                    onClick = { showStartDatePicker = false }
+                    onClick = { }
                 ) {
                     Text(stringResource(R.string.consumption_cancel))
                 }
@@ -181,17 +179,17 @@ fun ConsumptionScreen(
 
     if (showEndDatePicker) {
         DatePickerDialog(
-            onDismissRequest = { showEndDatePicker = false },
+            onDismissRequest = { },
             confirmButton = {
                 TextButton(
-                    onClick = { showEndDatePicker = false }
+                    onClick = { }
                 ) {
                     Text(stringResource(R.string.consumption_accept))
                 }
             },
             dismissButton = {
                 TextButton(
-                    onClick = { showEndDatePicker = false }
+                    onClick = { }
                 ) {
                     Text(stringResource(R.string.consumption_cancel))
                 }

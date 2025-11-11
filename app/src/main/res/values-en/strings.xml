@@ -274,7 +274,6 @@
     <string name="weight_cylinder_capacity_format">Capacity: %.1f kg</string>
     <string name="weight_cylinder_tare_format">Empty weight: %.1f kg</string>
     <string name="weight_no_cylinder_configured_emoji">No cylinder configured</string>
-    <string name="weight_waiting_sensor_data">Waiting for sensor data…</string>
     <string name="weight_make_sure_connected">Make sure the sensor is connected</string>
 
     <!-- BLE Connect Screen - Additional -->
