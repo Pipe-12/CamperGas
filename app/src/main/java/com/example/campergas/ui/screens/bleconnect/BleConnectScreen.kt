@@ -94,10 +94,8 @@ fun BleConnectScreen(
     if (showBluetoothDialog) {
         BluetoothDisabledDialog(
             onAccept = {
-                showBluetoothDialog = false
             },
             onDismiss = {
-                showBluetoothDialog = false
             }
         )
     }
@@ -513,15 +511,15 @@ fun ConnectionStatusCard(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = if (isConnected) "Sensor Connected" else "Bluetooth Connection",
+                        text = if (isConnected) stringResource(R.string.ble_sensor_connected) else stringResource(R.string.ble_bluetooth_connection),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = when {
-                            isConnected && connectedDevice != null -> "${connectedDevice.name} • Para cambiar de sensor, desconecta primero"
-                            isScanning -> "Escaneando devices..."
-                            else -> "Buscar devices BLE"
+                            isConnected && connectedDevice != null -> stringResource(R.string.ble_connected_device_info, connectedDevice.name)
+                            isScanning -> stringResource(R.string.ble_scanning_devices)
+                            else -> stringResource(R.string.ble_search_devices)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
