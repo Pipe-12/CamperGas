@@ -231,4 +231,92 @@
     <string name="settings_apply_inclination_interval">Aplica l\'interval d\'inclinació</string>
     <string name="settings_weight_interval_label">Interval (minuts)</string>
     <string name="settings_inclination_interval_label">Interval (segons)</string>
+    <string name="settings_percent_suffix">%</string>
+
+    <!-- Consumption Screen - Additional -->
+    <string name="consumption_summary_icon_title">Resum de consum</string>
+    <string name="consumption_kg_label">kg consumits</string>
+    <string name="consumption_period_last_24h">Últimes 24h</string>
+    <string name="consumption_period_last_week">Última setmana</string>
+    <string name="consumption_period_last_month">Últim mes</string>
+    <string name="consumption_period_selected">Període seleccionat</string>
+    <string name="consumption_chart_icon_title">Gràfic de consum diari</string>
+
+    <!-- Inclination Screen - Additional -->
+    <string name="inclination_waiting_data">Esperant dades del sensor…</string>
+    <string name="inclination_requesting_button">Sol·licitant…</string>
+    <string name="inclination_request_button">Sol·licitar dades</string>
+    <string name="inclination_vehicle_leveled_status">VEHICLE NIVELLAT</string>
+    <string name="inclination_vehicle_unleveled_status">VEHICLE NO NIVELLAT</string>
+    <string name="inclination_visualization_icon_title">Visualització del nivellat</string>
+    <string name="inclination_vehicle_type_caravan">Caravana</string>
+    <string name="inclination_vehicle_type_motorhome">Autocaravana</string>
+    <string name="inclination_config_icon_title">Configuració necessària</string>
+    <string name="inclination_config_description">Per mostrar les estimacions d\'elevació de rodes, configura les dimensions del vehicle a la secció de configuració.</string>
+    <string name="inclination_sensor_info_title">Informació del sensor</string>
+    <string name="inclination_last_update_format">Última actualització: %s</string>
+    <string name="inclination_pitch_leveled_emoji">Nivellat</string>
+    <string name="inclination_pitch_unleveled_emoji">No nivellat</string>
+    <string name="inclination_pitch_status_format">Estat Pitch: %s</string>
+    <string name="inclination_roll_status_format">Estat Roll: %s</string>
+    <string name="inclination_sensor_not_connected_emoji">Sensor no connectat</string>
+    <string name="inclination_info_icon_title">Informació</string>
+    <string name="inclination_info_details">• Tolerància de nivellació: ±2°\n• Pitch: Inclinació frontal/posterior (capcineig)\n• Roll: Inclinació lateral (alabeig)\n• Pitch + = front cap amunt\n• Roll + = dreta cap amunt</string>
+
+    <!-- Weight Screen - Additional -->
+    <string name="weight_percentage_format">%d%%</string>
+    <string name="weight_back_description">Tornar</string>
+    <string name="weight_measured_weight_format">Pes mesurat: %s</string>
+    <string name="weight_last_measurement_format">Última mesura: %s</string>
+    <string name="weight_sensor_not_connected_emoji">Sensor no connectat</string>
+    <string name="weight_current_cylinder_title">Bombona actual</string>
+    <string name="weight_cylinder_name_format">Nom: %s</string>
+    <string name="weight_cylinder_capacity_format">Capacitat: %.1f kg</string>
+    <string name="weight_cylinder_tare_format">Pes buida: %.1f kg</string>
+    <string name="weight_no_cylinder_configured_emoji">No hi ha bombona configurada</string>
+    <string name="weight_waiting_sensor_data">Esperant dades del sensor…</string>
+    <string name="weight_make_sure_connected">Assegura\'t que el sensor estigui connectat</string>
+
+    <!-- BLE Connect Screen - Additional -->
+    <string name="ble_signal_strength_format">Senyal: %s</string>
+    <string name="ble_rssi_display_format">RSSI: %d dBm</string>
+    <string name="ble_services_format">Serveis: %d disponibles</string>
+    <string name="ble_not_compatible_text">No compatible amb CamperGas</string>
+    <string name="ble_disconnect_text">Desconnectar</string>
+
+    <!-- Add Gas Cylinder Dialog - Additional -->
+    <string name="add_cylinder_name_label_mixed">Nom de la bombona</string>
+    <string name="add_cylinder_name_placeholder_mixed">Ex: Bombona principal</string>
+    <string name="add_cylinder_name_error_mixed">El nom és necessari</string>
+    <string name="add_cylinder_tare_label_mixed">Pes de la bombona buida (kg)</string>
+    <string name="add_cylinder_tare_placeholder_mixed">Ex: 15.5</string>
+    <string name="add_cylinder_tare_error_mixed">Introdueix un pes vàlid</string>
+    <string name="add_cylinder_capacity_label_mixed">Capacitat de gas (kg)</string>
+    <string name="add_cylinder_capacity_placeholder_mixed">Ex: 13.0</string>
+    <string name="add_cylinder_capacity_error_mixed">Introdueix una capacitat vàlida</string>
+    <string name="add_cylinder_set_active_mixed">Establir com a bombona activa</string>
+    <string name="add_cylinder_add_button_mixed">Afegir</string>
+    <string name="add_cylinder_cancel_button_mixed">Cancel·lar</string>
+
+    <!-- GasCylinderViewModel Messages -->
+    <string name="cylinder_no_active_warning">No hi ha bombona activa - Les mesures no es desaran</string>
+    <string name="cylinder_added_success">Bombona afegida correctament</string>
+    <string name="cylinder_error_format">Error: %s</string>
+    <string name="cylinder_error_adding">Error en afegir la bombona</string>
+
+    <!-- WheelElevationsDisplay -->
+    <string name="wheel_elevation_icon_title">Elevació de rodes</string>
+    <string name="wheel_elevation_hint">Valors positius = pujar, negatius = baixar</string>
+    <string name="wheel_front_wheels">Rodes davanteres</string>
+    <string name="wheel_rear_wheels">Rodes posteriors</string>
+    <string name="wheel_elevation_format">%.1f cm</string>
+
+    <!-- VehicleInclinationView -->
+    <string name="vehicle_inclination_side_view">Vista lateral - Nivell vertical (Pitch)</string>
+    <string name="vehicle_inclination_compact">Inclinació</string>
+    <string name="vehicle_inclination_rear_view">Vista posterior - Nivell horitzontal (Roll)</string>
+    <string name="vehicle_inclination_angle_format">%.1f°</string>
+
+    <!-- Home Screen - Additional -->
+    <string name="home_connect_icon">BLE</string>
 </resources>

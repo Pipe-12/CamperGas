@@ -81,7 +81,7 @@ fun GasCylinderVisualizer(
 
         // Percentage text with theme-aware coloring
         Text(
-            text = "${fuelPercentage.toInt()}%",
+            text = stringResource(R.string.weight_percentage_format, fuelPercentage.toInt()),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
@@ -200,7 +200,7 @@ fun WeightScreen(
                 title = { Text(stringResource(R.string.weight_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.weight_back_description))
                     }
                 }
             )
@@ -269,7 +269,7 @@ fun WeightScreen(
 
                             // Weight measured by sensor
                             Text(
-                                text = "Measured weight: ${fuelMeasurement.getFormattedTotalWeight()}",
+                                text = stringResource(R.string.weight_measured_weight_format, fuelMeasurement.getFormattedTotalWeight()),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -279,7 +279,7 @@ fun WeightScreen(
 
                             // Measurement time centered
                             Text(
-                                text = "Last measurement: ${formatTimestamp(fuelMeasurement.timestamp)}",
+                                text = stringResource(R.string.weight_last_measurement_format, formatTimestamp(fuelMeasurement.timestamp)),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -319,7 +319,7 @@ fun WeightScreen(
                             if (!viewModel.isConnected()) {
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = "⚠️ Sensor no conectado",
+                                    text = stringResource(R.string.weight_sensor_not_connected_emoji),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )
@@ -337,7 +337,7 @@ fun WeightScreen(
                             // Current cylinder data centered
                             activeCylinder?.let { cylinder ->
                                 Text(
-                                    text = "Current Cylinder",
+                                    text = stringResource(R.string.weight_current_cylinder_title),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -345,34 +345,22 @@ fun WeightScreen(
                                 Spacer(modifier = Modifier.height(12.dp))
 
                                 Text(
-                                    text = "Name: ${cylinder.name}",
+                                    text = stringResource(R.string.weight_cylinder_name_format, cylinder.name),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
 
                                 Text(
-                                    text = "Capacity: ${
-                                        String.format(
-                                            Locale.getDefault(),
-                                            "%.1f",
-                                            cylinder.capacity
-                                        )
-                                    } kg",
+                                    text = stringResource(R.string.weight_cylinder_capacity_format, cylinder.capacity),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
 
                                 Text(
-                                    text = "Empty weight: ${
-                                        String.format(
-                                            Locale.getDefault(),
-                                            "%.1f",
-                                            cylinder.tare
-                                        )
-                                    } kg",
+                                    text = stringResource(R.string.weight_cylinder_tare_format, cylinder.tare),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             } ?: run {
                                 Text(
-                                    text = "⚠️ No cylinder configured",
+                                    text = stringResource(R.string.weight_no_cylinder_configured_emoji),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.error,
                                     fontWeight = FontWeight.Medium
@@ -388,12 +376,12 @@ fun WeightScreen(
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Waiting for sensor data...",
+                            text = stringResource(R.string.weight_waiting_sensor_data),
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Make sure the sensor is connected",
+                            text = stringResource(R.string.weight_make_sure_connected),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

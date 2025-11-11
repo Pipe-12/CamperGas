@@ -51,7 +51,7 @@ fun WheelElevationsDisplay(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "🔧 Wheel Elevation",
+                text = stringResource(R.string.wheel_elevation_icon_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 12.dp)
@@ -65,7 +65,7 @@ fun WheelElevationsDisplay(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "💡 Positive values = raise, negative = lower",
+                text = stringResource(R.string.wheel_elevation_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -114,7 +114,7 @@ private fun MotorHomeWheelElevations(wheelElevations: WheelElevations) {
     Column {
         // Front wheels
         Text(
-            text = "Front Wheels",
+            text = stringResource(R.string.wheel_front_wheels),
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(bottom = 4.dp)
@@ -143,7 +143,7 @@ private fun MotorHomeWheelElevations(wheelElevations: WheelElevations) {
 
         // Rear wheels
         Text(
-            text = "Rear Wheels",
+            text = stringResource(R.string.wheel_rear_wheels),
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(bottom = 4.dp)
@@ -205,7 +205,7 @@ private fun WheelElevationItem(
             )
 
             Text(
-                text = "${String.format(Locale.US, "%.1f", elevation)} cm",
+                text = stringResource(R.string.wheel_elevation_format, elevation),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 color = when {

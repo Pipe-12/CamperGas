@@ -34,8 +34,9 @@ data class GasCylinderUiState(
  */
 @HiltViewModel
 class GasCylinderViewModel @Inject constructor(
+    private val application: android.app.Application,
     private val addGasCylinderUseCase: AddGasCylinderUseCase,
-    private val getActiveCylinderUseCase: GetActiveCylinderUseCase
+    getActiveCylinderUseCase: GetActiveCylinderUseCase
 ) : ViewModel() {
 
     private val _activeCylinder = MutableStateFlow<GasCylinder?>(null)
@@ -56,7 +57,7 @@ class GasCylinderViewModel @Inject constructor(
                 // Update message if no active cylinder
                 if (cylinder == null) {
                     _uiState.value = _uiState.value.copy(
-                        errorMessage = "No active cylinder - Measurements will not be saved"
+                        errorMessage = application.getString(com.example.campergas.R.string.cylinder_no_active_warning)
                     )
                 } else {
                     _uiState.value = _uiState.value.copy(errorMessage = null)
@@ -86,7 +87,7 @@ class GasCylinderViewModel @Inject constructor(
                 if (result.isSuccess) {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        successMessage = "Cylinder added successfully"
+                        successMessage = application.getString(com.example.campergas.R.string.cylinder_added_success)
                     )
                     // Clear message after a few seconds
                     kotlinx.coroutines.delay(3000)
@@ -95,13 +96,13 @@ class GasCylinderViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         errorMessage = result.exceptionOrNull()?.message
-                            ?: "Error adding cylinder"
+                            ?: application.getString(com.example.campergas.R.string.cylinder_error_adding)
                     )
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = "Error: ${e.message}"
+                    errorMessage = application.getString(com.example.campergas.R.string.cylinder_error_format, e.message ?: "")
                 )
             }
         }

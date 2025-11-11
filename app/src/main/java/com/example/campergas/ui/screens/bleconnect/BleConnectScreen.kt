@@ -383,7 +383,7 @@ private fun AvailableDeviceCard(
                     // Signal strength indicator
                     Icon(
                         imageVector = getSignalIcon(device.rssi),
-                        contentDescription = "Signal: ${device.signalStrength}",
+                        contentDescription = stringResource(R.string.ble_signal_strength_format, device.signalStrength),
                         modifier = Modifier.size(20.dp),
                         tint = getSignalColor(device.rssi)
                     )
@@ -405,7 +405,7 @@ private fun AvailableDeviceCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "RSSI: ${device.rssi} dBm",
+                    text = stringResource(R.string.ble_rssi_display_format, device.rssi),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -420,7 +420,7 @@ private fun AvailableDeviceCard(
             if (device.services.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Services: ${device.services.size} disponibles",
+                    text = stringResource(R.string.ble_services_format, device.services.size),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -449,7 +449,7 @@ private fun AvailableDeviceCard(
             } else {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "No compatible con CamperGas",
+                    text = stringResource(R.string.ble_not_compatible_text),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -535,7 +535,7 @@ fun ConnectionStatusCard(
                             contentColor = MaterialTheme.colorScheme.error
                         )
                     ) {
-                        Text("Desconectar")
+                        Text(stringResource(R.string.ble_disconnect_text))
                     }
                 }
             }

@@ -28,6 +28,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import com.example.campergas.R
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -385,13 +387,13 @@ fun ConsumptionSummarySection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "📊 Resumen de Consumo",
+                    text = stringResource(R.string.consumption_summary_icon_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
                 Text(
-                    text = "kg consumidos",
+                    text = stringResource(R.string.consumption_kg_label),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
@@ -405,12 +407,12 @@ fun ConsumptionSummarySection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 SummaryItem(
-                    title = "Last 24h",
+                    title = stringResource(R.string.consumption_period_last_24h),
                     value = lastDayConsumption,
                     modifier = Modifier.weight(1f)
                 )
                 SummaryItem(
-                    title = "Last week",
+                    title = stringResource(R.string.consumption_period_last_week),
                     value = lastWeekConsumption,
                     modifier = Modifier.weight(1f)
                 )
@@ -423,14 +425,14 @@ fun ConsumptionSummarySection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 SummaryItem(
-                    title = "Last month",
+                    title = stringResource(R.string.consumption_period_last_month),
                     value = lastMonthConsumption,
                     modifier = Modifier.weight(1f)
                 )
 
                 if (hasCustomPeriod && startDate != null && endDate != null) {
                     SummaryItem(
-                        title = "Selected period",
+                        title = stringResource(R.string.consumption_period_selected),
                         subtitle = "${formatDateOnly(startDate)} - ${formatDateOnly(endDate)}",
                         value = customPeriodConsumption,
                         modifier = Modifier.weight(1f)
@@ -507,7 +509,7 @@ fun ConsumptionChart(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "📈 Daily Consumption Chart",
+                text = stringResource(R.string.consumption_chart_icon_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSecondaryContainer

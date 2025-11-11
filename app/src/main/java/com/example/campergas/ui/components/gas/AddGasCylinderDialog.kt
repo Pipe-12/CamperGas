@@ -62,11 +62,11 @@ fun AddGasCylinderDialog(
                         name = it
                         nameError = it.isBlank()
                     },
-                    label = { Text("Nombre of the cylinder") },
-                    placeholder = { Text("Ej: Bombona Principal") },
+                    label = { Text(stringResource(R.string.add_cylinder_name_label)) },
+                    placeholder = { Text(stringResource(R.string.add_cylinder_name_placeholder)) },
                     isError = nameError,
                     supportingText = if (nameError) {
-                        { Text("El nombre es requerido") }
+                        { Text(stringResource(R.string.add_cylinder_name_error)) }
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -77,12 +77,12 @@ fun AddGasCylinderDialog(
                         tare = it
                         tareError = it.toFloatOrNull() == null || it.toFloatOrNull()!! < 0
                     },
-                    label = { Text("Empty cylinder weight (kg)") },
-                    placeholder = { Text("Ej: 15.5") },
+                    label = { Text(stringResource(R.string.add_cylinder_tare_label)) },
+                    placeholder = { Text(stringResource(R.string.add_cylinder_tare_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = tareError,
                     supportingText = if (tareError) {
-                        { Text("Enter a valid weight") }
+                        { Text(stringResource(R.string.add_cylinder_tare_error)) }
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -93,12 +93,12 @@ fun AddGasCylinderDialog(
                         capacity = it
                         capacityError = it.toFloatOrNull() == null || it.toFloatOrNull()!! <= 0
                     },
-                    label = { Text("Capacidad de gas (kg)") },
-                    placeholder = { Text("Ej: 13.0") },
+                    label = { Text(stringResource(R.string.add_cylinder_capacity_label)) },
+                    placeholder = { Text(stringResource(R.string.add_cylinder_capacity_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = capacityError,
                     supportingText = if (capacityError) {
-                        { Text("Enter a valid capacity") }
+                        { Text(stringResource(R.string.add_cylinder_capacity_error)) }
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -111,7 +111,7 @@ fun AddGasCylinderDialog(
                         onCheckedChange = { setAsActive = it }
                     )
                     Text(
-                        text = "Establecer como cylinder activa",
+                        text = stringResource(R.string.add_cylinder_set_active),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -133,12 +133,12 @@ fun AddGasCylinderDialog(
                         tare.toFloatOrNull() != null && tare.toFloatOrNull()!! >= 0 &&
                         capacity.toFloatOrNull() != null && capacity.toFloatOrNull()!! > 0
             ) {
-                Text("Add")
+                Text(stringResource(R.string.add_cylinder_add_button))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(R.string.add_cylinder_cancel_button))
             }
         }
     )

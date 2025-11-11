@@ -116,14 +116,14 @@ fun VehicleInclinationSideView(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (compact) "Inclination" else "Side View - Vertical Level (Pitch)",
+                text = if (compact) stringResource(R.string.vehicle_inclination_compact) else stringResource(R.string.vehicle_inclination_side_view),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = if (compact) 4.dp else 8.dp)
             )
 
             Text(
-                text = "${String.format(java.util.Locale.US, "%.1f", pitchAngle)}°",
+                text = stringResource(R.string.vehicle_inclination_angle_format, pitchAngle),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = if (kotlin.math.abs(pitchAngle) <= 2f)
@@ -195,14 +195,14 @@ fun VehicleInclinationRearView(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Rear View - Horizontal Level (Roll)",
+                text = stringResource(R.string.vehicle_inclination_rear_view),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
             Text(
-                text = "${String.format(java.util.Locale.US, "%.1f", rollAngle)}°",
+                text = stringResource(R.string.vehicle_inclination_angle_format, rollAngle),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = if (kotlin.math.abs(rollAngle) <= 2f)

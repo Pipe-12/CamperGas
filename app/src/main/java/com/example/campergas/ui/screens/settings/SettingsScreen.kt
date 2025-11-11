@@ -202,7 +202,7 @@ fun SettingsScreen(
                             gasThresholdText = newValue
                         },
                         label = { Text(stringResource(R.string.percentage_minimum_gas)) },
-                        suffix = { Text("%") },
+                        suffix = { Text(stringResource(R.string.settings_percent_suffix)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true

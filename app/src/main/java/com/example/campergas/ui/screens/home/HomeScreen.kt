@@ -267,7 +267,7 @@ fun HomeScreen(
                     // BLE connection button
                     ConfigurationButton(
                         title = stringResource(R.string.home_connect_ble_title),
-                        text = "🔗",
+                        text = stringResource(R.string.home_connect_icon),
                         onClick = { navController.navigate(Screen.BleConnect.route) },
                         modifier = Modifier.weight(1f)
                     )

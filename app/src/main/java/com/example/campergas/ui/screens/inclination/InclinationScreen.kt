@@ -98,7 +98,7 @@ fun InclinationScreen(
                     ) {
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("Waiting for sensor data...")
+                        Text(stringResource(R.string.inclination_waiting_data))
 
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -120,7 +120,7 @@ fun InclinationScreen(
                                 )
                             }
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(if (isRequestingData) "Requesting..." else "Request Data")
+                            Text(if (isRequestingData) stringResource(R.string.inclination_requesting_button) else stringResource(R.string.inclination_request_button))
                         }
 
                         if (!viewModel.isConnected()) {
@@ -164,7 +164,7 @@ fun InclinationScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = if (uiState.isLevel) "✅ VEHICLE LEVELED" else "⚠️ VEHICLE NOT LEVELED",
+                                text = if (uiState.isLevel) stringResource(R.string.inclination_vehicle_leveled_status) else stringResource(R.string.inclination_vehicle_unleveled_status),
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = if (uiState.isLevel)
@@ -187,7 +187,7 @@ fun InclinationScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "🚐 Level Visualization",
+                                text = stringResource(R.string.inclination_visualization_icon_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(bottom = 12.dp)
@@ -203,12 +203,13 @@ fun InclinationScreen(
                             Spacer(modifier = Modifier.height(8.dp))
 
                             Text(
-                                text = "Vehicle type: ${
+                                text = stringResource(
+                                    R.string.inclination_vehicle_type,
                                     when (uiState.vehicleType) {
-                                        VehicleType.CARAVAN -> "Caravan"
-                                        VehicleType.AUTOCARAVANA -> "Motorhome"
+                                        VehicleType.CARAVAN -> stringResource(R.string.inclination_vehicle_type_caravan)
+                                        VehicleType.AUTOCARAVANA -> stringResource(R.string.inclination_vehicle_type_motorhome)
                                     }
-                                }",
+                                ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -237,12 +238,12 @@ fun InclinationScreen(
                                 modifier = Modifier.padding(16.dp)
                             ) {
                                 Text(
-                                    text = "⚙️ Configuration Required",
+                                    text = stringResource(R.string.inclination_config_icon_title),
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = "To display wheel elevation estimates, configure the vehicle dimensions in the configuration section.",
+                                    text = stringResource(R.string.inclination_config_description),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -259,27 +260,39 @@ fun InclinationScreen(
                             modifier = Modifier.padding(16.dp)
                         ) {
                             Text(
-                                text = "Sensor Information",
+                                text = stringResource(R.string.inclination_sensor_info_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
 
                             if (uiState.timestamp > 0) {
                                 Text(
-                                    text = "Last update: ${formatTimestamp(uiState.timestamp)}",
+                                    text = stringResource(R.string.inclination_last_update_format, formatTimestamp(uiState.timestamp)),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }
 
                             // Show if each axis is leveled
                             Text(
-                                text = "Pitch Status: ${if (kotlin.math.abs(uiState.inclinationPitch) <= 2.0f) "✅ Leveled" else "⚠️ Not Leveled"}",
+                                text = stringResource(
+                                    R.string.inclination_pitch_status_format,
+                                    if (kotlin.math.abs(uiState.inclinationPitch) <= 2.0f) 
+                                        stringResource(R.string.inclination_pitch_leveled_emoji) 
+                                    else 
+                                        stringResource(R.string.inclination_pitch_unleveled_emoji)
+                                ),
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(top = 4.dp)
                             )
 
                             Text(
-                                text = "Roll Status: ${if (kotlin.math.abs(uiState.inclinationRoll) <= 2.0f) "✅ Leveled" else "⚠️ Not Leveled"}",
+                                text = stringResource(
+                                    R.string.inclination_roll_status_format,
+                                    if (kotlin.math.abs(uiState.inclinationRoll) <= 2.0f) 
+                                        stringResource(R.string.inclination_pitch_leveled_emoji) 
+                                    else 
+                                        stringResource(R.string.inclination_pitch_unleveled_emoji)
+                                ),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -306,13 +319,13 @@ fun InclinationScreen(
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(if (isRequestingData) "Requesting..." else "Update Inclination")
+                        Text(if (isRequestingData) stringResource(R.string.inclination_requesting_button) else stringResource(R.string.inclination_update_inclination))
                     }
 
                     if (!viewModel.isConnected()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "⚠️ Sensor no conectado",
+                            text = stringResource(R.string.inclination_sensor_not_connected_emoji),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.fillMaxWidth()
@@ -339,16 +352,12 @@ fun InclinationScreen(
                             modifier = Modifier.padding(16.dp)
                         ) {
                             Text(
-                                text = "💡 Information",
+                                text = stringResource(R.string.inclination_info_icon_title),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "• Leveling tolerance: ±2°\n" +
-                                        "• Pitch: Front/rear tilt (pitch)\n" +
-                                        "• Roll: Side tilt (roll)\n" +
-                                        "• Pitch + = front up\n" +
-                                        "• Roll + = right up",
+                                text = stringResource(R.string.inclination_info_details),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }

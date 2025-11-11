@@ -233,4 +233,92 @@
     <string name="settings_apply_inclination_interval">Aplicar Intervalo de Inclinación</string>
     <string name="settings_weight_interval_label">Intervalo (minutos)</string>
     <string name="settings_inclination_interval_label">Intervalo (segundos)</string>
+    <string name="settings_percent_suffix">%</string>
+
+    <!-- Consumption Screen - Additional -->
+    <string name="consumption_summary_icon_title">Resumen de Consumo</string>
+    <string name="consumption_kg_label">kg consumidos</string>
+    <string name="consumption_period_last_24h">Last 24h</string>
+    <string name="consumption_period_last_week">Last week</string>
+    <string name="consumption_period_last_month">Last month</string>
+    <string name="consumption_period_selected">Selected period</string>
+    <string name="consumption_chart_icon_title">Daily Consumption Chart</string>
+
+    <!-- Inclination Screen - Additional -->
+    <string name="inclination_waiting_data">Waiting for sensor data…</string>
+    <string name="inclination_requesting_button">Requesting…</string>
+    <string name="inclination_request_button">Request Data</string>
+    <string name="inclination_vehicle_leveled_status">VEHICLE LEVELED</string>
+    <string name="inclination_vehicle_unleveled_status">VEHICLE NOT LEVELED</string>
+    <string name="inclination_visualization_icon_title">Level Visualization</string>
+    <string name="inclination_vehicle_type_caravan">Caravan</string>
+    <string name="inclination_vehicle_type_motorhome">Motorhome</string>
+    <string name="inclination_config_icon_title">Configuration Required</string>
+    <string name="inclination_config_description">To display wheel elevation estimates, configure the vehicle dimensions in the configuration section.</string>
+    <string name="inclination_sensor_info_title">Sensor Information</string>
+    <string name="inclination_last_update_format">Last update: %s</string>
+    <string name="inclination_pitch_leveled_emoji">Leveled</string>
+    <string name="inclination_pitch_unleveled_emoji">Not Leveled</string>
+    <string name="inclination_pitch_status_format">Pitch Status: %s</string>
+    <string name="inclination_roll_status_format">Roll Status: %s</string>
+    <string name="inclination_sensor_not_connected_emoji">Sensor no conectado</string>
+    <string name="inclination_info_icon_title">Information</string>
+    <string name="inclination_info_details">• Leveling tolerance: ±2°\n• Pitch: Front/rear tilt (pitch)\n• Roll: Side tilt (roll)\n• Pitch + = front up\n• Roll + = right up</string>
+
+    <!-- Weight Screen - Additional -->
+    <string name="weight_percentage_format">%d%%</string>
+    <string name="weight_back_description">Back</string>
+    <string name="weight_measured_weight_format">Measured weight: %s</string>
+    <string name="weight_last_measurement_format">Last measurement: %s</string>
+    <string name="weight_sensor_not_connected_emoji">Sensor no conectado</string>
+    <string name="weight_current_cylinder_title">Current Cylinder</string>
+    <string name="weight_cylinder_name_format">Name: %s</string>
+    <string name="weight_cylinder_capacity_format">Capacity: %.1f kg</string>
+    <string name="weight_cylinder_tare_format">Empty weight: %.1f kg</string>
+    <string name="weight_no_cylinder_configured_emoji">No cylinder configured</string>
+    <string name="weight_waiting_sensor_data">Waiting for sensor data…</string>
+    <string name="weight_make_sure_connected">Make sure the sensor is connected</string>
+
+    <!-- BLE Connect Screen - Additional -->
+    <string name="ble_signal_strength_format">Signal: %s</string>
+    <string name="ble_rssi_display_format">RSSI: %d dBm</string>
+    <string name="ble_services_format">Services: %d disponibles</string>
+    <string name="ble_not_compatible_text">No compatible con CamperGas</string>
+    <string name="ble_disconnect_text">Desconectar</string>
+
+    <!-- Add Gas Cylinder Dialog - Additional -->
+    <string name="add_cylinder_name_label_mixed">Nombre of the cylinder</string>
+    <string name="add_cylinder_name_placeholder_mixed">Ej: Bombona Principal</string>
+    <string name="add_cylinder_name_error_mixed">El nombre es requerido</string>
+    <string name="add_cylinder_tare_label_mixed">Empty cylinder weight (kg)</string>
+    <string name="add_cylinder_tare_placeholder_mixed">Ej: 15.5</string>
+    <string name="add_cylinder_tare_error_mixed">Enter a valid weight</string>
+    <string name="add_cylinder_capacity_label_mixed">Capacidad de gas (kg)</string>
+    <string name="add_cylinder_capacity_placeholder_mixed">Ej: 13.0</string>
+    <string name="add_cylinder_capacity_error_mixed">Enter a valid capacity</string>
+    <string name="add_cylinder_set_active_mixed">Establecer como cylinder activa</string>
+    <string name="add_cylinder_add_button_mixed">Add</string>
+    <string name="add_cylinder_cancel_button_mixed">Cancelar</string>
+
+    <!-- GasCylinderViewModel Messages -->
+    <string name="cylinder_no_active_warning">No active cylinder - Measurements will not be saved</string>
+    <string name="cylinder_added_success">Cylinder added successfully</string>
+    <string name="cylinder_error_format">Error: %s</string>
+    <string name="cylinder_error_adding">Error adding cylinder</string>
+
+    <!-- WheelElevationsDisplay -->
+    <string name="wheel_elevation_icon_title">Wheel Elevation</string>
+    <string name="wheel_elevation_hint">Positive values = raise, negative = lower</string>
+    <string name="wheel_front_wheels">Front Wheels</string>
+    <string name="wheel_rear_wheels">Rear Wheels</string>
+    <string name="wheel_elevation_format">%.1f cm</string>
+
+    <!-- VehicleInclinationView -->
+    <string name="vehicle_inclination_side_view">Side View - Vertical Level (Pitch)</string>
+    <string name="vehicle_inclination_compact">Inclination</string>
+    <string name="vehicle_inclination_rear_view">Rear View - Horizontal Level (Roll)</string>
+    <string name="vehicle_inclination_angle_format">%.1f°</string>
+
+    <!-- Home Screen - Additional -->
+    <string name="home_connect_icon">BLE</string>
 </resources>
