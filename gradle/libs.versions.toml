@@ -26,7 +26,7 @@ roomVersion = "2.8.3"
 scanner = "1.6.0"
 turbine = "1.2.1"
 ui = "1.9.4"
-uiToolingPreview = "1.9.4"
+uiToolingPreview = "1.9.5"
 appcompat = "1.7.1"
 
 
