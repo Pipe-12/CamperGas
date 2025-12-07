@@ -1,12 +1,20 @@
 package com.example.campergas
 
+import com.example.campergas.domain.model.AppLanguageTest
 import com.example.campergas.domain.model.FuelMeasurementTest
 import com.example.campergas.domain.usecase.AddGasCylinderUseCaseTest
 import com.example.campergas.domain.usecase.GetActiveCylinderUseCaseTest
+import com.example.campergas.domain.usecase.GetConsumptionHistoryUseCaseTest
 import com.example.campergas.domain.usecase.SaveFuelMeasurementUseCaseTest
+import com.example.campergas.ui.SystemUIThemingTest
+import com.example.campergas.ui.components.gas.GasCylinderViewModelTest
 import com.example.campergas.ui.screens.bleconnect.BleConnectViewModelTest
+import com.example.campergas.ui.screens.caravanconfig.CaravanConfigViewModelTest
 import com.example.campergas.ui.screens.consumption.ConsumptionViewModelTest
+import com.example.campergas.ui.screens.home.HomeViewModelTest
 import com.example.campergas.ui.screens.inclination.InclinationViewModelTest
+import com.example.campergas.ui.screens.settings.SettingsViewModelTest
+import com.example.campergas.ui.screens.weight.WeightViewModelTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.runner.RunWith
 import org.junit.runners.Suite
@@ -27,24 +35,23 @@ import org.junit.runners.Suite
     SaveFuelMeasurementUseCaseTest::class,
     GetActiveCylinderUseCaseTest::class,
     AddGasCylinderUseCaseTest::class,
-
+    GetConsumptionHistoryUseCaseTest::class,
     // Domain Models Tests
     FuelMeasurementTest::class,
-
+    AppLanguageTest::class,
     // ViewModels Tests
+    GasCylinderViewModelTest::class,
     BleConnectViewModelTest::class,
+    CaravanConfigViewModelTest::class,
     ConsumptionViewModelTest::class,
-    InclinationViewModelTest::class
+    HomeViewModelTest::class,
+    InclinationViewModelTest::class,
+    SettingsViewModelTest::class,
+    WeightViewModelTest::class,
+    SystemUIThemingTest::class
 )
 class CamperGasTestSuite {
-    /**
-     * Esta clase actúa como un punto de entrada para ejecutar
-     * todos los tests de la aplicación CamperGas de una vez.
-     *
-     * Para ejecutar todos los tests:
-     * ./gradlew test
-     *
-     * Para ejecutar solo esta suite:
-     * ./gradlew test --tests "com.example.campergas.CamperGasTestSuite"
-     */
+
+    // Esta clase actúa como un punto de entrada para ejecutar
+    //  todos los tests de la aplicación CamperGas de una vez
 }
