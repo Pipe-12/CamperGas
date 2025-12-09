@@ -6,6 +6,8 @@ import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
+import com.example.campergas.domain.usecase.DeleteNonActiveCylindersUseCase
+import com.example.campergas.domain.usecase.GenerateTestDataUseCase
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -40,6 +42,9 @@ class SettingsViewModelTest {
     private lateinit var viewModel: SettingsViewModel
     private val preferencesDataStore: PreferencesDataStore = mockk(relaxed = true)
     private val configureReadingIntervalsUseCase: ConfigureReadingIntervalsUseCase =
+        mockk(relaxed = true)
+    private val generateTestDataUseCase: GenerateTestDataUseCase = mockk(relaxed = true)
+    private val deleteNonActiveCylindersUseCase: DeleteNonActiveCylindersUseCase = 
         mockk(relaxed = true)
 
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -89,7 +94,9 @@ class SettingsViewModelTest {
 
         viewModel = SettingsViewModel(
             preferencesDataStore,
-            configureReadingIntervalsUseCase
+            configureReadingIntervalsUseCase,
+            generateTestDataUseCase,
+            deleteNonActiveCylindersUseCase
         )
     }
 
