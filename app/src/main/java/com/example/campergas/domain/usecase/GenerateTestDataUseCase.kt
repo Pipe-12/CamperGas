@@ -55,6 +55,9 @@ class GenerateTestDataUseCase @Inject constructor(
             // Starting fuel percentage (80-95%)
             var currentFuelPercentage = Random.nextFloat() * 15f + 80f
 
+            // Calculate consumption rate once (constant for all measurements)
+            val consumptionRate = AVG_CONSUMPTION_PER_DAY / TEST_MEASUREMENTS_COUNT * 30
+
             // Generate measurements from oldest to newest
             for (i in 0 until TEST_MEASUREMENTS_COUNT) {
                 // Calculate timestamp (distributed over last 30 days)
@@ -62,7 +65,6 @@ class GenerateTestDataUseCase @Inject constructor(
                 val timestamp = currentTime - ageMs
 
                 // Simulate gradual consumption with some randomness
-                val consumptionRate = AVG_CONSUMPTION_PER_DAY / TEST_MEASUREMENTS_COUNT * 30
                 currentFuelPercentage -= consumptionRate + Random.nextFloat() * 0.5f - 0.25f
 
                 // Keep within valid range (5% to 100%)
