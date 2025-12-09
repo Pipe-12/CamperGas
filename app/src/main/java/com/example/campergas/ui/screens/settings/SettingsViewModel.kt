@@ -6,6 +6,8 @@ import com.example.campergas.data.local.preferences.PreferencesDataStore
 import com.example.campergas.domain.model.AppLanguage
 import com.example.campergas.domain.model.ThemeMode
 import com.example.campergas.domain.usecase.ConfigureReadingIntervalsUseCase
+import com.example.campergas.domain.usecase.DeleteNonActiveCylindersUseCase
+import com.example.campergas.domain.usecase.GenerateTestDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -32,7 +34,9 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val preferencesDataStore: PreferencesDataStore,
-    private val configureReadingIntervalsUseCase: ConfigureReadingIntervalsUseCase
+    private val configureReadingIntervalsUseCase: ConfigureReadingIntervalsUseCase,
+    private val generateTestDataUseCase: GenerateTestDataUseCase,
+    private val deleteNonActiveCylindersUseCase: DeleteNonActiveCylindersUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -196,6 +200,70 @@ class SettingsViewModel @Inject constructor(
                 _operationStatus.value =
                     "Error configuring inclination interval: ${exception.message}"
                 kotlinx.coroutines.delay(2000)
+                _operationStatus.value = null
+            }
+        }
+    }
+
+
+    /**
+     * Generates test fuel measurements for the active cylinder.
+     *
+     * Creates sample measurements distributed over the last 30 days to populate
+     * the consumption screen with test data.
+     */
+    fun generateTestData() {
+        viewModelScope.launch {
+            try {
+                _operationStatus.value = "Generating test data..."
+                val result = generateTestDataUseCase()
+                
+                result.fold(
+                    onSuccess = { count ->
+                        _operationStatus.value = "Successfully generated $count test measurements"
+                        kotlinx.coroutines.delay(3000)
+                        _operationStatus.value = null
+                    },
+                    onFailure = { exception ->
+                        _operationStatus.value = "Error generating test data: ${exception.message}"
+                        kotlinx.coroutines.delay(3000)
+                        _operationStatus.value = null
+                    }
+                )
+            } catch (exception: Exception) {
+                _operationStatus.value = "Error generating test data: ${exception.message}"
+                kotlinx.coroutines.delay(3000)
+                _operationStatus.value = null
+            }
+        }
+    }
+
+    /**
+     * Deletes all non-active gas cylinders and their measurements.
+     *
+     * Preserves only the currently active cylinder and its data.
+     */
+    fun deleteNonActiveData() {
+        viewModelScope.launch {
+            try {
+                _operationStatus.value = "Deleting non-active cylinders..."
+                val result = deleteNonActiveCylindersUseCase()
+                
+                result.fold(
+                    onSuccess = { count ->
+                        _operationStatus.value = "Successfully deleted $count non-active cylinder(s)"
+                        kotlinx.coroutines.delay(3000)
+                        _operationStatus.value = null
+                    },
+                    onFailure = { exception ->
+                        _operationStatus.value = "Error deleting data: ${exception.message}"
+                        kotlinx.coroutines.delay(3000)
+                        _operationStatus.value = null
+                    }
+                )
+            } catch (exception: Exception) {
+                _operationStatus.value = "Error deleting data: ${exception.message}"
+                kotlinx.coroutines.delay(3000)
                 _operationStatus.value = null
             }
         }
