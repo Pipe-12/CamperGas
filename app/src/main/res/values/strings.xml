@@ -318,4 +318,12 @@
 
     <!-- Home Screen - Additional -->
     <string name="home_connect_icon">BLE</string>
+
+    <!-- Test Data Management -->
+    <string name="settings_test_data">Datos de Prueba</string>
+    <string name="settings_test_data_description">Generar o eliminar datos de prueba para visualización</string>
+    <string name="settings_generate_test_data">Generar Datos de Prueba</string>
+    <string name="settings_generate_test_data_description">Crear mediciones de prueba para los últimos 30 días</string>
+    <string name="settings_delete_non_active_data">Eliminar Datos No Activos</string>
+    <string name="settings_delete_non_active_data_description">Eliminar bombonas inactivas y sus mediciones</string>
 </resources>

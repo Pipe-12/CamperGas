@@ -107,4 +107,12 @@ interface GasCylinderDao {
      */
     @Query("UPDATE gas_cylinders SET isActive = :isActive WHERE id = :id")
     suspend fun updateCylinderActiveStatus(id: Long, isActive: Boolean)
+
+    /**
+     * Elimina todas las bombonas de gas que no están activas.
+     *
+     * @return Número de bombonas eliminadas
+     */
+    @Query("DELETE FROM gas_cylinders WHERE isActive = 0")
+    suspend fun deleteNonActiveCylinders(): Int
 }
