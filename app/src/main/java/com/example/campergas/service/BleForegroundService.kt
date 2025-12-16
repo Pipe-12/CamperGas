@@ -41,7 +41,7 @@ class BleForegroundService : Service() {
     private val alertChannelId = "gas_alert_channel"
     private val alertNotificationId = 124
 
-    // Estado for evitar spam de notificaciones
+    // State to prevent notification spam
     private var lastAlertThreshold: Float? = null
     private var hasAlertBeenSent = false
 
@@ -51,9 +51,9 @@ class BleForegroundService : Service() {
     private var lastWeightRequestTime = 0L
     private var lastInclinationRequestTime = 0L
 
-    // Intervalos configurables (se cargan from preferencias)
-    private var weightRequestInterval = 5000L // 5 segundos por defecto
-    private var inclinationRequestInterval = 5000L // 5 segundos por defecto
+    // Configurable intervals (loaded from preferences)
+    private var weightRequestInterval = 5000L // 5 seconds by default
+    private var inclinationRequestInterval = 5000L // 5 seconds by default
 
     companion object {
         private const val TAG = "BleForegroundService"

@@ -1,25 +1,25 @@
 package com.example.campergas.domain.model
 
 /**
- * Modo de tema visual de la aplicación.
+ * Application visual theme mode.
  *
- * La aplicación soporta temas claro, oscuro y del sistema. El tema afecta a colores
- * de fondo, texto, componentes UI y barras del sistema.
+ * The application supports light, dark, and system themes. The theme affects background
+ * colors, text, UI components, and system bars.
  *
- * Temas disponibles:
- * - LIGHT: Tema claro con fondos claros y texto oscuro
- * - DARK: Tema oscuro con fondos negros/oscuros y texto claro
- * - SYSTEM: Usa el tema del sistema (Android 10+)
+ * Available themes:
+ * - LIGHT: Light theme with light backgrounds and dark text
+ * - DARK: Dark theme with dark/black backgrounds and light text
+ * - SYSTEM: Uses the system theme (Android 10+)
  *
  * @author Felipe García Gómez
  */
 enum class ThemeMode {
-    /** Modo de tema claro con fondos claros y texto oscuro */
+    /** Light theme mode with light backgrounds and dark text */
     LIGHT,
 
-    /** Modo de tema oscuro con fondos oscuros y texto claro */
+    /** Dark theme mode with dark backgrounds and light text */
     DARK,
 
-    /** Usa el tema del sistema operativo */
+    /** Uses the operating system theme */
     SYSTEM
 }

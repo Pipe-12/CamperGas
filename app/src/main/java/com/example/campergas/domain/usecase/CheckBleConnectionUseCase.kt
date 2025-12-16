@@ -5,48 +5,48 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
- * Caso de uso para verificar el estado de conexión BLE con sensores CamperGas.
+ * Use case for checking BLE connection status with CamperGas sensors.
  *
- * Este caso de uso encapsula la lógica de negocio para monitorear el estado
- * de conexión con el sensor BLE. Proporciona acceso tanto reactivo (Flow)
- * como directo al estado de conexión.
+ * This use case encapsulates the business logic for monitoring the
+ * connection status with the BLE sensor. Provides both reactive (Flow)
+ * and direct access to the connection state.
  *
- * El estado de conexión es crítico para:
- * - Habilitar/deshabilitar funcionalidades que requieren sensor conectado
- * - Mostrar indicadores visuales de conexión en la UI
- * - Decidir si iniciar lectura de datos o mostrar pantalla de conexión
- * - Manejar reconexiones automáticas cuando se pierde la conexión
+ * Connection status is critical for:
+ * - Enabling/disabling features that require connected sensor
+ * - Displaying visual connection indicators in the UI
+ * - Deciding whether to start data reading or show connection screen
+ * - Handling automatic reconnections when connection is lost
  *
- * Estados posibles:
- * - true: Sensor BLE conectado y funcional
- * - false: Sin sensor conectado o conexión perdida
+ * Possible states:
+ * - true: BLE sensor connected and functional
+ * - false: No sensor connected or connection lost
  *
- * @property bleRepository Repositorio BLE que gestiona el estado de conexión
+ * @property bleRepository BLE repository that manages connection state
  * @author Felipe García Gómez
  */
 class CheckBleConnectionUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
     /**
-     * Obtiene el estado de conexión BLE como un StateFlow reactivo.
+     * Gets the BLE connection status as a reactive StateFlow.
      *
-     * Retorna un StateFlow que emite el estado actual de conexión y se actualiza
-     * automáticamente cuando el estado cambia (conectado/desconectado).
-     * Permite a la UI reaccionar en tiempo real a cambios de conexión.
+     * Returns a StateFlow that emits the current connection status and updates
+     * automatically when the state changes (connected/disconnected).
+     * Allows the UI to react in real-time to connection changes.
      *
-     * @return StateFlow que emite true si hay conexión activa, false si no hay conexión
+     * @return StateFlow that emits true if there's an active connection, false if not
      */
     operator fun invoke(): StateFlow<Boolean> {
         return bleRepository.connectionState
     }
 
     /**
-     * Verifica si existe una conexión BLE activa en este momento.
+     * Checks if there's an active BLE connection at this moment.
      *
-     * Obtiene el valor actual del estado de conexión sin crear una suscripción
-     * reactiva. Útil para verificaciones puntuales.
+     * Gets the current value of the connection state without creating a reactive
+     * subscription. Useful for one-time checks.
      *
-     * @return true si hay un sensor BLE conectado, false en caso contrario
+     * @return true if a BLE sensor is connected, false otherwise
      */
     fun isConnected(): Boolean {
         return bleRepository.connectionState.value

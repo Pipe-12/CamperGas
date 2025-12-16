@@ -7,39 +7,38 @@ import java.util.Calendar
 import javax.inject.Inject
 
 /**
- * Caso de uso para obtener y analizar el historial de consumo de gas.
+ * Use case for getting and analyzing gas consumption history.
  *
- * Este caso de uso encapsula la lógica de negocio para recuperar, filtrar y analizar
- * las mediciones históricas de consumo de gas. Proporciona múltiples formas de consultar
- * el historial:
- * - Por rangos de fechas personalizados
- * - Por cilindro específico
- * - Por períodos predefinidos (último día, semana, mes)
+ * This use case encapsulates the business logic for retrieving, filtering, and analyzing
+ * historical gas consumption measurements. Provides multiple ways to query history:
+ * - By custom date ranges
+ * - By specific cylinder
+ * - By predefined periods (last day, week, month)
  *
- * Además, proporciona funciones de análisis para:
- * - Calcular el consumo total en un período
- * - Preparar datos para gráficos agrupados por día
- * - Detectar patrones de consumo
+ * Additionally, provides analysis functions for:
+ * - Calculating total consumption in a period
+ * - Preparing data for charts grouped by day
+ * - Detecting consumption patterns
  *
- * El consumo se calcula como la diferencia entre la medición más antigua y la más
- * reciente del período, considerando recargas de cilindros que podrían generar
- * valores negativos (que se normalizan a cero).
+ * Consumption is calculated as the difference between the oldest and most
+ * recent measurement in the period, considering cylinder refills that could
+ * generate negative values (which are normalized to zero).
  *
- * @property consumptionRepository Repositorio que proporciona acceso a datos de consumo
+ * @property consumptionRepository Repository that provides access to consumption data
  * @author Felipe García Gómez
  */
 class GetConsumptionHistoryUseCase @Inject constructor(
     private val consumptionRepository: ConsumptionRepository
 ) {
     /**
-     * Obtiene el historial de consumo completo o filtrado por rango de fechas.
+     * Gets complete consumption history or filtered by date range.
      *
-     * Si se proporcionan fechas de inicio y fin, filtra las mediciones en ese rango.
-     * Si no se proporcionan, devuelve todo el historial disponible.
+     * If start and end dates are provided, filters measurements in that range.
+     * If not provided, returns all available history.
      *
-     * @param startDate Timestamp Unix del inicio del período (opcional)
-     * @param endDate Timestamp Unix del fin del período (opcional)
-     * @return Flow que emite la lista de registros de consumo en el rango especificado
+     * @param startDate Unix timestamp of period start (optional)
+     * @param endDate Unix timestamp of period end (optional)
+     * @return Flow that emits the list of consumption records in the specified range
      */
     operator fun invoke(startDate: Long? = null, endDate: Long? = null): Flow<List<Consumption>> {
         return if (startDate != null && endDate != null) {
@@ -50,12 +49,12 @@ class GetConsumptionHistoryUseCase @Inject constructor(
     }
 
     /**
-     * Obtiene el consumo de la última semana (7 días).
+     * Gets consumption for the last week (7 days).
      *
-     * Calcula automáticamente las fechas de inicio y fin para el período
-     * de los últimos 7 días desde el momento actual.
+     * Automatically calculates start and end dates for the period
+     * of the last 7 days from the current moment.
      *
-     * @return Flow que emite las mediciones de la última semana
+     * @return Flow that emits measurements from the last week
      */
     fun getLastWeekConsumption(): Flow<List<Consumption>> {
         val calendar = Calendar.getInstance()
@@ -68,12 +67,12 @@ class GetConsumptionHistoryUseCase @Inject constructor(
     }
 
     /**
-     * Obtiene el consumo del último mes (30 días).
+     * Gets consumption for the last month (30 days).
      *
-     * Calcula automáticamente las fechas de inicio y fin para el período
-     * del último mes desde el momento actual.
+     * Automatically calculates start and end dates for the period
+     * of the last month from the current moment.
      *
-     * @return Flow que emite las mediciones del último mes
+     * @return Flow that emits measurements from the last month
      */
     fun getLastMonthConsumption(): Flow<List<Consumption>> {
         val calendar = Calendar.getInstance()
@@ -86,12 +85,12 @@ class GetConsumptionHistoryUseCase @Inject constructor(
     }
 
     /**
-     * Obtiene el consumo del último día (24 horas).
+     * Gets consumption for the last day (24 hours).
      *
-     * Calcula automáticamente las fechas de inicio y fin para el período
-     * de las últimas 24 horas desde el momento actual.
+     * Automatically calculates start and end dates for the period
+     * of the last 24 hours from the current moment.
      *
-     * @return Flow que emite las mediciones del último día
+     * @return Flow that emits measurements from the last day
      */
     fun getLastDayConsumption(): Flow<List<Consumption>> {
         val calendar = Calendar.getInstance()
@@ -104,24 +103,24 @@ class GetConsumptionHistoryUseCase @Inject constructor(
     }
 
     /**
-     * Calcula el total de gas consumido en una lista de mediciones.
+     * Calculates total gas consumed in a list of measurements.
      *
-     * Para cada cilindro en la lista:
-     * 1. Agrupa las mediciones por cilindro
-     * 2. Ordena por fecha (más reciente primero)
-     * 3. Calcula la diferencia entre la primera (más antigua) y última (más reciente)
-     * 4. Suma los consumos de todos los cilindros
+     * For each cylinder in the list:
+     * 1. Groups measurements by cylinder
+     * 2. Sorts by date (most recent first)
+     * 3. Calculates difference between first (oldest) and last (most recent)
+     * 4. Sums consumption from all cylinders
      *
-     * El consumo se calcula como: medición_inicial - medición_final
-     * Los valores negativos (recargas) se normalizan a cero.
+     * Consumption is calculated as: initial_measurement - final_measurement
+     * Negative values (refills) are normalized to zero.
      *
-     * @param consumptions Lista de mediciones a analizar
-     * @return Total de kilogramos de gas consumidos en el período
+     * @param consumptions List of measurements to analyze
+     * @return Total kilograms of gas consumed in the period
      */
     fun calculateTotalConsumption(consumptions: List<Consumption>): Float {
         if (consumptions.isEmpty()) return 0f
 
-        // Agrupar por cilindro y calcular el consumption for cada uno
+        // Group by cylinder and calculate consumption for each
         return consumptions.groupBy { it.cylinderId }
             .map { (_, cylinderConsumptions) ->
                 val sortedConsumptions = cylinderConsumptions.sortedByDescending { it.date }
@@ -131,30 +130,30 @@ class GetConsumptionHistoryUseCase @Inject constructor(
                 val firstMeasurement = sortedConsumptions.first()  // Most recent
                 val lastMeasurement = sortedConsumptions.last()    // Oldest
 
-                // El consumption es la diferencia: measurement inicial - measurement final
+                // Consumption is the difference: initial measurement - final measurement
                 val calculatedConsumption =
                     lastMeasurement.fuelKilograms - firstMeasurement.fuelKilograms
 
-                // Evitar valores negativos (puede ocurrir durante recargas de cylinders)
-                // En caso de recarga, el consumption se considera 0 for ese period
+                // Avoid negative values (can occur during cylinder refills)
+                // In case of refill, consumption is considered 0 for that period
                 kotlin.math.max(0f, calculatedConsumption)
             }
             .sum()
     }
 
     /**
-     * Prepara datos para gráficos agrupando consumos por día.
+     * Prepares data for charts by grouping consumption by day.
      *
-     * Agrupa todas las mediciones por día (eliminando horas, minutos, segundos)
-     * y calcula el consumo total de cada día. Los datos resultantes están
-     * ordenados cronológicamente y listos para visualización en gráficos.
+     * Groups all measurements by day (removing hours, minutes, seconds)
+     * and calculates total consumption for each day. Resulting data is
+     * sorted chronologically and ready for chart visualization.
      *
-     * Cada punto de datos contiene:
-     * - Fecha del día (timestamp normalizado a medianoche)
-     * - Kilogramos totales consumidos ese día
+     * Each data point contains:
+     * - Day date (timestamp normalized to midnight)
+     * - Total kilograms consumed that day
      *
-     * @param consumptions Lista de mediciones a agrupar y analizar
-     * @return Lista de puntos de datos ordenados cronológicamente para gráficos
+     * @param consumptions List of measurements to group and analyze
+     * @return List of data points sorted chronologically for charts
      */
     fun prepareChartData(consumptions: List<Consumption>): List<ChartDataPoint> {
         if (consumptions.isEmpty()) return emptyList()
@@ -177,13 +176,13 @@ class GetConsumptionHistoryUseCase @Inject constructor(
 }
 
 /**
- * Representa un punto de datos para visualización en gráficos.
+ * Represents a data point for chart visualization.
  *
- * Contiene el timestamp del día (normalizado a medianoche) y la cantidad
- * total de gas consumido durante ese día.
+ * Contains the day timestamp (normalized to midnight) and the total
+ * amount of gas consumed during that day.
  *
- * @property date Timestamp Unix del día (normalizado a 00:00:00)
- * @property kilograms Kilogramos totales de gas consumidos en ese día
+ * @property date Unix timestamp of the day (normalized to 00:00:00)
+ * @property kilograms Total kilograms of gas consumed on that day
  */
 data class ChartDataPoint(
     val date: Long,

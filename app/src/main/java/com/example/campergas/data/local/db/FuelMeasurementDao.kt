@@ -9,55 +9,55 @@ import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Objeto de Acceso a Datos (DAO) para operaciones de mediciones de combustible.
+ * Data Access Object (DAO) for fuel measurement operations.
  *
- * Proporciona métodos para insertar, actualizar, eliminar y consultar mediciones de combustible
- * desde la base de datos local. Soporta seguimiento de datos en tiempo real e históricos,
- * consultas por rangos de tiempo y mediciones específicas por bombona.
+ * Provides methods to insert, update, delete, and query fuel measurements
+ * from the local database. Supports real-time and historical data tracking,
+ * time range queries, and cylinder-specific measurements.
  */
 @Dao
 interface FuelMeasurementDao {
 
     /**
-     * Recupera todas las mediciones de combustible ordenadas por timestamp descendente.
+     * Retrieves all fuel measurements ordered by descending timestamp.
      *
-     * @return Flow que emite una lista de todas las mediciones, las más recientes primero
+     * @return Flow emitting a list of all measurements, most recent first
      */
     @Query("SELECT * FROM fuel_measurements ORDER BY timestamp DESC")
     fun getAllMeasurements(): Flow<List<FuelMeasurementEntity>>
 
     /**
-     * Recupera mediciones para una bombona de gas específica.
+     * Retrieves measurements for a specific gas cylinder.
      *
-     * @param cylinderId ID de la bombona de gas
-     * @return Flow que emite mediciones para la bombona especificada, las más recientes primero
+     * @param cylinderId ID of the gas cylinder
+     * @return Flow emitting measurements for the specified cylinder, most recent first
      */
     @Query("SELECT * FROM fuel_measurements WHERE cylinderId = :cylinderId ORDER BY timestamp DESC")
     fun getMeasurementsByCylinder(cylinderId: Long): Flow<List<FuelMeasurementEntity>>
 
     /**
-     * Recupera la medición en tiempo real (no histórica) más reciente.
+     * Retrieves the most recent real-time (non-historical) measurement.
      *
-     * @return Flow que emite la última medición en tiempo real, o null si no existe ninguna
+     * @return Flow emitting the latest real-time measurement, or null if none exists
      */
     @Query("SELECT * FROM fuel_measurements WHERE isHistorical = 0 ORDER BY timestamp DESC LIMIT 1")
     fun getLatestRealTimeMeasurement(): Flow<FuelMeasurementEntity?>
 
     /**
-     * Recupera todas las mediciones históricas para una bombona específica.
+     * Retrieves all historical measurements for a specific cylinder.
      *
-     * @param cylinderId ID de la bombona de gas
-     * @return Flow que emite mediciones históricas para la bombona, las más recientes primero
+     * @param cylinderId ID of the gas cylinder
+     * @return Flow emitting historical measurements for the cylinder, most recent first
      */
     @Query("SELECT * FROM fuel_measurements WHERE isHistorical = 1 AND cylinderId = :cylinderId ORDER BY timestamp DESC")
     fun getHistoricalMeasurements(cylinderId: Long): Flow<List<FuelMeasurementEntity>>
 
     /**
-     * Recupera mediciones dentro de un rango de tiempo específico.
+     * Retrieves measurements within a specific time range.
      *
-     * @param startTime Inicio del rango de tiempo (milisegundos desde epoch)
-     * @param endTime Fin del rango de tiempo (milisegundos desde epoch)
-     * @return Flow que emite mediciones dentro del rango de tiempo, las más recientes primero
+     * @param startTime Start of the time range (milliseconds since epoch)
+     * @param endTime End of the time range (milliseconds since epoch)
+     * @return Flow emitting measurements within the time range, most recent first
      */
     @Query("SELECT * FROM fuel_measurements WHERE timestamp BETWEEN :startTime AND :endTime ORDER BY timestamp DESC")
     fun getMeasurementsByTimeRange(
@@ -66,12 +66,12 @@ interface FuelMeasurementDao {
     ): Flow<List<FuelMeasurementEntity>>
 
     /**
-     * Recupera mediciones para una bombona específica dentro de un rango de tiempo.
+     * Retrieves measurements for a specific cylinder within a time range.
      *
-     * @param cylinderId ID de la bombona de gas
-     * @param startTime Inicio del rango de tiempo (milisegundos desde epoch)
-     * @param endTime Fin del rango de tiempo (milisegundos desde epoch)
-     * @return Flow que emite mediciones coincidentes, las más recientes primero
+     * @param cylinderId ID of the gas cylinder
+     * @param startTime Start of the time range (milliseconds since epoch)
+     * @param endTime End of the time range (milliseconds since epoch)
+     * @return Flow emitting matching measurements, most recent first
      */
     @Query(
         """
@@ -87,86 +87,86 @@ interface FuelMeasurementDao {
     ): Flow<List<FuelMeasurementEntity>>
 
     /**
-     * Inserta una nueva medición, reemplazando si ocurre un conflicto.
+     * Inserts a new measurement, replacing if conflict occurs.
      *
-     * @param measurement La medición a insertar
-     * @return ID de fila de la medición insertada
+     * @param measurement The measurement to insert
+     * @return Row ID of the inserted measurement
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMeasurement(measurement: FuelMeasurementEntity): Long
 
     /**
-     * Inserta múltiples mediciones, reemplazando en caso de conflictos.
+     * Inserts multiple measurements, replacing on conflicts.
      *
-     * @param measurements Lista de mediciones a insertar
+     * @param measurements List of measurements to insert
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMeasurements(measurements: List<FuelMeasurementEntity>)
 
     /**
-     * Actualiza una medición existente.
+     * Updates an existing measurement.
      *
-     * @param measurement La medición a actualizar
+     * @param measurement The measurement to update
      */
     @Update
     suspend fun updateMeasurement(measurement: FuelMeasurementEntity)
 
     /**
-     * Elimina una medición específica.
+     * Deletes a specific measurement.
      *
-     * @param measurement La medición a eliminar
+     * @param measurement The measurement to delete
      */
     @Delete
     suspend fun deleteMeasurement(measurement: FuelMeasurementEntity)
 
     /**
-     * Elimina una medición por su ID.
+     * Deletes a measurement by its ID.
      *
-     * @param id ID de la medición a eliminar
+     * @param id ID of the measurement to delete
      */
     @Query("DELETE FROM fuel_measurements WHERE id = :id")
     suspend fun deleteMeasurementById(id: Long)
 
     /**
-     * Elimina todas las mediciones para una bombona específica.
+     * Deletes all measurements for a specific cylinder.
      *
-     * @param cylinderId ID de la bombona de gas
+     * @param cylinderId ID of the gas cylinder
      */
     @Query("DELETE FROM fuel_measurements WHERE cylinderId = :cylinderId")
     suspend fun deleteMeasurementsByCylinder(cylinderId: Long)
 
     /**
-     * Elimina mediciones anteriores a un timestamp especificado.
+     * Deletes measurements older than a specified timestamp.
      *
-     * Útil para mantener el tamaño de la base de datos y eliminar datos obsoletos.
+     * Useful for maintaining database size and removing stale data.
      *
-     * @param beforeTimestamp Umbral de timestamp (milisegundos desde epoch)
+     * @param beforeTimestamp Timestamp threshold (milliseconds since epoch)
      */
     @Query("DELETE FROM fuel_measurements WHERE timestamp < :beforeTimestamp")
     suspend fun deleteOldMeasurements(beforeTimestamp: Long)
 
     /**
-     * Elimina todas las mediciones de la base de datos.
+     * Deletes all measurements from the database.
      */
     @Query("DELETE FROM fuel_measurements")
     suspend fun deleteAllMeasurements()
 
     /**
-     * Recupera las mediciones más recientes hasta un límite especificado.
+     * Retrieves the most recent measurements up to a specified limit.
      *
-     * @param limit Número máximo de mediciones a recuperar
-     * @return Flow que emite las mediciones más recientes
+     * @param limit Maximum number of measurements to retrieve
+     * @return Flow emitting the most recent measurements
      */
     @Query("SELECT * FROM fuel_measurements ORDER BY timestamp DESC LIMIT :limit")
     fun getRecentMeasurements(limit: Int): Flow<List<FuelMeasurementEntity>>
 
     /**
-     * Recupera las dos últimas mediciones para una bombona específica.
+     * Retrieves the last two measurements for a specific cylinder.
      *
-     * Se usa para calcular la tasa de consumo y tendencias.
+     * Used for calculating consumption rate and trends.
      *
-     * @param cylinderId ID de la bombona de gas
-     * @return Lista de las dos mediciones más recientes para la bombona
+     * @param cylinderId ID of the gas cylinder
+     * @return List of the two most recent measurements for the cylinder
      */
     @Query(
         """
@@ -179,11 +179,11 @@ interface FuelMeasurementDao {
     suspend fun getLastTwoMeasurements(cylinderId: Long): List<FuelMeasurementEntity>
 
     /**
-     * Recupera las últimas N mediciones para una bombona específica.
+     * Retrieves the last N measurements for a specific cylinder.
      *
-     * @param cylinderId ID de la bombona de gas
-     * @param limit Número de mediciones a recuperar
-     * @return Lista de las N mediciones más recientes para la bombona
+     * @param cylinderId ID of the gas cylinder
+     * @param limit Number of measurements to retrieve
+     * @return List of the N most recent measurements for the cylinder
      */
     @Query(
         """

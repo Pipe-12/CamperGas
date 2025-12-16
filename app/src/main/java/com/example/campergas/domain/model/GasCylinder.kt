@@ -4,31 +4,31 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 /**
- * Modelo de dominio y entidad de base de datos que representa un cilindro de gas.
+ * Domain model and database entity representing a gas cylinder.
  *
- * Esta clase de datos representa un cilindro de gas GPL (Gas Licuado de Petróleo) utilizado
- * en caravanas y autocaravanas. Almacena tanto las características físicas del cilindro
- * (peso vacío, capacidad) como su estado en el sistema (activo/inactivo).
+ * This data class represents an LPG (Liquefied Petroleum Gas) cylinder used
+ * in caravans and motorhomes. It stores both the physical characteristics of the cylinder
+ * (empty weight, capacity) and its state in the system (active/inactive).
  *
- * Funcionalidad clave:
- * - Solo un cilindro puede estar activo a la vez en el sistema
- * - El cilindro activo es el que se usa para las mediciones actuales de peso
- * - La tara (peso vacío) se utiliza para calcular el gas disponible restando del peso total
- * - La capacidad define el 100% de gas para calcular porcentajes
+ * Key functionality:
+ * - Only one cylinder can be active at a time in the system
+ * - The active cylinder is used for current weight measurements
+ * - The tare (empty weight) is used to calculate available gas by subtracting from total weight
+ * - The capacity defines 100% gas for percentage calculations
  *
- * Casos de uso:
- * - Gestión de múltiples cilindros (butano, propano, diferentes tamaños)
- * - Cambio entre cilindros sin perder historial de mediciones
- * - Cálculo preciso de gas disponible mediante calibración con tara
+ * Use cases:
+ * - Managing multiple cylinders (butane, propane, different sizes)
+ * - Switching between cylinders without losing measurement history
+ * - Precise gas calculation through tare calibration
  *
- * Se persiste en la base de datos Room con el nombre de tabla "gas_cylinders".
+ * Persisted in Room database with table name "gas_cylinders".
  *
- * @property id Identificador único autogenerado del cilindro en la base de datos
- * @property name Nombre descriptivo del cilindro (ej: "Butano 12.5kg", "Propano 11kg")
- * @property tare Peso del cilindro vacío en kilogramos (se resta del peso total para obtener el gas disponible)
- * @property capacity Capacidad máxima de gas del cilindro en kilogramos
- * @property isActive Indica si este cilindro es el que está actualmente en uso (solo uno puede estar activo)
- * @property createdAt Timestamp Unix (milisegundos) de cuándo se creó el registro del cilindro
+ * @property id Auto-generated unique identifier of the cylinder in the database
+ * @property name Descriptive name of the cylinder (e.g., "Butane 12.5kg", "Propane 11kg")
+ * @property tare Weight of the empty cylinder in kilograms (subtracted from total weight to get available gas)
+ * @property capacity Maximum gas capacity of the cylinder in kilograms
+ * @property isActive Indicates if this cylinder is currently in use (only one can be active)
+ * @property createdAt Unix timestamp (milliseconds) of when the cylinder record was created
  * @author Felipe García Gómez
  */
 @Entity(tableName = "gas_cylinders")

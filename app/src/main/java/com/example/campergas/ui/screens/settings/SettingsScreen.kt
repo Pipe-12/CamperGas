@@ -119,7 +119,7 @@ fun SettingsScreen(
             )
         }
 
-        // Mostrar el estado de la operación si hay uno
+        // Show operation status if there is one
         operationStatus?.let { status ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -159,7 +159,7 @@ fun SettingsScreen(
             }
         )
 
-        // Configuración de notificaciones
+        // Notification configuration
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -521,10 +521,10 @@ private fun ThemeSelectionCard(
     currentThemeMode: ThemeMode,
     onThemeModeSelected: (ThemeMode) -> Unit
 ) {
-    // Estado para controlar si el menú desplegable está expandido
+    // State to control whether the dropdown menu is expanded
     var expanded by remember { mutableStateOf(false) }
     
-    // Determinar el tema del sistema actual
+    // Determine the current system theme
     val systemIsDark = androidx.compose.foundation.isSystemInDarkTheme()
 
     Card(
@@ -546,7 +546,7 @@ private fun ThemeSelectionCard(
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
-            // Botón que muestra el tema actual y abre el menú desplegable
+            // Button that shows the current theme and opens the dropdown menu
             Box {
                 Button(
                     onClick = { expanded = true },
@@ -561,7 +561,7 @@ private fun ThemeSelectionCard(
                             text = when (currentThemeMode) {
                                 ThemeMode.LIGHT -> stringResource(R.string.theme_mode_light)
                                 ThemeMode.DARK -> stringResource(R.string.theme_mode_dark)
-                                // Si por alguna razón es SYSTEM, mostrar el tema actual del sistema
+                                // If for some reason it's SYSTEM, show the current system theme
                                 ThemeMode.SYSTEM -> if (systemIsDark) {
                                     stringResource(R.string.theme_mode_dark)
                                 } else {
@@ -576,12 +576,12 @@ private fun ThemeSelectionCard(
                     }
                 }
 
-                // Menú desplegable con las opciones de tema
+                // Dropdown menu with theme options
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    // Opción de tema claro
+                    // Light theme option
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.theme_mode_light)) },
                         onClick = {
@@ -589,7 +589,7 @@ private fun ThemeSelectionCard(
                             expanded = false
                         }
                     )
-                    // Opción de tema oscuro
+                    // Dark theme option
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.theme_mode_dark)) },
                         onClick = {
@@ -600,12 +600,12 @@ private fun ThemeSelectionCard(
                 }
             }
 
-            // Mostrar el estado actual del tema
+            // Show the current theme status
             Text(
                 text = when (currentThemeMode) {
                     ThemeMode.LIGHT -> stringResource(R.string.theme_light)
                     ThemeMode.DARK -> stringResource(R.string.theme_dark)
-                    // Si por alguna razón es SYSTEM, mostrar el tema actual del sistema
+                    // If for some reason it's SYSTEM, show the current system theme
                     ThemeMode.SYSTEM -> if (systemIsDark) {
                         stringResource(R.string.theme_dark)
                     } else {

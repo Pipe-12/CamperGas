@@ -4,46 +4,46 @@ import com.example.campergas.data.repository.BleRepository
 import javax.inject.Inject
 
 /**
- * Caso de uso para solicitar una lectura inmediata de inclinación del sensor BLE.
+ * Use case for requesting an immediate inclination reading from the BLE sensor.
  *
- * Este caso de uso encapsula la lógica de negocio para forzar una lectura
- * de inclinación (pitch y roll) del sensor BLE fuera del ciclo de lecturas
- * periódicas automáticas.
+ * This use case encapsulates the business logic for forcing an inclination
+ * reading (pitch and roll) from the BLE sensor outside the automatic periodic
+ * readings cycle.
  *
- * Utilidad principal:
- * - Obtener medición actualizada cuando el usuario necesita verificar la nivelación
- * - Actualizar datos de estabilidad antes de mostrar widgets o gráficos
- * - Verificar inclinación sin esperar al próximo ciclo automático
- * - Permitir al usuario "refrescar" manualmente los datos de nivelación
+ * Main utility:
+ * - Get updated measurement when user needs to check leveling
+ * - Update stability data before showing widgets or charts
+ * - Verify inclination without waiting for the next automatic cycle
+ * - Allow user to manually "refresh" leveling data
  *
- * Funcionamiento:
- * El sensor BLE lee la característica de inclinación bajo demanda (READ operation).
- * La respuesta se procesa de forma asíncrona y actualiza el Flow de datos
- * de inclinación automáticamente cuando llega.
+ * How it works:
+ * The BLE sensor reads the inclination characteristic on demand (READ operation).
+ * The response is processed asynchronously and updates the inclination data
+ * Flow automatically when it arrives.
  *
- * Diferencia con lecturas automáticas:
- * - Lecturas automáticas: Ocurren cada X segundos según configuración
- * - Lectura bajo demanda: Ocurre inmediatamente al invocar este caso de uso
+ * Difference from automatic readings:
+ * - Automatic readings: Occur every X seconds according to configuration
+ * - On-demand reading: Occurs immediately when invoking this use case
  *
- * Requisitos:
- * - Debe haber un sensor BLE conectado
- * - El sensor debe tener acelerómetro/giroscopio funcional
+ * Requirements:
+ * - A BLE sensor must be connected
+ * - The sensor must have a functional accelerometer/gyroscope
  *
- * @property bleRepository Repositorio BLE que gestiona la comunicación con el sensor
+ * @property bleRepository BLE repository that manages sensor communication
  * @author Felipe García Gómez
  */
 class RequestInclinationDataUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
     /**
-     * Solicita inmediatamente una lectura de inclinación del sensor BLE.
+     * Immediately requests an inclination reading from the BLE sensor.
      *
-     * Ejecuta una lectura BLE de la característica de inclinación sin esperar
-     * al próximo ciclo de lectura automática. El resultado se entregará de
-     * forma asíncrona a través del Flow de datos de inclinación.
+     * Executes a BLE reading of the inclination characteristic without waiting
+     * for the next automatic reading cycle. The result is delivered
+     * asynchronously through the inclination data Flow.
      *
-     * La invocación es segura incluso si no hay sensor conectado (no hace nada
-     * en ese caso). No bloquea la ejecución.
+     * The invocation is safe even if no sensor is connected (does nothing
+     * in that case). Does not block execution.
      */
     operator fun invoke() {
         bleRepository.readInclinationDataOnDemand()

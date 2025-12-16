@@ -1,29 +1,29 @@
 package com.example.campergas.domain.model
 
 /**
- * Modelo de dominio que representa la configuración geométrica de un vehículo recreativo.
+ * Domain model representing the geometric configuration of a recreational vehicle.
  *
- * Esta clase de datos almacena las dimensiones físicas del vehículo (caravana o autocaravana)
- * necesarias para calcular correctamente:
- * - Distribución de peso en los ejes
- * - Nivelación del vehículo
- * - Elevación necesaria en las ruedas para corregir inclinación
- * - Consumo estimado de gas
+ * This data class stores the physical dimensions of the vehicle (caravan or motorhome)
+ * needed to correctly calculate:
+ * - Weight distribution on the axles
+ * - Vehicle leveling
+ * - Required wheel elevation to correct inclination
+ * - Estimated gas consumption
  *
- * Las dimensiones son críticas para:
- * - Cálculos de estabilidad basados en inclinación del sensor
- * - Recomendaciones de nivelación mediante calzos
- * - Visualización correcta en los widgets de estabilidad
+ * The dimensions are critical for:
+ * - Stability calculations based on sensor inclination
+ * - Leveling recommendations using wheel chocks
+ * - Correct visualization in stability widgets
  *
- * Diferencias por tipo de vehículo:
- * - CARAVAN: Usa distanceToFrontSupport (punto de apoyo delantero en la lanza)
- * - AUTOCARAVANA: Usa distanceBetweenFrontWheels (eje delantero completo)
+ * Differences by vehicle type:
+ * - CARAVAN: Uses distanceToFrontSupport (front support point on the drawbar)
+ * - AUTOCARAVANA: Uses distanceBetweenFrontWheels (complete front axle)
  *
- * @property type Tipo de vehículo (caravana o autocaravana)
- * @property distanceBetweenRearWheels Distancia entre las ruedas del eje trasero en centímetros
- * @property distanceToFrontSupport Distancia desde eje trasero hasta punto de apoyo delantero en cm (solo caravanas)
- * @property distanceBetweenFrontWheels Distancia entre las ruedas del eje delantero en cm (solo autocaravanas)
- * @property gasTankCapacity Capacidad total del sistema de gas en kilogramos
+ * @property type Vehicle type (caravan or motorhome)
+ * @property distanceBetweenRearWheels Distance between rear axle wheels in centimeters
+ * @property distanceToFrontSupport Distance from rear axle to front support point in cm (caravans only)
+ * @property distanceBetweenFrontWheels Distance between front axle wheels in cm (motorhomes only)
+ * @property gasTankCapacity Total capacity of the gas system in kilograms
  * @author Felipe García Gómez
  */
 data class VehicleConfig(

@@ -9,25 +9,25 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Repositorio para gestionar mediciones de combustible en la base de datos.
+ * Repository for managing fuel measurements in the database.
  *
- * Este repositorio actúa como una capa de abstracción entre la capa de dominio
- * y la capa de persistencia (Room Database). Proporciona operaciones CRUD
- * para mediciones de combustible y maneja la conversión entre entidades de
- * base de datos (FuelMeasurementEntity) y modelos de dominio (FuelMeasurement).
+ * This repository acts as an abstraction layer between the domain layer
+ * and the persistence layer (Room Database). Provides CRUD operations
+ * for fuel measurements and handles conversion between database entities
+ * (FuelMeasurementEntity) and domain models (FuelMeasurement).
  *
- * Responsabilidades principales:
- * - Proveer acceso a mediciones de combustible con diferentes filtros
- * - Insertar nuevas mediciones (individuales o en lote)
- * - Eliminar mediciones antiguas o por criterios específicos
- * - Convertir entre modelos de dominio y entidades de base de datos
- * - Exponer datos como Flows reactivos para actualización automática de UI
+ * Main responsibilities:
+ * - Provide access to fuel measurements with different filters
+ * - Insert new measurements (individual or batch)
+ * - Delete old measurements or by specific criteria
+ * - Convert between domain models and database entities
+ * - Expose data as reactive Flows for automatic UI updates
  *
- * Tipos de mediciones soportadas:
- * - Tiempo real (isHistorical = false): Mediciones actuales del sensor
- * - Históricas/Offline (isHistorical = true): Datos sincronizados del sensor
+ * Supported measurement types:
+ * - Real-time (isHistorical = false): Current measurements from the sensor
+ * - Historical/Offline (isHistorical = true): Data synchronized from the sensor
  *
- * @property fuelMeasurementDao DAO de Room para acceso a la base de datos
+ * @property fuelMeasurementDao Room DAO for database access
  * @author Felipe García Gómez
  */
 @Singleton
@@ -35,9 +35,9 @@ class FuelMeasurementRepository @Inject constructor(
     private val fuelMeasurementDao: FuelMeasurementDao
 ) {
     /**
-     * Obtiene todas las mediciones de combustible ordenadas por timestamp descendente.
+     * Gets all fuel measurements ordered by descending timestamp.
      *
-     * @return Flow que emite la lista completa de mediciones
+     * @return Flow that emits the complete list of measurements
      */
     fun getAllMeasurements(): Flow<List<FuelMeasurement>> {
         return fuelMeasurementDao.getAllMeasurements().map { entities ->
@@ -46,11 +46,11 @@ class FuelMeasurementRepository @Inject constructor(
     }
 
     /**
-     * Obtiene la medición en tiempo real más reciente.
+     * Gets the most recent real-time measurement.
      *
-     * Solo devuelve mediciones marcadas como isHistorical = false.
+     * Only returns measurements marked as isHistorical = false.
      *
-     * @return Flow que emite la medición más reciente o null si no hay ninguna
+     * @return Flow that emits the most recent measurement or null if none exists
      */
     fun getLatestRealTimeMeasurement(): Flow<FuelMeasurement?> {
         return fuelMeasurementDao.getLatestRealTimeMeasurement().map { entity ->
@@ -59,11 +59,11 @@ class FuelMeasurementRepository @Inject constructor(
     }
 
     /**
-     * Obtiene mediciones en un rango de tiempo específico.
+     * Gets measurements within a specific time range.
      *
-     * @param startTime Timestamp Unix del inicio del período
-     * @param endTime Timestamp Unix del fin del período
-     * @return Flow que emite la lista de mediciones en el rango
+     * @param startTime Unix timestamp of the period start
+     * @param endTime Unix timestamp of the period end
+     * @return Flow that emits the list of measurements in the range
      */
     fun getMeasurementsByTimeRange(startTime: Long, endTime: Long): Flow<List<FuelMeasurement>> {
         return fuelMeasurementDao.getMeasurementsByTimeRange(startTime, endTime).map { entities ->
@@ -72,24 +72,24 @@ class FuelMeasurementRepository @Inject constructor(
     }
 
     /**
-     * Inserta una nueva medición de combustible en la base de datos.
+     * Inserts a new fuel measurement into the database.
      *
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @param measurement Medición a insertar
-     * @return ID asignado a la medición insertada
+     * @param measurement Measurement to insert
+     * @return ID assigned to the inserted measurement
      */
     suspend fun insertMeasurement(measurement: FuelMeasurement): Long {
         return fuelMeasurementDao.insertMeasurement(measurement.toEntity())
     }
 
     /**
-     * Inserta múltiples mediciones en la base de datos en lote.
+     * Inserts multiple measurements into the database in batch.
      *
-     * Optimizado para insertar grandes cantidades de datos históricos.
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * Optimized for inserting large amounts of historical data.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @param measurements Lista de mediciones a insertar
+     * @param measurements List of measurements to insert
      */
     suspend fun insertMeasurements(measurements: List<FuelMeasurement>) {
         fuelMeasurementDao.insertMeasurements(measurements.map { it.toEntity() })
@@ -97,35 +97,35 @@ class FuelMeasurementRepository @Inject constructor(
 
 
     /**
-     * Obtiene las N últimas mediciones de un cilindro.
+     * Gets the last N measurements for a cylinder.
      *
-     * Útil para análisis de patrones y detección de outliers.
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * Useful for pattern analysis and outlier detection.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @param cylinderId ID del cilindro a consultar
-     * @param limit Número máximo de mediciones a obtener
-     * @return Lista con las N mediciones más recientes ordenadas por timestamp descendente
+     * @param cylinderId ID of the cylinder to query
+     * @param limit Maximum number of measurements to get
+     * @return List with the N most recent measurements ordered by descending timestamp
      */
     suspend fun getLastNMeasurements(cylinderId: Long, limit: Int): List<FuelMeasurement> {
         return fuelMeasurementDao.getLastNMeasurements(cylinderId, limit).map { it.toDomainModel() }
     }
 
     /**
-     * Elimina una medición específica por su ID.
+     * Deletes a specific measurement by its ID.
      *
-     * Útil para eliminar outliers detectados.
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * Useful for removing detected outliers.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @param id ID de la medición a eliminar
+     * @param id ID of the measurement to delete
      */
     suspend fun deleteMeasurementById(id: Long) {
         fuelMeasurementDao.deleteMeasurementById(id)
     }
 
     /**
-     * Convierte una entidad de base de datos a modelo de dominio.
+     * Converts a database entity to a domain model.
      *
-     * @return Objeto FuelMeasurement del modelo de dominio
+     * @return FuelMeasurement domain model object
      */
     private fun FuelMeasurementEntity.toDomainModel(): FuelMeasurement {
         return FuelMeasurement(
@@ -142,9 +142,9 @@ class FuelMeasurementRepository @Inject constructor(
     }
 
     /**
-     * Convierte un modelo de dominio a entidad de base de datos.
+     * Converts a domain model to a database entity.
      *
-     * @return Objeto FuelMeasurementEntity para persistir en Room
+     * @return FuelMeasurementEntity object for Room persistence
      */
     private fun FuelMeasurement.toEntity(): FuelMeasurementEntity {
         return FuelMeasurementEntity(

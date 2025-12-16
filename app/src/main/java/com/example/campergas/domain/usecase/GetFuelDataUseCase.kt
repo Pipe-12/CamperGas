@@ -6,49 +6,49 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
- * Caso de uso para obtener datos de combustible en tiempo real del sensor BLE.
+ * Use case for getting real-time fuel data from the BLE sensor.
  *
- * Este caso de uso encapsula la lógica de negocio para acceder a las mediciones
- * de combustible (peso, porcentaje, kilogramos) calculadas en tiempo real a partir
- * de los datos del sensor de peso BLE.
+ * This use case encapsulates the business logic for accessing fuel
+ * measurements (weight, percentage, kilograms) calculated in real-time from
+ * the BLE weight sensor data.
  *
- * Los datos de combustible incluyen:
- * - Peso total medido por el sensor (cilindro + gas)
- * - Kilogramos de gas disponible (peso total - tara del cilindro)
- * - Porcentaje de gas disponible respecto a la capacidad total
- * - Información del cilindro activo asociado
- * - Timestamp de la medición
+ * Fuel data includes:
+ * - Total weight measured by sensor (cylinder + gas)
+ * - Kilograms of available gas (total weight - cylinder tare)
+ * - Percentage of available gas relative to total capacity
+ * - Associated active cylinder information
+ * - Measurement timestamp
  *
- * Estos datos se utilizan para:
- * - Mostrar el nivel de gas actual en la pantalla principal
- * - Generar gráficos de consumo y tendencias
- * - Alertar cuando el nivel de gas es bajo
- * - Actualizar widgets de la pantalla de inicio
- * - Registrar historial de consumo en la base de datos
+ * This data is used for:
+ * - Displaying current gas level on main screen
+ * - Generating consumption charts and trends
+ * - Alerting when gas level is low
+ * - Updating home screen widgets
+ * - Recording consumption history in database
  *
- * El Flow emite nuevas mediciones conforme el sensor BLE las proporciona,
- * típicamente cada minuto según la configuración de intervalos.
+ * The Flow emits new measurements as the BLE sensor provides them,
+ * typically every minute according to interval configuration.
  *
- * @property bleRepository Repositorio BLE que proporciona acceso a datos del sensor
+ * @property bleRepository BLE repository that provides access to sensor data
  * @author Felipe García Gómez
  */
 class GetFuelDataUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
     /**
-     * Obtiene los datos de combustible en tiempo real como un Flow reactivo.
+     * Gets real-time fuel data as a reactive Flow.
      *
-     * Retorna un Flow que emite las mediciones de combustible más recientes
-     * calculadas a partir de los datos del sensor de peso. El Flow se actualiza
-     * automáticamente cuando llegan nuevas mediciones desde el sensor.
+     * Returns a Flow that emits the most recent fuel measurements
+     * calculated from the weight sensor data. The Flow updates
+     * automatically when new measurements arrive from the sensor.
      *
-     * El valor puede ser null si:
-     * - No hay sensor conectado
-     * - No hay cilindro activo configurado
-     * - El sensor aún no ha enviado mediciones de peso
-     * - Se perdió la conexión con el sensor
+     * The value can be null if:
+     * - No sensor is connected
+     * - No active cylinder is configured
+     * - The sensor hasn't sent weight measurements yet
+     * - Connection to the sensor was lost
      *
-     * @return Flow que emite objetos FuelMeasurement con datos calculados, o null si no hay datos
+     * @return Flow that emits FuelMeasurement objects with calculated data, or null if no data
      */
     operator fun invoke(): Flow<FuelMeasurement?> {
         return bleRepository.fuelData

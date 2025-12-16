@@ -52,6 +52,6 @@ import org.junit.runners.Suite
 )
 class CamperGasTestSuite {
 
-    // Esta clase actúa como un punto de entrada para ejecutar
-    //  todos los tests de la aplicación CamperGas de una vez
+    // This class acts as an entry point to run
+    // all CamperGas application tests at once
 }

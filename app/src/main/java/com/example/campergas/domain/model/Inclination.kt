@@ -1,26 +1,26 @@
 package com.example.campergas.domain.model
 
 /**
- * Modelo de dominio que representa la inclinación de un vehículo en dos ejes.
+ * Domain model representing vehicle inclination on two axes.
  *
- * Esta clase de datos encapsula las mediciones de inclinación obtenidas del sensor
- * acelerómetro/giroscopio integrado en el dispositivo BLE. Proporciona información
- * sobre la orientación del vehículo en los ejes pitch (cabeceo) y roll (balanceo).
+ * This data class encapsulates inclination measurements obtained from the
+ * accelerometer/gyroscope integrated in the BLE device. Provides information
+ * about vehicle orientation on pitch (tilt forward/backward) and roll (tilt left/right) axes.
  *
- * Proporciona métodos útiles para:
- * - Determinar si el vehículo está nivelado en cada eje
- * - Verificar si el vehículo está completamente nivelado
- * - Formatear el timestamp de la medición
+ * Provides useful methods for:
+ * - Determining if the vehicle is level on each axis
+ * - Verifying if the vehicle is completely level
+ * - Formatting the measurement timestamp
  *
- * Usos principales:
- * - Monitorización de estabilidad del vehículo
- * - Detección de superficies irregulares o pendientes
- * - Alertas de seguridad cuando el vehículo no está nivelado
- * - Widgets de visualización de estabilidad
+ * Main uses:
+ * - Vehicle stability monitoring
+ * - Detection of irregular surfaces or slopes
+ * - Safety alerts when the vehicle is not level
+ * - Stability visualization widgets
  *
- * @property pitch Inclinación en el eje pitch/cabeceo en grados (-180° a +180°). Positivo = inclinación hacia adelante
- * @property roll Inclinación en el eje roll/balanceo en grados (-180° a +180°). Positivo = inclinación hacia la derecha
- * @property timestamp Momento en que se realizó la medición (timestamp Unix en milisegundos)
+ * @property pitch Inclination on the pitch axis in degrees (-180° to +180°). Positive = tilt forward
+ * @property roll Inclination on the roll axis in degrees (-180° to +180°). Positive = tilt to the right
+ * @property timestamp Moment when the measurement was taken (Unix timestamp in milliseconds)
  * @author Felipe García Gómez
  */
 data class Inclination(
@@ -29,49 +29,49 @@ data class Inclination(
     val timestamp: Long = System.currentTimeMillis()
 ) {
     /**
-     * Calcula si el vehículo está nivelado en el eje pitch (cabeceo).
+     * Calculates if the vehicle is level on the pitch axis.
      *
-     * Se considera nivelado si la inclinación está dentro de la tolerancia
-     * de ±2 grados respecto a la horizontal. Esta tolerancia permite pequeñas
-     * variaciones que no afectan significativamente a la estabilidad.
+     * Considered level if inclination is within the tolerance
+     * of ±2 degrees from horizontal. This tolerance allows small
+     * variations that don't significantly affect stability.
      *
-     * @return true si el pitch está entre -2° y +2°, false en caso contrario
+     * @return true if pitch is between -2° and +2°, false otherwise
      */
     val isLevelPitch: Boolean
         get() = kotlin.math.abs(pitch) <= 2.0f
 
     /**
-     * Calcula si el vehículo está nivelado en el eje roll (balanceo).
+     * Calculates if the vehicle is level on the roll axis.
      *
-     * Se considera nivelado si la inclinación está dentro de la tolerancia
-     * de ±2 grados respecto a la horizontal. Esta tolerancia permite pequeñas
-     * variaciones que no afectan significativamente a la estabilidad.
+     * Considered level if inclination is within the tolerance
+     * of ±2 degrees from horizontal. This tolerance allows small
+     * variations that don't significantly affect stability.
      *
-     * @return true si el roll está entre -2° y +2°, false en caso contrario
+     * @return true if roll is between -2° and +2°, false otherwise
      */
     val isLevelRoll: Boolean
         get() = kotlin.math.abs(roll) <= 2.0f
 
     /**
-     * Calcula si el vehículo está completamente nivelado en ambos ejes.
+     * Calculates if the vehicle is completely level on both axes.
      *
-     * El vehículo se considera completamente nivelado solo cuando tanto
-     * el pitch como el roll están dentro de sus respectivas tolerancias
-     * de ±2 grados. Esto indica que el vehículo está sobre una superficie
-     * relativamente plana y horizontal.
+     * The vehicle is considered completely level only when both
+     * pitch and roll are within their respective tolerances
+     * of ±2 degrees. This indicates the vehicle is on a
+     * relatively flat and horizontal surface.
      *
-     * @return true si ambos ejes están nivelados, false en caso contrario
+     * @return true if both axes are level, false otherwise
      */
     val isLevel: Boolean
         get() = isLevelPitch && isLevelRoll
 
     /**
-     * Formatea el timestamp de la medición en formato de hora legible.
+     * Formats the measurement timestamp in human-readable time format.
      *
-     * Convierte el timestamp Unix en una cadena con formato "HH:mm:ss"
-     * usando la configuración regional del dispositivo.
+     * Converts the Unix timestamp to a string with format "HH:mm:ss"
+     * using the device's locale configuration.
      *
-     * @return Cadena con la hora formateada (ej: "14:35:22")
+     * @return String with formatted time (e.g., "14:35:22")
      */
     fun getFormattedTimestamp(): String {
         val date = java.util.Date(timestamp)

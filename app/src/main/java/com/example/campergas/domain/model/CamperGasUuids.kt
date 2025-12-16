@@ -1,72 +1,72 @@
 package com.example.campergas.domain.model
 
 /**
- * Objeto singleton que contiene los UUIDs de servicios y características BLE de CamperGas.
+ * Singleton object containing BLE service and characteristic UUIDs for CamperGas.
  *
- * Este objeto centraliza todas las constantes UUID necesarias para la comunicación
- * con los sensores CamperGas mediante Bluetooth Low Energy (BLE). Los sensores
- * CamperGas utilizan un único servicio BLE con tres características diferentes:
+ * This object centralizes all UUID constants needed for communication
+ * with CamperGas sensors via Bluetooth Low Energy (BLE). CamperGas sensors
+ * use a single BLE service with three different characteristics:
  *
- * Arquitectura del sensor:
- * - 1 Servicio BLE principal (SENSOR_SERVICE_UUID)
- *   - Característica de peso en tiempo real (WEIGHT_CHARACTERISTIC_UUID)
- *   - Característica de datos históricos offline (OFFLINE_CHARACTERISTIC_UUID)
- *   - Característica de inclinación (INCLINATION_CHARACTERISTIC_UUID)
+ * Sensor architecture:
+ * - 1 Main BLE service (SENSOR_SERVICE_UUID)
+ *   - Real-time weight characteristic (WEIGHT_CHARACTERISTIC_UUID)
+ *   - Offline historical data characteristic (OFFLINE_CHARACTERISTIC_UUID)
+ *   - Inclination characteristic (INCLINATION_CHARACTERISTIC_UUID)
  *
- * Estas constantes se utilizan para:
- * - Identificar dispositivos compatibles durante el escaneo BLE
- * - Suscribirse a las características correctas después de conectar
- * - Leer datos de peso, inclinación e históricos del sensor
+ * These constants are used for:
+ * - Identifying compatible devices during BLE scanning
+ * - Subscribing to correct characteristics after connecting
+ * - Reading weight, inclination, and historical data from the sensor
  *
  * @author Felipe García Gómez
  */
 object CamperGasUuids {
     /**
-     * UUID del servicio BLE principal del sensor CamperGas.
+     * UUID of the main BLE service for the CamperGas sensor.
      *
-     * Este es el servicio único que contiene todas las características de medición
-     * (peso, inclinación y datos históricos). Un dispositivo BLE debe anunciar este
-     * UUID para ser considerado un sensor CamperGas compatible.
+     * This is the unique service containing all measurement characteristics
+     * (weight, inclination, and historical data). A BLE device must advertise this
+     * UUID to be considered a compatible CamperGas sensor.
      */
     const val SENSOR_SERVICE_UUID = "91bad492-b950-4226-aa2b-4ede9fa42f59"
 
     /**
-     * UUID de la característica BLE para mediciones de peso en tiempo real.
+     * UUID of the BLE characteristic for real-time weight measurements.
      *
-     * Esta característica proporciona el peso total actual del cilindro de gas
-     * medido por el sensor. Los datos se obtienen mediante lectura (READ operation).
-     * Formato de datos: JSON {"w": peso_en_kg}
+     * This characteristic provides the current total weight of the gas cylinder
+     * as measured by the sensor. Data is obtained via READ operation.
+     * Data format: JSON {"w": weight_in_kg}
      */
     const val WEIGHT_CHARACTERISTIC_UUID = "cba1d466-344c-4be3-ab3f-189f80dd7518"
 
     /**
-     * UUID de la característica BLE para datos históricos offline.
+     * UUID of the BLE characteristic for offline historical data.
      *
-     * Esta característica proporciona mediciones históricas almacenadas en el sensor
-     * cuando estuvo desconectado. Los datos se obtienen mediante lecturas sucesivas
-     * hasta que el sensor no tiene más datos que enviar.
-     * Formato de datos: JSON array [{"w": peso_en_kg, "t": milisegundos_transcurridos}, ...]
+     * This characteristic provides historical measurements stored in the sensor
+     * while disconnected. Data is obtained via successive reads
+     * until the sensor has no more data to send.
+     * Data format: JSON array [{"w": weight_in_kg, "t": elapsed_milliseconds}, ...]
      */
     const val OFFLINE_CHARACTERISTIC_UUID = "87654321-4321-4321-4321-cba987654321"
 
     /**
-     * UUID de la característica BLE para mediciones de inclinación.
+     * UUID of the BLE characteristic for inclination measurements.
      *
-     * Esta característica proporciona los datos de inclinación del vehículo en dos ejes
-     * (pitch y roll) obtenidos del acelerómetro/giroscopio integrado en el sensor.
-     * Formato de datos: JSON {"p": pitch_en_grados, "r": roll_en_grados}
+     * This characteristic provides vehicle inclination data on two axes
+     * (pitch and roll) obtained from the accelerometer/gyroscope integrated in the sensor.
+     * Data format: JSON {"p": pitch_in_degrees, "r": roll_in_degrees}
      */
     const val INCLINATION_CHARACTERISTIC_UUID = "fedcba09-8765-4321-fedc-ba0987654321"
 
     /**
-     * Verifica si un dispositivo BLE es compatible con CamperGas.
+     * Verifies if a BLE device is compatible with CamperGas.
      *
-     * Un dispositivo es compatible si anuncia el servicio UUID principal de CamperGas
-     * entre sus servicios disponibles. Esta verificación se realiza durante el escaneo
-     * BLE para filtrar dispositivos no compatibles.
+     * A device is compatible if it advertises the main CamperGas service UUID
+     * among its available services. This verification is performed during BLE
+     * scanning to filter out incompatible devices.
      *
-     * @param serviceUuids Lista de UUIDs de servicio anunciados por el dispositivo BLE
-     * @return true si el dispositivo es compatible con CamperGas, false en caso contrario
+     * @param serviceUuids List of service UUIDs advertised by the BLE device
+     * @return true if the device is compatible with CamperGas, false otherwise
      */
     fun isCompatibleDevice(serviceUuids: List<String>): Boolean {
         return serviceUuids.any { uuid ->

@@ -7,22 +7,22 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Repositorio para gestionar los datos de consumo de combustible.
+ * Repository for managing fuel consumption data.
  *
- * Este repositorio actúa como una capa de abstracción sobre FuelMeasurementRepository,
- * transformando las mediciones de combustible (FuelMeasurement) al modelo de dominio
- * más simple de Consumption, que se enfoca específicamente en datos de consumo
- * para visualización y análisis.
+ * This repository acts as an abstraction layer over FuelMeasurementRepository,
+ * transforming fuel measurements (FuelMeasurement) to the simpler domain model
+ * of Consumption, which focuses specifically on consumption data for display
+ * and analysis.
  *
- * Responsabilidades:
- * - Proveer acceso a registros de consumo en diferentes formatos (todos, por cilindro, por fechas)
- * - Convertir entre FuelMeasurement y Consumption
- * - Filtrar y ordenar datos de consumo
+ * Responsibilities:
+ * - Provide access to consumption records in different formats (all, by cylinder, by date range)
+ * - Convert between FuelMeasurement and Consumption
+ * - Filter and sort consumption data
  *
- * La conversión de FuelMeasurement a Consumption simplifica los datos,
- * extrayendo solo la información relevante para análisis de consumo.
+ * The conversion from FuelMeasurement to Consumption simplifies the data,
+ * extracting only the relevant information for consumption analysis.
  *
- * @property fuelMeasurementRepository Repositorio fuente de mediciones de combustible
+ * @property fuelMeasurementRepository Source repository for fuel measurements
  * @author Felipe García Gómez
  */
 @Singleton
@@ -31,12 +31,12 @@ class ConsumptionRepository @Inject constructor(
 ) {
 
     /**
-     * Obtiene todos los registros de consumo ordenados por fecha descendente.
+     * Gets all consumption records ordered by descending date.
      *
-     * Recupera todas las mediciones de combustible y las convierte al modelo
-     * Consumption para análisis y visualización de consumo histórico.
+     * Retrieves all fuel measurements and converts them to the
+     * Consumption model for analysis and historical consumption display.
      *
-     * @return Flow que emite la lista completa de registros de consumo
+     * @return Flow that emits the complete list of consumption records
      */
     fun getAllConsumptions(): Flow<List<Consumption>> {
         return fuelMeasurementRepository.getAllMeasurements().map { measurements ->
@@ -45,14 +45,14 @@ class ConsumptionRepository @Inject constructor(
     }
 
     /**
-     * Obtiene los registros de consumo en un rango de fechas.
+     * Gets consumption records within a date range.
      *
-     * Filtra las mediciones para mostrar solo aquellas dentro del período
-     * especificado, útil para análisis de consumo por períodos.
+     * Filters measurements to show only those within the specified
+     * period, useful for consumption analysis by time periods.
      *
-     * @param startDate Timestamp Unix del inicio del período
-     * @param endDate Timestamp Unix del fin del período
-     * @return Flow que emite la lista de registros en el rango de fechas
+     * @param startDate Unix timestamp of the period start
+     * @param endDate Unix timestamp of the period end
+     * @return Flow that emits the list of records within the date range
      */
     fun getConsumptionsByDateRange(startDate: Long, endDate: Long): Flow<List<Consumption>> {
         return fuelMeasurementRepository.getMeasurementsByTimeRange(startDate, endDate)

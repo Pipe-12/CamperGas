@@ -6,41 +6,41 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
- * Caso de uso para obtener la configuración del vehículo recreativo.
+ * Use case for getting the recreational vehicle configuration.
  *
- * Este caso de uso encapsula la lógica de negocio para recuperar la configuración
- * geométrica del vehículo (caravana o autocaravana) almacenada en el sistema.
+ * This use case encapsulates the business logic for retrieving the
+ * geometric configuration of the vehicle (caravan or motorhome) stored in the system.
  *
- * La configuración del vehículo incluye:
- * - Tipo de vehículo (caravana o autocaravana)
- * - Distancia entre ruedas traseras
- * - Distancia al punto de apoyo delantero (caravanas)
- * - Distancia entre ruedas delanteras (autocaravanas)
- * - Capacidad total del sistema de gas
+ * Vehicle configuration includes:
+ * - Vehicle type (caravan or motorhome)
+ * - Distance between rear wheels
+ * - Distance to front support point (caravans)
+ * - Distance between front wheels (motorhomes)
+ * - Gas system total capacity
  *
- * Esta información es crítica para:
- * - Calcular correctamente la distribución de peso en los ejes
- * - Determinar la elevación necesaria en las ruedas para nivelar
- * - Visualizar correctamente la geometría del vehículo en la UI
- * - Generar recomendaciones precisas de nivelación
+ * This information is critical for:
+ * - Correctly calculating weight distribution on axles
+ * - Determining required wheel elevation for leveling
+ * - Correctly displaying vehicle geometry in the UI
+ * - Generating precise leveling recommendations
  *
- * @property vehicleRepository Repositorio de configuración de vehículos
+ * @property vehicleRepository Vehicle configuration repository
  * @author Felipe García Gómez
  */
 class GetVehicleConfigUseCase @Inject constructor(
     private val vehicleRepository: VehicleRepository
 ) {
     /**
-     * Obtiene la configuración del vehículo como un Flow reactivo.
+     * Gets the vehicle configuration as a reactive Flow.
      *
-     * Retorna un Flow que emite la configuración actual del vehículo y se
-     * actualiza automáticamente cuando se modifica la configuración.
+     * Returns a Flow that emits the current vehicle configuration and
+     * updates automatically when configuration is modified.
      *
-     * El valor puede ser null si el usuario aún no ha configurado su vehículo.
-     * En ese caso, la aplicación debería mostrar la pantalla de configuración
-     * inicial para que el usuario ingrese las dimensiones.
+     * Value can be null if user hasn't configured their vehicle yet.
+     * In that case, the application should show the initial configuration
+     * screen for the user to enter dimensions.
      *
-     * @return Flow que emite la configuración del vehículo o null si no está configurado
+     * @return Flow that emits vehicle configuration or null if not configured
      */
     operator fun invoke(): Flow<VehicleConfig?> {
         return vehicleRepository.getVehicleConfig()

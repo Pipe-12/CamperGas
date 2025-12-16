@@ -7,26 +7,26 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Repositorio para gestionar cilindros de gas en la base de datos.
+ * Repository for managing gas cylinders in the database.
  *
- * Este repositorio proporciona una capa de abstracción para todas las operaciones
- * CRUD relacionadas con cilindros de gas. Gestiona tanto la persistencia de datos
- * como la lógica de negocio relacionada con el estado activo de los cilindros.
+ * This repository provides an abstraction layer for all CRUD operations
+ * related to gas cylinders. It manages both data persistence and business
+ * logic related to cylinder active status.
  *
- * Funcionalidad clave:
- * - Solo un cilindro puede estar activo a la vez
- * - Al activar un cilindro, los demás se desactivan automáticamente
- * - Soporte para múltiples cilindros (diferentes tipos, tamaños, capacidades)
- * - Acceso reactivo mediante Flows para actualización automática de UI
+ * Key functionality:
+ * - Only one cylinder can be active at a time
+ * - When activating a cylinder, others are automatically deactivated
+ * - Support for multiple cylinders (different types, sizes, capacities)
+ * - Reactive access via Flows for automatic UI updates
  *
- * Los cilindros almacenan:
- * - Nombre descriptivo
- * - Tara (peso vacío) para cálculos precisos de gas disponible
- * - Capacidad máxima de gas
- * - Estado activo/inactivo
- * - Fecha de creación
+ * Cylinders store:
+ * - Descriptive name
+ * - Tare (empty weight) for precise available gas calculations
+ * - Maximum gas capacity
+ * - Active/inactive status
+ * - Creation date
  *
- * @property gasCylinderDao DAO de Room para acceso a la base de datos
+ * @property gasCylinderDao Room DAO for database access
  * @author Felipe García Gómez
  */
 @Singleton
@@ -35,49 +35,49 @@ class GasCylinderRepository @Inject constructor(
 ) {
 
     /**
-     * Obtiene todos los cilindros de gas registrados.
+     * Gets all registered gas cylinders.
      *
-     * @return Flow que emite la lista de todos los cilindros ordenados por fecha de creación
+     * @return Flow that emits the list of all cylinders ordered by creation date
      */
     fun getAllCylinders(): Flow<List<GasCylinder>> = gasCylinderDao.getAllCylinders()
 
     /**
-     * Obtiene el cilindro actualmente activo.
+     * Gets the currently active cylinder.
      *
-     * Solo un cilindro puede estar activo a la vez. El cilindro activo es el
-     * que se utiliza para todas las mediciones actuales de peso y gas.
+     * Only one cylinder can be active at a time. The active cylinder is
+     * used for all current weight and gas measurements.
      *
-     * @return Flow que emite el cilindro activo o null si no hay ninguno activo
+     * @return Flow that emits the active cylinder or null if none is active
      */
     fun getActiveCylinder(): Flow<GasCylinder?> = gasCylinderDao.getActiveCylinder()
 
     /**
-     * Obtiene el cilindro activo de forma síncrona.
+     * Gets the active cylinder synchronously.
      *
-     * Ejecuta una consulta directa sin crear suscripción reactiva.
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * Executes a direct query without creating a reactive subscription.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @return El cilindro activo o null si no hay ninguno activo
+     * @return The active cylinder or null if none is active
      */
     suspend fun getActiveCylinderSync(): GasCylinder? = gasCylinderDao.getActiveCylinderSync()
 
     /**
-     * Obtiene un cilindro específico por su ID.
+     * Gets a specific cylinder by its ID.
      *
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @param id ID del cilindro a buscar
-     * @return El cilindro encontrado o null si no existe
+     * @param id ID of the cylinder to find
+     * @return The found cylinder or null if it doesn't exist
      */
     suspend fun getCylinderById(id: Long): GasCylinder? = gasCylinderDao.getCylinderById(id)
 
     /**
-     * Inserta un nuevo cilindro en la base de datos.
+     * Inserts a new cylinder into the database.
      *
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @param cylinder Cilindro a insertar
-     * @return ID asignado al cilindro insertado
+     * @param cylinder Cylinder to insert
+     * @return ID assigned to the inserted cylinder
      */
     suspend fun insertCylinder(cylinder: GasCylinder): Long {
         return gasCylinderDao.insertCylinder(cylinder)
@@ -85,20 +85,20 @@ class GasCylinderRepository @Inject constructor(
 
 
     /**
-     * Establece un cilindro como activo, desactivando todos los demás.
+     * Sets a cylinder as active, deactivating all others.
      *
-     * Esta operación es atómica: primero desactiva todos los cilindros
-     * y luego activa el especificado. Garantiza que solo un cilindro
-     * esté activo a la vez.
+     * This operation is atomic: first deactivates all cylinders
+     * then activates the specified one. Guarantees that only one cylinder
+     * is active at a time.
      *
-     * El cilindro activo es crítico porque:
-     * - Todas las mediciones de peso se asocian a este cilindro
-     * - Su tara se usa para calcular el gas disponible
-     * - Define el 100% de capacidad para calcular porcentajes
+     * The active cylinder is critical because:
+     * - All weight measurements are associated with this cylinder
+     * - Its tare is used to calculate available gas
+     * - It defines 100% capacity for percentage calculations
      *
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @param cylinderId ID del cilindro a activar
+     * @param cylinderId ID of the cylinder to activate
      */
     suspend fun setActiveCylinder(cylinderId: Long) {
         gasCylinderDao.setActiveCylinder(cylinderId)

@@ -5,50 +5,49 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
- * Caso de uso para conectar y desconectar dispositivos BLE sensores de CamperGas.
+ * Use case for connecting and disconnecting CamperGas BLE sensor devices.
  *
- * Este caso de uso encapsula la lógica de negocio para establecer y terminar
- * conexiones BLE con sensores CamperGas. Gestiona tanto la conexión física
- * como el almacenamiento de la dirección del último dispositivo conectado para
- * permitir reconexiones automáticas.
+ * This use case encapsulates the business logic for establishing and terminating
+ * BLE connections with CamperGas sensors. Manages both the physical connection
+ * and storage of the last connected device address to allow automatic reconnection.
  *
- * Funcionalidades:
- * - Conexión a un sensor BLE por su dirección MAC
- * - Desconexión del sensor actualmente conectado
- * - Guardado y recuperación del último dispositivo conectado
- * - Soporte para reconexión automática al último sensor usado
+ * Functionality:
+ * - Connection to a BLE sensor by its MAC address
+ * - Disconnection from the currently connected sensor
+ * - Saving and retrieving the last connected device
+ * - Support for automatic reconnection to the last used sensor
  *
- * Proceso de conexión:
- * 1. Recibe la dirección MAC del dispositivo
- * 2. Establece conexión BLE con el sensor
- * 3. Descubre servicios y características disponibles
- * 4. Guarda la dirección para futuras reconexiones
- * 5. Inicia lectura automática de datos históricos (offline)
- * 6. Comienza lectura periódica de datos en tiempo real
+ * Connection process:
+ * 1. Receives device MAC address
+ * 2. Establishes BLE connection with sensor
+ * 3. Discovers available services and characteristics
+ * 4. Saves address for future reconnections
+ * 5. Starts automatic reading of historical (offline) data
+ * 6. Begins periodic reading of real-time data
  *
- * @property bleRepository Repositorio BLE que gestiona las conexiones y comunicación
+ * @property bleRepository BLE repository that manages connections and communication
  * @author Felipe García Gómez
  */
 class ConnectBleDeviceUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
     /**
-     * Conecta a un dispositivo BLE sensor de CamperGas.
+     * Connects to a CamperGas BLE sensor device.
      *
-     * Establece una conexión BLE con el sensor especificado por su dirección MAC.
-     * Una vez conectado, el sensor comienza a enviar automáticamente:
-     * - Datos históricos almacenados offline
-     * - Mediciones en tiempo real de peso e inclinación
+     * Establishes a BLE connection with the sensor specified by its MAC address.
+     * Once connected, the sensor automatically starts sending:
+     * - Historical data stored offline
+     * - Real-time weight and inclination measurements
      *
-     * Guarda la dirección del dispositivo para permitir reconexión automática
-     * la próxima vez que se abra la aplicación.
+     * Saves the device address to allow automatic reconnection
+     * the next time the application is opened.
      *
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @param deviceAddress Dirección MAC del dispositivo BLE (formato: "XX:XX:XX:XX:XX:XX")
+     * @param deviceAddress MAC address of the BLE device (format: "XX:XX:XX:XX:XX:XX")
      */
     suspend operator fun invoke(deviceAddress: String) {
-        // Conectamos al sensor unificado
+        // Connect to the unified sensor
         bleRepository.connectToSensor(deviceAddress)
 
         // Save address of last connected device
@@ -56,26 +55,26 @@ class ConnectBleDeviceUseCase @Inject constructor(
     }
 
     /**
-     * Desconecta del sensor BLE actualmente conectado.
+     * Disconnects from the currently connected BLE sensor.
      *
-     * Cierra la conexión BLE activa, detiene las lecturas periódicas de datos
-     * y libera los recursos asociados. No borra la dirección del último
-     * dispositivo conectado, permitiendo reconexión posterior.
+     * Closes the active BLE connection, stops periodic data readings
+     * and releases associated resources. Does not delete the address of the last
+     * connected device, allowing later reconnection.
      *
-     * Es seguro llamar este método aunque no haya dispositivo conectado.
+     * Safe to call this method even if no device is connected.
      */
     fun disconnect() {
         bleRepository.disconnectSensor()
     }
 
     /**
-     * Obtiene la dirección del último dispositivo BLE conectado.
+     * Gets the address of the last connected BLE device.
      *
-     * Retorna un Flow que emite la dirección MAC del último sensor al que se
-     * conectó la aplicación. Útil para implementar reconexión automática o
-     * mostrar el dispositivo previamente usado.
+     * Returns a Flow that emits the MAC address of the last sensor the
+     * application connected to. Useful for implementing automatic reconnection or
+     * showing the previously used device.
      *
-     * @return Flow que emite la dirección MAC del último dispositivo conectado
+     * @return Flow that emits the MAC address of the last connected device
      */
     fun getLastConnectedDevice(): Flow<String> {
         return bleRepository.lastConnectedDeviceAddress

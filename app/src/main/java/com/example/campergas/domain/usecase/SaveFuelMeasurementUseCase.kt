@@ -7,28 +7,28 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 /**
- * Caso de uso para guardar mediciones de combustible en la base de datos.
+ * Use case for saving fuel measurements to the database.
  *
- * Este caso de uso encapsula la lógica de negocio compleja para persistir mediciones
- * de nivel de gas, distinguiendo entre:
- * - Mediciones en tiempo real: Datos actuales del sensor (guardados cada 2 minutos)
- * - Mediciones históricas/offline: Datos sincronizados del almacenamiento del sensor
+ * This use case encapsulates complex business logic for persisting gas level
+ * measurements, distinguishing between:
+ * - Real-time measurements: Current sensor data (saved every 2 minutes)
+ * - Historical/offline measurements: Data synchronized from sensor storage
  *
- * Funcionalidades principales:
- * - Control de frecuencia de guardado (evita spam en BD con límite de 2 minutos)
- * - Cálculo automático de combustible disponible (peso total - tara)
- * - Validación de datos antes de guardar
- * - Detección y eliminación automática de mediciones erróneas (outliers)
- * - Soporte para guardado masivo de datos históricos
+ * Main functionality:
+ * - Save frequency control (avoids database spam with 2-minute limit)
+ * - Automatic calculation of available fuel (total weight - tare)
+ * - Data validation before saving
+ * - Automatic detection and removal of erroneous measurements (outliers)
+ * - Support for batch saving of historical data
  *
- * Detección de outliers:
- * Identifica y elimina mediciones anómalas basándose en patrones:
- * - Una medición que se desvía >30% del valor anterior
- * - Y luego el valor regresa a la normalidad
- * - Se considera un error del sensor y se elimina
+ * Outlier detection:
+ * Identifies and removes anomalous measurements based on patterns:
+ * - A measurement that deviates >30% from the previous value
+ * - Then the value returns to normal
+ * - Considered a sensor error and removed
  *
- * @property fuelMeasurementRepository Repositorio de mediciones de combustible
- * @property gasCylinderRepository Repositorio de cilindros para obtener tara y capacidad
+ * @property fuelMeasurementRepository Repository for fuel measurements
+ * @property gasCylinderRepository Repository for cylinders to get tare and capacity
  * @author Felipe García Gómez
  */
 class SaveFuelMeasurementUseCase @Inject constructor(
@@ -37,45 +37,45 @@ class SaveFuelMeasurementUseCase @Inject constructor(
 ) {
 
     companion object {
-        /** Tiempo mínimo entre guardados de mediciones en tiempo real (2 minutos) */
+        /** Minimum time between real-time measurement saves (2 minutes) */
         private const val MIN_TIME_BETWEEN_SAVES_MS = 2 * 60 * 1000L
 
-        /** Porcentaje de cambio que se considera anómalo (30%) */
+        /** Percentage change considered anomalous (30%) */
         private const val OUTLIER_THRESHOLD_PERCENTAGE = 30.0f
 
-        /** Número mínimo de mediciones necesarias para detectar outliers */
+        /** Minimum number of measurements needed for outlier detection */
         private const val MIN_MEASUREMENTS_FOR_OUTLIER_DETECTION = 3
     }
 
     /**
-     * Timestamp de la última medición en tiempo real guardada.
-     * Se utiliza para controlar la frecuencia de guardado.
+     * Timestamp of the last real-time measurement saved.
+     * Used to control save frequency.
      */
     @Volatile
     private var lastSaveTimestamp: Long = 0L
 
     /**
-     * Guarda una medición de combustible en TIEMPO REAL.
+     * Saves a REAL-TIME fuel measurement.
      *
-     * Esta función se invoca cuando llegan datos del sensor BLE en tiempo real
-     * (característica WEIGHT_CHARACTERISTIC_UUID). Las mediciones se marcan como
+     * This function is invoked when data arrives from the BLE sensor in real-time
+     * (WEIGHT_CHARACTERISTIC_UUID characteristic). Measurements are marked as
      * isHistorical = false.
      *
-     * Control de frecuencia:
-     * Solo se guardan mediciones cada 2 minutos para evitar saturar la base de datos.
-     * Si se intenta guardar antes, se devuelve un resultado indicando el tiempo restante.
+     * Frequency control:
+     * Measurements are only saved every 2 minutes to avoid saturating the database.
+     * If an attempt is made to save before that, a result indicating the remaining time is returned.
      *
-     * Proceso:
-     * 1. Verifica que haya pasado el tiempo mínimo desde el último guardado
-     * 2. Obtiene el cilindro activo y su configuración (tara, capacidad)
-     * 3. Calcula combustible disponible y porcentaje
-     * 4. Valida los datos calculados
-     * 5. Guarda la medición en la base de datos
-     * 6. Ejecuta detección de outliers para mantener calidad de datos
+     * Process:
+     * 1. Verifies minimum time has passed since last save
+     * 2. Gets active cylinder and its configuration (tare, capacity)
+     * 3. Calculates available fuel and percentage
+     * 4. Validates calculated data
+     * 5. Saves measurement to database
+     * 6. Executes outlier detection to maintain data quality
      *
-     * @param totalWeight Peso total medido por el sensor (cilindro + gas) en kilogramos
-     * @param timestamp Timestamp de cuándo se tomó la medición (default: ahora)
-     * @return Result con SaveMeasurementResult indicando si se guardó o por qué no
+     * @param totalWeight Total weight measured by sensor (cylinder + gas) in kilograms
+     * @param timestamp Timestamp of when measurement was taken (default: now)
+     * @return Result with SaveMeasurementResult indicating if saved or why not
      */
     suspend fun saveRealTimeMeasurement(
         totalWeight: Float,
@@ -151,29 +151,29 @@ class SaveFuelMeasurementUseCase @Inject constructor(
     }
 
     /**
-     * Guarda múltiples mediciones HISTÓRICAS de combustible.
+     * Saves multiple HISTORICAL fuel measurements.
      *
-     * Esta función se invoca cuando se sincronizan datos históricos almacenados
-     * en el sensor BLE mientras estuvo desconectado (característica
-     * OFFLINE_CHARACTERISTIC_UUID). Las mediciones se marcan como isHistorical = true.
+     * This function is invoked when historical data stored in the BLE sensor
+     * while disconnected is synchronized (OFFLINE_CHARACTERISTIC_UUID characteristic).
+     * Measurements are marked as isHistorical = true.
      *
-     * A diferencia de las mediciones en tiempo real, estas:
-     * - NO tienen límite de frecuencia de guardado
-     * - Se guardan en lotes completos
-     * - Representan datos del pasado, no mediciones actuales
+     * Unlike real-time measurements, these:
+     * - Have NO save frequency limit
+     * - Are saved in complete batches
+     * - Represent past data, not current measurements
      *
-     * Proceso:
-     * 1. Obtiene información del cilindro (tara, capacidad)
-     * 2. Para cada par (peso, timestamp):
-     *    - Calcula combustible disponible y porcentaje
-     *    - Crea objeto FuelMeasurement marcado como histórico
-     *    - Valida los datos
-     * 3. Filtra solo mediciones válidas
-     * 4. Guarda todas las mediciones en lote
+     * Process:
+     * 1. Gets cylinder information (tare, capacity)
+     * 2. For each (weight, timestamp) pair:
+     *    - Calculates available fuel and percentage
+     *    - Creates FuelMeasurement object marked as historical
+     *    - Validates data
+     * 3. Filters only valid measurements
+     * 4. Saves all measurements in batch
      *
-     * @param cylinderId ID del cilindro al que pertenecen las mediciones
-     * @param weightMeasurements Lista de pares (peso total en kg, timestamp Unix)
-     * @return Result con el número de mediciones guardadas o error
+     * @param cylinderId ID of the cylinder the measurements belong to
+     * @param weightMeasurements List of pairs (total weight in kg, Unix timestamp)
+     * @return Result with number of measurements saved or error
      */
     suspend fun saveHistoricalMeasurements(
         cylinderId: Long,
@@ -182,9 +182,9 @@ class SaveFuelMeasurementUseCase @Inject constructor(
         return try {
             // Get cylinder information
             val cylinder = gasCylinderRepository.getCylinderById(cylinderId)
-                ?: return Result.failure(Exception("Bombona no encontrada"))
+                ?: return Result.failure(Exception("Cylinder not found"))
 
-            // Crear las mediciones
+            // Create the measurements
             val measurements = weightMeasurements.map { (totalWeight, timestamp) ->
                 val fuelKilograms = maxOf(0f, totalWeight - cylinder.tare)
                 val fuelPercentage = if (cylinder.capacity > 0) {
@@ -205,7 +205,7 @@ class SaveFuelMeasurementUseCase @Inject constructor(
                 )
             }.filter { it.isValid() } // Filter only valid measurements
 
-            // Guardar todas las mediciones
+            // Save all measurements
             fuelMeasurementRepository.insertMeasurements(measurements)
 
             Result.success(measurements.size)
@@ -215,24 +215,23 @@ class SaveFuelMeasurementUseCase @Inject constructor(
     }
 
     /**
-     * Detecta y elimina mediciones erróneas (outliers) basándose en patrones de peso.
+     * Detects and removes erroneous measurements (outliers) based on weight patterns.
      *
-     * Un outlier es una medición que se desvía significativamente del patrón esperado
-     * y probablemente representa un error del sensor. Esta función analiza las últimas
-     * 3 mediciones buscando el patrón: anterior -> outlier -> actual
+     * An outlier is a measurement that deviates significantly from the expected pattern
+     * and probably represents a sensor error. This function analyzes the last 3
+     * measurements looking for the pattern: previous -> outlier -> current
      *
-     * Patrón de detección:
-     * - Medición anterior: peso normal (ej: 25 kg)
-     * - Outlier: peso sustancialmente diferente >30% (ej: 15 kg - error)
-     * - Medición actual: peso vuelve a normal (ej: 24.8 kg)
+     * Detection pattern:
+     * - Previous measurement: normal weight (e.g., 25 kg)
+     * - Outlier: substantially different weight >30% (e.g., 15 kg - error)
+     * - Current measurement: weight returns to normal (e.g., 24.8 kg)
      *
-     * Si se detecta este patrón, la medición del medio se considera errónea
-     * y se elimina de la base de datos para mantener la calidad de los datos.
+     * If this pattern is detected, the middle measurement is considered erroneous
+     * and is removed from the database to maintain data quality.
      *
-     * Esta función se ejecuta automáticamente después de cada guardado de
-     * medición en tiempo real.
+     * This function runs automatically after each real-time measurement save.
      *
-     * @param cylinderId ID del cilindro a analizar
+     * @param cylinderId ID of the cylinder to analyze
      */
     private suspend fun detectAndRemoveOutliers(cylinderId: Long) {
         try {
@@ -249,8 +248,8 @@ class SaveFuelMeasurementUseCase @Inject constructor(
 
             // Measurements come sorted by timestamp DESC, so:
             // current = recentMeasurements[0] (most recent)
-            // outlier = recentMeasurements[1] (medio)
-            // previous = recentMeasurements[2] (anterior)
+            // outlier = recentMeasurements[1] (middle)
+            // previous = recentMeasurements[2] (previous)
             val current = recentMeasurements[0]
             val outlier = recentMeasurements[1]
             val previous = recentMeasurements[2]
@@ -262,35 +261,35 @@ class SaveFuelMeasurementUseCase @Inject constructor(
             }
         } catch (_: Exception) {
             // If any error occurs in outlier detection, do not affect main flow
-            // Solo registrar silenciosamente el error
+            // Silently log the error
         }
     }
 
     /**
-     * Determina si una medición es un outlier analizando el patrón de tres mediciones.
+     * Determines if a measurement is an outlier by analyzing the pattern of three measurements.
      *
-     * Analiza tres mediciones consecutivas (anterior -> candidata -> actual) y determina
-     * si la medición del medio es anómala.
+     * Analyzes three consecutive measurements (previous -> candidate -> current) and determines
+     * if the middle measurement is anomalous.
      *
-     * Criterios para considerar outlier:
-     * 1. Desviación significativa (>30%) respecto al valor anterior
-     * 2. El valor actual regresa cerca del valor anterior (diferencia <30%)
-     * 3. La desviación del outlier es mayor que la variación normal entre anterior y actual
+     * Criteria to consider an outlier:
+     * 1. Significant deviation (>30%) compared to the previous value
+     * 2. The current value returns close to the previous value (difference <30%)
+     * 3. The outlier's deviation is greater than the normal variation between previous and current
      *
-     * Ejemplo de outlier detectado:
-     * - Anterior: 25.0 kg
-     * - Outlier: 15.0 kg (40% cambio - anómalo)
-     * - Actual: 24.8 kg (vuelve a normal)
+     * Example of detected outlier:
+     * - Previous: 25.0 kg
+     * - Outlier: 15.0 kg (40% change - anomalous)
+     * - Current: 24.8 kg (returns to normal)
      *
-     * Ejemplo de cambio normal (NO outlier):
-     * - Anterior: 25.0 kg
-     * - Media: 24.0 kg (consumo gradual)
-     * - Actual: 23.0 kg (tendencia consistente)
+     * Example of normal change (NOT an outlier):
+     * - Previous: 25.0 kg
+     * - Middle: 24.0 kg (gradual consumption)
+     * - Current: 23.0 kg (consistent trend)
      *
-     * @param previous Medición anterior (más antigua)
-     * @param outlier Medición candidata a outlier (medio)
-     * @param current Medición actual (más reciente)
-     * @return true si la medición del medio es un outlier que debe eliminarse
+     * @param previous Previous measurement (oldest)
+     * @param outlier Outlier candidate measurement (middle)
+     * @param current Current measurement (most recent)
+     * @return true if the middle measurement is an outlier that should be removed
      */
     private fun isOutlierMeasurement(
         previous: FuelMeasurement,
@@ -307,12 +306,12 @@ class SaveFuelMeasurementUseCase @Inject constructor(
             return false
         }
 
-        // Calculatesr porcentajes de cambio
+        // Calculate percentage changes
         val outlierVsPrevious = kotlin.math.abs(outlierWeight - prevWeight) / prevWeight * 100f
         val currentVsPrevious = kotlin.math.abs(currentWeight - prevWeight) / prevWeight * 100f
         val currentVsOutlier = kotlin.math.abs(currentWeight - outlierWeight) / outlierWeight * 100f
 
-        // Condiciones for considerar outlier:
+        // Conditions to consider outlier:
         // 1. The outlier deviates substantially from previous (>30%)
         val isSignificantDeviation = outlierVsPrevious > OUTLIER_THRESHOLD_PERCENTAGE
 
@@ -326,14 +325,14 @@ class SaveFuelMeasurementUseCase @Inject constructor(
     }
 
     /**
-     * Resultado del guardado de una medición.
+     * Result of saving a measurement.
      *
-     * Contiene información sobre si la medición se procesó y guardó exitosamente,
-     * o por qué no se guardó (ej: tiempo mínimo no transcurrido, datos inválidos).
+     * Contains information about whether the measurement was processed and saved successfully,
+     * or why it wasn't saved (e.g., minimum time not elapsed, invalid data).
      *
-     * @property measurementId ID asignado a la medición guardada, o -1 si no se guardó
-     * @property processed true si la medición se guardó, false si se omitió
-     * @property reason Explicación de por qué se guardó o no se guardó la medición
+     * @property measurementId ID assigned to the saved measurement, or -1 if not saved
+     * @property processed true if measurement was saved, false if skipped
+     * @property reason Explanation of why the measurement was saved or not saved
      */
     data class SaveMeasurementResult(
         val measurementId: Long,

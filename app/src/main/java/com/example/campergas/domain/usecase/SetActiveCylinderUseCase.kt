@@ -4,44 +4,44 @@ import com.example.campergas.data.repository.GasCylinderRepository
 import javax.inject.Inject
 
 /**
- * Caso de uso para establecer un cilindro de gas como activo en el sistema.
+ * Use case for setting a gas cylinder as active in the system.
  *
- * Este caso de uso encapsula la lógica de negocio para cambiar qué cilindro de gas
- * está actualmente activo. Solo un cilindro puede estar activo a la vez, y el cambio
- * de cilindro activo desactiva automáticamente el anterior.
+ * This use case encapsulates the business logic for changing which gas cylinder
+ * is currently active. Only one cylinder can be active at a time, and changing
+ * the active cylinder automatically deactivates the previous one.
  *
- * El cilindro activo es crucial porque:
- * - Todas las mediciones de peso se asocian a este cilindro
- * - La tara del cilindro activo se usa para calcular el gas disponible
- * - Los widgets y pantallas principales muestran información de este cilindro
+ * The active cylinder is crucial because:
+ * - All weight measurements are associated with this cylinder
+ * - The active cylinder's tare is used to calculate available gas
+ * - Widgets and main screens display information from this cylinder
  *
- * Validaciones realizadas:
- * - Verifica que el cilindro existe antes de activarlo
- * - Captura y reporta errores de base de datos
+ * Validations performed:
+ * - Verifies the cylinder exists before activating it
+ * - Captures and reports database errors
  *
- * Casos de uso comunes:
- * - Cambiar de cilindro de butano a propano
- * - Activar un cilindro de repuesto cuando se agota el principal
- * - Seleccionar el cilindro correcto después de añadir varios
+ * Common use cases:
+ * - Switch from butane to propane cylinder
+ * - Activate a spare cylinder when the main one runs out
+ * - Select the correct cylinder after adding several
  *
- * @property repository Repositorio de cilindros de gas que accede a la base de datos
+ * @property repository Gas cylinder repository that accesses the database
  * @author Felipe García Gómez
  */
 class SetActiveCylinderUseCase @Inject constructor(
     private val repository: GasCylinderRepository
 ) {
     /**
-     * Establece un cilindro específico como activo en el sistema.
+     * Sets a specific cylinder as active in the system.
      *
-     * Busca el cilindro por su ID y, si existe, lo marca como activo.
-     * Automáticamente desactiva cualquier otro cilindro que estuviera activo.
+     * Looks up the cylinder by its ID and, if it exists, marks it as active.
+     * Automatically deactivates any other cylinder that was active.
      *
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @param cylinderId ID del cilindro que se desea activar
-     * @return Result.success(Unit) si el cilindro se activó correctamente
-     * @return Result.failure con IllegalArgumentException si el cilindro no existe
-     * @return Result.failure con la excepción correspondiente si hay error de base de datos
+     * @param cylinderId ID of the cylinder to activate
+     * @return Result.success(Unit) if the cylinder was activated successfully
+     * @return Result.failure with IllegalArgumentException if the cylinder doesn't exist
+     * @return Result.failure with the corresponding exception if there's a database error
      */
     suspend operator fun invoke(cylinderId: Long): Result<Unit> {
         return try {
@@ -50,7 +50,7 @@ class SetActiveCylinderUseCase @Inject constructor(
                 repository.setActiveCylinder(cylinderId)
                 Result.success(Unit)
             } else {
-                Result.failure(IllegalArgumentException("Bombona no encontrada"))
+                Result.failure(IllegalArgumentException("Cylinder not found"))
             }
         } catch (e: Exception) {
             Result.failure(e)

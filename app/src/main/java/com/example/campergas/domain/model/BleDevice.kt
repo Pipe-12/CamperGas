@@ -1,24 +1,24 @@
 package com.example.campergas.domain.model
 
 /**
- * Modelo de dominio que representa un dispositivo Bluetooth Low Energy (BLE).
+ * Domain model representing a Bluetooth Low Energy (BLE) device.
  *
- * Esta clase de datos encapsula toda la información relevante de un dispositivo BLE
- * descubierto durante el escaneo, incluyendo su identificación, estado de conexión,
- * servicios disponibles y calidad de señal.
+ * This data class encapsulates all relevant information about a BLE device
+ * discovered during scanning, including its identification, connection status,
+ * available services, and signal quality.
  *
- * Proporciona propiedades calculadas para:
- * - Evaluar la calidad de la señal (excelente, buena, regular, débil)
- * - Verificar compatibilidad con sensores CamperGas
- * - Identificar el tipo de dispositivo basado en su nombre y servicios
+ * Provides computed properties for:
+ * - Evaluating signal quality (excellent, good, fair, weak)
+ * - Verifying compatibility with CamperGas sensors
+ * - Identifying device type based on its name and services
  *
- * @property name Nombre visible del dispositivo BLE
- * @property address Dirección MAC única del dispositivo
- * @property rssi Indicador de intensidad de señal recibida (en dBm, valores negativos)
- * @property isConnected Indica si el dispositivo está actualmente conectado
- * @property services Lista de UUIDs de servicios BLE que el dispositivo anuncia
- * @property isConnectable Indica si el dispositivo acepta conexiones
- * @property lastSeen Timestamp de la última vez que se detectó el dispositivo
+ * @property name Visible name of the BLE device
+ * @property address Unique MAC address of the device
+ * @property rssi Received Signal Strength Indicator (in dBm, negative values)
+ * @property isConnected Indicates if the device is currently connected
+ * @property services List of BLE service UUIDs advertised by the device
+ * @property isConnectable Indicates if the device accepts connections
+ * @property lastSeen Timestamp of the last time the device was detected
  * @author Felipe García Gómez
  */
 data class BleDevice(
@@ -31,49 +31,49 @@ data class BleDevice(
     val lastSeen: Long = System.currentTimeMillis()
 ) {
     /**
-     * Calidad de la señal interpretada en forma legible.
+     * Human-readable signal quality interpretation.
      *
-     * Clasifica la intensidad de señal RSSI en cuatro categorías:
-     * - "Excelente": RSSI >= -50 dBm (señal muy fuerte, dispositivo muy cerca)
-     * - "Buena": RSSI >= -70 dBm (señal fuerte, dispositivo cerca)
-     * - "Regular": RSSI >= -85 dBm (señal aceptable, dispositivo a distancia media)
-     * - "Weak": RSSI < -85 dBm (señal débil, dispositivo lejos o con obstrucciones)
+     * Classifies RSSI signal strength into four categories:
+     * - "Excellent": RSSI >= -50 dBm (very strong signal, device very close)
+     * - "Good": RSSI >= -70 dBm (strong signal, device nearby)
+     * - "Fair": RSSI >= -85 dBm (acceptable signal, device at medium distance)
+     * - "Weak": RSSI < -85 dBm (weak signal, device far away or obstructed)
      */
     val signalStrength: String
         get() = when {
-            rssi >= -50 -> "Excelente"
-            rssi >= -70 -> "Buena"
-            rssi >= -85 -> "Regular"
+            rssi >= -50 -> "Excellent"
+            rssi >= -70 -> "Good"
+            rssi >= -85 -> "Fair"
             else -> "Weak"
         }
 
     /**
-     * Verifica si este dispositivo es compatible con CamperGas.
+     * Verifies if this device is compatible with CamperGas.
      *
-     * Un dispositivo es compatible si anuncia alguno de los UUIDs de servicio
-     * definidos como compatibles con el sistema CamperGas.
+     * A device is compatible if it advertises any of the service UUIDs
+     * defined as compatible with the CamperGas system.
      *
-     * @return true si el dispositivo es compatible con CamperGas, false en caso contrario
+     * @return true if the device is compatible with CamperGas, false otherwise
      */
     val isCompatibleWithCamperGas: Boolean
         get() = CamperGasUuids.isCompatibleDevice(services)
 
     /**
-     * Obtiene el tipo de dispositivo basado en su nombre y compatibilidad.
+     * Gets the device type based on its name and compatibility.
      *
-     * Clasifica el dispositivo analizando su nombre y servicios en las siguientes categorías:
-     * - "Sensor CamperGas": Dispositivo con nombre que incluye "CamperGas"
-     * - "Sensor de Peso": Dispositivo especializado en medición de peso
-     * - "Inclination Sensor": Dispositivo especializado en medición de inclinación
-     * - "Dispositivo Compatible": Dispositivo BLE compatible pero sin nombre específico
-     * - "Dispositivo BLE": Dispositivo BLE genérico no compatible
+     * Classifies the device by analyzing its name and services into the following categories:
+     * - "CamperGas Sensor": Device with name containing "CamperGas"
+     * - "Weight Sensor": Device specialized in weight measurement
+     * - "Inclination Sensor": Device specialized in inclination measurement
+     * - "Compatible Device": Compatible BLE device without specific name
+     * - "BLE Device": Generic non-compatible BLE device
      */
     val deviceType: String
         get() = when {
-            name.contains("CamperGas", ignoreCase = true) -> "Sensor CamperGas"
-            name.contains("Weight", ignoreCase = true) -> "Sensor de Peso"
+            name.contains("CamperGas", ignoreCase = true) -> "CamperGas Sensor"
+            name.contains("Weight", ignoreCase = true) -> "Weight Sensor"
             name.contains("Inclination", ignoreCase = true) -> "Inclination Sensor"
-            isCompatibleWithCamperGas -> "Dispositivo Compatible"
-            else -> "Dispositivo BLE"
+            isCompatibleWithCamperGas -> "Compatible Device"
+            else -> "BLE Device"
         }
 }
