@@ -3,16 +3,25 @@ package com.example.campergas.domain.usecase
 import com.example.campergas.data.repository.FuelMeasurementRepository
 import com.example.campergas.data.repository.GasCylinderRepository
 import com.example.campergas.domain.model.FuelMeasurement
-import kotlinx.coroutines.flow.first
+import com.example.campergas.domain.model.GasCylinder
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.random.Random
 
 /**
- * Use case to generate test fuel measurements for the active gas cylinder.
+ * Use case to generate test fuel measurements on a separate test cylinder.
  *
  * Generates realistic test data with timestamps up to one month old to populate
  * the consumption screen with sample data. This is useful for testing and
  * demonstrating the application without actual sensor data.
+ *
+ * The test data is created on a new test cylinder (not the active one) to avoid
+ * mixing test data with real consumption data. The test cylinder:
+ * - Has a unique name with "🧪" prefix for easy identification
+ * - Is NOT set as active
+ * - Has typical cylinder parameters (12.5kg capacity, 14kg tare)
  *
  * @property fuelMeasurementRepository Repository for fuel measurements
  * @property gasCylinderRepository Repository for gas cylinders
@@ -30,12 +39,21 @@ class GenerateTestDataUseCase @Inject constructor(
 
         /** Average consumption rate per day in kg */
         private const val AVG_CONSUMPTION_PER_DAY = 0.3f
+
+        /** Prefix for test cylinder name to easily identify it */
+        const val TEST_CYLINDER_NAME_PREFIX = "🧪 Prueba"
+
+        /** Default capacity for test cylinder in kg */
+        private const val TEST_CYLINDER_CAPACITY = 12.5f
+
+        /** Default tare (empty weight) for test cylinder in kg */
+        private const val TEST_CYLINDER_TARE = 14.0f
     }
 
     /**
-     * Generates test fuel measurements for the active cylinder.
+     * Generates test fuel measurements on a new test cylinder.
      *
-     * Creates measurements with:
+     * Creates a new test cylinder (not active) and populates it with measurements:
      * - Timestamps distributed over the last 30 days
      * - Realistic decreasing fuel levels (simulating consumption)
      * - Some random variation to simulate real sensor data
@@ -45,11 +63,24 @@ class GenerateTestDataUseCase @Inject constructor(
      */
     suspend operator fun invoke(): Result<Int> {
         return try {
-            // Get the active cylinder
-            val activeCylinder = gasCylinderRepository.getActiveCylinder().first()
-                ?: return Result.failure(Exception("No active cylinder configured"))
-
             val currentTime = System.currentTimeMillis()
+
+            // Create a unique test cylinder name with date/time
+            val dateFormat = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault())
+            val testCylinderName = "$TEST_CYLINDER_NAME_PREFIX - ${dateFormat.format(Date(currentTime))}"
+
+            // Create a new test cylinder (NOT active)
+            val testCylinder = GasCylinder(
+                name = testCylinderName,
+                tare = TEST_CYLINDER_TARE,
+                capacity = TEST_CYLINDER_CAPACITY,
+                isActive = false, // Not active to avoid mixing with real data
+                createdAt = currentTime
+            )
+
+            // Insert the test cylinder and get its ID
+            val testCylinderId = gasCylinderRepository.insertCylinder(testCylinder)
+
             val measurements = mutableListOf<FuelMeasurement>()
 
             // Starting fuel percentage (80-95%)
@@ -71,14 +102,14 @@ class GenerateTestDataUseCase @Inject constructor(
                 currentFuelPercentage = currentFuelPercentage.coerceIn(5f, 100f)
 
                 // Calculate fuel kilograms from percentage
-                val fuelKilograms = activeCylinder.capacity * currentFuelPercentage / 100f
+                val fuelKilograms = TEST_CYLINDER_CAPACITY * currentFuelPercentage / 100f
 
                 // Calculate total weight
-                val totalWeight = activeCylinder.tare + fuelKilograms
+                val totalWeight = TEST_CYLINDER_TARE + fuelKilograms
 
                 val measurement = FuelMeasurement(
-                    cylinderId = activeCylinder.id,
-                    cylinderName = activeCylinder.name,
+                    cylinderId = testCylinderId,
+                    cylinderName = testCylinderName,
                     timestamp = timestamp,
                     fuelKilograms = fuelKilograms,
                     fuelPercentage = currentFuelPercentage,
