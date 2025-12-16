@@ -6,28 +6,28 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
- * Caso de uso para configurar los intervalos de lectura periódica del sensor BLE.
+ * Use case for configuring periodic reading intervals from the BLE sensor.
  *
- * Este caso de uso encapsula la lógica de negocio para ajustar la frecuencia con
- * la que se solicitan datos al sensor BLE. Permite configurar intervalos diferentes
- * para mediciones de peso e inclinación de forma independiente.
+ * This use case encapsulates the business logic for adjusting the frequency with
+ * which data is requested from the BLE sensor. Allows configuring different intervals
+ * for weight and inclination measurements independently.
  *
- * Intervalos configurables:
- * - Peso: Define cada cuántos segundos se lee el peso del cilindro
- * - Inclinación: Define cada cuántos segundos se lee la inclinación del vehículo
+ * Configurable intervals:
+ * - Weight: Defines every how many seconds the cylinder weight is read
+ * - Inclination: Defines every how many seconds the vehicle inclination is read
  *
- * Consideraciones de los intervalos:
- * - Intervalos más cortos: Mayor precisión y datos más actualizados, mayor consumo de batería
- * - Intervalos más largos: Menor consumo de batería, menor frecuencia de actualización
+ * Interval considerations:
+ * - Shorter intervals: Greater precision and more updated data, higher battery consumption
+ * - Longer intervals: Lower battery consumption, less update frequency
  *
- * Valores recomendados:
- * - Peso: 60 segundos (1 minuto) - El gas no cambia rápidamente
- * - Inclinación: 5-15 segundos - Permite monitoreo en tiempo real de estabilidad
+ * Recommended values:
+ * - Weight: 60 seconds (1 minute) - Gas doesn't change quickly
+ * - Inclination: 5-15 seconds - Allows real-time stability monitoring
  *
- * La configuración se persiste y se aplica inmediatamente al sensor conectado.
- * Si no hay sensor conectado, la configuración se aplicará en la próxima conexión.
+ * Configuration is persisted and applied immediately to the connected sensor.
+ * If no sensor is connected, configuration is applied on the next connection.
  *
- * @property bleRepository Repositorio BLE que gestiona la comunicación con el sensor
+ * @property bleRepository BLE repository that manages sensor communication
  * @author Felipe García Gómez
  */
 class ConfigureReadingIntervalsUseCase @Inject constructor(
@@ -35,15 +35,15 @@ class ConfigureReadingIntervalsUseCase @Inject constructor(
 ) {
 
     /**
-     * Configura el intervalo de lectura de peso del sensor.
+     * Configures the sensor weight reading interval.
      *
-     * Establece cada cuántos segundos el sistema solicitará una nueva medición
-     * de peso al sensor BLE. El cambio se aplica inmediatamente si hay sensor
-     * conectado, y se guarda para futuras conexiones.
+     * Sets every how many seconds the system requests a new weight
+     * measurement from the BLE sensor. Change is applied immediately if sensor
+     * is connected, and saved for future connections.
      *
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @param intervalSeconds Intervalo en segundos entre lecturas de peso (ej: 60 para 1 minuto)
+     * @param intervalSeconds Interval in seconds between weight readings (e.g., 60 for 1 minute)
      */
     suspend fun setWeightReadInterval(intervalSeconds: Int) {
         val intervalMs = intervalSeconds * 1000L
@@ -55,15 +55,15 @@ class ConfigureReadingIntervalsUseCase @Inject constructor(
     }
 
     /**
-     * Configura el intervalo de lectura de inclinación del sensor.
+     * Configures the sensor inclination reading interval.
      *
-     * Establece cada cuántos segundos el sistema solicitará una nueva medición
-     * de inclinación al sensor BLE. El cambio se aplica inmediatamente si hay
-     * sensor conectado, y se guarda para futuras conexiones.
+     * Sets every how many seconds the system requests a new inclination
+     * measurement from the BLE sensor. Change is applied immediately if sensor
+     * is connected, and saved for future connections.
      *
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @param intervalSeconds Intervalo en segundos entre lecturas de inclinación (ej: 15 para 15 segundos)
+     * @param intervalSeconds Interval in seconds between inclination readings (e.g., 15 for 15 seconds)
      */
     suspend fun setInclinationReadInterval(intervalSeconds: Int) {
         val intervalMs = intervalSeconds * 1000L
@@ -75,24 +75,24 @@ class ConfigureReadingIntervalsUseCase @Inject constructor(
     }
 
     /**
-     * Obtiene el intervalo actual de lectura de peso en segundos.
+     * Gets the current weight reading interval in seconds.
      *
-     * Retorna un Flow que emite el intervalo configurado en segundos y se
-     * actualiza cuando se modifica la configuración.
+     * Returns a Flow that emits the configured interval in seconds and
+     * updates when configuration changes.
      *
-     * @return Flow que emite el intervalo de peso en segundos
+     * @return Flow that emits the weight interval in seconds
      */
     fun getWeightReadIntervalSeconds(): Flow<Int> {
         return bleRepository.weightReadInterval.map { it.toInt() / 1000 }
     }
 
     /**
-     * Obtiene el intervalo actual de lectura de inclinación en segundos.
+     * Gets the current inclination reading interval in seconds.
      *
-     * Retorna un Flow que emite el intervalo configurado en segundos y se
-     * actualiza cuando se modifica la configuración.
+     * Returns a Flow that emits the configured interval in seconds and
+     * updates when configuration changes.
      *
-     * @return Flow que emite el intervalo de inclinación en segundos
+     * @return Flow that emits the inclination interval in seconds
      */
     fun getInclinationReadIntervalSeconds(): Flow<Int> {
         return bleRepository.inclinationReadInterval.map { it.toInt() / 1000 }

@@ -80,53 +80,53 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Configurar el gestor de permisos de Bluetooth
+        // Configure the Bluetooth permission manager
         bluetoothPermissionManager = BluetoothPermissionManager(
             activity = this,
             onPermissionsGranted = {
-                // Permisos concedidos, la aplicación puede usar BLE
+                // Permissions granted, the application can use BLE
             },
             onPermissionsDenied = { deniedPermissions ->
-                // Manejar permisos denegados
+                // Handle denied permissions
             }
         )
 
         setContent {
-            // Cargar el tema guardado desde las preferencias de forma reactiva
-            // Usamos collectAsState para que el tema se actualice automáticamente cuando cambia
-            // El valor inicial es SYSTEM para evitar parpadeos en el primer frame
+            // Load saved theme from preferences reactively
+            // Use collectAsState so the theme updates automatically when it changes
+            // Initial value is SYSTEM to avoid flickering on first frame
             val themeMode by preferencesDataStore.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
 
-            // Determinar el tema actual del sistema
+            // Determine the current system theme
             val systemIsDark = androidx.compose.foundation.isSystemInDarkTheme()
 
-            // Convertir SYSTEM al tema actual del sistema en el primer inicio
-            // LaunchedEffect(Unit) garantiza que solo se ejecute una vez por sesión de la app
-            // Nota: Esta migración ocurre de forma asíncrona. Mientras tanto, el tema SYSTEM
-            // se maneja correctamente en la UI usando el valor systemIsDark.
+            // Convert SYSTEM to actual system theme on first launch
+            // LaunchedEffect(Unit) ensures this only runs once per app session
+            // Note: This migration happens asynchronously. Meanwhile, the SYSTEM theme
+            // is handled correctly in the UI using the systemIsDark value.
             LaunchedEffect(Unit) {
-                // Obtener el tema actual de las preferencias
+                // Get current theme from preferences
                 val currentTheme = preferencesDataStore.themeMode.first()
                 if (currentTheme == ThemeMode.SYSTEM) {
-                    // Si el tema es SYSTEM, convertirlo al tema actual del sistema
+                    // If theme is SYSTEM, convert it to the current system theme
                     val newTheme = if (systemIsDark) ThemeMode.DARK else ThemeMode.LIGHT
                     preferencesDataStore.setThemeMode(newTheme)
                 }
             }
 
-            // Determinar si se debe usar el tema oscuro para configurar las barras del sistema
+            // Determine if dark theme should be used for configuring system bars
             val isDarkTheme = when (themeMode) {
                 ThemeMode.LIGHT -> false
                 ThemeMode.DARK -> true
                 ThemeMode.SYSTEM -> systemIsDark
             }
 
-            // Configurar las barras del sistema según el tema actual
+            // Configure system bars according to current theme
             LaunchedEffect(isDarkTheme) {
                 configureSystemBars(isDarkTheme)
             }
 
-            // Aplicar el tema de la aplicación
+            // Apply the application theme
             CamperGasTheme(themeMode = themeMode) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -134,17 +134,17 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     val navController = rememberNavController()
 
-                    // Estado para controlar si mostrar el diálogo de permisos
+                    // State to control whether to show the permission dialog
                     var showPermissionDialog by remember { mutableStateOf(false) }
 
-                    // Verificar permisos al inicio
+                    // Verify permissions at startup
                     LaunchedEffect(Unit) {
                         if (!bluetoothPermissionManager.hasAllPermissions()) {
                             showPermissionDialog = true
                         }
                     }
 
-                    // Mostrar diálogo de permisos si es necesario
+                    // Show permission dialog if necessary
                     if (showPermissionDialog) {
                         PermissionDialog(
                             title = stringResource(R.string.permissions_needed_title),

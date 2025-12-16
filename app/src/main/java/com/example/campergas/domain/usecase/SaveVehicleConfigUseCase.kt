@@ -6,48 +6,48 @@ import com.example.campergas.domain.model.VehicleType
 import javax.inject.Inject
 
 /**
- * Caso de uso para guardar o actualizar la configuración del vehículo recreativo.
+ * Use case for saving or updating the recreational vehicle configuration.
  *
- * Este caso de uso encapsula la lógica de negocio para persistir la configuración
- * geométrica del vehículo (caravana o autocaravana) en la base de datos.
+ * This use case encapsulates the business logic for persisting the
+ * geometric configuration of the vehicle (caravan or motorhome) in the database.
  *
- * Comportamiento:
- * - Si no existe configuración previa, crea una nueva
- * - Si ya existe configuración, la actualiza (solo hay una configuración por app)
+ * Behavior:
+ * - If no previous configuration exists, creates a new one
+ * - If configuration already exists, updates it (only one configuration per app)
  *
- * Proporciona dos formas de guardar:
- * 1. Mediante parámetros individuales (tipo, distancias)
- * 2. Mediante un objeto VehicleConfig completo
+ * Provides two ways to save:
+ * 1. Via individual parameters (type, distances)
+ * 2. Via a complete VehicleConfig object
  *
- * La configuración guardada se utiliza para:
- * - Cálculos de nivelación y estabilidad
- * - Visualizaciones de geometría del vehículo
- * - Recomendaciones de elevación de ruedas
- * - Distribución de peso en los ejes
+ * The saved configuration is used for:
+ * - Leveling and stability calculations
+ * - Vehicle geometry visualizations
+ * - Wheel elevation recommendations
+ * - Weight distribution on axles
  *
- * Validaciones recomendadas (no implementadas aquí, delegar a la UI):
- * - Distancias deben ser positivas
- * - Distancias deben estar en rangos realistas (ej: 100-300 cm)
- * - Para autocaravanas, distanceBetweenFrontWheels no debe ser null
+ * Recommended validations (not implemented here, delegate to UI):
+ * - Distances must be positive
+ * - Distances must be in realistic ranges (e.g., 100-300 cm)
+ * - For motorhomes, distanceBetweenFrontWheels should not be null
  *
- * @property vehicleRepository Repositorio de configuración de vehículos
+ * @property vehicleRepository Vehicle configuration repository
  * @author Felipe García Gómez
  */
 class SaveVehicleConfigUseCase @Inject constructor(
     private val vehicleRepository: VehicleRepository
 ) {
     /**
-     * Guarda o actualiza la configuración del vehículo mediante parámetros individuales.
+     * Saves or updates vehicle configuration via individual parameters.
      *
-     * Crea un objeto VehicleConfig con los parámetros proporcionados y lo persiste
-     * en la base de datos. Si ya existe una configuración, la reemplaza.
+     * Creates a VehicleConfig object with the provided parameters and persists
+     * it in the database. If configuration already exists, replaces it.
      *
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @param type Tipo de vehículo (CARAVAN o AUTOCARAVANA)
-     * @param distanceBetweenRearWheels Distancia entre ruedas traseras en centímetros
-     * @param distanceToFrontSupport Distancia desde eje trasero al apoyo delantero en cm (caravanas)
-     * @param distanceBetweenFrontWheels Distancia entre ruedas delanteras en cm (autocaravanas, opcional)
+     * @param type Vehicle type (CARAVAN or AUTOCARAVANA)
+     * @param distanceBetweenRearWheels Distance between rear wheels in centimeters
+     * @param distanceToFrontSupport Distance from rear axle to front support in cm (caravans)
+     * @param distanceBetweenFrontWheels Distance between front wheels in cm (motorhomes, optional)
      */
     suspend operator fun invoke(
         type: VehicleType,

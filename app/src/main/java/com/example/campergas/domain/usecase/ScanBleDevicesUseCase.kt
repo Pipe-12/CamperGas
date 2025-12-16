@@ -8,45 +8,45 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
- * Caso de uso para escanear dispositivos Bluetooth Low Energy (BLE) disponibles.
+ * Use case for scanning available Bluetooth Low Energy (BLE) devices.
  *
- * Este caso de uso encapsula la lógica de negocio para el escaneo de dispositivos BLE
- * cercanos, incluyendo:
- * - Inicio y detención del escaneo
- * - Filtrado de dispositivos compatibles con CamperGas
- * - Verificación del estado de Bluetooth
- * - Acceso a los resultados del escaneo en tiempo real
+ * This use case encapsulates the business logic for BLE device scanning,
+ * including:
+ * - Starting and stopping scans
+ * - Filtering CamperGas-compatible devices
+ * - Bluetooth state verification
+ * - Real-time access to scan results
  *
- * Requisitos de permisos:
+ * Permission requirements:
  * - Android 12+: BLUETOOTH_SCAN
- * - Android 11 y anteriores: BLUETOOTH_ADMIN + ACCESS_FINE_LOCATION
+ * - Android 11 and earlier: BLUETOOTH_ADMIN + ACCESS_FINE_LOCATION
  *
- * Funcionalidades del filtro:
- * - Habilitado: Solo muestra dispositivos con servicios CamperGas
- * - Deshabilitado: Muestra todos los dispositivos BLE encontrados
+ * Filter functionality:
+ * - Enabled: Only shows devices with CamperGas services
+ * - Disabled: Shows all BLE devices found
  *
- * Casos de uso principales:
- * - Buscar sensores CamperGas cercanos para conectar
- * - Descubrir dispositivos BLE en el entorno
- * - Filtrar dispositivos no compatibles para simplificar la UI
+ * Main use cases:
+ * - Search for nearby CamperGas sensors to connect
+ * - Discover BLE devices in the environment
+ * - Filter incompatible devices to simplify the UI
  *
- * @property bleRepository Repositorio BLE que gestiona el escaneo y conexión
+ * @property bleRepository BLE repository that manages scanning and connection
  * @author Felipe García Gómez
  */
 class ScanBleDevicesUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
     /**
-     * Inicia el escaneo de dispositivos BLE y retorna el estado de resultados.
+     * Starts scanning for BLE devices and returns the results state.
      *
-     * Comienza a buscar dispositivos BLE cercanos y devuelve un StateFlow que
-     * emite la lista de dispositivos encontrados. La lista se actualiza
-     * automáticamente conforme se descubren nuevos dispositivos o se actualiza
-     * información de dispositivos ya encontrados.
+     * Begins searching for nearby BLE devices and returns a StateFlow that
+     * emits the list of devices found. The list updates automatically
+     * as new devices are discovered or information is updated for
+     * already found devices.
      *
-     * Requiere permisos de escaneo BLE según la versión de Android.
+     * Requires BLE scanning permissions according to Android version.
      *
-     * @return StateFlow que emite la lista actualizada de dispositivos encontrados
+     * @return StateFlow that emits the updated list of devices found
      */
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     operator fun invoke(): StateFlow<List<BleDevice>> {
@@ -55,12 +55,12 @@ class ScanBleDevicesUseCase @Inject constructor(
     }
 
     /**
-     * Detiene el escaneo de dispositivos BLE.
+     * Stops scanning for BLE devices.
      *
-     * Cancela el escaneo activo para ahorrar batería. Los dispositivos ya
-     * encontrados permanecen en la lista de resultados.
+     * Cancels the active scan to save battery. Devices already
+     * found remain in the results list.
      *
-     * Requiere permisos de escaneo BLE según la versión de Android.
+     * Requires BLE scanning permissions according to Android version.
      */
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun stopScan() {
@@ -68,28 +68,28 @@ class ScanBleDevicesUseCase @Inject constructor(
     }
 
     /**
-     * Verifica si el Bluetooth está habilitado en el dispositivo.
+     * Checks if Bluetooth is enabled on the device.
      *
-     * @return true si el Bluetooth está encendido, false si está apagado o no disponible
+     * @return true if Bluetooth is on, false if off or unavailable
      */
     fun isBluetoothEnabled(): Boolean {
         return bleRepository.isBluetoothEnabled()
     }
 
     /**
-     * Verifica si el filtro de compatibilidad está actualmente activo.
+     * Checks if the compatibility filter is currently active.
      *
-     * @return true si solo se muestran dispositivos compatibles, false si se muestran todos
+     * @return true if only compatible devices are shown, false if all are shown
      */
     fun isCompatibleFilterEnabled(): Boolean {
         return bleRepository.isCompatibleFilterEnabled()
     }
 
     /**
-     * Alterna el estado del filtro de compatibilidad.
+     * Toggles the compatibility filter state.
      *
-     * Si el filtro está activo, lo desactiva. Si está inactivo, lo activa.
-     * Proporciona una forma conveniente de cambiar entre modos de visualización.
+     * If the filter is active, deactivates it. If inactive, activates it.
+     * Provides a convenient way to switch between display modes.
      */
     fun toggleCompatibleDevicesFilter() {
         val currentState = bleRepository.isCompatibleFilterEnabled()

@@ -6,51 +6,51 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
- * Caso de uso para obtener el cilindro de gas actualmente activo.
+ * Use case for getting the currently active gas cylinder.
  *
- * Este caso de uso encapsula la lógica de negocio para recuperar el cilindro
- * de gas que está marcado como activo en el sistema. El cilindro activo es el
- * que se utiliza para las mediciones actuales de peso y consumo de gas.
+ * This use case encapsulates the business logic for retrieving the gas
+ * cylinder that is marked as active in the system. The active cylinder is the
+ * one used for current weight and gas consumption measurements.
  *
- * Proporciona dos variantes de acceso:
- * - Reactiva (Flow): Para observar cambios en tiempo real del cilindro activo
- * - Síncrona (suspend): Para obtener el valor actual en un momento específico
+ * Provides two access variants:
+ * - Reactive (Flow): For observing real-time changes to the active cylinder
+ * - Synchronous (suspend): For getting the current value at a specific moment
  *
- * Casos de uso principales:
- * - Mostrar información del cilindro actual en la pantalla principal
- * - Calcular gas disponible usando la tara del cilindro activo
- * - Asociar mediciones de peso al cilindro correcto
- * - Validar que existe un cilindro activo antes de realizar operaciones
+ * Main use cases:
+ * - Display current cylinder information on the main screen
+ * - Calculate available gas using the active cylinder's tare
+ * - Associate weight measurements to the correct cylinder
+ * - Validate that an active cylinder exists before performing operations
  *
- * @property repository Repositorio de cilindros de gas que accede a la base de datos
+ * @property repository Gas cylinder repository that accesses the database
  * @author Felipe García Gómez
  */
 class GetActiveCylinderUseCase @Inject constructor(
     private val repository: GasCylinderRepository
 ) {
     /**
-     * Obtiene el cilindro activo como un Flow reactivo.
+     * Gets the active cylinder as a reactive Flow.
      *
-     * Devuelve un Flow que emite el cilindro activo actual y se actualiza
-     * automáticamente cuando cambia en la base de datos. Permite a la UI
-     * reaccionar a cambios en tiempo real.
+     * Returns a Flow that emits the current active cylinder and updates
+     * automatically when it changes in the database. Allows the UI
+     * to react to real-time changes.
      *
-     * @return Flow que emite el cilindro activo o null si no hay ninguno activo
+     * @return Flow that emits the active cylinder or null if none is active
      */
     operator fun invoke(): Flow<GasCylinder?> {
         return repository.getActiveCylinder()
     }
 
     /**
-     * Obtiene el cilindro activo de forma síncrona.
+     * Gets the active cylinder synchronously.
      *
-     * Ejecuta una consulta directa a la base de datos para obtener el cilindro
-     * activo actual. Útil cuando se necesita el valor en un momento específico
-     * sin observar cambios continuos.
+     * Executes a direct database query to get the current active cylinder.
+     * Useful when the value is needed at a specific moment without observing
+     * continuous changes.
      *
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @return El cilindro activo actual o null si no hay ninguno activo
+     * @return The current active cylinder or null if none is active
      */
     suspend fun getActiveCylinderSync(): GasCylinder? {
         return repository.getActiveCylinderSync()

@@ -12,81 +12,81 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
- * Escáner de dispositivos Bluetooth Low Energy (BLE).
+ * Bluetooth Low Energy (BLE) device scanner.
  *
- * Esta clase gestiona el escaneo de dispositivos BLE disponibles en el entorno,
- * permitiendo descubrir sensores compatibles con CamperGas. Proporciona funcionalidad
- * para iniciar y detener el escaneo, así como filtrar dispositivos compatibles.
+ * This class manages scanning of available BLE devices in the environment,
+ * allowing discovery of sensors compatible with CamperGas. Provides functionality
+ * to start and stop scanning, as well as filter compatible devices.
  *
- * Características principales:
- * - Escaneo continuo de dispositivos BLE cercanos
- * - Actualización en tiempo real de la lista de dispositivos encontrados
- * - Filtrado opcional de dispositivos compatibles con CamperGas
- * - Detección de información RSSI (intensidad de señal) y servicios disponibles
- * - Gestión automática de duplicados actualizando dispositivos ya encontrados
+ * Main features:
+ * - Continuous scanning of nearby BLE devices
+ * - Real-time update of the discovered devices list
+ * - Optional filtering of CamperGas-compatible devices
+ * - Detection of RSSI (signal strength) information and available services
+ * - Automatic management of duplicates by updating already found devices
  *
- * @property bleManager Gestor de Bluetooth que proporciona acceso al adaptador BLE
+ * @property bleManager Bluetooth manager that provides access to the BLE adapter
  * @author Felipe García Gómez
  */
 class BleDeviceScanner @Inject constructor(
     private val bleManager: BleManager
 ) {
     /**
-     * Lista de dispositivos BLE encontrados durante el escaneo.
+     * List of BLE devices found during scanning.
      *
-     * Se actualiza automáticamente cuando se encuentran nuevos dispositivos
-     * o cuando se actualiza la información de dispositivos ya encontrados.
-     * Los dispositivos se filtran según el estado del filtro de compatibilidad.
+     * Automatically updated when new devices are found
+     * or when information is updated for already found devices.
+     * Devices are filtered according to the compatibility filter state.
      */
     private val _scanResults = MutableStateFlow<List<BleDevice>>(emptyList())
     val scanResults: StateFlow<List<BleDevice>> = _scanResults
 
     /**
-     * Estado actual del escaneo.
+     * Current scanning state.
      *
-     * Indica si el escáner está actualmente buscando dispositivos BLE (true)
-     * o si el escaneo está detenido (false).
+     * Indicates if the scanner is currently searching for BLE devices (true)
+     * or if scanning is stopped (false).
      */
     private val _isScanning = MutableStateFlow(false)
 
     /**
-     * Filtro para mostrar solo dispositivos compatibles con CamperGas.
+     * Filter to show only CamperGas-compatible devices.
      *
-     * Cuando está activo (true), solo se incluyen en los resultados aquellos
-     * dispositivos que anuncian los servicios UUID específicos de CamperGas.
+     * When active (true), only devices advertising the specific
+     * CamperGas service UUIDs are included in the results.
      */
     private var showOnlyCompatibleDevices = false
 
     /**
-     * Adaptador de Bluetooth obtenido del gestor BLE.
+     * Bluetooth adapter obtained from the BLE manager.
      *
-     * Proporciona acceso a las funcionalidades de Bluetooth del dispositivo.
+     * Provides access to the device's Bluetooth functionality.
      */
     private val bluetoothAdapter: BluetoothAdapter? get() = bleManager.bluetoothAdapter
 
     /**
-     * Escáner BLE específico obtenido del adaptador de Bluetooth.
+     * BLE scanner obtained from the Bluetooth adapter.
      *
-     * Se utiliza para iniciar y detener operaciones de escaneo BLE.
+     * Used to start and stop BLE scanning operations.
      */
     private var scanner: BluetoothLeScanner? = null
 
     /**
-     * Callback que procesa los resultados del escaneo BLE.
+     * Callback that processes BLE scan results.
      *
-     * Este callback se invoca cada vez que se encuentra un dispositivo BLE durante
-     * el escaneo. Extrae la información del dispositivo (nombre, dirección, RSSI, servicios)
-     * y lo añade o actualiza en la lista de resultados.
+     * This callback is invoked every time a BLE device is found during
+     * scanning. Extracts device information (name, address, RSSI, services)
+     * and adds or updates it in the results list.
      */
     private val scanCallback = object : ScanCallback() {
         /**
-         * Llamado cuando se encuentra un resultado de escaneo BLE.
+         * Called when a BLE scan result is found.
          *
-         * Procesa el dispositivo encontrado, extrae su información y lo añade
-         * a la lista de resultados si pasa los filtros activos.
+         * Processes the found device, extracts its information, and adds
+         * it to the results list if it passes the active filters.
          *
-         * @param callbackType Tipo de callback (match encontrado, perdido, o actualización)
-         * @param result Resultado del escaneo conteniendo información del dispositivo
+         * @param callbackType Type of callback (match found, lost, or update)
+         * @param result Scan result containing device information
          */
         @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -110,11 +110,11 @@ class BleDeviceScanner @Inject constructor(
         }
 
         /**
-         * Llamado cuando falla el escaneo BLE.
+         * Called when BLE scanning fails.
          *
-         * Detiene el estado de escaneo y registra el código de error.
+         * Stops the scanning state and logs the error code.
          *
-         * @param errorCode Código de error que indica por qué falló el escaneo
+         * @param errorCode Error code indicating why scanning failed
          */
         override fun onScanFailed(errorCode: Int) {
             _isScanning.value = false
@@ -123,13 +123,13 @@ class BleDeviceScanner @Inject constructor(
     }
 
     /**
-     * Añade o actualiza un dispositivo en la lista de resultados.
+     * Adds or updates a device in the results list.
      *
-     * Si el dispositivo ya existe en la lista (mismo dirección MAC), se actualiza
-     * su información. Si es nuevo, se añade solo si pasa el filtro de compatibilidad
-     * (si está activo). Después de la operación, aplica el filtro a toda la lista.
+     * If the device already exists in the list (same MAC address), updates
+     * its information. If new, adds it only if it passes the compatibility
+     * filter (if active). After the operation, applies the filter to the entire list.
      *
-     * @param device Dispositivo BLE a añadir o actualizar
+     * @param device BLE device to add or update
      */
     private fun addDeviceToList(device: BleDevice) {
         val currentList = _scanResults.value.toMutableList()
@@ -138,7 +138,7 @@ class BleDeviceScanner @Inject constructor(
         val existingIndex = currentList.indexOfFirst { it.address == device.address }
 
         if (existingIndex >= 0) {
-            // Updatesr device existente
+        // Update existing device
             currentList[existingIndex] = device
         } else {
             // Add new device only if it passes filter or if filter is disabled
@@ -158,13 +158,13 @@ class BleDeviceScanner @Inject constructor(
     }
 
     /**
-     * Establece el filtro para mostrar solo dispositivos compatibles con CamperGas.
+     * Sets the filter to show only CamperGas-compatible devices.
      *
-     * Cuando se habilita, solo se muestran dispositivos que anuncian los servicios
-     * UUID específicos de CamperGas. Al cambiar el filtro, se reaplica automáticamente
-     * a todos los dispositivos ya encontrados.
+     * When enabled, only devices advertising the specific CamperGas service
+     * UUIDs are shown. When changing the filter, it is automatically reapplied
+     * to all already found devices.
      *
-     * @param enabled true para activar el filtro, false para mostrar todos los dispositivos
+     * @param enabled true to activate the filter, false to show all devices
      */
     fun setCompatibleDevicesFilter(enabled: Boolean) {
         showOnlyCompatibleDevices = enabled
@@ -172,18 +172,18 @@ class BleDeviceScanner @Inject constructor(
     }
 
     /**
-     * Obtiene el estado actual del filtro de compatibilidad.
+     * Gets the current state of the compatibility filter.
      *
-     * @return true si el filtro está activo, false si está desactivado
+     * @return true if the filter is active, false if disabled
      */
     fun isCompatibleFilterEnabled(): Boolean = showOnlyCompatibleDevices
 
     /**
-     * Actualiza los resultados aplicando el filtro si está habilitado.
+     * Updates results by applying the filter if enabled.
      *
-     * Recorre la lista de dispositivos encontrados y filtra aquellos que son
-     * compatibles con CamperGas si el filtro está activo. Si está desactivado,
-     * muestra todos los dispositivos.
+     * Iterates through the found devices list and filters those that are
+     * compatible with CamperGas if the filter is active. If disabled,
+     * shows all devices.
      */
     private fun updateFilteredResults() {
         val allDevices = _scanResults.value
@@ -196,14 +196,14 @@ class BleDeviceScanner @Inject constructor(
     }
 
     /**
-     * Inicia el escaneo de dispositivos BLE.
+     * Starts scanning for BLE devices.
      *
-     * Obtiene el escáner BLE del adaptador de Bluetooth y comienza a buscar
-     * dispositivos cercanos. Limpia la lista de resultados previos y marca el
-     * escaneo como activo. Si ya hay un escaneo en curso, no hace nada.
+     * Gets the BLE scanner from the Bluetooth adapter and starts searching
+     * for nearby devices. Clears the previous results list and marks
+     * scanning as active. If scanning is already in progress, does nothing.
      *
-     * Requiere el permiso BLUETOOTH_SCAN en Android 12+ o BLUETOOTH_ADMIN
-     * en versiones anteriores.
+     * Requires BLUETOOTH_SCAN permission on Android 12+ or BLUETOOTH_ADMIN
+     * on earlier versions.
      */
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun startScan() {
@@ -219,13 +219,13 @@ class BleDeviceScanner @Inject constructor(
     }
 
     /**
-     * Detiene el escaneo de dispositivos BLE.
+     * Stops scanning for BLE devices.
      *
-     * Cancela el escaneo en curso y marca el estado como no escaneando.
-     * Si no hay escaneo activo, no hace nada.
+     * Cancels the ongoing scan and marks the state as not scanning.
+     * If there is no active scan, does nothing.
      *
-     * Requiere el permiso BLUETOOTH_SCAN en Android 12+ o BLUETOOTH_ADMIN
-     * en versiones anteriores.
+     * Requires BLUETOOTH_SCAN permission on Android 12+ or BLUETOOTH_ADMIN
+     * on earlier versions.
      */
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun stopScan() {

@@ -6,41 +6,41 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
- * Caso de uso para obtener datos de inclinación del sensor BLE.
+ * Use case for getting inclination data from the BLE sensor.
  *
- * Este caso de uso encapsula la lógica de negocio para acceder a las mediciones
- * de inclinación (pitch y roll) en tiempo real del sensor acelerómetro/giroscopio
- * integrado en el dispositivo BLE CamperGas.
+ * This use case encapsulates the business logic for accessing inclination
+ * measurements (pitch and roll) in real-time from the accelerometer/gyroscope
+ * sensor integrated in the CamperGas BLE device.
  *
- * Los datos de inclinación se utilizan para:
- * - Monitorear la estabilidad del vehículo en tiempo real
- * - Detectar superficies irregulares o pendientes pronunciadas
- * - Calcular la nivelación necesaria para estabilizar el vehículo
- * - Generar alertas de seguridad cuando el vehículo no está nivelado
- * - Mostrar visualizaciones de estabilidad en pantallas y widgets
+ * Inclination data is used for:
+ * - Real-time vehicle stability monitoring
+ * - Detection of irregular surfaces or steep slopes
+ * - Calculating leveling needed to stabilize the vehicle
+ * - Generating safety alerts when vehicle is not level
+ * - Displaying stability visualizations in screens and widgets
  *
- * El Flow emite nuevas mediciones conforme el sensor BLE las proporciona,
- * típicamente cada pocos segundos según la configuración de intervalos.
+ * The Flow emits new measurements as the BLE sensor provides them,
+ * typically every few seconds according to interval configuration.
  *
- * @property bleRepository Repositorio BLE que proporciona acceso a datos del sensor
+ * @property bleRepository BLE repository that provides access to sensor data
  * @author Felipe García Gómez
  */
 class GetInclinationUseCase @Inject constructor(
     private val bleRepository: BleRepository
 ) {
     /**
-     * Obtiene los datos de inclinación como un Flow reactivo.
+     * Gets inclination data as a reactive Flow.
      *
-     * Retorna un Flow que emite las mediciones de inclinación más recientes
-     * del sensor BLE. El Flow se actualiza automáticamente cuando llegan
-     * nuevas mediciones desde el sensor.
+     * Returns a Flow that emits the most recent inclination measurements
+     * from the BLE sensor. The Flow updates automatically when new
+     * measurements arrive from the sensor.
      *
-     * El valor puede ser null si:
-     * - No hay sensor conectado
-     * - El sensor aún no ha enviado mediciones de inclinación
-     * - Se perdió la conexión con el sensor
+     * The value can be null if:
+     * - No sensor is connected
+     * - The sensor hasn't sent inclination measurements yet
+     * - Connection to the sensor was lost
      *
-     * @return Flow que emite objetos Inclination con pitch y roll, o null si no hay datos
+     * @return Flow that emits Inclination objects with pitch and roll, or null if no data
      */
     operator fun invoke(): Flow<Inclination?> {
         return bleRepository.inclinationData

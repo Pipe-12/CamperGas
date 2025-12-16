@@ -1,28 +1,28 @@
 package com.example.campergas.domain.model
 
 /**
- * Modelo de dominio que representa un registro de consumo de combustible.
+ * Domain model representing a fuel consumption record.
  *
- * Esta clase de datos es una vista simplificada de FuelMeasurement, enfocada
- * específicamente en el historial de consumo de gas para su visualización en
- * gráficos y listas de consumo histórico.
+ * This data class is a simplified view of FuelMeasurement, focused
+ * specifically on gas consumption history for display in
+ * charts and historical consumption lists.
  *
- * Contiene información sobre:
- * - El cilindro de gas asociado (ID y nombre)
- * - La fecha/hora de la medición
- * - Los valores de combustible (kilogramos, porcentaje, peso total)
- * - Estado de calibración
- * - Origen de los datos (tiempo real vs histórico/offline)
+ * Contains information about:
+ * - The associated gas cylinder (ID and name)
+ * - The measurement date/time
+ * - Fuel values (kilograms, percentage, total weight)
+ * - Calibration status
+ * - Data origin (real-time vs historical/offline)
  *
- * @property id Identificador único del registro de consumo
- * @property cylinderId ID del cilindro de gas al que pertenece esta medición
- * @property cylinderName Nombre descriptivo del cilindro de gas
- * @property date Timestamp Unix (milisegundos) de cuándo se realizó la medición
- * @property fuelKilograms Cantidad de gas disponible en kilogramos
- * @property fuelPercentage Porcentaje de gas disponible respecto a la capacidad total (0-100%)
- * @property totalWeight Peso total medido incluyendo cilindro y gas (en kg)
- * @property isCalibrated Indica si la medición está calibrada con la tara del cilindro
- * @property isHistorical Indica si es un dato histórico/offline sincronizado del sensor o dato en tiempo real
+ * @property id Unique identifier of the consumption record
+ * @property cylinderId ID of the gas cylinder this measurement belongs to
+ * @property cylinderName Descriptive name of the gas cylinder
+ * @property date Unix timestamp (milliseconds) of when the measurement was taken
+ * @property fuelKilograms Amount of available gas in kilograms
+ * @property fuelPercentage Percentage of available gas relative to total capacity (0-100%)
+ * @property totalWeight Total measured weight including cylinder and gas (in kg)
+ * @property isCalibrated Indicates if the measurement is calibrated with the cylinder tare
+ * @property isHistorical Indicates if it's a historical/offline synced data from the sensor or real-time data
  * @author Felipe García Gómez
  */
 data class Consumption(
@@ -38,14 +38,14 @@ data class Consumption(
 ) {
     companion object {
         /**
-         * Convierte una medición de combustible completa a un registro de consumo.
+         * Converts a complete fuel measurement to a consumption record.
          *
-         * Este método de fábrica transforma un objeto FuelMeasurement (que contiene
-         * información detallada de medición) en un objeto Consumption más simple
-         * orientado a visualización de historial.
+         * This factory method transforms a FuelMeasurement object (containing
+         * detailed measurement information) into a simpler Consumption object
+         * oriented for history display.
          *
-         * @param fuelMeasurement Medición de combustible completa a convertir
-         * @return Objeto Consumption con los datos relevantes para historial
+         * @param fuelMeasurement Complete fuel measurement to convert
+         * @return Consumption object with relevant data for history
          */
         fun fromFuelMeasurement(fuelMeasurement: FuelMeasurement): Consumption {
             return Consumption(

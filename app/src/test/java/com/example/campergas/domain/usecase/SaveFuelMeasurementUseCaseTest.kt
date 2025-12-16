@@ -179,7 +179,7 @@ class SaveFuelMeasurementUseCaseTest {
 
         // Assert
         assertTrue(result.isFailure)
-        assertEquals("Bombona no encontrada", result.exceptionOrNull()?.message)
+        assertEquals("Cylinder not found", result.exceptionOrNull()?.message)
 
         coVerify(exactly = 0) { fuelMeasurementRepository.insertMeasurements(any()) }
     }

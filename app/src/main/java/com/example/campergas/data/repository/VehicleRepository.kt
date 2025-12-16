@@ -9,31 +9,31 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Repositorio para gestionar la configuración del vehículo recreativo.
+ * Repository for managing recreational vehicle configuration.
  *
- * Este repositorio proporciona acceso a la configuración geométrica del vehículo
- * (caravana o autocaravana), manejando la conversión entre entidades de base de
- * datos y modelos de dominio.
+ * This repository provides access to the vehicle's geometric configuration
+ * (caravan or motorhome), handling conversion between database entities
+ * and domain models.
  *
- * Características:
- * - Solo existe una configuración de vehículo por aplicación
- * - Al guardar, actualiza la existente o crea una nueva si no existe
- * - Almacena dimensiones críticas para cálculos de nivelación y estabilidad
+ * Features:
+ * - Only one vehicle configuration exists per application
+ * - When saving, updates existing or creates new if it doesn't exist
+ * - Stores critical dimensions for leveling and stability calculations
  *
- * La configuración incluye:
- * - Tipo de vehículo (caravana/autocaravana)
- * - Distancia entre ruedas traseras
- * - Distancia al punto de apoyo delantero (caravanas)
- * - Distancia entre ruedas delanteras (autocaravanas)
- * - Capacidad del sistema de gas
+ * The configuration includes:
+ * - Vehicle type (caravan/motorhome)
+ * - Distance between rear wheels
+ * - Distance to front support point (caravans)
+ * - Distance between front wheels (motorhomes)
+ * - Gas system capacity
  *
- * Estos datos se utilizan para:
- * - Calcular distribución de peso en los ejes
- * - Determinar elevación necesaria en ruedas para nivelar
- * - Visualizar geometría del vehículo en la UI
- * - Generar recomendaciones de nivelación
+ * This data is used for:
+ * - Calculating weight distribution on axles
+ * - Determining required wheel elevation for leveling
+ * - Displaying vehicle geometry in the UI
+ * - Generating leveling recommendations
  *
- * @property vehicleDao DAO de Room para acceso a la base de datos
+ * @property vehicleDao Room DAO for database access
  * @author Felipe García Gómez
  */
 @Singleton
@@ -41,9 +41,9 @@ class VehicleRepository @Inject constructor(
     private val vehicleDao: VehicleDao
 ) {
     /**
-     * Obtiene la configuración del vehículo.
+     * Gets the vehicle configuration.
      *
-     * @return Flow que emite la configuración actual o null si no está configurado
+     * @return Flow that emits the current configuration or null if not configured
      */
     fun getVehicleConfig(): Flow<VehicleConfig?> {
         return vehicleDao.getVehicleConfig().map { entity ->
@@ -52,14 +52,14 @@ class VehicleRepository @Inject constructor(
     }
 
     /**
-     * Guarda o actualiza la configuración del vehículo.
+     * Saves or updates the vehicle configuration.
      *
-     * Si ya existe una configuración, la actualiza. Si no existe, crea una nueva.
-     * Solo puede haber una configuración de vehículo en el sistema.
+     * If a configuration already exists, updates it. If not, creates a new one.
+     * Only one vehicle configuration can exist in the system.
      *
-     * Esta función debe llamarse desde una coroutine o función suspend.
+     * This function must be called from a coroutine or suspend function.
      *
-     * @param config Configuración del vehículo a guardar
+     * @param config Vehicle configuration to save
      */
     suspend fun saveVehicleConfig(config: VehicleConfig) {
         val entity = config.toEntity()
@@ -73,9 +73,9 @@ class VehicleRepository @Inject constructor(
     }
 
     /**
-     * Convierte una entidad de base de datos a modelo de dominio.
+     * Converts a database entity to a domain model.
      *
-     * @return Objeto VehicleConfig del modelo de dominio
+     * @return VehicleConfig domain model object
      */
     private fun VehicleConfigEntity.toDomainModel(): VehicleConfig {
         return VehicleConfig(
@@ -87,9 +87,9 @@ class VehicleRepository @Inject constructor(
     }
 
     /**
-     * Convierte un modelo de dominio a entidad de base de datos.
+     * Converts a domain model to a database entity.
      *
-     * @return Objeto VehicleConfigEntity para persistir en Room
+     * @return VehicleConfigEntity object for Room persistence
      */
     private fun VehicleConfig.toEntity(): VehicleConfigEntity {
         return VehicleConfigEntity(

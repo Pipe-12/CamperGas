@@ -6,34 +6,34 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
- * Caso de uso para obtener la lista de todos los cilindros de gas registrados.
+ * Use case for getting the list of all registered gas cylinders.
  *
- * Este caso de uso encapsula la lógica de negocio para recuperar todos los cilindros
- * de gas almacenados en el sistema, así como acceder al cilindro activo actual.
+ * This use case encapsulates the business logic for retrieving all gas
+ * cylinders stored in the system, as well as accessing the current active cylinder.
  *
- * Funcionalidades proporcionadas:
- * - Obtener lista completa de cilindros (reactiva con Flow)
- * - Obtener el cilindro activo actual (reactiva y síncrona)
+ * Provided functionality:
+ * - Get complete list of cylinders (reactive with Flow)
+ * - Get the current active cylinder (reactive and synchronous)
  *
- * Casos de uso comunes:
- * - Mostrar lista de cilindros en pantalla de configuración
- * - Permitir al usuario seleccionar un cilindro para activar
- * - Visualizar todos los cilindros con sus características (tara, capacidad)
- * - Gestionar múltiples cilindros (añadir, editar, activar, eliminar)
+ * Common use cases:
+ * - Display cylinder list in configuration screen
+ * - Allow user to select a cylinder to activate
+ * - View all cylinders with their characteristics (tare, capacity)
+ * - Manage multiple cylinders (add, edit, activate, delete)
  *
- * @property repository Repositorio de cilindros de gas que accede a la base de datos
+ * @property repository Gas cylinder repository that accesses the database
  * @author Felipe García Gómez
  */
 class GetGasCylindersUseCase @Inject constructor(
     private val repository: GasCylinderRepository
 ) {
     /**
-     * Obtiene todos los cilindros de gas como un Flow reactivo.
+     * Gets all gas cylinders as a reactive Flow.
      *
-     * Devuelve un Flow que emite la lista completa de cilindros registrados
-     * y se actualiza automáticamente cuando hay cambios (añadir, eliminar, modificar).
+     * Returns a Flow that emits the complete list of registered cylinders
+     * and updates automatically when there are changes (add, delete, modify).
      *
-     * @return Flow que emite la lista de todos los cilindros (puede estar vacía si no hay cilindros)
+     * @return Flow that emits the list of all cylinders (can be empty if no cylinders exist)
      */
     operator fun invoke(): Flow<List<GasCylinder>> {
         return repository.getAllCylinders()

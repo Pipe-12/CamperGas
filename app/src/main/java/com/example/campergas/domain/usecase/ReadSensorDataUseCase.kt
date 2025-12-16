@@ -5,29 +5,29 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
- * Caso de uso para leer datos del sensor CamperGas bajo demanda.
+ * Use case for reading CamperGas sensor data on demand.
  *
- * Este caso de uso encapsula la lógica de negocio para solicitar lecturas
- * inmediatas de datos del sensor BLE, fuera del ciclo automático de lecturas
- * periódicas. Permite al usuario o al sistema obtener mediciones actualizadas
- * en cualquier momento.
+ * This use case encapsulates the business logic for requesting immediate
+ * readings of BLE sensor data, outside the automatic periodic readings
+ * cycle. Allows the user or system to get updated measurements
+ * at any time.
  *
- * Funcionalidades proporcionadas:
- * - Lectura bajo demanda de peso del cilindro
- * - Lectura bajo demanda de inclinación del vehículo
- * - Lectura combinada de todos los datos del sensor
- * - Consulta del estado de conexión
+ * Provided functionality:
+ * - On-demand cylinder weight reading
+ * - On-demand vehicle inclination reading
+ * - Combined reading of all sensor data
+ * - Connection state query
  *
- * Las lecturas bajo demanda son útiles para:
- * - Actualizar datos cuando el usuario lo solicita (botón "refrescar")
- * - Obtener mediciones antes de operaciones críticas
- * - Verificar valores sin esperar al próximo ciclo automático
- * - Responder a eventos de la aplicación que requieren datos actuales
+ * On-demand readings are useful for:
+ * - Updating data when the user requests it ("refresh" button)
+ * - Getting measurements before critical operations
+ * - Verifying values without waiting for the next automatic cycle
+ * - Responding to application events that require current data
  *
- * Los resultados se entregan de forma asíncrona a través de los StateFlows
- * correspondientes en el repositorio BLE.
+ * Results are delivered asynchronously through the corresponding
+ * StateFlows in the BLE repository.
  *
- * @property bleRepository Repositorio BLE que gestiona la comunicación con el sensor
+ * @property bleRepository BLE repository that manages sensor communication
  * @author Felipe García Gómez
  */
 class ReadSensorDataUseCase @Inject constructor(
@@ -35,45 +35,45 @@ class ReadSensorDataUseCase @Inject constructor(
 ) {
 
     /**
-     * Solicita lectura de datos de peso bajo demanda.
+     * Requests on-demand weight data reading.
      *
-     * Ejecuta una lectura BLE inmediata de la característica de peso.
-     * El resultado se entregará a través del StateFlow de datos de combustible
-     * del repositorio BLE.
+     * Executes an immediate BLE reading of the weight characteristic.
+     * The result is delivered through the fuel data StateFlow
+     * in the BLE repository.
      *
-     * Esta función es privada porque se prefiere usar readAllSensorData()
-     * para obtener una vista completa del estado del sensor.
+     * This function is private because readAllSensorData() is preferred
+     * to get a complete view of the sensor state.
      */
     private fun readWeightData() {
         bleRepository.readWeightDataOnDemand()
     }
 
     /**
-     * Solicita lectura de datos de inclinación bajo demanda.
+     * Requests on-demand inclination data reading.
      *
-     * Ejecuta una lectura BLE inmediata de la característica de inclinación.
-     * El resultado se entregará a través del StateFlow de datos de inclinación
-     * del repositorio BLE.
+     * Executes an immediate BLE reading of the inclination characteristic.
+     * The result is delivered through the inclination data StateFlow
+     * in the BLE repository.
      *
-     * Esta función es privada porque se prefiere usar readAllSensorData()
-     * para obtener una vista completa del estado del sensor.
+     * This function is private because readAllSensorData() is preferred
+     * to get a complete view of the sensor state.
      */
     private fun readInclinationData() {
         bleRepository.readInclinationDataOnDemand()
     }
 
     /**
-     * Solicita lectura de todos los datos del sensor (peso e inclinación) bajo demanda.
+     * Requests on-demand reading of all sensor data (weight and inclination).
      *
-     * Ejecuta lecturas BLE inmediatas de ambas características:
-     * - Peso total del cilindro
-     * - Inclinación del vehículo (pitch y roll)
+     * Executes immediate BLE readings of both characteristics:
+     * - Total cylinder weight
+     * - Vehicle inclination (pitch and roll)
      *
-     * Los resultados se entregan de forma asíncrona a través de sus respectivos
-     * StateFlows. Esta es la forma recomendada de obtener una actualización
-     * completa del estado del sensor.
+     * Results are delivered asynchronously through their respective
+     * StateFlows. This is the recommended way to get a complete
+     * update of the sensor state.
      *
-     * Es seguro llamar este método incluso si no hay sensor conectado (no hace nada).
+     * Safe to call this method even if no sensor is connected (does nothing).
      */
     fun readAllSensorData() {
         readWeightData()
@@ -81,13 +81,13 @@ class ReadSensorDataUseCase @Inject constructor(
     }
 
     /**
-     * Obtiene el estado de conexión BLE como StateFlow.
+     * Gets the BLE connection state as StateFlow.
      *
-     * Permite observar el estado de conexión en tiempo real, útil para
-     * habilitar/deshabilitar la funcionalidad de lectura de datos según
-     * si hay un sensor conectado.
+     * Allows observing the connection state in real-time, useful for
+     * enabling/disabling data reading functionality based on
+     * whether a sensor is connected.
      *
-     * @return StateFlow que emite true si hay conexión activa, false en caso contrario
+     * @return StateFlow that emits true if there's an active connection, false otherwise
      */
     fun getConnectionState(): StateFlow<Boolean> {
         return bleRepository.connectionState

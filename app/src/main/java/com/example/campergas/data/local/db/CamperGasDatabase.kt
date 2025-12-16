@@ -5,13 +5,13 @@ import androidx.room.RoomDatabase
 import com.example.campergas.domain.model.GasCylinder
 
 /**
- * Base de datos Room principal para la aplicación CamperGas.
+ * Main Room database for the CamperGas application.
  *
- * Esta base de datos gestiona la información de las bombonas de gas y las mediciones de combustible,
- * proporcionando persistencia para datos de sensores en tiempo real y seguimiento histórico.
+ * This database manages gas cylinder information and fuel measurements,
+ * providing persistence for real-time sensor data and historical tracking.
  *
- * @property gasCylinderDao Objeto de acceso a datos para operaciones de bombonas de gas
- * @property fuelMeasurementDao Objeto de acceso a datos para operaciones de mediciones de combustible
+ * @property gasCylinderDao Data Access Object for gas cylinder operations
+ * @property fuelMeasurementDao Data Access Object for fuel measurement operations
  */
 @Database(
     entities = [
@@ -24,21 +24,21 @@ import com.example.campergas.domain.model.GasCylinder
 abstract class CamperGasDatabase : RoomDatabase() {
 
     /**
-     * Proporciona acceso a las operaciones de base de datos de bombonas de gas.
+     * Provides access to gas cylinder database operations.
      *
-     * @return DAO para gestionar entidades de bombonas de gas
+     * @return DAO for managing gas cylinder entities
      */
     abstract fun gasCylinderDao(): GasCylinderDao
 
     /**
-     * Proporciona acceso a las operaciones de base de datos de mediciones de combustible.
+     * Provides access to fuel measurement database operations.
      *
-     * @return DAO para gestionar entidades de mediciones de combustible
+     * @return DAO for managing fuel measurement entities
      */
     abstract fun fuelMeasurementDao(): FuelMeasurementDao
 
     companion object {
-        /** Nombre del archivo de base de datos */
+        /** Database file name */
         const val DATABASE_NAME = "campergas_database"
     }
 }

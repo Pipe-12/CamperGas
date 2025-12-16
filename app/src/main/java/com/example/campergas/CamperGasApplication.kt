@@ -9,17 +9,17 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 /**
- * Clase principal de la aplicación CamperGas.
+ * Main application class for CamperGas.
  *
- * Esta clase es el punto de entrada de la aplicación y se inicializa cuando la aplicación
- * comienza. Extiende Application y está anotada con @HiltAndroidApp para habilitar la
- * inyección de dependencias con Hilt en toda la aplicación.
+ * This class is the entry point of the application and is initialized when the application
+ * starts. It extends Application and is annotated with @HiltAndroidApp to enable
+ * Hilt dependency injection throughout the application.
  *
- * Responsabilidades:
- * - Inicializar el contenedor de inyección de dependencias Hilt
- * - Mantener referencia al gestor de actualización de widgets
- * - Proporcionar el contexto de la aplicación a través de todo el ciclo de vida
- * - Configurar el idioma de la aplicación antes de crear las actividades
+ * Responsibilities:
+ * - Initialize the Hilt dependency injection container
+ * - Maintain a reference to the widget update manager
+ * - Provide application context throughout the lifecycle
+ * - Configure the application language before creating activities
  *
  * @author Felipe García Gómez
  */
@@ -27,17 +27,16 @@ import javax.inject.Inject
 class CamperGasApplication : Application() {
 
     /**
-     * Gestor de actualización de widgets de la aplicación.
+     * Widget update manager for the application.
      *
-     * Se inyecta mediante Hilt y se utiliza para coordinar las actualizaciones
-     * de los widgets de la pantalla de inicio (home screen widgets) con los datos
-     * más recientes de cilindros de gas y estabilidad del vehículo.
+     * Injected via Hilt and used to coordinate updates of home screen widgets
+     * with the latest gas cylinder and vehicle stability data.
      */
     @Inject
     lateinit var widgetUpdateManager: WidgetUpdateManager
 
     /**
-     * DataStore de preferencias para acceso a configuraciones del usuario.
+     * Preferences DataStore for accessing user configuration settings.
      */
     @Inject
     lateinit var preferencesDataStore: PreferencesDataStore
@@ -45,8 +44,8 @@ class CamperGasApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Configurar el idioma de la aplicación una sola vez al inicio
-        // Esto previene bucles de recreación de actividades
+        // Configure the application language once at startup
+        // This prevents activity recreation loops
         kotlinx.coroutines.runBlocking {
             val appLanguage = preferencesDataStore.appLanguage.first()
             AppCompatDelegate.setApplicationLocales(appLanguage.toLocaleList())

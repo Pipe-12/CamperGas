@@ -1,27 +1,27 @@
 package com.example.campergas.domain.model
 
 /**
- * Tipos de vehículos recreativos soportados por la aplicación.
+ * Types of recreational vehicles supported by the application.
  *
- * Esta enumeración define los tipos de vehículos que pueden ser configurados
- * en CamperGas para el monitoreo de cilindros de gas y estabilidad.
+ * This enumeration defines the types of vehicles that can be configured
+ * in CamperGas for gas cylinder and stability monitoring.
  *
- * Tipos disponibles:
- * - CARAVAN: Caravana remolcada (trailer) sin motor propio
- * - AUTOCARAVANA: Vehículo motorizado con habitáculo integrado
+ * Available types:
+ * - CARAVAN: Towed caravan (trailer) without its own engine
+ * - AUTOCARAVANA: Motorized vehicle with integrated living space (motorhome)
  *
- * El tipo de vehículo puede afectar a:
- * - Cálculos de consumo de gas
- * - Configuración de estabilidad y nivelación
- * - Ubicación recomendada de sensores
- * - Cálculos de elevación de ruedas
+ * The vehicle type can affect:
+ * - Gas consumption calculations
+ * - Stability and leveling configuration
+ * - Recommended sensor placement
+ * - Wheel elevation calculations
  *
  * @author Felipe García Gómez
  */
 enum class VehicleType {
-    /** Caravana remolcada sin motor propio */
+    /** Towed caravan without its own engine */
     CARAVAN,
 
-    /** Autocaravana motorizada con habitáculo integrado */
+    /** Motorized motorhome with integrated living space */
     AUTOCARAVANA
 }
