@@ -121,12 +121,14 @@ class GetConsumptionHistoryUseCase @Inject constructor(
      * @return Total kilograms of gas consumed in the period
      */
     fun calculateTotalConsumption(consumptions: List<Consumption>): Float {
+        // Need at least 2 measurements to calculate any consumption
         if (consumptions.size < 2) return 0f
 
         return consumptions.groupBy { it.cylinderId }
             .map { (_, cylinderConsumptions) ->
                 // Sort by date ascending (oldest first)
                 val sorted = cylinderConsumptions.sortedBy { it.date }
+                // zipWithNext compares consecutive pairs; returns empty list for size < 2
                 sorted.zipWithNext { older, newer ->
                     val difference = older.fuelKilograms - newer.fuelKilograms
                     // Only count positive differences (consumption), ignore negative (refills)
