@@ -128,6 +128,32 @@ class GetConsumptionHistoryUseCaseTest {
     }
 
     @Test
+    fun `calculateTotalConsumption handles intermediate refill correctly`() {
+        // Arrange - Main improvement scenario: Consumption before and after a refill
+        // should sum all consumption, not just first-to-last difference
+        val consumptions = listOf(
+            // Day 1: Start with 10kg
+            createTestConsumption(id = 1, fuelKilograms = 10f, date = 1000L),
+            // Day 2: 7kg (3kg consumed)
+            createTestConsumption(id = 2, fuelKilograms = 7f, date = 2000L),
+            // Day 3: 3kg (4kg consumed)
+            createTestConsumption(id = 3, fuelKilograms = 3f, date = 3000L),
+            // Day 4: REFILL to 10kg (increase should be ignored)
+            createTestConsumption(id = 4, fuelKilograms = 10f, date = 4000L),
+            // Day 5: 8kg (2kg consumed)
+            createTestConsumption(id = 5, fuelKilograms = 8f, date = 5000L),
+        )
+
+        // Act
+        val result = useCase.calculateTotalConsumption(consumptions)
+
+        // Assert
+        // With improved method: 3 + 4 + 0 (refill) + 2 = 9kg total consumed
+        // Old method would calculate: 10 - 8 = 2kg (incorrect!)
+        assertEquals(9f, result, 0.01f)
+    }
+
+    @Test
     fun `prepareChartData should not include negative consumption values`() {
         // Arrange - Mix of normal consumption and refill scenarios
         val consumptions = listOf(
@@ -210,9 +236,10 @@ class GetConsumptionHistoryUseCaseTest {
         val chartData = useCase.prepareChartData(consumptions)
 
         // Assert
-        // Total consumption calculated as oldest (15kg) - newest (11kg) = 4kg
-        // This shows net consumption over the entire period, ignoring the refill
-        assertEquals(4f, totalConsumption, 0.01f)
+        // Improved calculation sums all decrements:
+        // 15->12=3, 12->9=3, 9->6=3, 6->3=3, 3->15=0 (refill ignored), 15->13=2, 13->11=2
+        // Total = 3+3+3+3+0+2+2 = 16kg
+        assertEquals(16f, totalConsumption, 0.01f)
 
         // Chart data should have no negative values
         chartData.forEach { dataPoint ->
