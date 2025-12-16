@@ -105,38 +105,33 @@ class GetConsumptionHistoryUseCase @Inject constructor(
     /**
      * Calculates total gas consumed in a list of measurements.
      *
+     * This improved method iterates through all measurements sequentially for each cylinder
+     * and sums only the consumption decrements (when gas decreases), ignoring increments
+     * (when gas increases due to refills). This provides accurate consumption calculation
+     * even when intermediate refills occur during the period.
+     *
      * For each cylinder in the list:
      * 1. Groups measurements by cylinder
-     * 2. Sorts by date (most recent first)
-     * 3. Calculates difference between first (oldest) and last (most recent)
-     * 4. Sums consumption from all cylinders
-     *
-     * Consumption is calculated as: initial_measurement - final_measurement
-     * Negative values (refills) are normalized to zero.
+     * 2. Sorts by date (ascending - oldest first)
+     * 3. Compares consecutive measurements
+     * 4. Sums only positive differences (decrements = consumption)
+     * 5. Sums consumption from all cylinders
      *
      * @param consumptions List of measurements to analyze
      * @return Total kilograms of gas consumed in the period
      */
     fun calculateTotalConsumption(consumptions: List<Consumption>): Float {
-        if (consumptions.isEmpty()) return 0f
+        if (consumptions.size < 2) return 0f
 
-        // Group by cylinder and calculate consumption for each
         return consumptions.groupBy { it.cylinderId }
             .map { (_, cylinderConsumptions) ->
-                val sortedConsumptions = cylinderConsumptions.sortedByDescending { it.date }
-                if (sortedConsumptions.size < 2) return@map 0f
-
-                // Calculate difference between first and last measurement of period
-                val firstMeasurement = sortedConsumptions.first()  // Most recent
-                val lastMeasurement = sortedConsumptions.last()    // Oldest
-
-                // Consumption is the difference: initial measurement - final measurement
-                val calculatedConsumption =
-                    lastMeasurement.fuelKilograms - firstMeasurement.fuelKilograms
-
-                // Avoid negative values (can occur during cylinder refills)
-                // In case of refill, consumption is considered 0 for that period
-                kotlin.math.max(0f, calculatedConsumption)
+                // Sort by date ascending (oldest first)
+                val sorted = cylinderConsumptions.sortedBy { it.date }
+                sorted.zipWithNext { older, newer ->
+                    val difference = older.fuelKilograms - newer.fuelKilograms
+                    // Only count positive differences (consumption), ignore negative (refills)
+                    kotlin.math.max(0f, difference)
+                }.sum()
             }
             .sum()
     }
