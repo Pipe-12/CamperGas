@@ -14,12 +14,18 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.util.concurrent.TimeUnit
 
 class GenerateTestDataUseCaseTest {
 
     private lateinit var useCase: GenerateTestDataUseCase
     private val fuelMeasurementRepository: FuelMeasurementRepository = mockk(relaxed = true)
     private val gasCylinderRepository: GasCylinderRepository = mockk(relaxed = true)
+
+    companion object {
+        /** 30 days in milliseconds for test timestamp validation */
+        private val THIRTY_DAYS_IN_MILLIS = TimeUnit.DAYS.toMillis(30)
+    }
 
     @Before
     fun setUp() {
@@ -147,7 +153,7 @@ class GenerateTestDataUseCaseTest {
         val testCylinderId = 99L
         val measurementsSlot = slot<List<FuelMeasurement>>()
         val now = System.currentTimeMillis()
-        val thirtyDaysAgo = now - (30L * 24 * 60 * 60 * 1000)
+        val thirtyDaysAgo = now - THIRTY_DAYS_IN_MILLIS
         
         coEvery { gasCylinderRepository.insertCylinder(any()) } returns testCylinderId
         coEvery { fuelMeasurementRepository.insertMeasurements(capture(measurementsSlot)) } returns Unit
