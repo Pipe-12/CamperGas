@@ -82,21 +82,21 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
                 val gasComponentName = ComponentName(context, GasCylinderWidgetProvider::class.java)
                 val gasWidgetIds = widgetManager.getAppWidgetIds(gasComponentName)
 
-                // Verificar si hay widgets de estabilidad activos
+                // Verify if there are active stability widgets
                 val stabilityComponentName =
                     ComponentName(context, VehicleStabilityWidgetProvider::class.java)
                 val stabilityWidgetIds = widgetManager.getAppWidgetIds(stabilityComponentName)
 
-                // Si no hay widgets activos, detener el servicio
+                // If no active widgets, stop the service
                 if (gasWidgetIds.isEmpty() && stabilityWidgetIds.isEmpty()) {
                     Log.d(
                         "VehicleStabilityWidget",
-                        "No hay widgets activos - deteniendo servicio BLE"
+                        "No active widgets - stopping BLE service"
                     )
                     com.example.campergas.service.BleForegroundService.stopService(context)
                 }
             } catch (e: Exception) {
-                Log.e("VehicleStabilityWidget", "Error verifying widgets activos", e)
+                Log.e("VehicleStabilityWidget", "Error verifying active widgets", e)
             }
         }
     }
@@ -116,7 +116,7 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
                 val inclinationData = bleRepository.inclinationData.first()
                 val isConnected = bleRepository.connectionState.first()
 
-                // Crear las vistas remotas
+                // Create the remote views
                 val views = RemoteViews(context.packageName, R.layout.vehicle_stability_widget)
 
                 // Configure inclination data
@@ -205,10 +205,10 @@ class VehicleStabilityWidgetProvider : AppWidgetProvider() {
                         val entryPoint = getEntryPoint(context)
                         val bleRepository = entryPoint.bleRepository()
 
-                        // Solicitar data of inclination manualmente
+                        // Request inclination data manually
                         bleRepository.readInclinationDataOnDemand()
 
-                        // Updatesr todos los widgets
+                        // Update all widgets
                         val appWidgetManager = AppWidgetManager.getInstance(context)
                         val componentName =
                             ComponentName(context, VehicleStabilityWidgetProvider::class.java)

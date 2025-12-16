@@ -67,7 +67,7 @@ fun VehicleInclinationView(
             modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Vista lateral - Nivelado Vertical (Pitch)
+            // Side view - Vertical Leveling (Pitch)
             VehicleInclinationSideView(
                 vehicleType = vehicleType,
                 pitchAngle = pitchAngle,
@@ -76,7 +76,7 @@ fun VehicleInclinationView(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Vista trasera - Nivelado Horizontal (Roll)
+            // Rear view - Horizontal Leveling (Roll)
             VehicleInclinationRearView(
                 vehicleType = vehicleType,
                 rollAngle = rollAngle,

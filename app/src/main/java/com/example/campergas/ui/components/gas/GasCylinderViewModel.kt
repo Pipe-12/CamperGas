@@ -50,7 +50,7 @@ class GasCylinderViewModel @Inject constructor(
     val uiState: StateFlow<GasCylinderUiState> = _uiState
 
     init {
-        // Observar la cylinder activa
+        // Observe the active cylinder
         viewModelScope.launch {
             getActiveCylinderUseCase().collectLatest { cylinder ->
                 _activeCylinder.value = cylinder

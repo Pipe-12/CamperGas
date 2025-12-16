@@ -42,10 +42,10 @@ class WidgetConfigActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Configurar resultado como cancelado por defecto
+        // Configure result as canceled by default
         setResult(RESULT_CANCELED)
 
-        // Get el ID del widget from the intent
+        // Get the widget ID from the intent
         appWidgetId = intent?.extras?.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
@@ -100,7 +100,7 @@ class WidgetConfigActivity : ComponentActivity() {
                     intArrayOf(appWidgetId)
                 )
             } catch (_: Exception) {
-                // Si ambos fallan, al menos intentar actualizar todos los widgets
+                // If both fail, at least try to update all widgets
                 GasCylinderWidgetProvider.updateAllWidgets(this)
                 VehicleStabilityWidgetProvider.updateAllWidgets(this)
             }

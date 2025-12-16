@@ -115,15 +115,15 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
                 val gasCylinderRepository = entryPoint.gasCylinderRepository()
                 val bleRepository = entryPoint.bleRepository()
 
-                // Get solo data actuales from sensor BLE
+                // Get only current data from BLE sensor
                 val currentFuelMeasurement = bleRepository.fuelMeasurementData.first()
                 val activeCylinder = gasCylinderRepository.getActiveCylinder().first()
                 val isConnected = bleRepository.connectionState.first()
 
-                // Crear las vistas remotas
+                // Create the remote views
                 val views = RemoteViews(context.packageName, R.layout.gas_cylinder_widget)
 
-                // Configurar textos
+                // Configure texts
                 if (activeCylinder != null && currentFuelMeasurement != null) {
                     views.setTextViewText(R.id.widget_cylinder_name, activeCylinder.name)
                     views.setTextViewText(
@@ -218,13 +218,13 @@ class GasCylinderWidgetProvider : AppWidgetProvider() {
         paint.style = Paint.Style.FILL
         canvas.drawRoundRect(cylinderRect, 18f, 18f, paint)
 
-        // Nivel de combustible
+        // Fuel level
         if (fillPercentage > 0) {
             val fillHeight = cylinderHeight * fillPercentage
             val fillColor = when {
-                fillPercentage > 0.5f -> Color.parseColor("#4CAF50") // Verde
-                fillPercentage > 0.2f -> Color.parseColor("#FF9800") // Naranja
-                else -> Color.parseColor("#F44336") // Rojo
+                fillPercentage > 0.5f -> Color.parseColor("#4CAF50") // Green
+                fillPercentage > 0.2f -> Color.parseColor("#FF9800") // Orange
+                else -> Color.parseColor("#F44336") // Red
             }
 
             paint.color = fillColor
