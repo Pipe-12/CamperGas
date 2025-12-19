@@ -323,7 +323,7 @@
     <string name="settings_test_data">Test Data</string>
     <string name="settings_test_data_description">Generate or delete test data for visualization</string>
     <string name="settings_generate_test_data">Generate Test Data</string>
-    <string name="settings_generate_test_data_description">Create test measurements for the last 30 days</string>
-    <string name="settings_delete_non_active_data">Delete Non-Active Data</string>
-    <string name="settings_delete_non_active_data_description">Delete inactive cylinders and their measurements</string>
+    <string name="settings_generate_test_data_description">Creates a test cylinder 🧪 with measurements from the last 30 days (does not affect active cylinder)</string>
+    <string name="settings_delete_non_active_data">Delete Test Data</string>
+    <string name="settings_delete_non_active_data_description">Deletes test cylinders 🧪 and their associated measurements</string>
 </resources>

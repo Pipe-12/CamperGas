@@ -323,7 +323,7 @@
     <string name="settings_test_data">Dades de Prova</string>
     <string name="settings_test_data_description">Generar o eliminar dades de prova per a visualització</string>
     <string name="settings_generate_test_data">Generar Dades de Prova</string>
-    <string name="settings_generate_test_data_description">Crear mesuraments de prova per als últims 30 dies</string>
-    <string name="settings_delete_non_active_data">Eliminar Dades No Actives</string>
-    <string name="settings_delete_non_active_data_description">Eliminar bombones inactives i els seus mesuraments</string>
+    <string name="settings_generate_test_data_description">Crea una bombona de prova 🧪 amb mesuraments dels últims 30 dies (no afecta la bombona activa)</string>
+    <string name="settings_delete_non_active_data">Eliminar Dades de Prova</string>
+    <string name="settings_delete_non_active_data_description">Elimina les bombones de prova 🧪 i els seus mesuraments associats</string>
 </resources>
