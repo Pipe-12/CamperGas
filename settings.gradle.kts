@@ -15,6 +15,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // Add Maven Central mirror as fallback for GitHub Actions
+        maven {
+            url = uri("https://repo1.maven.org/maven2/")
+        }
     }
 }
 
